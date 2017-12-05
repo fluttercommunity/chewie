@@ -3,8 +3,8 @@ import 'dart:ui';
 
 import 'package:chewie/src/material_progress_bar.dart';
 import 'package:chewie/src/utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 import 'package:video_player/video_player.dart';
 
 class MaterialControls extends StatefulWidget {

@@ -4,8 +4,8 @@ import 'dart:ui';
 
 import 'package:chewie/src/cupertino_progress_bar.dart';
 import 'package:chewie/src/utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 import 'package:open_iconic_flutter/open_iconic_flutter.dart';
 import 'package:video_player/video_player.dart';
 
