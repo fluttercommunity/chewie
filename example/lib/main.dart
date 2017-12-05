@@ -1,12 +1,8 @@
-import 'package:chewie_example/chewie_player.dart';
+import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 void main() => runApp(new ChewieDemo());
-
-const String butterflyUri =
-    'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4';
 
 class ChewieDemo extends StatefulWidget {
   final String title;
@@ -20,9 +16,6 @@ class ChewieDemo extends StatefulWidget {
 }
 
 class _ChewieDemoState extends State<ChewieDemo> {
-  final controller = new VideoPlayerController(
-    butterflyUri,
-  );
   TargetPlatform _platform;
 
   @override
@@ -40,11 +33,22 @@ class _ChewieDemoState extends State<ChewieDemo> {
           children: <Widget>[
             new Expanded(
               child: new Center(
-                child: new ChewiePlayer(
-                  controller: controller,
+                child: new Chewie(
+                  'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
                   aspectRatio: 3 / 2,
-                  looping: true,
                   autoPlay: true,
+                  looping: true,
+                  // Try playing around with some of these other options:
+                  // progressColors: new VideoProgressColors(
+                  //   playedColor: Colors.red,
+                  //   handleColor: Colors.blue,
+                  //   disabledColor: Colors.grey,
+                  //   bufferedColor: Colors.lightGreen,
+                  // ),
+                  // placeholder: new Container(
+                  //   color: Colors.grey,
+                  // ),
+                  // autoInitialize: true,
                 ),
               ),
             ),
@@ -64,15 +68,16 @@ class _ChewieDemoState extends State<ChewieDemo> {
                 )),
                 new Expanded(
                   child: new FlatButton(
-                      onPressed: () {
-                        setState(() {
-                          _platform = TargetPlatform.iOS;
-                        });
-                      },
-                      child: new Padding(
-                        padding: new EdgeInsets.symmetric(vertical: 16.0),
-                        child: new Text("iOS controls"),
-                      )),
+                    onPressed: () {
+                      setState(() {
+                        _platform = TargetPlatform.iOS;
+                      });
+                    },
+                    child: new Padding(
+                      padding: new EdgeInsets.symmetric(vertical: 16.0),
+                      child: new Text("iOS controls"),
+                    ),
+                  ),
                 )
               ],
             )
