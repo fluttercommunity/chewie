@@ -15,10 +15,11 @@ class ChewiePlayer extends StatefulWidget {
   ChewiePlayer({
     Key key,
     @required this.controller,
-    @required this.aspectRatio,
+    this.aspectRatio,
     this.autoPlay = false,
     this.looping = false,
-  }) : super(key: key);
+  })
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -30,12 +31,11 @@ class _ChewiePlayerState extends State<ChewiePlayer> {
   @override
   Widget build(BuildContext context) {
     return new PlayerWithControls(
-      controller: widget.controller,
-      onExpandCollapse: () {
-        return _pushFullScreenWidget(context);
-      },
-      aspectRatio: widget.aspectRatio,
-    );
+        controller: widget.controller,
+        onExpandCollapse: () {
+          return _pushFullScreenWidget(context);
+        },
+        aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context));
   }
 
   @override
@@ -93,5 +93,14 @@ class _ChewiePlayerState extends State<ChewiePlayer> {
     return Navigator.of(context).push(route).then((_) {
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     });
+  }
+
+  double _calculateAspectRatio(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
+    return width > height ? width / height : height / width;
+
   }
 }

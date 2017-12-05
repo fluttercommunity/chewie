@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
 
+import 'package:chewie_example/cupertino_progress_bar.dart';
 import 'package:chewie_example/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
@@ -35,7 +36,6 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   bool _hideStuff = true;
   bool _disposed = false;
   Timer _hideTimer;
-  final barHeight = 30.0;
   final marginSize = 5.0;
 
   @override
@@ -43,12 +43,16 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     final backgroundColor = widget.backgroundColor;
     final iconColor = widget.iconColor;
     final controller = widget.controller;
+    final orientation = MediaQuery.of(context).orientation;
+    final barHeight = orientation == Orientation.portrait ? 30.0 : 47.0;
+    final buttonPadding = orientation == Orientation.portrait ? 16.0 : 24.0;
 
     return new Column(
       children: <Widget>[
-        _buildTopBar(backgroundColor, iconColor, controller),
+        _buildTopBar(
+            backgroundColor, iconColor, controller, barHeight, buttonPadding),
         _buildHitArea(),
-        _buildBottomBar(backgroundColor, iconColor, controller),
+        _buildBottomBar(backgroundColor, iconColor, controller, barHeight),
       ],
     );
   }
@@ -67,8 +71,12 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     super.initState();
   }
 
-  AnimatedOpacity _buildBottomBar(Color backgroundColor, Color iconColor,
-      VideoPlayerController controller) {
+  AnimatedOpacity _buildBottomBar(
+    Color backgroundColor,
+    Color iconColor,
+    VideoPlayerController controller,
+    double barHeight,
+  ) {
     return new AnimatedOpacity(
       opacity: _hideStuff ? 0.0 : 1.0,
       duration: new Duration(milliseconds: 300),
@@ -92,11 +100,11 @@ class _CupertinoControlsState extends State<CupertinoControls> {
               ),
               child: new Row(
                 children: <Widget>[
-                  _buildSkipBack(iconColor),
-                  _buildPlayPause(controller, iconColor),
-                  _buildSkipForward(iconColor),
+                  _buildSkipBack(iconColor, barHeight),
+                  _buildPlayPause(controller, iconColor, barHeight),
+                  _buildSkipForward(iconColor, barHeight),
                   _buildPosition(iconColor),
-                  new _ProgressBar(controller),
+                  _buildProgressBar(),
                   _buildRemaining(iconColor)
                 ],
               ),
@@ -107,7 +115,12 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     );
   }
 
-  GestureDetector _buildExpandButton(Color backgroundColor, Color iconColor) {
+  GestureDetector _buildExpandButton(
+    Color backgroundColor,
+    Color iconColor,
+    double barHeight,
+    double buttonPadding,
+  ) {
     return new GestureDetector(
       onTap: _onExpandCollapse,
       child: new AnimatedOpacity(
@@ -119,8 +132,8 @@ class _CupertinoControlsState extends State<CupertinoControls> {
             child: new Container(
               height: barHeight,
               padding: new EdgeInsets.only(
-                left: 16.0,
-                right: 16.0,
+                left: buttonPadding,
+                right: buttonPadding,
               ),
               decoration: new BoxDecoration(
                 color: backgroundColor,
@@ -163,8 +176,13 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     );
   }
 
-  GestureDetector _buildMuteButton(VideoPlayerController controller,
-      Color backgroundColor, Color iconColor) {
+  GestureDetector _buildMuteButton(
+    VideoPlayerController controller,
+    Color backgroundColor,
+    Color iconColor,
+    double barHeight,
+    double buttonPadding,
+  ) {
     return new GestureDetector(
       onTap: () {
         _cancelAndRestartTimer();
@@ -192,8 +210,8 @@ class _CupertinoControlsState extends State<CupertinoControls> {
               child: new Container(
                 height: barHeight,
                 padding: new EdgeInsets.only(
-                  left: 16.0,
-                  right: 16.0,
+                  left: buttonPadding,
+                  right: buttonPadding,
                 ),
                 child: new Icon(
                   (_latestValue != null && _latestValue.volume > 0)
@@ -211,7 +229,10 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   }
 
   GestureDetector _buildPlayPause(
-      VideoPlayerController controller, Color iconColor) {
+    VideoPlayerController controller,
+    Color iconColor,
+    double barHeight,
+  ) {
     return new GestureDetector(
       onTap: _playPause,
       child: new Container(
@@ -262,7 +283,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     );
   }
 
-  GestureDetector _buildSkipBack(Color iconColor) {
+  GestureDetector _buildSkipBack(Color iconColor, double barHeight) {
     return new GestureDetector(
       onTap: _skipBack,
       child: new Container(
@@ -288,7 +309,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     );
   }
 
-  GestureDetector _buildSkipForward(Color iconColor) {
+  GestureDetector _buildSkipForward(Color iconColor, double barHeight) {
     return new GestureDetector(
       onTap: _skipForward,
       child: new Container(
@@ -310,8 +331,13 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     );
   }
 
-  Widget _buildTopBar(Color backgroundColor, Color iconColor,
-      VideoPlayerController controller) {
+  Widget _buildTopBar(
+    Color backgroundColor,
+    Color iconColor,
+    VideoPlayerController controller,
+    double barHeight,
+    double buttonPadding,
+  ) {
     return new Container(
       height: barHeight,
       margin: new EdgeInsets.only(
@@ -321,9 +347,11 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       ),
       child: new Row(
         children: <Widget>[
-          _buildExpandButton(backgroundColor, iconColor),
+          _buildExpandButton(
+              backgroundColor, iconColor, barHeight, buttonPadding),
           new Expanded(child: new Container()),
-          _buildMuteButton(controller, backgroundColor, iconColor),
+          _buildMuteButton(
+              controller, backgroundColor, iconColor, barHeight, buttonPadding),
         ],
       ),
     );
@@ -369,6 +397,49 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     });
   }
 
+  Widget _buildProgressBar() {
+    return new Expanded(
+      child: new Padding(
+        padding: new EdgeInsets.only(right: 12.0),
+        child: new CupertinoVideoProgressBar(
+          widget.controller,
+          onDragStart: () {
+            _hideTimer?.cancel();
+          },
+          onDragEnd: () {
+            _startHideTimer();
+          },
+          colors: new VideoProgressColors(
+            playedColor: new Color.fromARGB(
+              120,
+              255,
+              255,
+              255,
+            ),
+            handleColor: new Color.fromARGB(
+              255,
+              255,
+              255,
+              255,
+            ),
+            bufferedColor: new Color.fromARGB(
+              60,
+              255,
+              255,
+              255,
+            ),
+            disabledColor: new Color.fromARGB(
+              20,
+              255,
+              255,
+              255,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _playPause() {
     setState(() {
       if (widget.controller.value.isPlaying) {
@@ -411,49 +482,5 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     setState(() {
       _latestValue = widget.controller.value;
     });
-  }
-}
-
-class _ProgressBar extends StatelessWidget {
-  final VideoPlayerController controller;
-
-  _ProgressBar(this.controller);
-
-  @override
-  Widget build(BuildContext context) {
-    return new Expanded(
-      child: new Padding(
-        padding: new EdgeInsets.only(right: 12.0),
-        child: new ClipRRect(
-          borderRadius: new BorderRadius.all(new Radius.circular(10.0)),
-          child: new Container(
-            height: 5.0,
-            child: new VideoProgressBar(
-              controller,
-              colors: new VideoProgressColors(
-                playedColor: new Color.fromARGB(
-                  255,
-                  255,
-                  255,
-                  255,
-                ),
-                handleColor: new Color.fromARGB(
-                  255,
-                  255,
-                  255,
-                  255,
-                ),
-                bufferedColor: new Color.fromARGB(
-                  140,
-                  255,
-                  255,
-                  255,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
