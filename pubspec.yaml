@@ -5,9 +5,9 @@ homepage: https://github.com/brianegan/chewie
 author: Brian Egan <brian@brianegan.com>
 
 dependencies:
-  open_iconic_flutter: ^0.2.0
-  connectivity: ^0.1.1
-  video_player: ^0.0.6
+  open_iconic_flutter: ">=0.2.0 <0.3.0"
+  connectivity: ">=0.1.1 <0.2.0"
+  video_player: ">=0.0.6 <0.1.0"
   flutter:
     sdk: flutter
 
