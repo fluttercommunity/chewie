@@ -6,7 +6,7 @@ The `video_player` plugin provides low-level access to video playback. Chewie us
 
 ## Demo
 
-![Demo](assets/chewie_demo.gif)
+![Demo](https://github.com/brianegan/chewie/raw/master/assets/chewie_demo.gif)
 
 ## Installation
 
@@ -32,7 +32,7 @@ final playerWidget = new Chewie(
 
 ## Example
 
-Please run the app in the `example/` folder to start playing!
+Please run the app in the [`example/`](https://github.com/brianegan/chewie/tree/master/example) folder to start playing!
 
 ```
 000000000000000KKKKKKKKKKKKXXXXXXXXXXXXXKKKKKKKKKKKKKKKKKKKKKKKKKKK00

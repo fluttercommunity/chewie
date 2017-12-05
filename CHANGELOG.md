@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+  * Fix images in docs for pub 
+
 ## 0.1.0
 
 Initial version of Chewie, the video player with a heart of gold.
