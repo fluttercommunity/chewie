@@ -10,6 +10,9 @@ import 'package:video_player/video_player.dart';
 /// `video_player` is pretty low level. Chewie wraps it in a friendly skin to
 /// make it easy to use!
 class Chewie extends StatefulWidget {
+  /// The Controller for the Video you want to play
+  final VideoPlayerController controller;
+
   /// Initialize the Video on Startup. This will prep the video for playback.
   final bool autoInitialize;
 
@@ -34,11 +37,8 @@ class Chewie extends StatefulWidget {
   /// or played.
   final Widget placeholder;
 
-  // THe internal controller created from the URI.
-  final VideoPlayerController _controller;
-
   Chewie(
-    String uri, {
+    this.controller, {
     Key key,
     this.aspectRatio,
     this.autoInitialize = false,
@@ -47,8 +47,7 @@ class Chewie extends StatefulWidget {
     this.progressColors,
     this.placeholder,
   })
-      : assert(uri != null, 'You must provide a URI to a video'),
-        this._controller = new VideoPlayerController(uri),
+      : assert(controller != null, 'You must provide a controller to play a video'),
         super(key: key);
 
   @override
@@ -61,7 +60,7 @@ class _ChewiePlayerState extends State<Chewie> {
   @override
   Widget build(BuildContext context) {
     return new PlayerWithControls(
-      controller: widget._controller,
+      controller: widget.controller,
       onExpandCollapse: () {
         return _pushFullScreenWidget(context);
       },
@@ -85,7 +84,7 @@ class _ChewiePlayerState extends State<Chewie> {
       body: new Container(
         color: Colors.black,
         child: new PlayerWithControls(
-          controller: widget._controller,
+          controller: widget.controller,
           onExpandCollapse: () => new Future.value(Navigator.of(context).pop()),
           aspectRatio: widget.aspectRatio,
           fullScreen: true,
@@ -108,14 +107,14 @@ class _ChewiePlayerState extends State<Chewie> {
   }
 
   Future _initialize() async {
-    await widget._controller.setLooping(widget.looping);
+    await widget.controller.setLooping(widget.looping);
 
     if (widget.autoInitialize || widget.autoPlay) {
-      await widget._controller.initialize();
+      await widget.controller.initialize();
     }
 
     if (widget.autoPlay) {
-      await widget._controller.play();
+      await widget.controller.play();
     }
   }
 

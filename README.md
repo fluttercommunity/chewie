@@ -14,7 +14,7 @@ In your `pubspec.yaml` file within your Flutter Project:
 
 ```yaml
 dependencies:
-  chewie: ^0.1.0
+  chewie: ^0.2.0
 ```
 
 ## Use it
@@ -23,7 +23,9 @@ dependencies:
 import 'package:chewie/chewie.dart';
 
 final playerWidget = new Chewie(
-  'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
+  new VideoPlayerController(
+    'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4'
+  ),
   aspectRatio: 3 / 2,
   autoPlay: true,
   looping: true,

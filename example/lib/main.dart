@@ -1,6 +1,7 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 void main() => runApp(new ChewieDemo());
 
@@ -17,6 +18,7 @@ class ChewieDemo extends StatefulWidget {
 
 class _ChewieDemoState extends State<ChewieDemo> {
   TargetPlatform _platform;
+  VideoPlayerController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
             new Expanded(
               child: new Center(
                 child: new Chewie(
-                  'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
+                  controller,
                   aspectRatio: 3 / 2,
                   autoPlay: true,
                   looping: true,
@@ -85,5 +87,14 @@ class _ChewieDemoState extends State<ChewieDemo> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    controller = new VideoPlayerController(
+      'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
+    );
+
+    super.initState();
   }
 }

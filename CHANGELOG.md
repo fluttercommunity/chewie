@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+  * Take a `controller` instead of a `String uri`. Allows for better control of playback outside the player if need be.
+
 ## 0.1.1
 
   * Fix images in docs for pub 
