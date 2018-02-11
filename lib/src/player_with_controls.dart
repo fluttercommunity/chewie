@@ -1,3 +1,4 @@
+import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -12,7 +13,7 @@ class PlayerWithControls extends StatefulWidget {
   final VideoPlayerController controller;
   final Future<dynamic> Function() onExpandCollapse;
   final bool fullScreen;
-  final VideoProgressColors progressColors;
+  final ChewieProgressColors progressColors;
   final Widget placeholder;
   final double aspectRatio;
   final bool autoPlay;
