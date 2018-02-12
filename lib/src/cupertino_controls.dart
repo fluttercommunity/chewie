@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui';
+import 'dart:ui' as ui;
 
+import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino_progress_bar.dart';
 import 'package:chewie/src/utils.dart';
 import 'package:flutter/foundation.dart';
@@ -15,7 +16,7 @@ class CupertinoControls extends StatefulWidget {
   final VideoPlayerController controller;
   final Future<dynamic> Function() onExpandCollapse;
   final bool fullScreen;
-  final VideoProgressColors progressColors;
+  final ChewieProgressColors progressColors;
   final bool autoPlay;
 
   CupertinoControls({
@@ -90,7 +91,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
         margin: new EdgeInsets.all(marginSize),
         child: new ClipRect(
           child: new BackdropFilter(
-            filter: new ImageFilter.blur(
+            filter: new ui.ImageFilter.blur(
               sigmaX: 10.0,
               sigmaY: 10.0,
             ),
@@ -132,7 +133,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
         duration: new Duration(milliseconds: 300),
         child: new ClipRect(
           child: new BackdropFilter(
-            filter: new ImageFilter.blur(sigmaX: 10.0),
+            filter: new ui.ImageFilter.blur(sigmaX: 10.0),
             child: new Container(
               height: barHeight,
               padding: new EdgeInsets.only(
@@ -203,7 +204,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
         duration: new Duration(milliseconds: 300),
         child: new ClipRect(
           child: new BackdropFilter(
-            filter: new ImageFilter.blur(sigmaX: 10.0),
+            filter: new ui.ImageFilter.blur(sigmaX: 10.0),
             child: new Container(
               decoration: new BoxDecoration(
                 color: backgroundColor,
@@ -418,7 +419,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
             _startHideTimer();
           },
           colors: widget.progressColors ??
-              new VideoProgressColors(
+              new ChewieProgressColors(
                 playedColor: new Color.fromARGB(
                   120,
                   255,
@@ -437,7 +438,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
                   255,
                   255,
                 ),
-                disabledColor: new Color.fromARGB(
+                backgroundColor: new Color.fromARGB(
                   20,
                   255,
                   255,

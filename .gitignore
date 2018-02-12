@@ -7,3 +7,5 @@ build/
 ios/.generated/
 packages
 pubspec.lock
+.iml
+Podfile.lock

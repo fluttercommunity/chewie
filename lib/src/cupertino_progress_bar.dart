@@ -1,22 +1,23 @@
+import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
 
 class CupertinoVideoProgressBar extends StatefulWidget {
   final VideoPlayerController controller;
-  final VideoProgressColors colors;
+  final ChewieProgressColors colors;
   final Function() onDragStart;
   final Function() onDragEnd;
   final Function() onDragUpdate;
 
   CupertinoVideoProgressBar(
     this.controller, {
-    VideoProgressColors colors,
+    ChewieProgressColors colors,
     this.onDragEnd,
     this.onDragStart,
     this.onDragUpdate,
   })
-      : colors = colors ?? new VideoProgressColors();
+      : colors = colors ?? new ChewieProgressColors();
 
   @override
   _VideoProgressBarState createState() {
@@ -60,7 +61,7 @@ class _VideoProgressBarState extends State<CupertinoVideoProgressBar> {
     }
 
     return new GestureDetector(
-      child: (controller.value.isErroneous)
+      child: (controller.value.hasError)
           ? new Text(controller.value.errorDescription)
           : new Center(
               child: new Container(
@@ -119,7 +120,7 @@ class _VideoProgressBarState extends State<CupertinoVideoProgressBar> {
 
 class _ProgressBarPainter extends CustomPainter {
   VideoPlayerValue value;
-  VideoProgressColors colors;
+  ChewieProgressColors colors;
 
   _ProgressBarPainter(this.value, this.colors);
 
@@ -142,7 +143,7 @@ class _ProgressBarPainter extends CustomPainter {
         ),
         new Radius.circular(4.0),
       ),
-      colors.disabledPaint,
+      colors.backgroundPaint,
     );
     if (!value.initialized) {
       return;

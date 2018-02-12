@@ -1,13 +1,13 @@
 name: chewie
 description: The video player for Flutter with a heart of gold
-version: 0.2.0
+version: 0.3.0
 homepage: https://github.com/brianegan/chewie
 author: Brian Egan <brian@brianegan.com>
 
 dependencies:
   open_iconic_flutter: ">=0.2.0 <0.3.0"
   connectivity: ">=0.1.1 <0.2.0"
-  video_player: ">=0.0.6 <0.1.0"
+  video_player: ">=0.2.0 <0.3.0"
   flutter:
     sdk: flutter
 

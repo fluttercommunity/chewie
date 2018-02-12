@@ -1,3 +1,4 @@
+import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -22,16 +23,22 @@ class Chewie extends StatefulWidget {
   /// Whether or not the video should loop
   final bool looping;
 
+  /// Whether or not to show the controls
+  final bool showControls;
+
   /// The Aspect Ratio of the Video. Important to get the correct size of the
   /// video!
   ///
   /// Will fallback to fitting within the space allowed.
   final double aspectRatio;
 
-  /// The colors to use for the Progress Bar. By default, the Material player
-  /// uses the colors from your Theme. The Cupertino player uses colors taken
-  /// from iOS designs.
-  final VideoProgressColors progressColors;
+  /// The colors to use for controls on iOS. By default, the iOS player uses
+  /// colors sampled from the original iOS 11 designs.
+  final ChewieProgressColors cupertinoProgressColors;
+
+  /// The colors to use for the Material Progress Bar. By default, the Material
+  /// player uses the colors from your Theme.
+  final ChewieProgressColors materialProgressColors;
 
   /// The placeholder is displayed underneath the Video before it is initialized
   /// or played.
@@ -44,10 +51,13 @@ class Chewie extends StatefulWidget {
     this.autoInitialize = false,
     this.autoPlay = false,
     this.looping = false,
-    this.progressColors,
+    this.cupertinoProgressColors,
+    this.materialProgressColors,
     this.placeholder,
+    this.showControls = true,
   })
-      : assert(controller != null, 'You must provide a controller to play a video'),
+      : assert(controller != null,
+            'You must provide a controller to play a video'),
         super(key: key);
 
   @override
@@ -57,37 +67,43 @@ class Chewie extends StatefulWidget {
 }
 
 class _ChewiePlayerState extends State<Chewie> {
+  bool initialized = false;
+  VoidCallback listener;
+
   @override
   Widget build(BuildContext context) {
     return new PlayerWithControls(
       controller: widget.controller,
-      onExpandCollapse: () {
-        return _pushFullScreenWidget(context);
-      },
+      onExpandCollapse: () => _pushFullScreenWidget(context),
       aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
-      progressColors: widget.progressColors,
+      cupertinoProgressColors: widget.cupertinoProgressColors,
+      materialProgressColors: widget.materialProgressColors,
       placeholder: widget.placeholder,
       autoPlay: widget.autoPlay,
+      showControls: widget.showControls,
     );
   }
 
   @override
   void initState() {
-    _initialize();
-
     super.initState();
+    _initialize();
   }
 
-  _buildFullScreenVideo(BuildContext context, Animation<double> animation) {
+  Widget _buildFullScreenVideo(
+      BuildContext context, Animation<double> animation) {
     return new Scaffold(
       resizeToAvoidBottomPadding: false,
       body: new Container(
         color: Colors.black,
         child: new PlayerWithControls(
           controller: widget.controller,
-          onExpandCollapse: () => new Future.value(Navigator.of(context).pop()),
-          aspectRatio: widget.aspectRatio,
+          onExpandCollapse: () =>
+              new Future<dynamic>.value(Navigator.of(context).pop()),
+          aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
           fullScreen: true,
+          cupertinoProgressColors: widget.cupertinoProgressColors,
+          materialProgressColors: widget.materialProgressColors,
         ),
       ),
     );
@@ -126,7 +142,7 @@ class _ChewiePlayerState extends State<Chewie> {
 
     SystemChrome.setEnabledSystemUIOverlays([]);
 
-    return Navigator.of(context).push(route).then((_) {
+    return Navigator.of(context).push(route).then<Null>((_) {
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     });
   }

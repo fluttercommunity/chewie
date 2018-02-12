@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:ui';
 
+import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/material_progress_bar.dart';
 import 'package:chewie/src/utils.dart';
 import 'package:flutter/foundation.dart';
@@ -11,7 +11,7 @@ class MaterialControls extends StatefulWidget {
   final VideoPlayerController controller;
   final bool fullScreen;
   final Future<dynamic> Function() onExpandCollapse;
-  final VideoProgressColors progressColors;
+  final ChewieProgressColors progressColors;
   final bool autoPlay;
 
   MaterialControls({
@@ -328,11 +328,11 @@ class _MaterialControlsState extends State<MaterialControls> {
             _startHideTimer();
           },
           colors: widget.progressColors ??
-              new VideoProgressColors(
+              new ChewieProgressColors(
                   playedColor: Theme.of(context).accentColor,
                   handleColor: Theme.of(context).accentColor,
                   bufferedColor: Theme.of(context).backgroundColor,
-                  disabledColor: Theme.of(context).disabledColor),
+                  backgroundColor: Theme.of(context).disabledColor),
         ),
       ),
     );

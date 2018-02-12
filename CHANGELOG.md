@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+  * Update to work with `video_player: ">=0.2.0 <0.3.0`
+  * Add `showControls` option. You can use this to show / hide the controls
+  * Move from `VideoProgressColors` to `ChewieProgressColors` for customization of the Chewie progress controls
+  * Remove `progressColors` in favor of platform-specific customizations: `cupertinoProgressColors` and `materialProgressColors` to control 
+  * Add analysis options
+
 ## 0.2.0
 
   * Take a `controller` instead of a `String uri`. Allows for better control of playback outside the player if need be.
