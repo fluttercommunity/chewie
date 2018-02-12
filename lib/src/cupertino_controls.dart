@@ -438,7 +438,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
                   255,
                   255,
                 ),
-                disabledColor: new Color.fromARGB(
+                backgroundColor: new Color.fromARGB(
                   20,
                   255,
                   255,

@@ -3,12 +3,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-void main() => runApp(new ChewieDemo());
+void main() {
+  runApp(
+    new ChewieDemo(
+      controller: new VideoPlayerController(
+        'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
+      ),
+    ),
+  );
+}
 
 class ChewieDemo extends StatefulWidget {
   final String title;
+  final VideoPlayerController controller;
 
-  ChewieDemo({this.title = 'Chewie Demo'});
+  ChewieDemo({this.title = 'Chewie Demo', this.controller});
 
   @override
   State<StatefulWidget> createState() {
@@ -18,7 +27,6 @@ class ChewieDemo extends StatefulWidget {
 
 class _ChewieDemoState extends State<ChewieDemo> {
   TargetPlatform _platform;
-  VideoPlayerController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -36,15 +44,18 @@ class _ChewieDemoState extends State<ChewieDemo> {
             new Expanded(
               child: new Center(
                 child: new Chewie(
-                  controller,
+                  widget.controller,
                   aspectRatio: 3 / 2,
                   autoPlay: true,
                   looping: true,
+
                   // Try playing around with some of these other options:
-                  // progressColors: new VideoProgressColors(
+
+                  // showControls: false,
+                  // materialProgressColors: new ChewieProgressColors(
                   //   playedColor: Colors.red,
                   //   handleColor: Colors.blue,
-                  //   disabledColor: Colors.grey,
+                  //   backgroundColor: Colors.grey,
                   //   bufferedColor: Colors.lightGreen,
                   // ),
                   // placeholder: new Container(
@@ -57,17 +68,18 @@ class _ChewieDemoState extends State<ChewieDemo> {
             new Row(
               children: <Widget>[
                 new Expanded(
-                    child: new FlatButton(
-                  onPressed: () {
-                    setState(() {
-                      _platform = TargetPlatform.android;
-                    });
-                  },
-                  child: new Padding(
-                    child: new Text("Android controls"),
-                    padding: new EdgeInsets.symmetric(vertical: 16.0),
+                  child: new FlatButton(
+                    onPressed: () {
+                      setState(() {
+                        _platform = TargetPlatform.android;
+                      });
+                    },
+                    child: new Padding(
+                      child: new Text("Android controls"),
+                      padding: new EdgeInsets.symmetric(vertical: 16.0),
+                    ),
                   ),
-                )),
+                ),
                 new Expanded(
                   child: new FlatButton(
                     onPressed: () {
@@ -87,14 +99,5 @@ class _ChewieDemoState extends State<ChewieDemo> {
         ),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    controller = new VideoPlayerController(
-      'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
-    );
-
-    super.initState();
   }
 }

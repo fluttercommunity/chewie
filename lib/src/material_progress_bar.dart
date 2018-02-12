@@ -141,7 +141,7 @@ class _ProgressBarPainter extends CustomPainter {
         ),
         new Radius.circular(4.0),
       ),
-      colors.disabledPaint,
+      colors.backgroundPaint,
     );
     if (!value.initialized) {
       return;
