@@ -2,7 +2,7 @@
 
 The video player for Flutter with a heart of gold. 
 
-The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood, and wraps it in a friendly Material or Cupertino UI so you don't have to! 
+The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI! 
 
 ## Demo
 
@@ -14,7 +14,7 @@ In your `pubspec.yaml` file within your Flutter Project:
 
 ```yaml
 dependencies:
-  chewie: ^0.2.0
+  chewie: ^0.3.0
 ```
 
 ## Use it
