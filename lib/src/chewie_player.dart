@@ -90,14 +90,16 @@ class _ChewiePlayerState extends State<Chewie> {
     _initialize();
   }
 
-  _buildFullScreenVideo(BuildContext context, Animation<double> animation) {
+  Widget _buildFullScreenVideo(
+      BuildContext context, Animation<double> animation) {
     return new Scaffold(
       resizeToAvoidBottomPadding: false,
       body: new Container(
         color: Colors.black,
         child: new PlayerWithControls(
           controller: widget.controller,
-          onExpandCollapse: () => new Future.value(Navigator.of(context).pop()),
+          onExpandCollapse: () =>
+              new Future<dynamic>.value(Navigator.of(context).pop()),
           aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
           fullScreen: true,
           cupertinoProgressColors: widget.cupertinoProgressColors,
@@ -140,7 +142,7 @@ class _ChewiePlayerState extends State<Chewie> {
 
     SystemChrome.setEnabledSystemUIOverlays([]);
 
-    return Navigator.of(context).push(route).then((_) {
+    return Navigator.of(context).push(route).then<Null>((_) {
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     });
   }
