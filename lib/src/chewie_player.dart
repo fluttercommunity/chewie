@@ -1,11 +1,11 @@
+import 'dart:async';
+
 import 'package:chewie/src/chewie_progress_colors.dart';
+import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:chewie/src/player_with_controls.dart';
-import 'dart:async';
 import 'package:video_player/video_player.dart';
-
 
 /// A Video Player with Material and Cupertino skins.
 ///
@@ -56,8 +56,7 @@ class Chewie extends StatefulWidget {
     this.materialProgressColors,
     this.placeholder,
     this.showControls = true,
-  })
-      : assert(controller != null,
+  })  : assert(controller != null,
             'You must provide a controller to play a video'),
         super(key: key);
 
@@ -68,13 +67,12 @@ class Chewie extends StatefulWidget {
 }
 
 class _ChewiePlayerState extends State<Chewie> {
-  bool initialized = false;
-  VoidCallback listener;
+  VideoPlayerController _controller;
 
   @override
   Widget build(BuildContext context) {
     return new PlayerWithControls(
-      controller: widget.controller,
+      controller: _controller,
       onExpandCollapse: () => _pushFullScreenWidget(context),
       aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
       cupertinoProgressColors: widget.cupertinoProgressColors,
@@ -88,6 +86,7 @@ class _ChewiePlayerState extends State<Chewie> {
   @override
   void initState() {
     super.initState();
+    _controller = widget.controller;
     _initialize();
   }
 
@@ -96,9 +95,10 @@ class _ChewiePlayerState extends State<Chewie> {
     return new Scaffold(
       resizeToAvoidBottomPadding: false,
       body: new Container(
+        alignment: Alignment.center,
         color: Colors.black,
         child: new PlayerWithControls(
-          controller: widget.controller,
+          controller: _controller,
           onExpandCollapse: () =>
               new Future<dynamic>.value(Navigator.of(context).pop()),
           aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
@@ -124,28 +124,58 @@ class _ChewiePlayerState extends State<Chewie> {
   }
 
   Future _initialize() async {
-    await widget.controller.setLooping(widget.looping);
+    await _controller.setLooping(widget.looping);
 
     if (widget.autoInitialize || widget.autoPlay) {
-      await widget.controller.initialize();
+      await _controller.initialize();
     }
 
     if (widget.autoPlay) {
-      await widget.controller.play();
+      await _controller.play();
     }
   }
 
-  Future<dynamic> _pushFullScreenWidget(BuildContext context) {
+  @override
+  void didUpdateWidget(Chewie oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.controller.dataSource != _controller.dataSource) {
+      _controller.dispose();
+      _controller = widget.controller;
+      _initialize();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
+    final isAndroid = Theme.of(context).platform == TargetPlatform.android;
     final TransitionRoute<Null> route = new PageRouteBuilder<Null>(
       settings: new RouteSettings(isInitialRoute: false),
       pageBuilder: _fullScreenRoutePageBuilder,
     );
 
     SystemChrome.setEnabledSystemUIOverlays([]);
+    if (isAndroid) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    }
 
-    return Navigator.of(context).push(route).then<Null>((_) {
-      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    });
+    await Navigator.of(context).push(route);
+
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
   }
 
   double _calculateAspectRatio(BuildContext context) {

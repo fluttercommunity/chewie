@@ -5,19 +5,14 @@ import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(
-    new ChewieDemo(
-      controller: new VideoPlayerController.network(
-        'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
-      ),
-    ),
+    new ChewieDemo(),
   );
 }
 
 class ChewieDemo extends StatefulWidget {
   final String title;
-  final VideoPlayerController controller;
 
-  ChewieDemo({this.title = 'Chewie Demo', this.controller});
+  ChewieDemo({this.title = 'Chewie Demo'});
 
   @override
   State<StatefulWidget> createState() {
@@ -27,6 +22,15 @@ class ChewieDemo extends StatefulWidget {
 
 class _ChewieDemoState extends State<ChewieDemo> {
   TargetPlatform _platform;
+  VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = new VideoPlayerController.network(
+      'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +48,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
             new Expanded(
               child: new Center(
                 child: new Chewie(
-                  widget.controller,
+                  _controller,
                   aspectRatio: 3 / 2,
                   autoPlay: true,
                   looping: true,
@@ -64,6 +68,40 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   // autoInitialize: true,
                 ),
               ),
+            ),
+            new Row(
+              children: <Widget>[
+                new Expanded(
+                  child: new FlatButton(
+                    onPressed: () {
+                      setState(() {
+                        _controller = new VideoPlayerController.network(
+                          'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
+                        );
+                      });
+                    },
+                    child: new Padding(
+                      child: new Text("Video 1"),
+                      padding: new EdgeInsets.symmetric(vertical: 16.0),
+                    ),
+                  ),
+                ),
+                new Expanded(
+                  child: new FlatButton(
+                    onPressed: () {
+                      setState(() {
+                        _controller = new VideoPlayerController.network(
+                          'http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4',
+                        );
+                      });
+                    },
+                    child: new Padding(
+                      padding: new EdgeInsets.symmetric(vertical: 16.0),
+                      child: new Text("Video 2"),
+                    ),
+                  ),
+                )
+              ],
             ),
             new Row(
               children: <Widget>[

@@ -32,8 +32,9 @@ class _MaterialControlsState extends State<MaterialControls> {
   VideoPlayerValue _latestValue;
   double _latestVolume;
   bool _hideStuff = true;
-  bool _disposed = false;
   Timer _hideTimer;
+  Timer _showTimer;
+  Timer _showAfterExpandCollapseTimer;
   bool _dragging = false;
 
   final barHeight = 48.0;
@@ -41,21 +42,25 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = widget.controller;
-
     return new Column(
       children: <Widget>[
         _buildHitArea(),
-        _buildBottomBar(context, controller),
+        _buildBottomBar(context, widget.controller),
       ],
     );
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(_updateState);
-    _disposed = true;
+    _dispose();
     super.dispose();
+  }
+
+  void _dispose() {
+    widget.controller.removeListener(_updateState);
+    _hideTimer?.cancel();
+    _showTimer?.cancel();
+    _showAfterExpandCollapseTimer?.cancel();
   }
 
   @override
@@ -63,6 +68,15 @@ class _MaterialControlsState extends State<MaterialControls> {
     _initialize();
 
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(MaterialControls oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller.dataSource != oldWidget.controller.dataSource) {
+      _dispose();
+      _initialize();
+    }
   }
 
   AnimatedOpacity _buildBottomBar(
@@ -229,11 +243,10 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   void _cancelAndRestartTimer() {
     _hideTimer?.cancel();
+    _startHideTimer();
 
     setState(() {
       _hideStuff = false;
-
-      _startHideTimer();
     });
   }
 
@@ -248,7 +261,7 @@ class _MaterialControlsState extends State<MaterialControls> {
       _startHideTimer();
     }
 
-    new Timer(new Duration(milliseconds: 200), () {
+    _showTimer = new Timer(new Duration(milliseconds: 200), () {
       setState(() {
         _hideStuff = false;
       });
@@ -260,12 +273,11 @@ class _MaterialControlsState extends State<MaterialControls> {
       _hideStuff = true;
 
       widget.onExpandCollapse().then((dynamic _) {
-        new Timer(new Duration(milliseconds: 300), () {
-          if (!_disposed) {
-            setState(() {
-              _cancelAndRestartTimer();
-            });
-          }
+        _showAfterExpandCollapseTimer =
+            new Timer(new Duration(milliseconds: 300), () {
+          setState(() {
+            _cancelAndRestartTimer();
+          });
         });
       });
     });
@@ -293,11 +305,9 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   void _startHideTimer() {
     _hideTimer = new Timer(const Duration(seconds: 3), () {
-      if (!_disposed) {
-        setState(() {
-          _hideStuff = true;
-        });
-      }
+      setState(() {
+        _hideStuff = true;
+      });
     });
   }
 

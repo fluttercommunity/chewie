@@ -39,9 +39,10 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   VideoPlayerValue _latestValue;
   double _latestVolume;
   bool _hideStuff = true;
-  bool _disposed = false;
   Timer _hideTimer;
   final marginSize = 5.0;
+  Timer _expandCollapseTimer;
+  Timer _initTimer;
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +65,15 @@ class _CupertinoControlsState extends State<CupertinoControls> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_updateState);
-    _disposed = true;
+    _dispose();
     super.dispose();
+  }
+
+  void _dispose() {
+    widget.controller.removeListener(_updateState);
+    _hideTimer?.cancel();
+    _expandCollapseTimer?.cancel();
+    _initTimer?.cancel();
   }
 
   @override
@@ -74,6 +81,16 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     _initialize();
 
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(CupertinoControls oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.controller.dataSource != oldWidget.controller.dataSource) {
+      _dispose();
+      _initialize();
+    }
   }
 
   AnimatedOpacity _buildBottomBar(
@@ -383,7 +400,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       _startHideTimer();
     }
 
-    new Timer(new Duration(milliseconds: 200), () {
+    _initTimer = new Timer(new Duration(milliseconds: 200), () {
       setState(() {
         _hideStuff = false;
       });
@@ -395,12 +412,10 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       _hideStuff = true;
 
       widget.onExpandCollapse().then((dynamic _) {
-        new Timer(new Duration(milliseconds: 300), () {
-          if (!_disposed) {
-            setState(() {
-              _cancelAndRestartTimer();
-            });
-          }
+        _expandCollapseTimer = new Timer(new Duration(milliseconds: 300), () {
+          setState(() {
+            _cancelAndRestartTimer();
+          });
         });
       });
     });
@@ -489,11 +504,9 @@ class _CupertinoControlsState extends State<CupertinoControls> {
 
   void _startHideTimer() {
     _hideTimer = new Timer(const Duration(seconds: 3), () {
-      if (!_disposed) {
-        setState(() {
-          _hideStuff = true;
-        });
-      }
+      setState(() {
+        _hideStuff = true;
+      });
     });
   }
 

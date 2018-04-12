@@ -1,13 +1,12 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:chewie/src/chewie_progress_colors.dart';
+import 'package:chewie/src/cupertino_controls.dart';
+import 'package:chewie/src/material_controls.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-
-import 'dart:async';
-
-import 'dart:ui';
-import 'package:chewie/src/material_controls.dart';
-import 'package:chewie/src/cupertino_controls.dart';
 
 class PlayerWithControls extends StatefulWidget {
   final VideoPlayerController controller;
@@ -31,8 +30,7 @@ class PlayerWithControls extends StatefulWidget {
     this.materialProgressColors,
     this.placeholder,
     this.autoPlay,
-  })
-      : super(key: key);
+  }) : super(key: key);
 
   @override
   State createState() {
@@ -48,24 +46,38 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
     return new Center(
       child: new Container(
         width: MediaQuery.of(context).size.width,
-        child: new AspectRatio(
-          aspectRatio: widget.aspectRatio,
-          child: new Container(
-            child: new Stack(
-              children: <Widget>[
-                widget.placeholder ?? new Container(),
-                new Hero(
-                  tag: controller,
-                  child: new AspectRatio(
-                    aspectRatio: widget.aspectRatio,
-                    child: new VideoPlayer(controller),
-                  ),
-                ),
-                _buildControls(context, controller),
-              ],
+        child: widget.fullScreen &&
+                MediaQuery.of(context).orientation == Orientation.landscape
+            ? _buildPlayerWithControls(controller, context)
+            : new AspectRatio(
+                aspectRatio: widget.aspectRatio,
+                child: _buildPlayerWithControls(controller, context),
+              ),
+      ),
+    );
+  }
+
+  Container _buildPlayerWithControls(
+      VideoPlayerController controller, BuildContext context) {
+    return new Container(
+      child: new Stack(
+        children: <Widget>[
+          widget.placeholder ?? new Container(),
+          new Center(
+            child: new Hero(
+              tag: controller,
+              child: widget.fullScreen &&
+                      MediaQuery.of(context).orientation ==
+                          Orientation.landscape
+                  ? new VideoPlayer(controller)
+                  : new AspectRatio(
+                      aspectRatio: widget.aspectRatio,
+                      child: new VideoPlayer(controller),
+                    ),
             ),
           ),
-        ),
+          _buildControls(context, controller),
+        ],
       ),
     );
   }
@@ -102,6 +114,16 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
     widget.controller.addListener(_onPlay);
 
     super.initState();
+  }
+
+
+  @override
+  void didUpdateWidget(PlayerWithControls oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.controller.dataSource != oldWidget.controller.dataSource) {
+      widget.controller.addListener(_onPlay);
+    }
   }
 
   void _onPlay() {
