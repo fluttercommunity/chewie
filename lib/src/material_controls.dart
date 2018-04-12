@@ -227,7 +227,7 @@ class _MaterialControlsState extends State<MaterialControls> {
     );
   }
 
-  _cancelAndRestartTimer() {
+  void _cancelAndRestartTimer() {
     _hideTimer?.cancel();
 
     setState(() {
@@ -259,7 +259,7 @@ class _MaterialControlsState extends State<MaterialControls> {
     setState(() {
       _hideStuff = true;
 
-      widget.onExpandCollapse().then((_) {
+      widget.onExpandCollapse().then((dynamic _) {
         new Timer(new Duration(milliseconds: 300), () {
           if (!_disposed) {
             setState(() {

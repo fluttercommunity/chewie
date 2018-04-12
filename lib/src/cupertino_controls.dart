@@ -362,7 +362,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     );
   }
 
-  _cancelAndRestartTimer() {
+  void _cancelAndRestartTimer() {
     _hideTimer?.cancel();
 
     setState(() {
@@ -394,7 +394,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     setState(() {
       _hideStuff = true;
 
-      widget.onExpandCollapse().then((_) {
+      widget.onExpandCollapse().then((dynamic _) {
         new Timer(new Duration(milliseconds: 300), () {
           if (!_disposed) {
             setState(() {
@@ -450,7 +450,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     );
   }
 
-  _playPause() {
+  void _playPause() {
     setState(() {
       if (widget.controller.value.isPlaying) {
         _hideStuff = false;

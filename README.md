@@ -23,7 +23,7 @@ dependencies:
 import 'package:chewie/chewie.dart';
 
 final playerWidget = new Chewie(
-  new VideoPlayerController(
+  new VideoPlayerController.network(
     'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4'
   ),
   aspectRatio: 3 / 2,
