@@ -6,6 +6,7 @@ import 'package:chewie/src/player_with_controls.dart';
 import 'dart:async';
 import 'package:video_player/video_player.dart';
 
+
 /// A Video Player with Material and Cupertino skins.
 ///
 /// `video_player` is pretty low level. Chewie wraps it in a friendly skin to

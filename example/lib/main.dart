@@ -6,7 +6,7 @@ import 'package:video_player/video_player.dart';
 void main() {
   runApp(
     new ChewieDemo(
-      controller: new VideoPlayerController(
+      controller: new VideoPlayerController.network(
         'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
       ),
     ),
