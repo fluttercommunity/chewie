@@ -14,7 +14,7 @@ In your `pubspec.yaml` file within your Flutter Project:
 
 ```yaml
 dependencies:
-  chewie: ^0.3.0
+  chewie: <latest_version>
 ```
 
 ## Use it

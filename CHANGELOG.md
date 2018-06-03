@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+  * Update README to fix installation instructions
+
 ## 0.5.0
 
   * Update to work with `video_player: ">=0.5.0 <0.6.0`
