@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+
+  * Update to work with `video_player: ">=0.5.0 <0.6.0`
+
 ## 0.3.0
 
   * Update to work with `video_player: ">=0.2.0 <0.3.0`
