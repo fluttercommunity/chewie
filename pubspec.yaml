@@ -1,6 +1,6 @@
 name: chewie
 description: A video player for Flutter with Cupertino and Material play controls
-version: 0.5.0
+version: 0.6.0
 homepage: https://github.com/brianegan/chewie
 author: Brian Egan <brian@brianegan.com>
 
@@ -9,7 +9,7 @@ environment:
 
 dependencies:
   open_iconic_flutter: ">=0.2.0 <0.3.0"
-  video_player: ">=0.5.0 <0.6.0"
+  video_player: ">=0.6.0 <0.7.0"
   flutter:
     sdk: flutter
 
