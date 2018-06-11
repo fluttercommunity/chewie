@@ -126,6 +126,12 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
     }
   }
 
+  @override
+  dispose(){
+    widget.controller.removeListener(_onPlay);
+    super.dispose();
+  }
+
   void _onPlay() {
     if (widget.controller.value.isPlaying) {
       setState(() {
