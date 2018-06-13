@@ -21,6 +21,9 @@ class Chewie extends StatefulWidget {
   /// Play the video as soon as it's displayed
   final bool autoPlay;
 
+  /// Start video at a certain position
+  final Duration startAt;
+
   /// Whether or not the video should loop
   final bool looping;
 
@@ -51,6 +54,7 @@ class Chewie extends StatefulWidget {
     this.aspectRatio,
     this.autoInitialize = false,
     this.autoPlay = false,
+    this.startAt,
     this.looping = false,
     this.cupertinoProgressColors,
     this.materialProgressColors,
@@ -132,6 +136,10 @@ class _ChewiePlayerState extends State<Chewie> {
 
     if (widget.autoPlay) {
       await _controller.play();
+    }
+
+    if (widget.startAt != null) {
+      await _controller.seekTo(widget.startAt);
     }
   }
 
