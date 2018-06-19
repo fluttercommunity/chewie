@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.1
+
+  * Fix time formatting
+  * Fix skipping
+  * Remove listener when disposed
+  * Start video at certain position
+
 ## 0.6.0
 
   * Update to work with `video_player: ">=0.6.0 <0.7.0`
