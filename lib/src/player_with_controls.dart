@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino_controls.dart';
+import 'package:chewie/src/fadeout_placeholder.dart';
 import 'package:chewie/src/material_controls.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class PlayerWithControls extends StatefulWidget {
   final double aspectRatio;
   final bool autoPlay;
   final bool showControls;
+  final Duration startAt;
 
   PlayerWithControls({
     Key key,
@@ -30,6 +32,7 @@ class PlayerWithControls extends StatefulWidget {
     this.materialProgressColors,
     this.placeholder,
     this.autoPlay,
+    this.startAt,
   }) : super(key: key);
 
   @override
@@ -62,7 +65,6 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
     return new Container(
       child: new Stack(
         children: <Widget>[
-          widget.placeholder ?? new Container(),
           new Center(
             child: new Hero(
               tag: controller,
@@ -75,6 +77,11 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
                       child: new VideoPlayer(controller),
                     ),
             ),
+          ),
+          fadeoutPlaceholder(
+            controller: controller,
+            placeholder: widget.placeholder,
+            fadeAfter: widget.startAt,
           ),
           _buildControls(context, controller),
         ],

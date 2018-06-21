@@ -54,7 +54,7 @@ class Chewie extends StatefulWidget {
     this.aspectRatio,
     this.autoInitialize = false,
     this.autoPlay = false,
-    this.startAt,
+    this.startAt = const Duration(),
     this.looping = false,
     this.cupertinoProgressColors,
     this.materialProgressColors,
@@ -84,6 +84,7 @@ class _ChewiePlayerState extends State<Chewie> {
       placeholder: widget.placeholder,
       autoPlay: widget.autoPlay,
       showControls: widget.showControls,
+      startAt: widget.startAt,
     );
   }
 
