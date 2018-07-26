@@ -57,7 +57,13 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       children: <Widget>[
         _buildTopBar(
             backgroundColor, iconColor, controller, barHeight, buttonPadding),
-        _buildHitArea(),
+        _latestValue != null && !_latestValue.isPlaying &&
+            _latestValue.duration == null || _latestValue.isBuffering ?
+          Expanded(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ) : _buildHitArea(),
         _buildBottomBar(backgroundColor, iconColor, controller, barHeight),
       ],
     );
