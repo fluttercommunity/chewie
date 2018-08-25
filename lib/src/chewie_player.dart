@@ -72,18 +72,60 @@ class Chewie extends StatefulWidget {
 
 class _ChewiePlayerState extends State<Chewie> {
   VideoPlayerController _controller;
+  // Whether it was on landscape before to not trigger it twice
+  bool wasLandscape = false;
+  double playerHeight;
+  // Fullscreen button pressed
+  bool leaveFullscreen = false;
+
+  BuildContext videoContext;
 
   @override
   Widget build(BuildContext context) {
-    return new PlayerWithControls(
-      controller: _controller,
-      onExpandCollapse: () => _pushFullScreenWidget(context),
-      aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
-      cupertinoProgressColors: widget.cupertinoProgressColors,
-      materialProgressColors: widget.materialProgressColors,
-      placeholder: widget.placeholder,
-      autoPlay: widget.autoPlay,
-      showControls: widget.showControls,
+
+    // Start fullscreen on landscape
+    final Orientation orientation = MediaQuery.of(context).orientation;
+    final bool _isLandscape = orientation == Orientation.landscape;
+    // Lock orientation if exit fullscreen button was pressed
+    final isAndroid = Theme.of(context).platform == TargetPlatform.android;
+    if (isAndroid && leaveFullscreen) {
+      setState(() {
+        playerHeight = null;
+        wasLandscape = false;
+      });
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
+    // Check whether we are in fullscreen already
+    if (_isLandscape && !wasLandscape && !leaveFullscreen) {
+      // Start fullscreen mode
+      setState(() {
+        playerHeight = 0.0;
+      });
+      _pushFullScreenWidget(context);
+      wasLandscape = true;
+    } else if (!_isLandscape && wasLandscape && !leaveFullscreen) {
+      // End fullscreen mode
+      setState(() {
+        playerHeight = null;
+        wasLandscape = false;
+      });
+      new Future<dynamic>.value(Navigator.of(context).pop());
+    }
+    return new Container(
+        height: playerHeight,
+        child: new PlayerWithControls(
+            controller: _controller,
+            onExpandCollapse: () => _pushFullScreenWidget(context),
+            aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
+            cupertinoProgressColors: widget.cupertinoProgressColors,
+            materialProgressColors: widget.materialProgressColors,
+            placeholder: widget.placeholder,
+            autoPlay: widget.autoPlay,
+            showControls: widget.showControls,
+        ),
     );
   }
 
@@ -96,6 +138,7 @@ class _ChewiePlayerState extends State<Chewie> {
 
   Widget _buildFullScreenVideo(
       BuildContext context, Animation<double> animation) {
+    videoContext = context;
     return new Scaffold(
       resizeToAvoidBottomPadding: false,
       body: new Container(
@@ -103,8 +146,13 @@ class _ChewiePlayerState extends State<Chewie> {
         color: Colors.black,
         child: new PlayerWithControls(
           controller: _controller,
-          onExpandCollapse: () =>
-              new Future<dynamic>.value(Navigator.of(context).pop()),
+          onExpandCollapse: () {
+            new Future<dynamic>.value(Navigator.of(context).pop()).then(
+                setState(() {
+                  leaveFullscreen = true;})
+            );
+
+          },
           aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
           fullScreen: true,
           cupertinoProgressColors: widget.cupertinoProgressColors,
@@ -154,7 +202,19 @@ class _ChewiePlayerState extends State<Chewie> {
     }
   }
 
+  @override
+  dispose(){
+    super.dispose();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
+    leaveFullscreen = false;
     final isAndroid = Theme.of(context).platform == TargetPlatform.android;
     final TransitionRoute<Null> route = new PageRouteBuilder<Null>(
       settings: new RouteSettings(isInitialRoute: false),
@@ -166,6 +226,8 @@ class _ChewiePlayerState extends State<Chewie> {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
       ]);
     }
 
