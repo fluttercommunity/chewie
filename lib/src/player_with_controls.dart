@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/cupertino_controls.dart';
-import 'package:chewie/src/material_controls.dart';
+import 'package:custom_chewie/src/custom_chewie_progress_colors.dart';
+import 'package:custom_chewie/src/cupertino_controls.dart';
+import 'package:custom_chewie/src/material_controls.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -116,7 +116,6 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
     super.initState();
   }
 
-
   @override
   void didUpdateWidget(PlayerWithControls oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -127,7 +126,7 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
   }
 
   @override
-  dispose(){
+  dispose() {
     widget.controller.removeListener(_onPlay);
     super.dispose();
   }

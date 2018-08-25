@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/player_with_controls.dart';
+import 'package:custom_chewie/src/custom_chewie_progress_colors.dart';
+import 'package:custom_chewie/src/player_with_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -82,7 +82,6 @@ class _ChewiePlayerState extends State<Chewie> {
 
   @override
   Widget build(BuildContext context) {
-
     // Start fullscreen on landscape
     final Orientation orientation = MediaQuery.of(context).orientation;
     final bool _isLandscape = orientation == Orientation.landscape;
@@ -115,17 +114,17 @@ class _ChewiePlayerState extends State<Chewie> {
       new Future<dynamic>.value(Navigator.of(context).pop());
     }
     return new Container(
-        height: playerHeight,
-        child: new PlayerWithControls(
-            controller: _controller,
-            onExpandCollapse: () => _pushFullScreenWidget(context),
-            aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
-            cupertinoProgressColors: widget.cupertinoProgressColors,
-            materialProgressColors: widget.materialProgressColors,
-            placeholder: widget.placeholder,
-            autoPlay: widget.autoPlay,
-            showControls: widget.showControls,
-        ),
+      height: playerHeight,
+      child: new PlayerWithControls(
+        controller: _controller,
+        onExpandCollapse: () => _pushFullScreenWidget(context),
+        aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
+        cupertinoProgressColors: widget.cupertinoProgressColors,
+        materialProgressColors: widget.materialProgressColors,
+        placeholder: widget.placeholder,
+        autoPlay: widget.autoPlay,
+        showControls: widget.showControls,
+      ),
     );
   }
 
@@ -147,11 +146,10 @@ class _ChewiePlayerState extends State<Chewie> {
         child: new PlayerWithControls(
           controller: _controller,
           onExpandCollapse: () {
-            new Future<dynamic>.value(Navigator.of(context).pop()).then(
-                setState(() {
-                  leaveFullscreen = true;})
-            );
-
+            new Future<dynamic>.value(Navigator.of(context).pop())
+                .then(setState(() {
+              leaveFullscreen = true;
+            }));
           },
           aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
           fullScreen: true,
@@ -203,7 +201,7 @@ class _ChewiePlayerState extends State<Chewie> {
   }
 
   @override
-  dispose(){
+  dispose() {
     super.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,

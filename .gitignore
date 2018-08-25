@@ -10,4 +10,4 @@ packages
 pubspec.lock
 .iml
 Podfile.lock
-chewie.iml
+custom_chewie.iml

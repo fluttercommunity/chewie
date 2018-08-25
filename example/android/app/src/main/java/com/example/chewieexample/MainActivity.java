@@ -1,4 +1,4 @@
-package com.example.chewieexample;
+package com.example.custom_chewieexample;
 
 import android.os.Bundle;
 

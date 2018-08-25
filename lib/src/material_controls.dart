@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/material_progress_bar.dart';
-import 'package:chewie/src/utils.dart';
+import 'package:custom_chewie/src/custom_chewie_progress_colors.dart';
+import 'package:custom_chewie/src/material_progress_bar.dart';
+import 'package:custom_chewie/src/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -44,37 +44,41 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        new AnimatedOpacity(
-          opacity: _hideStuff ? 0.0 : 1.0,
-          duration: new Duration(milliseconds: 300),
-          child: new Container(
-            color: Colors.black38,
-          ),
+    return Stack(children: <Widget>[
+      new AnimatedOpacity(
+        opacity: _hideStuff ? 0.0 : 1.0,
+        duration: new Duration(milliseconds: 300),
+        child: new Container(
+          color: Colors.black38,
         ),
-        new Column(
-          children: <Widget>[
-            _latestValue != null && !_latestValue.isPlaying &&
-                _latestValue.duration == null || _latestValue != null && _latestValue.isBuffering ?
-            Expanded(
-              child: Center(
-                child: CircularProgressIndicator(),
+      ),
+      new Column(
+        children: <Widget>[
+          _latestValue != null &&
+                      !_latestValue.isPlaying &&
+                      _latestValue.duration == null ||
+                  _latestValue != null && _latestValue.isBuffering
+              ? Expanded(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              : _buildHitArea(),
+          _buildBottomBar(context, widget.controller),
+        ],
+      ),
+      _hideStuff
+          ? new Container()
+          : new IconButton(
+              icon: new Icon(
+                Icons.arrow_back,
+                color: Colors.white,
               ),
-            ) : _buildHitArea(),
-            _buildBottomBar(context, widget.controller),
-          ],
-        ),
-        _hideStuff ? new Container() : new IconButton(
-          icon: new Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-          ),
-          onPressed: () async {
-            print("pressed true");
-            widget.controller.pause();
-            Navigator.pop(context);
-            /*tempShowAd--;
+              onPressed: () async {
+                print("pressed true");
+                widget.controller.pause();
+                Navigator.pop(context);
+                /*tempShowAd--;
             if (tempShowAd == 0 &&
                 await retrieveData("no_ads") ==
                     null) {
@@ -85,11 +89,10 @@ class _MaterialControlsState extends State<MaterialControls> {
                 });
               tempShowAd = initialShowAd;
             }*/
-            //Navigator.pop(contextWidget);
-          },
-        ),
-      ]
-    );
+                //Navigator.pop(contextWidget);
+              },
+            ),
+    ]);
   }
 
   @override
@@ -176,12 +179,12 @@ class _MaterialControlsState extends State<MaterialControls> {
       child: new GestureDetector(
         onTap: _latestValue != null && _latestValue.isPlaying
             ? () {
-              _playPause();
-              //_cancelAndRestartTimer;
-              setState(() {
-                _hideStuff = false;
-              });
-            }
+                _playPause();
+                //_cancelAndRestartTimer;
+                setState(() {
+                  _hideStuff = false;
+                });
+              }
             : () {
                 _playPause();
                 setState(() {
@@ -205,8 +208,11 @@ class _MaterialControlsState extends State<MaterialControls> {
                   ),
                   child: new Padding(
                     padding: new EdgeInsets.only(top: 30.0),
-                    child: new Icon(Icons.play_arrow, size: 50.0,
-                      color: Colors.white,),
+                    child: new Icon(
+                      Icons.play_arrow,
+                      size: 50.0,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),

@@ -1,4 +1,4 @@
-import 'package:chewie/chewie.dart';
+import 'package:custom_chewie/custom_chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -28,7 +28,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   void initState() {
     super.initState();
     _controller = new VideoPlayerController.network(
-      'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
+      'https://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4',
     );
   }
 

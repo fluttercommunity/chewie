@@ -1,4 +1,4 @@
-import 'package:chewie/src/chewie_progress_colors.dart';
+import 'package:custom_chewie/src/custom_chewie_progress_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
@@ -16,8 +16,7 @@ class CupertinoVideoProgressBar extends StatefulWidget {
     this.onDragEnd,
     this.onDragStart,
     this.onDragUpdate,
-  })
-      : colors = colors ?? new ChewieProgressColors();
+  }) : colors = colors ?? new ChewieProgressColors();
 
   @override
   _VideoProgressBarState createState() {

@@ -1,8 +1,8 @@
-name: chewie_example
-description: An example of how to use the chewie for Flutter
+name: custom_chewie_example
+description: An example of how to use the custom_chewie for Flutter
 
 dependencies:
-  chewie:
+  custom_chewie:
     path: ../
   flutter:
     sdk: flutter
