@@ -78,18 +78,6 @@ class _MaterialControlsState extends State<MaterialControls> {
                 print("pressed true");
                 widget.controller.pause();
                 Navigator.pop(context);
-                /*tempShowAd--;
-            if (tempShowAd == 0 &&
-                await retrieveData("no_ads") ==
-                    null) {
-              myInterstitial
-                ..load()
-                ..show().then((e) {
-                  myInterstitial..load();
-                });
-              tempShowAd = initialShowAd;
-            }*/
-                //Navigator.pop(contextWidget);
               },
             ),
     ]);
