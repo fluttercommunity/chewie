@@ -1,8 +1,20 @@
 # custom chewie
 
+
+## fork
+A custom chewie fork that has a unique design and some extra features.
+
 The video player for Flutter with a heart of gold. 
 
 The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI! 
+
+### features
+* Fullscreen on orientation change to landscape
+* Exit fullscreen on portrait orientation
+* Picture in Picture for Android SDK > 24
+* Custom design
+* Back button
+
 
 ## Demo
 
