@@ -1,4 +1,4 @@
-# chewie
+# custom chewie
 
 The video player for Flutter with a heart of gold. 
 
@@ -6,7 +6,7 @@ The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin prov
 
 ## Demo
 
-![Demo](https://github.com/brianegan/chewie/raw/master/assets/chewie_demo.gif)
+<img src="https://github.com/bostrot/chewie/raw/master/assets/chewie_demo.gif" width="300" />
 
 ## Installation
 
