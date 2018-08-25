@@ -11,7 +11,6 @@ dependencies:
   cached_network_image: ^0.4.1
   video_player: ">=0.6.0 <0.7.0"
   device_info: ^0.2.1
-  native_device_orientation: ^0.0.2
   flutter:
     sdk: flutter
 
