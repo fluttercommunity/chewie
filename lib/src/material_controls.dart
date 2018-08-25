@@ -7,6 +7,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import 'package:flutter_android_pip/flutter_android_pip.dart';
+
 class MaterialControls extends StatefulWidget {
   final VideoPlayerController controller;
   final bool fullScreen;
@@ -42,11 +44,51 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   @override
   Widget build(BuildContext context) {
-    return new Column(
+    return Stack(
       children: <Widget>[
-        _buildHitArea(),
-        _buildBottomBar(context, widget.controller),
-      ],
+        new AnimatedOpacity(
+          opacity: _hideStuff ? 0.0 : 1.0,
+          duration: new Duration(milliseconds: 300),
+          child: new Container(
+            color: Colors.black38,
+          ),
+        ),
+        new Column(
+          children: <Widget>[
+            _latestValue != null && !_latestValue.isPlaying &&
+                _latestValue.duration == null || _latestValue != null && _latestValue.isBuffering ?
+            Expanded(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ) : _buildHitArea(),
+            _buildBottomBar(context, widget.controller),
+          ],
+        ),
+        _hideStuff ? new Container() : new IconButton(
+          icon: new Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () async {
+            print("pressed true");
+            widget.controller.pause();
+            Navigator.pop(context);
+            /*tempShowAd--;
+            if (tempShowAd == 0 &&
+                await retrieveData("no_ads") ==
+                    null) {
+              myInterstitial
+                ..load()
+                ..show().then((e) {
+                  myInterstitial..load();
+                });
+              tempShowAd = initialShowAd;
+            }*/
+            //Navigator.pop(contextWidget);
+          },
+        ),
+      ]
     );
   }
 
@@ -90,13 +132,14 @@ class _MaterialControlsState extends State<MaterialControls> {
       duration: new Duration(milliseconds: 300),
       child: new Container(
         height: barHeight,
-        color: Theme.of(context).dialogBackgroundColor,
+        color: Colors.transparent,
         child: new Row(
           children: <Widget>[
             _buildPlayPause(controller),
-            _buildPosition(iconColor),
+            _buildPosition(Colors.white),
             _buildProgressBar(),
             _buildMuteButton(controller),
+            widget.fullScreen ? _buildPipButton() : Container(),
             _buildExpandButton(),
           ],
         ),
@@ -120,6 +163,7 @@ class _MaterialControlsState extends State<MaterialControls> {
           child: new Center(
             child: new Icon(
               widget.fullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
+              color: Colors.white,
             ),
           ),
         ),
@@ -131,10 +175,15 @@ class _MaterialControlsState extends State<MaterialControls> {
     return new Expanded(
       child: new GestureDetector(
         onTap: _latestValue != null && _latestValue.isPlaying
-            ? _cancelAndRestartTimer
+            ? () {
+              _playPause();
+              //_cancelAndRestartTimer;
+              setState(() {
+                _hideStuff = false;
+              });
+            }
             : () {
                 _playPause();
-
                 setState(() {
                   _hideStuff = true;
                 });
@@ -151,12 +200,13 @@ class _MaterialControlsState extends State<MaterialControls> {
               child: new GestureDetector(
                 child: new Container(
                   decoration: new BoxDecoration(
-                    color: Theme.of(context).dialogBackgroundColor,
+                    color: Colors.transparent,
                     borderRadius: new BorderRadius.circular(48.0),
                   ),
                   child: new Padding(
-                    padding: new EdgeInsets.all(12.0),
-                    child: new Icon(Icons.play_arrow, size: 32.0),
+                    padding: new EdgeInsets.only(top: 30.0),
+                    child: new Icon(Icons.play_arrow, size: 50.0,
+                      color: Colors.white,),
                   ),
                 ),
               ),
@@ -196,6 +246,38 @@ class _MaterialControlsState extends State<MaterialControls> {
                 (_latestValue != null && _latestValue.volume > 0)
                     ? Icons.volume_up
                     : Icons.volume_off,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  GestureDetector _buildPipButton() {
+    return new GestureDetector(
+      onTap: () {
+        FlutterAndroidPip.enterPictureInPictureMode;
+        _playPause();
+        setState(() {
+          _hideStuff = true;
+        });
+      },
+      child: new AnimatedOpacity(
+        opacity: _hideStuff ? 0.0 : 1.0,
+        duration: new Duration(milliseconds: 300),
+        child: new ClipRect(
+          child: new Container(
+            child: new Container(
+              height: barHeight,
+              padding: new EdgeInsets.only(
+                left: 8.0,
+                right: 8.0,
+              ),
+              child: new Icon(
+                Icons.picture_in_picture,
+                color: Colors.white,
               ),
             ),
           ),
@@ -210,14 +292,7 @@ class _MaterialControlsState extends State<MaterialControls> {
       child: new Container(
         height: barHeight,
         color: Colors.transparent,
-        margin: new EdgeInsets.only(left: 8.0, right: 4.0),
-        padding: new EdgeInsets.only(
-          left: 12.0,
-          right: 12.0,
-        ),
-        child: new Icon(
-          controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-        ),
+        margin: new EdgeInsets.only(left: 8.0, right: 8.0),
       ),
     );
   }
@@ -236,6 +311,7 @@ class _MaterialControlsState extends State<MaterialControls> {
         '${formatDuration(position)} / ${formatDuration(duration)}',
         style: new TextStyle(
           fontSize: 14.0,
+          color: Colors.white,
         ),
       ),
     );
@@ -339,10 +415,10 @@ class _MaterialControlsState extends State<MaterialControls> {
           },
           colors: widget.progressColors ??
               new ChewieProgressColors(
-                  playedColor: Theme.of(context).accentColor,
-                  handleColor: Theme.of(context).accentColor,
-                  bufferedColor: Theme.of(context).backgroundColor,
-                  backgroundColor: Theme.of(context).disabledColor),
+                  playedColor: Colors.red,
+                  handleColor: Colors.red,
+                  bufferedColor: Colors.grey,
+                  backgroundColor: Colors.grey),
         ),
       ),
     );
