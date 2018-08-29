@@ -116,7 +116,6 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
     super.initState();
   }
 
-
   @override
   void didUpdateWidget(PlayerWithControls oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -127,7 +126,7 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
   }
 
   @override
-  dispose(){
+  dispose() {
     widget.controller.removeListener(_onPlay);
     super.dispose();
   }

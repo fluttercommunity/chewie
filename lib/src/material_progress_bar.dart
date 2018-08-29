@@ -16,8 +16,7 @@ class MaterialVideoProgressBar extends StatefulWidget {
     this.onDragEnd,
     this.onDragStart,
     this.onDragUpdate,
-  })
-      : colors = colors ?? new ChewieProgressColors();
+  }) : colors = colors ?? new ChewieProgressColors();
 
   @override
   _VideoProgressBarState createState() {

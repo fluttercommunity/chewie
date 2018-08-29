@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.0
+
+  * Requires Dart 2
+  * Updated dependencies that were not Dart 2 compatible
+
 ## 0.6.1
 
   * Fix time formatting

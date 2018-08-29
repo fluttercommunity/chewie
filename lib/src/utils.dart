@@ -15,8 +15,8 @@ String formatDuration(Duration position) {
   final secondsString =
       seconds >= 10 ? '$seconds' : seconds == 0 ? '00' : '0$seconds';
 
-  final formattedTime = '${hoursString == '00' ? '' : hoursString +
-      ':'}$minutesString:$secondsString';
+  final formattedTime =
+      '${hoursString == '00' ? '' : hoursString + ':'}$minutesString:$secondsString';
 
   return formattedTime;
 }

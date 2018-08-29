@@ -28,7 +28,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   void initState() {
     super.initState();
     _controller = new VideoPlayerController.network(
-      'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4',
+      'https://github.com/flutter/assets-for-api-docs/blob/master/assets/videos/butterfly.mp4?raw=true',
     );
   }
 
