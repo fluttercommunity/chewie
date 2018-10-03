@@ -48,6 +48,9 @@ class Chewie extends StatefulWidget {
   /// or played.
   final Widget placeholder;
 
+  /// Defines if the player will start in fullscreen when play is pressed
+  final bool fullScreenByDefault;
+
   Chewie(
     this.controller, {
     Key key,
@@ -56,12 +59,12 @@ class Chewie extends StatefulWidget {
     this.autoPlay = false,
     this.startAt,
     this.looping = false,
+    this.fullScreenByDefault = false,
     this.cupertinoProgressColors,
     this.materialProgressColors,
     this.placeholder,
     this.showControls = true,
-  })  : assert(controller != null,
-            'You must provide a controller to play a video'),
+  })  : assert(controller != null, 'You must provide a controller to play a video'),
         super(key: key);
 
   @override
@@ -94,8 +97,7 @@ class _ChewiePlayerState extends State<Chewie> {
     _initialize();
   }
 
-  Widget _buildFullScreenVideo(
-      BuildContext context, Animation<double> animation) {
+  Widget _buildFullScreenVideo(BuildContext context, Animation<double> animation) {
     return new Scaffold(
       resizeToAvoidBottomPadding: false,
       body: new Container(
@@ -103,8 +105,7 @@ class _ChewiePlayerState extends State<Chewie> {
         color: Colors.black,
         child: new PlayerWithControls(
           controller: _controller,
-          onExpandCollapse: () =>
-              new Future<dynamic>.value(Navigator.of(context).pop()),
+          onExpandCollapse: () => new Future<dynamic>.value(Navigator.of(context).pop()),
           aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
           fullScreen: true,
           cupertinoProgressColors: widget.cupertinoProgressColors,
@@ -140,6 +141,10 @@ class _ChewiePlayerState extends State<Chewie> {
 
     if (widget.startAt != null) {
       await _controller.seekTo(widget.startAt);
+    }
+
+    if (widget.fullScreenByDefault) {
+      await _pushFullScreenWidget(context);
     }
   }
 
