@@ -75,6 +75,7 @@ class Chewie extends StatefulWidget {
 
 class _ChewiePlayerState extends State<Chewie> {
   VideoPlayerController _controller;
+  bool _isFullScreen = false;
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +137,11 @@ class _ChewiePlayerState extends State<Chewie> {
     }
 
     if (widget.autoPlay) {
+      if (widget.fullScreenByDefault) {
+        _isFullScreen = true;
+        await _pushFullScreenWidget(context);
+      }
+
       await _controller.play();
     }
 
@@ -144,7 +150,12 @@ class _ChewiePlayerState extends State<Chewie> {
     }
 
     if (widget.fullScreenByDefault) {
-      await _pushFullScreenWidget(context);
+      widget.controller.addListener(() async {
+        if (await widget.controller.value.isPlaying && !_isFullScreen) {
+          _isFullScreen = true;
+          await _pushFullScreenWidget(context);
+        }
+      });
     }
   }
 
@@ -155,6 +166,7 @@ class _ChewiePlayerState extends State<Chewie> {
     if (widget.controller.dataSource != _controller.dataSource) {
       _controller.dispose();
       _controller = widget.controller;
+      _isFullScreen = false;
       _initialize();
     }
   }
