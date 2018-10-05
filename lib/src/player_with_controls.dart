@@ -46,10 +46,7 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
     return new Center(
       child: new Container(
         width: MediaQuery.of(context).size.width,
-        child: widget.fullScreen &&
-                MediaQuery.of(context).orientation == Orientation.landscape
-            ? _buildPlayerWithControls(controller, context)
-            : new AspectRatio(
+        child: new AspectRatio(
                 aspectRatio: widget.aspectRatio,
                 child: _buildPlayerWithControls(controller, context),
               ),
@@ -66,11 +63,7 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
           new Center(
             child: new Hero(
               tag: controller,
-              child: widget.fullScreen &&
-                      MediaQuery.of(context).orientation ==
-                          Orientation.landscape
-                  ? new VideoPlayer(controller)
-                  : new AspectRatio(
+              child: new AspectRatio(
                       aspectRatio: widget.aspectRatio,
                       child: new VideoPlayer(controller),
                     ),
