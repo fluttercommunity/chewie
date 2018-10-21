@@ -9,10 +9,9 @@ environment:
 
 dependencies:
   open_iconic_flutter: ">=0.3.0 <0.4.0"
-  cached_network_image: ^0.4.1
+  cached_network_image: ^0.5.0
   flutter_android_pip: ^0.0.2
-  video_player: ">=0.6.0 <0.7.0"
-  device_info: ^0.2.1
+  video_player: ">=0.7.0 <0.8.0"
   flutter:
     sdk: flutter
 

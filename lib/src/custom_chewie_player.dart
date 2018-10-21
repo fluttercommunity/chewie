@@ -146,10 +146,8 @@ class _ChewiePlayerState extends State<Chewie> {
         child: new PlayerWithControls(
           controller: _controller,
           onExpandCollapse: () {
-            new Future<dynamic>.value(Navigator.of(context).pop())
-                .then(setState(() {
-              leaveFullscreen = true;
-            }));
+            new Future<dynamic>.value(Navigator.of(context).pop());
+            leaveFullscreen = true;
           },
           aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
           fullScreen: true,
