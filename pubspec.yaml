@@ -9,7 +9,7 @@ environment:
 
 dependencies:
   open_iconic_flutter: ">=0.3.0 <0.4.0"
-  video_player: ">=0.6.0 <0.7.0"
+  video_player: ">= 0.6.0 <0.6.4" # video_player should stay at 0.6.4 due to a bug that prevents video rendering with chewie
   flutter:
     sdk: flutter
 

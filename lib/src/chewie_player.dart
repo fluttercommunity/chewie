@@ -48,6 +48,9 @@ class Chewie extends StatefulWidget {
   /// or played.
   final Widget placeholder;
 
+  /// Defines if the player will start in fullscreen when play is pressed
+  final bool fullScreenByDefault;
+
   Chewie(
     this.controller, {
     Key key,
@@ -56,12 +59,12 @@ class Chewie extends StatefulWidget {
     this.autoPlay = false,
     this.startAt,
     this.looping = false,
+    this.fullScreenByDefault = false,
     this.cupertinoProgressColors,
     this.materialProgressColors,
     this.placeholder,
     this.showControls = true,
-  })  : assert(controller != null,
-            'You must provide a controller to play a video'),
+  })  : assert(controller != null, 'You must provide a controller to play a video'),
         super(key: key);
 
   @override
@@ -72,6 +75,7 @@ class Chewie extends StatefulWidget {
 
 class _ChewiePlayerState extends State<Chewie> {
   VideoPlayerController _controller;
+  bool _isFullScreen = false;
 
   @override
   Widget build(BuildContext context) {
@@ -94,8 +98,7 @@ class _ChewiePlayerState extends State<Chewie> {
     _initialize();
   }
 
-  Widget _buildFullScreenVideo(
-      BuildContext context, Animation<double> animation) {
+  Widget _buildFullScreenVideo(BuildContext context, Animation<double> animation) {
     return new Scaffold(
       resizeToAvoidBottomPadding: false,
       body: new Container(
@@ -103,8 +106,7 @@ class _ChewiePlayerState extends State<Chewie> {
         color: Colors.black,
         child: new PlayerWithControls(
           controller: _controller,
-          onExpandCollapse: () =>
-              new Future<dynamic>.value(Navigator.of(context).pop()),
+          onExpandCollapse: () => new Future<dynamic>.value(Navigator.of(context).pop()),
           aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
           fullScreen: true,
           cupertinoProgressColors: widget.cupertinoProgressColors,
@@ -135,11 +137,25 @@ class _ChewiePlayerState extends State<Chewie> {
     }
 
     if (widget.autoPlay) {
+      if (widget.fullScreenByDefault) {
+        _isFullScreen = true;
+        await _pushFullScreenWidget(context);
+      }
+
       await _controller.play();
     }
 
     if (widget.startAt != null) {
       await _controller.seekTo(widget.startAt);
+    }
+
+    if (widget.fullScreenByDefault) {
+      widget.controller.addListener(() async {
+        if (await widget.controller.value.isPlaying && !_isFullScreen) {
+          _isFullScreen = true;
+          await _pushFullScreenWidget(context);
+        }
+      });
     }
   }
 
@@ -150,6 +166,7 @@ class _ChewiePlayerState extends State<Chewie> {
     if (widget.controller.dataSource != _controller.dataSource) {
       _controller.dispose();
       _controller = widget.controller;
+      _isFullScreen = false;
       _initialize();
     }
   }
