@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+
+  * Update to work with `video_player: ">=0.7.0 <0.8.0` - Thanks @Sub6Resources 
+  * Preserves AspectRatio on FullScreen - Thanks @patrickb
+  * Ability to start video in FullScreen - Thanks @miguelpruivo
+
 ## 0.7.0
 
   * Requires Dart 2
