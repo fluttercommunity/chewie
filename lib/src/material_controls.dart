@@ -105,7 +105,9 @@ class _MaterialControlsState extends State<MaterialControls> {
         child: new Row(
           children: <Widget>[
             _buildPlayPause(controller),
-            widget.isLive ? const Text('LIVE') : _buildPosition(iconColor),
+            widget.isLive
+                ? Expanded(child: const Text('LIVE'))
+                : _buildPosition(iconColor),
             widget.isLive ? const SizedBox() : _buildProgressBar(),
             _buildMuteButton(controller),
             _buildExpandButton(),
