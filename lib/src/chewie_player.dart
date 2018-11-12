@@ -5,6 +5,7 @@ import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:screen/screen.dart';
 import 'package:video_player/video_player.dart';
 
 /// A Video Player with Material and Cupertino skins.
@@ -51,6 +52,12 @@ class Chewie extends StatefulWidget {
   /// Defines if the player will start in fullscreen when play is pressed
   final bool fullScreenByDefault;
 
+  /// Defines if the player will sleep in fullscreen or not
+  final bool allowedScreenSleep;
+
+  /// Defines if the controls should be for live stream video
+  final bool isLive;
+
   Chewie(
     this.controller, {
     Key key,
@@ -64,7 +71,10 @@ class Chewie extends StatefulWidget {
     this.materialProgressColors,
     this.placeholder,
     this.showControls = true,
-  })  : assert(controller != null, 'You must provide a controller to play a video'),
+    this.allowedScreenSleep = true,
+    this.isLive = false,
+  })  : assert(controller != null,
+            'You must provide a controller to play a video'),
         super(key: key);
 
   @override
@@ -88,6 +98,7 @@ class _ChewiePlayerState extends State<Chewie> {
       placeholder: widget.placeholder,
       autoPlay: widget.autoPlay,
       showControls: widget.showControls,
+      isLive: widget.isLive,
     );
   }
 
@@ -98,7 +109,8 @@ class _ChewiePlayerState extends State<Chewie> {
     _initialize();
   }
 
-  Widget _buildFullScreenVideo(BuildContext context, Animation<double> animation) {
+  Widget _buildFullScreenVideo(
+      BuildContext context, Animation<double> animation) {
     return new Scaffold(
       resizeToAvoidBottomPadding: false,
       body: new Container(
@@ -106,9 +118,11 @@ class _ChewiePlayerState extends State<Chewie> {
         color: Colors.black,
         child: new PlayerWithControls(
           controller: _controller,
-          onExpandCollapse: () => new Future<dynamic>.value(Navigator.of(context).pop()),
+          onExpandCollapse: () =>
+              new Future<dynamic>.value(Navigator.of(context).pop()),
           aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
           fullScreen: true,
+          isLive: widget.isLive,
           cupertinoProgressColors: widget.cupertinoProgressColors,
           materialProgressColors: widget.materialProgressColors,
         ),
@@ -186,7 +200,16 @@ class _ChewiePlayerState extends State<Chewie> {
       ]);
     }
 
+    if (!widget.allowedScreenSleep) {
+      Screen.keepOn(true);
+    }
+
     await Navigator.of(context).push(route);
+
+    bool isKeptOn = await Screen.isKeptOn;
+    if (isKeptOn) {
+      Screen.keepOn(false);
+    }
 
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     SystemChrome.setPreferredOrientations([
