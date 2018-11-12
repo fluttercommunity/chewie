@@ -99,6 +99,7 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
                 fullScreen: widget.fullScreen,
                 progressColors: widget.cupertinoProgressColors,
                 autoPlay: widget.autoPlay,
+                isLive: widget.isLive,
               )
         : new Container();
   }

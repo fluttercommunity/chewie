@@ -18,6 +18,7 @@ class CupertinoControls extends StatefulWidget {
   final bool fullScreen;
   final ChewieProgressColors progressColors;
   final bool autoPlay;
+  final bool isLive;
 
   CupertinoControls({
     @required this.backgroundColor,
@@ -27,6 +28,7 @@ class CupertinoControls extends StatefulWidget {
     @required this.fullScreen,
     @required this.progressColors,
     @required this.autoPlay,
+    @required this.isLive,
   });
 
   @override
@@ -120,19 +122,37 @@ class _CupertinoControlsState extends State<CupertinoControls> {
                   new Radius.circular(10.0),
                 ),
               ),
-              child: new Row(
-                children: <Widget>[
-                  _buildSkipBack(iconColor, barHeight),
-                  _buildPlayPause(controller, iconColor, barHeight),
-                  _buildSkipForward(iconColor, barHeight),
-                  _buildPosition(iconColor),
-                  _buildProgressBar(),
-                  _buildRemaining(iconColor)
-                ],
-              ),
+              child: widget.isLive
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        _buildPlayPause(controller, iconColor, barHeight),
+                        _buildLive(iconColor),
+                      ],
+                    )
+                  : new Row(
+                      children: <Widget>[
+                        _buildSkipBack(iconColor, barHeight),
+                        _buildPlayPause(controller, iconColor, barHeight),
+                        _buildSkipForward(iconColor, barHeight),
+                        _buildPosition(iconColor),
+                        _buildProgressBar(),
+                        _buildRemaining(iconColor)
+                      ],
+                    ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLive(Color iconColor) {
+    return new Padding(
+      padding: new EdgeInsets.only(right: 12.0),
+      child: new Text(
+        'LIVE',
+        style: new TextStyle(color: iconColor, fontSize: 12.0),
       ),
     );
   }
