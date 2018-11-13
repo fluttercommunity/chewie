@@ -18,6 +18,7 @@ class PlayerWithControls extends StatefulWidget {
   final double aspectRatio;
   final bool autoPlay;
   final bool showControls;
+  final bool isLive;
 
   PlayerWithControls({
     Key key,
@@ -30,6 +31,7 @@ class PlayerWithControls extends StatefulWidget {
     this.materialProgressColors,
     this.placeholder,
     this.autoPlay,
+    this.isLive = false,
   }) : super(key: key);
 
   @override
@@ -47,9 +49,9 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
       child: new Container(
         width: MediaQuery.of(context).size.width,
         child: new AspectRatio(
-                aspectRatio: widget.aspectRatio,
-                child: _buildPlayerWithControls(controller, context),
-              ),
+          aspectRatio: widget.aspectRatio,
+          child: _buildPlayerWithControls(controller, context),
+        ),
       ),
     );
   }
@@ -64,9 +66,9 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
             child: new Hero(
               tag: controller,
               child: new AspectRatio(
-                      aspectRatio: widget.aspectRatio,
-                      child: new VideoPlayer(controller),
-                    ),
+                aspectRatio: widget.aspectRatio,
+                child: new VideoPlayer(controller),
+              ),
             ),
           ),
           _buildControls(context, controller),
@@ -87,6 +89,7 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
                 fullScreen: widget.fullScreen,
                 progressColors: widget.materialProgressColors,
                 autoPlay: widget.autoPlay,
+                isLive: widget.isLive,
               )
             : new CupertinoControls(
                 backgroundColor: new Color.fromRGBO(41, 41, 41, 0.7),
@@ -96,6 +99,7 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
                 fullScreen: widget.fullScreen,
                 progressColors: widget.cupertinoProgressColors,
                 autoPlay: widget.autoPlay,
+                isLive: widget.isLive,
               )
         : new Container();
   }

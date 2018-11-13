@@ -13,6 +13,7 @@ class MaterialControls extends StatefulWidget {
   final Future<dynamic> Function() onExpandCollapse;
   final ChewieProgressColors progressColors;
   final bool autoPlay;
+  final bool isLive;
 
   MaterialControls({
     @required this.controller,
@@ -20,6 +21,7 @@ class MaterialControls extends StatefulWidget {
     @required this.onExpandCollapse,
     @required this.progressColors,
     @required this.autoPlay,
+    @required this.isLive,
   });
 
   @override
@@ -103,8 +105,10 @@ class _MaterialControlsState extends State<MaterialControls> {
         child: new Row(
           children: <Widget>[
             _buildPlayPause(controller),
-            _buildPosition(iconColor),
-            _buildProgressBar(),
+            widget.isLive
+                ? Expanded(child: const Text('LIVE'))
+                : _buildPosition(iconColor),
+            widget.isLive ? const SizedBox() : _buildProgressBar(),
             _buildMuteButton(controller),
             _buildExpandButton(),
           ],
