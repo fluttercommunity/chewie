@@ -58,6 +58,9 @@ class Chewie extends StatefulWidget {
   /// Defines if the controls should be for live stream video
   final bool isLive;
 
+  /// Defines if the full screen control should be shown
+  final bool allowFullscreen;
+
   Chewie(
     this.controller, {
     Key key,
@@ -73,6 +76,7 @@ class Chewie extends StatefulWidget {
     this.showControls = true,
     this.allowedScreenSleep = true,
     this.isLive = false,
+    this.allowFullscreen = true
   })  : assert(controller != null,
             'You must provide a controller to play a video'),
         super(key: key);
@@ -99,6 +103,7 @@ class _ChewiePlayerState extends State<Chewie> {
       autoPlay: widget.autoPlay,
       showControls: widget.showControls,
       isLive: widget.isLive,
+      allowFullscreen: widget.allowFullscreen
     );
   }
 

@@ -19,6 +19,7 @@ class CupertinoControls extends StatefulWidget {
   final ChewieProgressColors progressColors;
   final bool autoPlay;
   final bool isLive;
+  final bool allowFullscreen;
 
   CupertinoControls({
     @required this.backgroundColor,
@@ -29,6 +30,7 @@ class CupertinoControls extends StatefulWidget {
     @required this.progressColors,
     @required this.autoPlay,
     @required this.isLive,
+    @required this.allowFullscreen
   });
 
   @override

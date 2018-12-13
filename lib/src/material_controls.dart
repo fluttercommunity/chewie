@@ -14,6 +14,7 @@ class MaterialControls extends StatefulWidget {
   final ChewieProgressColors progressColors;
   final bool autoPlay;
   final bool isLive;
+  final bool allowFullscreen;
 
   MaterialControls({
     @required this.controller,
@@ -22,6 +23,7 @@ class MaterialControls extends StatefulWidget {
     @required this.progressColors,
     @required this.autoPlay,
     @required this.isLive,
+    @required this.allowFullscreen
   });
 
   @override

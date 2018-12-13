@@ -19,6 +19,7 @@ class PlayerWithControls extends StatefulWidget {
   final bool autoPlay;
   final bool showControls;
   final bool isLive;
+  final bool allowFullscreen;
 
   PlayerWithControls({
     Key key,
@@ -32,6 +33,7 @@ class PlayerWithControls extends StatefulWidget {
     this.placeholder,
     this.autoPlay,
     this.isLive = false,
+    this.allowFullscreen = true
   }) : super(key: key);
 
   @override
@@ -90,6 +92,7 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
                 progressColors: widget.materialProgressColors,
                 autoPlay: widget.autoPlay,
                 isLive: widget.isLive,
+                allowFullscreen: widget.allowFullscreen
               )
             : new CupertinoControls(
                 backgroundColor: new Color.fromRGBO(41, 41, 41, 0.7),
@@ -100,6 +103,7 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
                 progressColors: widget.cupertinoProgressColors,
                 autoPlay: widget.autoPlay,
                 isLive: widget.isLive,
+                allowFullscreen: widget.allowFullscreen
               )
         : new Container();
   }
