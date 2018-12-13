@@ -112,7 +112,7 @@ class _MaterialControlsState extends State<MaterialControls> {
                 : _buildPosition(iconColor),
             widget.isLive ? const SizedBox() : _buildProgressBar(),
             _buildMuteButton(controller),
-            _buildExpandButton(),
+            widget.allowFullscreen ? _buildExpandButton() : new Container(),
           ],
         ),
       ),

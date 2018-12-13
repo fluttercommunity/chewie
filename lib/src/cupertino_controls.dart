@@ -391,8 +391,9 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       ),
       child: new Row(
         children: <Widget>[
-          _buildExpandButton(
-              backgroundColor, iconColor, barHeight, buttonPadding),
+          widget.allowFullscreen ? _buildExpandButton(
+              backgroundColor, iconColor, barHeight, buttonPadding)
+              : new Container(),
           new Expanded(child: new Container()),
           _buildMuteButton(
               controller, backgroundColor, iconColor, barHeight, buttonPadding),
