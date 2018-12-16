@@ -111,8 +111,8 @@ class _ChewiePlayerState extends State<Chewie> {
   
   @override
   void dispose() {
-    super.dispose();
     _controller.dispose();
+    super.dispose();
   }
 
   Widget _buildFullScreenVideo(
