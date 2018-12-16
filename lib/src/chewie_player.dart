@@ -108,6 +108,12 @@ class _ChewiePlayerState extends State<Chewie> {
     _controller = widget.controller;
     _initialize();
   }
+  
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
 
   Widget _buildFullScreenVideo(
       BuildContext context, Animation<double> animation) {
