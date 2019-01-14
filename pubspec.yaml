@@ -9,7 +9,7 @@ environment:
 
 dependencies:
   open_iconic_flutter: ">=0.3.0 <0.4.0"
-  video_player: ">=0.7.0 <0.8.0"
+  video_player: ">=0.7.0 <0.9.0"
   screen: ">=0.0.4 <0.1.0"
   flutter:
     sdk: flutter
