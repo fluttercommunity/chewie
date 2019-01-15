@@ -286,8 +286,7 @@ class _MaterialControlsState extends State<MaterialControls> {
       _hideStuff = true;
 
       widget.onExpandCollapse().then((dynamic _) {
-        _showAfterExpandCollapseTimer =
-            Timer(Duration(milliseconds: 300), () {
+        _showAfterExpandCollapseTimer = Timer(Duration(milliseconds: 300), () {
           setState(() {
             _cancelAndRestartTimer();
           });

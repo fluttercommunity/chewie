@@ -508,17 +508,14 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   void _skipBack() {
     _cancelAndRestartTimer();
     final beginning = Duration(seconds: 0).inMilliseconds;
-    final skip =
-        (_latestValue.position - Duration(seconds: 15)).inMilliseconds;
-    widget.controller
-        .seekTo(Duration(milliseconds: math.max(skip, beginning)));
+    final skip = (_latestValue.position - Duration(seconds: 15)).inMilliseconds;
+    widget.controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
   }
 
   void _skipForward() {
     _cancelAndRestartTimer();
     final end = _latestValue.duration.inMilliseconds;
-    final skip =
-        (_latestValue.position + Duration(seconds: 15)).inMilliseconds;
+    final skip = (_latestValue.position + Duration(seconds: 15)).inMilliseconds;
     widget.controller.seekTo(Duration(milliseconds: math.min(skip, end)));
   }
 
