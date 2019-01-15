@@ -11,8 +11,8 @@ class ChewieProgressColors {
     Color bufferedColor: const Color.fromRGBO(30, 30, 200, 0.2),
     Color handleColor: const Color.fromRGBO(200, 200, 200, 1.0),
     Color backgroundColor: const Color.fromRGBO(200, 200, 200, 0.5),
-  })  : playedPaint = new Paint()..color = playedColor,
-        bufferedPaint = new Paint()..color = bufferedColor,
-        handlePaint = new Paint()..color = handleColor,
-        backgroundPaint = new Paint()..color = backgroundColor;
+  })  : playedPaint = Paint()..color = playedColor,
+        bufferedPaint = Paint()..color = bufferedColor,
+        handlePaint = Paint()..color = handleColor,
+        backgroundPaint = Paint()..color = backgroundColor;
 }

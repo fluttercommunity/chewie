@@ -79,7 +79,7 @@ class Chewie extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new _ChewiePlayerState();
+    return _ChewiePlayerState();
   }
 }
 
@@ -89,7 +89,7 @@ class _ChewiePlayerState extends State<Chewie> {
 
   @override
   Widget build(BuildContext context) {
-    return new PlayerWithControls(
+    return PlayerWithControls(
       controller: _controller,
       onExpandCollapse: () => _pushFullScreenWidget(context),
       aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
@@ -111,15 +111,15 @@ class _ChewiePlayerState extends State<Chewie> {
 
   Widget _buildFullScreenVideo(
       BuildContext context, Animation<double> animation) {
-    return new Scaffold(
+    return Scaffold(
       resizeToAvoidBottomPadding: false,
-      body: new Container(
+      body: Container(
         alignment: Alignment.center,
         color: Colors.black,
-        child: new PlayerWithControls(
+        child: PlayerWithControls(
           controller: _controller,
           onExpandCollapse: () =>
-              new Future<dynamic>.value(Navigator.of(context).pop()),
+              Future<dynamic>.value(Navigator.of(context).pop()),
           aspectRatio: widget.aspectRatio ?? _calculateAspectRatio(context),
           fullScreen: true,
           isLive: widget.isLive,
@@ -135,7 +135,7 @@ class _ChewiePlayerState extends State<Chewie> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    return new AnimatedBuilder(
+    return AnimatedBuilder(
       animation: animation,
       builder: (BuildContext context, Widget child) {
         return _buildFullScreenVideo(context, animation);
@@ -187,8 +187,8 @@ class _ChewiePlayerState extends State<Chewie> {
 
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
     final isAndroid = Theme.of(context).platform == TargetPlatform.android;
-    final TransitionRoute<Null> route = new PageRouteBuilder<Null>(
-      settings: new RouteSettings(isInitialRoute: false),
+    final TransitionRoute<Null> route = PageRouteBuilder<Null>(
+      settings: RouteSettings(isInitialRoute: false),
       pageBuilder: _fullScreenRoutePageBuilder,
     );
 

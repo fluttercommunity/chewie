@@ -26,7 +26,7 @@ class MaterialControls extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new _MaterialControlsState();
+    return _MaterialControlsState();
   }
 }
 
@@ -44,7 +44,7 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   @override
   Widget build(BuildContext context) {
-    return new Column(
+    return Column(
       children: <Widget>[
         _latestValue != null &&
                     !_latestValue.isPlaying &&
@@ -96,13 +96,13 @@ class _MaterialControlsState extends State<MaterialControls> {
   ) {
     final iconColor = Theme.of(context).textTheme.button.color;
 
-    return new AnimatedOpacity(
+    return AnimatedOpacity(
       opacity: _hideStuff ? 0.0 : 1.0,
-      duration: new Duration(milliseconds: 300),
-      child: new Container(
+      duration: Duration(milliseconds: 300),
+      child: Container(
         height: barHeight,
         color: Theme.of(context).dialogBackgroundColor,
-        child: new Row(
+        child: Row(
           children: <Widget>[
             _buildPlayPause(controller),
             widget.isLive
@@ -118,20 +118,20 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   GestureDetector _buildExpandButton() {
-    return new GestureDetector(
+    return GestureDetector(
       onTap: _onExpandCollapse,
-      child: new AnimatedOpacity(
+      child: AnimatedOpacity(
         opacity: _hideStuff ? 0.0 : 1.0,
-        duration: new Duration(milliseconds: 300),
-        child: new Container(
+        duration: Duration(milliseconds: 300),
+        child: Container(
           height: barHeight,
-          margin: new EdgeInsets.only(right: 12.0),
-          padding: new EdgeInsets.only(
+          margin: EdgeInsets.only(right: 12.0),
+          padding: EdgeInsets.only(
             left: 8.0,
             right: 8.0,
           ),
-          child: new Center(
-            child: new Icon(
+          child: Center(
+            child: Icon(
               widget.fullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
             ),
           ),
@@ -141,8 +141,8 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   Expanded _buildHitArea() {
-    return new Expanded(
-      child: new GestureDetector(
+    return Expanded(
+      child: GestureDetector(
         onTap: _latestValue != null && _latestValue.isPlaying
             ? _cancelAndRestartTimer
             : () {
@@ -152,24 +152,24 @@ class _MaterialControlsState extends State<MaterialControls> {
                   _hideStuff = true;
                 });
               },
-        child: new Container(
+        child: Container(
           color: Colors.transparent,
-          child: new Center(
-            child: new AnimatedOpacity(
+          child: Center(
+            child: AnimatedOpacity(
               opacity:
                   _latestValue != null && !_latestValue.isPlaying && !_dragging
                       ? 1.0
                       : 0.0,
-              duration: new Duration(milliseconds: 300),
-              child: new GestureDetector(
-                child: new Container(
-                  decoration: new BoxDecoration(
+              duration: Duration(milliseconds: 300),
+              child: GestureDetector(
+                child: Container(
+                  decoration: BoxDecoration(
                     color: Theme.of(context).dialogBackgroundColor,
-                    borderRadius: new BorderRadius.circular(48.0),
+                    borderRadius: BorderRadius.circular(48.0),
                   ),
-                  child: new Padding(
-                    padding: new EdgeInsets.all(12.0),
-                    child: new Icon(Icons.play_arrow, size: 32.0),
+                  child: Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: Icon(Icons.play_arrow, size: 32.0),
                   ),
                 ),
               ),
@@ -183,7 +183,7 @@ class _MaterialControlsState extends State<MaterialControls> {
   GestureDetector _buildMuteButton(
     VideoPlayerController controller,
   ) {
-    return new GestureDetector(
+    return GestureDetector(
       onTap: () {
         _cancelAndRestartTimer();
 
@@ -194,18 +194,18 @@ class _MaterialControlsState extends State<MaterialControls> {
           controller.setVolume(0.0);
         }
       },
-      child: new AnimatedOpacity(
+      child: AnimatedOpacity(
         opacity: _hideStuff ? 0.0 : 1.0,
-        duration: new Duration(milliseconds: 300),
-        child: new ClipRect(
-          child: new Container(
-            child: new Container(
+        duration: Duration(milliseconds: 300),
+        child: ClipRect(
+          child: Container(
+            child: Container(
               height: barHeight,
-              padding: new EdgeInsets.only(
+              padding: EdgeInsets.only(
                 left: 8.0,
                 right: 8.0,
               ),
-              child: new Icon(
+              child: Icon(
                 (_latestValue != null && _latestValue.volume > 0)
                     ? Icons.volume_up
                     : Icons.volume_off,
@@ -218,17 +218,17 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   GestureDetector _buildPlayPause(VideoPlayerController controller) {
-    return new GestureDetector(
+    return GestureDetector(
       onTap: _playPause,
-      child: new Container(
+      child: Container(
         height: barHeight,
         color: Colors.transparent,
-        margin: new EdgeInsets.only(left: 8.0, right: 4.0),
-        padding: new EdgeInsets.only(
+        margin: EdgeInsets.only(left: 8.0, right: 4.0),
+        padding: EdgeInsets.only(
           left: 12.0,
           right: 12.0,
         ),
-        child: new Icon(
+        child: Icon(
           controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
         ),
       ),
@@ -243,11 +243,11 @@ class _MaterialControlsState extends State<MaterialControls> {
         ? _latestValue.duration
         : Duration.zero;
 
-    return new Padding(
-      padding: new EdgeInsets.only(right: 24.0),
-      child: new Text(
+    return Padding(
+      padding: EdgeInsets.only(right: 24.0),
+      child: Text(
         '${formatDuration(position)} / ${formatDuration(duration)}',
-        style: new TextStyle(
+        style: TextStyle(
           fontSize: 14.0,
         ),
       ),
@@ -274,7 +274,7 @@ class _MaterialControlsState extends State<MaterialControls> {
       _startHideTimer();
     }
 
-    _showTimer = new Timer(new Duration(milliseconds: 200), () {
+    _showTimer = Timer(Duration(milliseconds: 200), () {
       setState(() {
         _hideStuff = false;
       });
@@ -287,7 +287,7 @@ class _MaterialControlsState extends State<MaterialControls> {
 
       widget.onExpandCollapse().then((dynamic _) {
         _showAfterExpandCollapseTimer =
-            new Timer(new Duration(milliseconds: 300), () {
+            Timer(Duration(milliseconds: 300), () {
           setState(() {
             _cancelAndRestartTimer();
           });
@@ -317,7 +317,7 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   void _startHideTimer() {
-    _hideTimer = new Timer(const Duration(seconds: 3), () {
+    _hideTimer = Timer(const Duration(seconds: 3), () {
       setState(() {
         _hideStuff = true;
       });
@@ -331,10 +331,10 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   Widget _buildProgressBar() {
-    return new Expanded(
-      child: new Padding(
-        padding: new EdgeInsets.only(right: 20.0),
-        child: new MaterialVideoProgressBar(
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.only(right: 20.0),
+        child: MaterialVideoProgressBar(
           widget.controller,
           onDragStart: () {
             setState(() {
@@ -351,7 +351,7 @@ class _MaterialControlsState extends State<MaterialControls> {
             _startHideTimer();
           },
           colors: widget.progressColors ??
-              new ChewieProgressColors(
+              ChewieProgressColors(
                   playedColor: Theme.of(context).accentColor,
                   handleColor: Theme.of(context).accentColor,
                   bufferedColor: Theme.of(context).backgroundColor,

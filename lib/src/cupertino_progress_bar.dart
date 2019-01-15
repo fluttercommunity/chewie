@@ -16,11 +16,11 @@ class CupertinoVideoProgressBar extends StatefulWidget {
     this.onDragEnd,
     this.onDragStart,
     this.onDragUpdate,
-  }) : colors = colors ?? new ChewieProgressColors();
+  }) : colors = colors ?? ChewieProgressColors();
 
   @override
   _VideoProgressBarState createState() {
-    return new _VideoProgressBarState();
+    return _VideoProgressBarState();
   }
 }
 
@@ -59,16 +59,16 @@ class _VideoProgressBarState extends State<CupertinoVideoProgressBar> {
       controller.seekTo(position);
     }
 
-    return new GestureDetector(
+    return GestureDetector(
       child: (controller.value.hasError)
-          ? new Text(controller.value.errorDescription)
-          : new Center(
-              child: new Container(
+          ? Text(controller.value.errorDescription)
+          : Center(
+              child: Container(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
                 color: Colors.transparent,
-                child: new CustomPaint(
-                  painter: new _ProgressBarPainter(
+                child: CustomPaint(
+                  painter: _ProgressBarPainter(
                     controller.value,
                     widget.colors,
                   ),
@@ -135,12 +135,12 @@ class _ProgressBarPainter extends CustomPainter {
     final baseOffset = size.height / 2 - barHeight / 2.0;
 
     canvas.drawRRect(
-      new RRect.fromRectAndRadius(
-        new Rect.fromPoints(
-          new Offset(0.0, baseOffset),
-          new Offset(size.width, baseOffset + barHeight),
+      RRect.fromRectAndRadius(
+        Rect.fromPoints(
+          Offset(0.0, baseOffset),
+          Offset(size.width, baseOffset + barHeight),
         ),
-        new Radius.circular(4.0),
+        Radius.circular(4.0),
       ),
       colors.backgroundPaint,
     );
@@ -154,35 +154,35 @@ class _ProgressBarPainter extends CustomPainter {
       final double start = range.startFraction(value.duration) * size.width;
       final double end = range.endFraction(value.duration) * size.width;
       canvas.drawRRect(
-        new RRect.fromRectAndRadius(
-          new Rect.fromPoints(
-            new Offset(start, baseOffset),
-            new Offset(end, baseOffset + barHeight),
+        RRect.fromRectAndRadius(
+          Rect.fromPoints(
+            Offset(start, baseOffset),
+            Offset(end, baseOffset + barHeight),
           ),
-          new Radius.circular(4.0),
+          Radius.circular(4.0),
         ),
         colors.bufferedPaint,
       );
     }
     canvas.drawRRect(
-      new RRect.fromRectAndRadius(
-        new Rect.fromPoints(
-          new Offset(0.0, baseOffset),
-          new Offset(playedPart, baseOffset + barHeight),
+      RRect.fromRectAndRadius(
+        Rect.fromPoints(
+          Offset(0.0, baseOffset),
+          Offset(playedPart, baseOffset + barHeight),
         ),
-        new Radius.circular(4.0),
+        Radius.circular(4.0),
       ),
       colors.playedPaint,
     );
 
-    final shadowPath = new Path()
-      ..addOval(new Rect.fromCircle(
-          center: new Offset(playedPart, baseOffset + barHeight / 2),
+    final shadowPath = Path()
+      ..addOval(Rect.fromCircle(
+          center: Offset(playedPart, baseOffset + barHeight / 2),
           radius: handleHeight));
 
     canvas.drawShadow(shadowPath, Colors.black, 0.2, false);
     canvas.drawCircle(
-      new Offset(playedPart, baseOffset + barHeight / 2),
+      Offset(playedPart, baseOffset + barHeight / 2),
       handleHeight,
       colors.handlePaint,
     );

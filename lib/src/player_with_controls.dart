@@ -36,7 +36,7 @@ class PlayerWithControls extends StatefulWidget {
 
   @override
   State createState() {
-    return new _VideoPlayerWithControlsState();
+    return _VideoPlayerWithControlsState();
   }
 }
 
@@ -45,10 +45,10 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
   Widget build(BuildContext context) {
     final controller = widget.controller;
 
-    return new Center(
-      child: new Container(
+    return Center(
+      child: Container(
         width: MediaQuery.of(context).size.width,
-        child: new AspectRatio(
+        child: AspectRatio(
           aspectRatio: widget.aspectRatio,
           child: _buildPlayerWithControls(controller, context),
         ),
@@ -58,16 +58,16 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
 
   Container _buildPlayerWithControls(
       VideoPlayerController controller, BuildContext context) {
-    return new Container(
-      child: new Stack(
+    return Container(
+      child: Stack(
         children: <Widget>[
-          widget.placeholder ?? new Container(),
-          new Center(
-            child: new Hero(
+          widget.placeholder ?? Container(),
+          Center(
+            child: Hero(
               tag: controller,
-              child: new AspectRatio(
+              child: AspectRatio(
                 aspectRatio: widget.aspectRatio,
-                child: new VideoPlayer(controller),
+                child: VideoPlayer(controller),
               ),
             ),
           ),
@@ -83,7 +83,7 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
   ) {
     return widget.showControls
         ? Theme.of(context).platform == TargetPlatform.android
-            ? new MaterialControls(
+            ? MaterialControls(
                 controller: controller,
                 onExpandCollapse: widget.onExpandCollapse,
                 fullScreen: widget.fullScreen,
@@ -91,9 +91,9 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
                 autoPlay: widget.autoPlay,
                 isLive: widget.isLive,
               )
-            : new CupertinoControls(
-                backgroundColor: new Color.fromRGBO(41, 41, 41, 0.7),
-                iconColor: new Color.fromARGB(255, 200, 200, 200),
+            : CupertinoControls(
+                backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
+                iconColor: Color.fromARGB(255, 200, 200, 200),
                 controller: controller,
                 onExpandCollapse: widget.onExpandCollapse,
                 fullScreen: widget.fullScreen,
@@ -101,7 +101,7 @@ class _VideoPlayerWithControlsState extends State<PlayerWithControls> {
                 autoPlay: widget.autoPlay,
                 isLive: widget.isLive,
               )
-        : new Container();
+        : Container();
   }
 
   @override
