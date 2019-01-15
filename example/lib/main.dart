@@ -28,7 +28,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   void initState() {
     super.initState();
     _controller = new VideoPlayerController.network(
-      'https://github.com/flutter/assets-for-api-docs/blob/master/assets/videos/butterfly.mp4?raw=true',
+      'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
     );
   }
 
@@ -76,7 +76,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     onPressed: () {
                       setState(() {
                         _controller = new VideoPlayerController.network(
-                          'https://github.com/flutter/assets-for-api-docs/blob/master/assets/videos/butterfly.mp4?raw=true',
+                          'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
                         );
                       });
                     },
@@ -91,7 +91,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     onPressed: () {
                       setState(() {
                         _controller = new VideoPlayerController.network(
-                          'http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4',
+                          'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_20mb.mp4',
                         );
                       });
                     },
