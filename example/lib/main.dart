@@ -5,7 +5,7 @@ import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(
-    new ChewieDemo(),
+    ChewieDemo(),
   );
 }
 
@@ -16,7 +16,7 @@ class ChewieDemo extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new _ChewieDemoState();
+    return _ChewieDemoState();
   }
 }
 
@@ -27,27 +27,27 @@ class _ChewieDemoState extends State<ChewieDemo> {
   @override
   void initState() {
     super.initState();
-    _controller = new VideoPlayerController.network(
+    _controller = VideoPlayerController.network(
       'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
+    return MaterialApp(
       title: widget.title,
-      theme: new ThemeData.light().copyWith(
+      theme: ThemeData.light().copyWith(
         platform: _platform ?? Theme.of(context).platform,
       ),
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text(widget.title),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-        body: new Column(
+        body: Column(
           children: <Widget>[
-            new Expanded(
-              child: new Center(
-                child: new Chewie(
+            Expanded(
+              child: Center(
+                child: Chewie(
                   _controller,
                   aspectRatio: 3 / 2,
                   autoPlay: true,
@@ -56,78 +56,78 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   // Try playing around with some of these other options:
 
                   // showControls: false,
-                  // materialProgressColors: new ChewieProgressColors(
+                  // materialProgressColors: ChewieProgressColors(
                   //   playedColor: Colors.red,
                   //   handleColor: Colors.blue,
                   //   backgroundColor: Colors.grey,
                   //   bufferedColor: Colors.lightGreen,
                   // ),
-                  // placeholder: new Container(
+                  // placeholder: Container(
                   //   color: Colors.grey,
                   // ),
                   // autoInitialize: true,
                 ),
               ),
             ),
-            new Row(
+            Row(
               children: <Widget>[
-                new Expanded(
-                  child: new FlatButton(
+                Expanded(
+                  child: FlatButton(
                     onPressed: () {
                       setState(() {
-                        _controller = new VideoPlayerController.network(
+                        _controller = VideoPlayerController.network(
                           'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
                         );
                       });
                     },
-                    child: new Padding(
-                      child: new Text("Video 1"),
-                      padding: new EdgeInsets.symmetric(vertical: 16.0),
+                    child: Padding(
+                      child: Text("Video 1"),
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
                     ),
                   ),
                 ),
-                new Expanded(
-                  child: new FlatButton(
+                Expanded(
+                  child: FlatButton(
                     onPressed: () {
                       setState(() {
-                        _controller = new VideoPlayerController.network(
+                        _controller = VideoPlayerController.network(
                           'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_20mb.mp4',
                         );
                       });
                     },
-                    child: new Padding(
-                      padding: new EdgeInsets.symmetric(vertical: 16.0),
-                      child: new Text("Video 2"),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("Video 2"),
                     ),
                   ),
                 )
               ],
             ),
-            new Row(
+            Row(
               children: <Widget>[
-                new Expanded(
-                  child: new FlatButton(
+                Expanded(
+                  child: FlatButton(
                     onPressed: () {
                       setState(() {
                         _platform = TargetPlatform.android;
                       });
                     },
-                    child: new Padding(
-                      child: new Text("Android controls"),
-                      padding: new EdgeInsets.symmetric(vertical: 16.0),
+                    child: Padding(
+                      child: Text("Android controls"),
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
                     ),
                   ),
                 ),
-                new Expanded(
-                  child: new FlatButton(
+                Expanded(
+                  child: FlatButton(
                     onPressed: () {
                       setState(() {
                         _platform = TargetPlatform.iOS;
                       });
                     },
-                    child: new Padding(
-                      padding: new EdgeInsets.symmetric(vertical: 16.0),
-                      child: new Text("iOS controls"),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("iOS controls"),
                     ),
                   ),
                 )
