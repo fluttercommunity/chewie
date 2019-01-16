@@ -97,6 +97,11 @@ class ChewieController extends ValueNotifier<ChewieValue> {
   /// Defines if the controls should be for live stream video
   final bool isLive;
 
+  bool get isFullScreen => value.isFullScreen;
+
+  VideoPlayerController get videoPlayerController =>
+      value.videoPlayerController;
+
   Future _initialize() async {
     await value.videoPlayerController.setLooping(looping);
 

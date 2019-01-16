@@ -43,7 +43,7 @@ class ChewieState extends State<Chewie> {
   }
 
   void listener() async {
-    if (widget.controller.value.isFullScreen && !_isFullScreen) {
+    if (widget.controller.isFullScreen && !_isFullScreen) {
       _isFullScreen = true;
       await _pushFullScreenWidget(context);
     } else if (_isFullScreen) {

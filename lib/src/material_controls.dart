@@ -66,7 +66,7 @@ class _MaterialControlsState extends State<MaterialControls> {
   @override
   void didChangeDependencies() {
     chewieController = ChewieControllerProvider.of(context);
-    controller = chewieController.value.videoPlayerController;
+    controller = chewieController.videoPlayerController;
 
     _dispose();
     _initialize();
@@ -115,7 +115,7 @@ class _MaterialControlsState extends State<MaterialControls> {
           ),
           child: Center(
             child: Icon(
-              chewieController.value.isFullScreen
+              chewieController.isFullScreen
                   ? Icons.fullscreen_exit
                   : Icons.fullscreen,
             ),

@@ -43,7 +43,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     final backgroundColor = widget.backgroundColor;
     final iconColor = widget.iconColor;
     chewieController = ChewieControllerProvider.of(context);
-    controller = chewieController.value.videoPlayerController;
+    controller = chewieController.videoPlayerController;
     final orientation = MediaQuery.of(context).orientation;
     final barHeight = orientation == Orientation.portrait ? 30.0 : 47.0;
     final buttonPadding = orientation == Orientation.portrait ? 16.0 : 24.0;
@@ -73,7 +73,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   @override
   void didChangeDependencies() {
     chewieController = ChewieControllerProvider.of(context);
-    controller = chewieController.value.videoPlayerController;
+    controller = chewieController.videoPlayerController;
 
     _dispose();
     _initialize();
@@ -170,7 +170,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
               ),
               child: Center(
                 child: Icon(
-                  chewieController.value.isFullScreen
+                  chewieController.isFullScreen
                       ? OpenIconicIcons.fullscreenExit
                       : OpenIconicIcons.fullscreenEnter,
                   color: iconColor,

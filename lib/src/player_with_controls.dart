@@ -35,12 +35,12 @@ class PlayerWithControls extends StatelessWidget {
           chewieController.placeholder ?? Container(),
           Center(
             child: Hero(
-              tag: chewieController.value.videoPlayerController,
+              tag: chewieController.videoPlayerController,
               child: AspectRatio(
                 aspectRatio: chewieController.aspectRatio ??
                     _calculateAspectRatio(context),
                 child:
-                    VideoPlayer(chewieController.value.videoPlayerController),
+                    VideoPlayer(chewieController.videoPlayerController),
               ),
             ),
           ),
