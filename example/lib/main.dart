@@ -1,4 +1,5 @@
 import 'package:chewie/chewie.dart';
+import 'package:chewie/src/chewie_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -22,13 +23,32 @@ class ChewieDemo extends StatefulWidget {
 
 class _ChewieDemoState extends State<ChewieDemo> {
   TargetPlatform _platform;
-  VideoPlayerController _controller;
+  VideoPlayerController _videoPlayerController;
+  ChewieController _chewieController;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
+    _videoPlayerController = VideoPlayerController.network(
       'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+    );
+    _chewieController = ChewieController(
+      _videoPlayerController, aspectRatio: 3 / 2,
+      autoPlay: true,
+      looping: true,
+      // Try playing around with some of these other options:
+
+      // showControls: false,
+      // materialProgressColors: ChewieProgressColors(
+      //   playedColor: Colors.red,
+      //   handleColor: Colors.blue,
+      //   backgroundColor: Colors.grey,
+      //   bufferedColor: Colors.lightGreen,
+      // ),
+      // placeholder: Container(
+      //   color: Colors.grey,
+      // ),
+      // autoInitialize: true,
     );
   }
 
@@ -48,26 +68,15 @@ class _ChewieDemoState extends State<ChewieDemo> {
             Expanded(
               child: Center(
                 child: Chewie(
-                  _controller,
-                  aspectRatio: 3 / 2,
-                  autoPlay: true,
-                  looping: true,
-
-                  // Try playing around with some of these other options:
-
-                  // showControls: false,
-                  // materialProgressColors: ChewieProgressColors(
-                  //   playedColor: Colors.red,
-                  //   handleColor: Colors.blue,
-                  //   backgroundColor: Colors.grey,
-                  //   bufferedColor: Colors.lightGreen,
-                  // ),
-                  // placeholder: Container(
-                  //   color: Colors.grey,
-                  // ),
-                  // autoInitialize: true,
+                  controller: _chewieController,
                 ),
               ),
+            ),
+            FlatButton(
+              onPressed: () {
+                _chewieController.enterFullscreen();
+              },
+              child: Text('Fullscreen'),
             ),
             Row(
               children: <Widget>[
@@ -75,7 +84,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: FlatButton(
                     onPressed: () {
                       setState(() {
-                        _controller = VideoPlayerController.network(
+                        _chewieController.videoPlayerController =
+                            VideoPlayerController.network(
                           'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
                         );
                       });
@@ -90,8 +100,10 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: FlatButton(
                     onPressed: () {
                       setState(() {
-                        _controller = VideoPlayerController.network(
-                          'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_20mb.mp4',
+                        _chewieController.videoPlayerController =
+                            VideoPlayerController.network(
+                              'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
+//                          'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_20mb.mp4',
                         );
                       });
                     },

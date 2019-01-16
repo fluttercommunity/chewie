@@ -1,28 +1,14 @@
 import 'dart:async';
 
+import 'package:chewie/src/chewie_controller.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/material_progress_bar.dart';
 import 'package:chewie/src/utils.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class MaterialControls extends StatefulWidget {
-  final VideoPlayerController controller;
-  final bool fullScreen;
-  final Future<dynamic> Function() onExpandCollapse;
-  final ChewieProgressColors progressColors;
-  final bool autoPlay;
-  final bool isLive;
-
-  MaterialControls({
-    @required this.controller,
-    @required this.fullScreen,
-    @required this.onExpandCollapse,
-    @required this.progressColors,
-    @required this.autoPlay,
-    @required this.isLive,
-  });
+  MaterialControls({Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -42,6 +28,9 @@ class _MaterialControlsState extends State<MaterialControls> {
   final barHeight = 48.0;
   final marginSize = 5.0;
 
+  VideoPlayerController controller;
+  ChewieController chewieController;
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -56,7 +45,7 @@ class _MaterialControlsState extends State<MaterialControls> {
                 ),
               )
             : _buildHitArea(),
-        _buildBottomBar(context, widget.controller),
+        _buildBottomBar(context),
       ],
     );
   }
@@ -68,31 +57,25 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   void _dispose() {
-    widget.controller.removeListener(_updateState);
+    controller.removeListener(_updateState);
     _hideTimer?.cancel();
     _showTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
   }
 
   @override
-  void initState() {
+  void didChangeDependencies() {
+    chewieController = ChewieControllerProvider.of(context);
+    controller = chewieController.value.videoPlayerController;
+
+    _dispose();
     _initialize();
 
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(MaterialControls oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.controller.dataSource != oldWidget.controller.dataSource) {
-      _dispose();
-      _initialize();
-    }
+    super.didChangeDependencies();
   }
 
   AnimatedOpacity _buildBottomBar(
     BuildContext context,
-    VideoPlayerController controller,
   ) {
     final iconColor = Theme.of(context).textTheme.button.color;
 
@@ -105,10 +88,10 @@ class _MaterialControlsState extends State<MaterialControls> {
         child: Row(
           children: <Widget>[
             _buildPlayPause(controller),
-            widget.isLive
+            chewieController.isLive
                 ? Expanded(child: const Text('LIVE'))
                 : _buildPosition(iconColor),
-            widget.isLive ? const SizedBox() : _buildProgressBar(),
+            chewieController.isLive ? const SizedBox() : _buildProgressBar(),
             _buildMuteButton(controller),
             _buildExpandButton(),
           ],
@@ -132,7 +115,9 @@ class _MaterialControlsState extends State<MaterialControls> {
           ),
           child: Center(
             child: Icon(
-              widget.fullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
+              chewieController.value.isFullScreen
+                  ? Icons.fullscreen_exit
+                  : Icons.fullscreen,
             ),
           ),
         ),
@@ -264,13 +249,12 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   Future<Null> _initialize() async {
-    widget.controller.addListener(_updateState);
+    controller.addListener(_updateState);
 
     _updateState();
 
-    if ((widget.controller.value != null &&
-            widget.controller.value.isPlaying) ||
-        widget.autoPlay) {
+    if ((controller.value != null && controller.value.isPlaying) ||
+        chewieController.autoPlay) {
       _startHideTimer();
     }
 
@@ -285,11 +269,10 @@ class _MaterialControlsState extends State<MaterialControls> {
     setState(() {
       _hideStuff = true;
 
-      widget.onExpandCollapse().then((dynamic _) {
-        _showAfterExpandCollapseTimer = Timer(Duration(milliseconds: 300), () {
-          setState(() {
-            _cancelAndRestartTimer();
-          });
+      chewieController.toggleFullscreen();
+      _showAfterExpandCollapseTimer = Timer(Duration(milliseconds: 300), () {
+        setState(() {
+          _cancelAndRestartTimer();
         });
       });
     });
@@ -297,19 +280,19 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   void _playPause() {
     setState(() {
-      if (widget.controller.value.isPlaying) {
+      if (controller.value.isPlaying) {
         _hideStuff = false;
         _hideTimer?.cancel();
-        widget.controller.pause();
+        controller.pause();
       } else {
         _cancelAndRestartTimer();
 
-        if (!widget.controller.value.initialized) {
-          widget.controller.initialize().then((_) {
-            widget.controller.play();
+        if (!controller.value.initialized) {
+          controller.initialize().then((_) {
+            controller.play();
           });
         } else {
-          widget.controller.play();
+          controller.play();
         }
       }
     });
@@ -325,7 +308,7 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   void _updateState() {
     setState(() {
-      _latestValue = widget.controller.value;
+      _latestValue = controller.value;
     });
   }
 
@@ -334,7 +317,7 @@ class _MaterialControlsState extends State<MaterialControls> {
       child: Padding(
         padding: EdgeInsets.only(right: 20.0),
         child: MaterialVideoProgressBar(
-          widget.controller,
+          controller,
           onDragStart: () {
             setState(() {
               _dragging = true;
@@ -349,7 +332,7 @@ class _MaterialControlsState extends State<MaterialControls> {
 
             _startHideTimer();
           },
-          colors: widget.progressColors ??
+          colors: chewieController.materialProgressColors ??
               ChewieProgressColors(
                   playedColor: Theme.of(context).accentColor,
                   handleColor: Theme.of(context).accentColor,
