@@ -96,6 +96,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     onPressed: () {
                       setState(() {
                         _chewieController.dispose();
+                        _videoPlayerController2.pause();
+                        _videoPlayerController2.seekTo(Duration(seconds: 0));
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController1,
                           aspectRatio: 3 / 2,
@@ -115,6 +117,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     onPressed: () {
                       setState(() {
                         _chewieController.dispose();
+                        _videoPlayerController1.pause();
+                        _videoPlayerController1.seekTo(Duration(seconds: 0));
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController2,
                           aspectRatio: 3 / 2,
