@@ -42,6 +42,14 @@ class ChewieState extends State<Chewie> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(Chewie oldWidget) {
+    if (oldWidget.controller != widget.controller) {
+      widget.controller.addListener(listener);
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
   void listener() async {
     if (widget.controller.isFullScreen && !_isFullScreen) {
       _isFullScreen = true;
