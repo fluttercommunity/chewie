@@ -114,12 +114,24 @@ class ChewieController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void play() {
-    videoPlayerController.play();
+  Future<void> play() async {
+    await videoPlayerController.play();
   }
 
-  void pause() {
-    videoPlayerController.pause();
+  Future<void> setLooping(bool looping) async {
+    await videoPlayerController.setLooping(looping);
+  }
+
+  Future<void> pause() async {
+    await videoPlayerController.pause();
+  }
+
+  Future<void> seekTo(Duration moment) async {
+    await videoPlayerController.seekTo(moment);
+  }
+
+  Future<void> setVolume(double volume) async {
+    await videoPlayerController.setVolume(volume);
   }
 }
 
