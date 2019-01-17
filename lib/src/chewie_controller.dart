@@ -5,23 +5,18 @@ import 'package:video_player/video_player.dart';
 /// The state of the [ChewieController].
 @immutable
 class ChewieValue {
-  ChewieValue(
-    this.videoPlayerController, {
+  ChewieValue({
     this.isFullScreen = false,
   });
 
   /// True if the video is currently playing fullscreen
   final bool isFullScreen;
 
-  /// The controller for the video you want to play
-  final VideoPlayerController videoPlayerController;
-
   ChewieValue copyWith({
     VideoPlayerController videoPlayerController,
     bool isFullScreen,
   }) {
     return ChewieValue(
-      videoPlayerController ?? this.videoPlayerController,
       isFullScreen: isFullScreen ?? this.isFullScreen,
     );
   }
@@ -29,14 +24,13 @@ class ChewieValue {
   @override
   String toString() {
     return '$runtimeType('
-        'isFullscreen: $isFullScreen, '
-        'videoPlayerController: $videoPlayerController, ';
+        'isFullscreen: $isFullScreen, ';
   }
 }
 
 class ChewieController extends ValueNotifier<ChewieValue> {
-  ChewieController(
-    VideoPlayerController videoPlayerController, {
+  ChewieController({
+    this.videoPlayerController,
     this.aspectRatio,
     this.autoInitialize = false,
     this.autoPlay = false,
@@ -51,9 +45,12 @@ class ChewieController extends ValueNotifier<ChewieValue> {
     this.isLive = false,
   })  : assert(videoPlayerController != null,
             'You must provide a controller to play a video'),
-        super(ChewieValue(videoPlayerController)) {
+        super(ChewieValue()) {
     _initialize();
   }
+
+  /// The controller for the video you want to play
+  final VideoPlayerController videoPlayerController;
 
   /// Initialize the Video on Startup. This will prep the video for playback.
   final bool autoInitialize;
@@ -99,14 +96,11 @@ class ChewieController extends ValueNotifier<ChewieValue> {
 
   bool get isFullScreen => value.isFullScreen;
 
-  VideoPlayerController get videoPlayerController =>
-      value.videoPlayerController;
-
   Future _initialize() async {
-    await value.videoPlayerController.setLooping(looping);
+    await videoPlayerController.setLooping(looping);
 
     if (autoInitialize || autoPlay) {
-      await value.videoPlayerController.initialize();
+      await videoPlayerController.initialize();
     }
 
     if (autoPlay) {
@@ -114,16 +108,16 @@ class ChewieController extends ValueNotifier<ChewieValue> {
         enterFullscreen();
       }
 
-      await value.videoPlayerController.play();
+      await videoPlayerController.play();
     }
 
     if (startAt != null) {
-      await value.videoPlayerController.seekTo(startAt);
+      await videoPlayerController.seekTo(startAt);
     }
 
     if (fullScreenByDefault) {
-      value.videoPlayerController.addListener(() async {
-        if (await value.videoPlayerController.value.isPlaying &&
+      videoPlayerController.addListener(() async {
+        if (await videoPlayerController.value.isPlaying &&
             !value.isFullScreen) {
           enterFullscreen();
         }
@@ -144,22 +138,11 @@ class ChewieController extends ValueNotifier<ChewieValue> {
   }
 
   void play() {
-    value.videoPlayerController.play();
+    videoPlayerController.play();
   }
 
   void pause() {
-    value.videoPlayerController.pause();
-  }
-
-  // TODO: Do we really need the ability to change the controller?
-  set videoPlayerController(VideoPlayerController controller) {
-    if (value.videoPlayerController.dataSource != controller.dataSource) {
-      // FIXME: The VideoPlayer widget still tries to access the controller
-      value.videoPlayerController.dispose();
-      value = value.copyWith(videoPlayerController: controller);
-      exitFullscreen();
-      _initialize();
-    }
+    videoPlayerController.pause();
   }
 }
 
