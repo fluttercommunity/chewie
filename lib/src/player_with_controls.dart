@@ -39,8 +39,7 @@ class PlayerWithControls extends StatelessWidget {
               child: AspectRatio(
                 aspectRatio: chewieController.aspectRatio ??
                     _calculateAspectRatio(context),
-                child:
-                    VideoPlayer(chewieController.videoPlayerController),
+                child: VideoPlayer(chewieController.videoPlayerController),
               ),
             ),
           ),
@@ -55,12 +54,14 @@ class PlayerWithControls extends StatelessWidget {
     ChewieController chewieController,
   ) {
     return chewieController.showControls
-        ? Theme.of(context).platform == TargetPlatform.android
-            ? MaterialControls()
-            : CupertinoControls(
-                backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
-                iconColor: Color.fromARGB(255, 200, 200, 200),
-              )
+        ? chewieController.customControls != null
+            ? chewieController.customControls
+            : Theme.of(context).platform == TargetPlatform.android
+                ? MaterialControls()
+                : CupertinoControls(
+                    backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
+                    iconColor: Color.fromARGB(255, 200, 200, 200),
+                  )
         : Container();
   }
 

@@ -15,6 +15,7 @@ class ChewieController extends ChangeNotifier {
     this.materialProgressColors,
     this.placeholder,
     this.showControls = true,
+    this.customControls,
     this.allowedScreenSleep = true,
     this.isLive = false,
   }) : assert(videoPlayerController != null,
@@ -39,6 +40,10 @@ class ChewieController extends ChangeNotifier {
 
   /// Whether or not to show the controls
   final bool showControls;
+
+  /// Defines customised controls. Check [MaterialControls] or
+  /// [CupertinoControls] for reference.
+  final Widget customControls;
 
   /// The Aspect Ratio of the Video. Important to get the correct size of the
   /// video!
