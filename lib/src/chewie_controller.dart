@@ -2,33 +2,7 @@ import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-/// The state of the [ChewieController].
-@immutable
-class ChewieValue {
-  ChewieValue({
-    this.isFullScreen = false,
-  });
-
-  /// True if the video is currently playing fullscreen
-  final bool isFullScreen;
-
-  ChewieValue copyWith({
-    VideoPlayerController videoPlayerController,
-    bool isFullScreen,
-  }) {
-    return ChewieValue(
-      isFullScreen: isFullScreen ?? this.isFullScreen,
-    );
-  }
-
-  @override
-  String toString() {
-    return '$runtimeType('
-        'isFullscreen: $isFullScreen, ';
-  }
-}
-
-class ChewieController extends ValueNotifier<ChewieValue> {
+class ChewieController extends ChangeNotifier {
   ChewieController({
     this.videoPlayerController,
     this.aspectRatio,
@@ -43,9 +17,8 @@ class ChewieController extends ValueNotifier<ChewieValue> {
     this.showControls = true,
     this.allowedScreenSleep = true,
     this.isLive = false,
-  })  : assert(videoPlayerController != null,
-            'You must provide a controller to play a video'),
-        super(ChewieValue()) {
+  }) : assert(videoPlayerController != null,
+            'You must provide a controller to play a video') {
     _initialize();
   }
 
@@ -94,7 +67,9 @@ class ChewieController extends ValueNotifier<ChewieValue> {
   /// Defines if the controls should be for live stream video
   final bool isLive;
 
-  bool get isFullScreen => value.isFullScreen;
+  bool _isFullScreen = false;
+
+  bool get isFullScreen => _isFullScreen;
 
   Future _initialize() async {
     await videoPlayerController.setLooping(looping);
@@ -117,8 +92,7 @@ class ChewieController extends ValueNotifier<ChewieValue> {
 
     if (fullScreenByDefault) {
       videoPlayerController.addListener(() async {
-        if (await videoPlayerController.value.isPlaying &&
-            !value.isFullScreen) {
+        if (await videoPlayerController.value.isPlaying && !_isFullScreen) {
           enterFullscreen();
         }
       });
@@ -126,15 +100,18 @@ class ChewieController extends ValueNotifier<ChewieValue> {
   }
 
   void enterFullscreen() {
-    value = value.copyWith(isFullScreen: true);
+    _isFullScreen = true;
+    notifyListeners();
   }
 
   void exitFullscreen() {
-    value = value.copyWith(isFullScreen: false);
+    _isFullScreen = false;
+    notifyListeners();
   }
 
   void toggleFullscreen() {
-    value = value.copyWith(isFullScreen: !value.isFullScreen);
+    _isFullScreen = !_isFullScreen;
+    notifyListeners();
   }
 
   void play() {
