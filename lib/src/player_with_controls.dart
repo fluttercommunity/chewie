@@ -71,37 +71,4 @@ class PlayerWithControls extends StatelessWidget {
 
     return width > height ? width / height : height / width;
   }
-
-// TODO: Add playback hack somewhere or better: fix in the VideoPlayer plugin
-//  @override
-//  void initState() {
-//    // Hack to show the video when it starts playing. Should be fixed by the
-//    // Plugin IMO.
-//    widget.controller.addListener(_onPlay);
-//
-//    super.initState();
-//  }
-//
-//  @override
-//  void didUpdateWidget(PlayerWithControls oldWidget) {
-//    super.didUpdateWidget(oldWidget);
-//
-//    if (widget.controller.dataSource != oldWidget.controller.dataSource) {
-//      widget.controller.addListener(_onPlay);
-//    }
-//  }
-//
-//  @override
-//  dispose() {
-//    widget.controller.removeListener(_onPlay);
-//    super.dispose();
-//  }
-//
-//  void _onPlay() {
-//    if (widget.controller.value.isPlaying) {
-//      setState(() {
-//        widget.controller.removeListener(_onPlay);
-//      });
-//    }
-//  }
 }
