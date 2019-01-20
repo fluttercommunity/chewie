@@ -12,13 +12,13 @@ import 'package:open_iconic_flutter/open_iconic_flutter.dart';
 import 'package:video_player/video_player.dart';
 
 class CupertinoControls extends StatefulWidget {
-  final Color backgroundColor;
-  final Color iconColor;
-
   CupertinoControls({
     @required this.backgroundColor,
     @required this.iconColor,
   });
+
+  final Color backgroundColor;
+  final Color iconColor;
 
   @override
   State<StatefulWidget> createState() {

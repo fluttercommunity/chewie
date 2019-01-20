@@ -11,9 +11,9 @@ void main() {
 }
 
 class ChewieDemo extends StatefulWidget {
-  final String title;
-
   ChewieDemo({this.title = 'Chewie Demo'});
+
+  final String title;
 
   @override
   State<StatefulWidget> createState() {

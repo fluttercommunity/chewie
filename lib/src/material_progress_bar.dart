@@ -4,12 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
 
 class MaterialVideoProgressBar extends StatefulWidget {
-  final VideoPlayerController controller;
-  final ChewieProgressColors colors;
-  final Function() onDragStart;
-  final Function() onDragEnd;
-  final Function() onDragUpdate;
-
   MaterialVideoProgressBar(
     this.controller, {
     ChewieProgressColors colors,
@@ -18,6 +12,12 @@ class MaterialVideoProgressBar extends StatefulWidget {
     this.onDragUpdate,
   }) : colors = colors ?? ChewieProgressColors();
 
+  final VideoPlayerController controller;
+  final ChewieProgressColors colors;
+  final Function() onDragStart;
+  final Function() onDragEnd;
+  final Function() onDragUpdate;
+
   @override
   _VideoProgressBarState createState() {
     return _VideoProgressBarState();
@@ -25,15 +25,14 @@ class MaterialVideoProgressBar extends StatefulWidget {
 }
 
 class _VideoProgressBarState extends State<MaterialVideoProgressBar> {
-  VoidCallback listener;
-
-  bool _controllerWasPlaying = false;
-
   _VideoProgressBarState() {
     listener = () {
       setState(() {});
     };
   }
+
+  VoidCallback listener;
+  bool _controllerWasPlaying = false;
 
   VideoPlayerController get controller => widget.controller;
 
@@ -118,10 +117,10 @@ class _VideoProgressBarState extends State<MaterialVideoProgressBar> {
 }
 
 class _ProgressBarPainter extends CustomPainter {
+  _ProgressBarPainter(this.value, this.colors);
+
   VideoPlayerValue value;
   ChewieProgressColors colors;
-
-  _ProgressBarPainter(this.value, this.colors);
 
   @override
   bool shouldRepaint(CustomPainter painter) {
