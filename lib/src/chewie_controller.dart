@@ -2,6 +2,16 @@ import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+/// The ChewieController is used to configure and drive the Chewie Player
+/// Widgets. It provides methods to control playback, such as [pause] and
+/// [play], as well as methods that control the visual appearance of the player,
+/// such as [enterFullScreen] or [exitFullScreen].
+///
+/// In addition, you can listen to the ChewieController for presentational
+/// changes, such as entering and exiting full screen mode. To listen for
+/// changes to the playback, such as a change to the seek position of the
+/// player, please use the standard information provided by the
+/// `VideoPlayerController`.
 class ChewieController extends ChangeNotifier {
   ChewieController({
     this.videoPlayerController,
