@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0
+## 0.9.0
 
   * **Breaking changes**: Add a `ChewieController` to make customizations and control from outside of the player easier.
     Refer to the [README](README.md) for details on how to upgrade from previous versions.

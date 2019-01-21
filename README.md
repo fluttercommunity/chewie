@@ -50,7 +50,7 @@ super.dispose();
 
 Please run the app in the [`example/`](https://github.com/brianegan/chewie/tree/master/example) folder to start playing!
 
-## Migrating from Chewie < 1.0.0
+## Migrating from Chewie < 0.9.0
 Instead of passing the `VideoPlayerController` and your options to the `Chewie` widget you now pass them to the `ChewieController` and pass that latter to the `Chewie` widget.
 
 ```dart
