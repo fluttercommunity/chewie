@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:chewie/src/chewie_controller.dart';
+import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/material_progress_bar.dart';
 import 'package:chewie/src/utils.dart';
@@ -65,7 +65,7 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   @override
   void didChangeDependencies() {
-    chewieController = ChewieControllerProvider.of(context);
+    chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
     _dispose();

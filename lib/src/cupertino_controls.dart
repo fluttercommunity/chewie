@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
-import 'package:chewie/src/chewie_controller.dart';
+import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino_progress_bar.dart';
 import 'package:chewie/src/utils.dart';
@@ -42,7 +42,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   Widget build(BuildContext context) {
     final backgroundColor = widget.backgroundColor;
     final iconColor = widget.iconColor;
-    chewieController = ChewieControllerProvider.of(context);
+    chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
     final orientation = MediaQuery.of(context).orientation;
     final barHeight = orientation == Orientation.portrait ? 30.0 : 47.0;
@@ -72,7 +72,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
 
   @override
   void didChangeDependencies() {
-    chewieController = ChewieControllerProvider.of(context);
+    chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
     _dispose();

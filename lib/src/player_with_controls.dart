@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:chewie/src/chewie_controller.dart';
+import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/cupertino_controls.dart';
 import 'package:chewie/src/material_controls.dart';
 import 'package:flutter/foundation.dart';
@@ -12,8 +12,7 @@ class PlayerWithControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ChewieController chewieController =
-        ChewieControllerProvider.of(context);
+    final ChewieController chewieController = ChewieController.of(context);
 
     return Center(
       child: Container(
