@@ -65,11 +65,14 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   @override
   void didChangeDependencies() {
+    final _oldController = chewieController;
     chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
-    _dispose();
-    _initialize();
+    if (_oldController != chewieController) {
+      _dispose();
+      _initialize();
+    }
 
     super.didChangeDependencies();
   }

@@ -72,11 +72,14 @@ class _CupertinoControlsState extends State<CupertinoControls> {
 
   @override
   void didChangeDependencies() {
+    final _oldController = chewieController;
     chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
-    _dispose();
-    _initialize();
+    if (_oldController != chewieController) {
+      _dispose();
+      _initialize();
+    }
 
     super.didChangeDependencies();
   }
