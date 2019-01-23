@@ -118,7 +118,7 @@ class ChewieState extends State<Chewie> {
 
     await Navigator.of(context).push(route);
     _isFullScreen = false;
-    widget.controller.exitFullscreen();
+    widget.controller.exitFullScreen();
 
     bool isKeptOn = await Screen.isKeptOn;
     if (isKeptOn) {
@@ -236,7 +236,7 @@ class ChewieController extends ChangeNotifier {
 
     if (autoPlay) {
       if (fullScreenByDefault) {
-        enterFullscreen();
+        enterFullScreen();
       }
 
       await videoPlayerController.play();
@@ -249,23 +249,23 @@ class ChewieController extends ChangeNotifier {
     if (fullScreenByDefault) {
       videoPlayerController.addListener(() async {
         if (await videoPlayerController.value.isPlaying && !_isFullScreen) {
-          enterFullscreen();
+          enterFullScreen();
         }
       });
     }
   }
 
-  void enterFullscreen() {
+  void enterFullScreen() {
     _isFullScreen = true;
     notifyListeners();
   }
 
-  void exitFullscreen() {
+  void exitFullScreen() {
     _isFullScreen = false;
     notifyListeners();
   }
 
-  void toggleFullscreen() {
+  void toggleFullScreen() {
     _isFullScreen = !_isFullScreen;
     notifyListeners();
   }

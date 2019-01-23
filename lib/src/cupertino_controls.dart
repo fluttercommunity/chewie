@@ -417,7 +417,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     setState(() {
       _hideStuff = true;
 
-      chewieController.toggleFullscreen();
+      chewieController.toggleFullScreen();
       _expandCollapseTimer = Timer(Duration(milliseconds: 300), () {
         setState(() {
           _cancelAndRestartTimer();

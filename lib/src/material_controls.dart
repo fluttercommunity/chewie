@@ -272,7 +272,7 @@ class _MaterialControlsState extends State<MaterialControls> {
     setState(() {
       _hideStuff = true;
 
-      chewieController.toggleFullscreen();
+      chewieController.toggleFullScreen();
       _showAfterExpandCollapseTimer = Timer(Duration(milliseconds: 300), () {
         setState(() {
           _cancelAndRestartTimer();
