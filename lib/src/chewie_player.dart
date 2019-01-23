@@ -117,6 +117,8 @@ class ChewieState extends State<Chewie> {
     }
 
     await Navigator.of(context).push(route);
+    _isFullScreen = false;
+    widget.controller.exitFullscreen();
 
     bool isKeptOn = await Screen.isKeptOn;
     if (isKeptOn) {
