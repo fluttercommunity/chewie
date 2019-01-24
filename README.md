@@ -21,23 +21,63 @@ dependencies:
 
 ```dart
 import 'package:chewie/chewie.dart';
+final videoPlayerController = VideoPlayerController.network(
+    'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4');
 
-final playerWidget = new Chewie(
-  new VideoPlayerController.network(
-    'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4'
-  ),
+final chewieController = ChewieController(
+  videoPlayerController: videoPlayerController,
   aspectRatio: 3 / 2,
   autoPlay: true,
   looping: true,
 );
+
+final playerWidget = Chewie(
+  controller: chewieController,
+);
+```
+
+Please make sure to dispose both controller widgets after use. For example by overriding the dispose method of the a `StatefulWidget`:
+```dart
+@override
+void dispose() {
+videoPlayerController.dispose();
+chewieController.dispose();
+super.dispose();
+}
 ```
 
 ## Example
 
 Please run the app in the [`example/`](https://github.com/brianegan/chewie/tree/master/example) folder to start playing!
 
+## Migrating from Chewie < 0.9.0
+Instead of passing the `VideoPlayerController` and your options to the `Chewie` widget you now pass them to the `ChewieController` and pass that latter to the `Chewie` widget.
 
-## iOS Warning
+```dart
+final playerWidget = Chewie(
+  videoPlayerController,
+  aspectRatio: 3 / 2,
+  autoPlay: true,
+  looping: true,
+);
+```
+
+becomes
+
+```dart
+final chewieController = ChewieController(
+  videoPlayerController: videoPlayerController,
+  aspectRatio: 3 / 2,
+  autoPlay: true,
+  looping: true,
+);
+
+final playerWidget = Chewie(
+  controller: chewieController,
+);
+```
+
+## iOS warning
 
 The video player plugin used by chewie is not functional on iOS simulators. An iOS device must be used during development/testing. Please refer to this [issue](https://github.com/flutter/flutter/issues/14647).
 

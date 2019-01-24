@@ -1,4 +1,5 @@
 import 'package:chewie/chewie.dart';
+import 'package:chewie/src/chewie_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -10,9 +11,9 @@ void main() {
 }
 
 class ChewieDemo extends StatefulWidget {
-  final String title;
-
   ChewieDemo({this.title = 'Chewie Demo'});
+
+  final String title;
 
   @override
   State<StatefulWidget> createState() {
@@ -22,14 +23,44 @@ class ChewieDemo extends StatefulWidget {
 
 class _ChewieDemoState extends State<ChewieDemo> {
   TargetPlatform _platform;
-  VideoPlayerController _controller;
+  VideoPlayerController _videoPlayerController1;
+  VideoPlayerController _videoPlayerController2;
+  ChewieController _chewieController;
 
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
-      'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+    _videoPlayerController1 = VideoPlayerController.network(
+        'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
+    _videoPlayerController2 = VideoPlayerController.network(
+        'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_20mb.mp4');
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController1,
+      aspectRatio: 3 / 2,
+      autoPlay: true,
+      looping: true,
+      // Try playing around with some of these other options:
+
+      // showControls: false,
+      // materialProgressColors: ChewieProgressColors(
+      //   playedColor: Colors.red,
+      //   handleColor: Colors.blue,
+      //   backgroundColor: Colors.grey,
+      //   bufferedColor: Colors.lightGreen,
+      // ),
+      // placeholder: Container(
+      //   color: Colors.grey,
+      // ),
+      // autoInitialize: true,
     );
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController1.dispose();
+    _videoPlayerController2.dispose();
+    _chewieController.dispose();
+    super.dispose();
   }
 
   @override
@@ -48,26 +79,15 @@ class _ChewieDemoState extends State<ChewieDemo> {
             Expanded(
               child: Center(
                 child: Chewie(
-                  _controller,
-                  aspectRatio: 3 / 2,
-                  autoPlay: true,
-                  looping: true,
-
-                  // Try playing around with some of these other options:
-
-                  // showControls: false,
-                  // materialProgressColors: ChewieProgressColors(
-                  //   playedColor: Colors.red,
-                  //   handleColor: Colors.blue,
-                  //   backgroundColor: Colors.grey,
-                  //   bufferedColor: Colors.lightGreen,
-                  // ),
-                  // placeholder: Container(
-                  //   color: Colors.grey,
-                  // ),
-                  // autoInitialize: true,
+                  controller: _chewieController,
                 ),
               ),
+            ),
+            FlatButton(
+              onPressed: () {
+                _chewieController.enterFullScreen();
+              },
+              child: Text('Fullscreen'),
             ),
             Row(
               children: <Widget>[
@@ -75,8 +95,14 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: FlatButton(
                     onPressed: () {
                       setState(() {
-                        _controller = VideoPlayerController.network(
-                          'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4',
+                        _chewieController.dispose();
+                        _videoPlayerController2.pause();
+                        _videoPlayerController2.seekTo(Duration(seconds: 0));
+                        _chewieController = ChewieController(
+                          videoPlayerController: _videoPlayerController1,
+                          aspectRatio: 3 / 2,
+                          autoPlay: true,
+                          looping: true,
                         );
                       });
                     },
@@ -90,8 +116,14 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: FlatButton(
                     onPressed: () {
                       setState(() {
-                        _controller = VideoPlayerController.network(
-                          'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_20mb.mp4',
+                        _chewieController.dispose();
+                        _videoPlayerController1.pause();
+                        _videoPlayerController1.seekTo(Duration(seconds: 0));
+                        _chewieController = ChewieController(
+                          videoPlayerController: _videoPlayerController2,
+                          aspectRatio: 3 / 2,
+                          autoPlay: true,
+                          looping: true,
                         );
                       });
                     },

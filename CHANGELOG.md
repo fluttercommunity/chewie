@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.0
+
+  * **Breaking changes**: Add a `ChewieController` to make customizations and control from outside of the player easier.
+    Refer to the [README](README.md) for details on how to upgrade from previous versions.
+
 ## 0.8.0
 
   * Update to work with `video_player: ">=0.7.0 <0.8.0` - Thanks @Sub6Resources 
