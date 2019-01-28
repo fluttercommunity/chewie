@@ -40,9 +40,9 @@ Please make sure to dispose both controller widgets after use. For example by ov
 ```dart
 @override
 void dispose() {
-videoPlayerController.dispose();
-chewieController.dispose();
-super.dispose();
+  videoPlayerController.dispose();
+  chewieController.dispose();
+  super.dispose();
 }
 ```
 
