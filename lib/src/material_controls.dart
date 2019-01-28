@@ -96,7 +96,9 @@ class _MaterialControlsState extends State<MaterialControls> {
                 : _buildPosition(iconColor),
             chewieController.isLive ? const SizedBox() : _buildProgressBar(),
             _buildMuteButton(controller),
-            _buildExpandButton(),
+            chewieController.allowFullScreen
+                ? _buildExpandButton()
+                : Container(),
           ],
         ),
       ),

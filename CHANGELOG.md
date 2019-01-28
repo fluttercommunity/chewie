@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.1
+
+  * Add option to hide full screen button
+
 ## 0.9.0
 
   * **Breaking changes**: Add a `ChewieController` to make customizations and control from outside of the player easier.

@@ -161,6 +161,7 @@ class ChewieController extends ChangeNotifier {
     this.customControls,
     this.allowedScreenSleep = true,
     this.isLive = false,
+    this.allowFullScreen = true,
   }) : assert(videoPlayerController != null,
             'You must provide a controller to play a video') {
     _initialize();
@@ -214,6 +215,9 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines if the controls should be for live stream video
   final bool isLive;
+
+  /// Defines if the fullscreen control should be shown
+  final bool allowFullScreen;
 
   static ChewieController of(BuildContext context) {
     final _ChewieControllerProvider chewieControllerProvider =
