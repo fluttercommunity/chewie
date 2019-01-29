@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.2
+
+  * Add options to define system overlays after exiting full screen
+  * Add option to hide mute button
+
 ## 0.9.1
 
   * Add option to hide full screen button
