@@ -33,20 +33,28 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        _latestValue != null &&
-                    !_latestValue.isPlaying &&
-                    _latestValue.duration == null ||
-                _latestValue.isBuffering
-            ? Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              )
-            : _buildHitArea(),
-        _buildBottomBar(context),
-      ],
+    return GestureDetector(
+      onTap: () {
+        _cancelAndRestartTimer();
+      },
+      child: AbsorbPointer(
+        absorbing: _hideStuff,
+        child: Column(
+          children: <Widget>[
+            _latestValue != null &&
+                        !_latestValue.isPlaying &&
+                        _latestValue.duration == null ||
+                    _latestValue.isBuffering
+                ? Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : _buildHitArea(),
+            _buildBottomBar(context),
+          ],
+        ),
+      ),
     );
   }
 

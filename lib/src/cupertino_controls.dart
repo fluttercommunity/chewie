@@ -48,12 +48,20 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     final barHeight = orientation == Orientation.portrait ? 30.0 : 47.0;
     final buttonPadding = orientation == Orientation.portrait ? 16.0 : 24.0;
 
-    return Column(
-      children: <Widget>[
-        _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
-        _buildHitArea(),
-        _buildBottomBar(backgroundColor, iconColor, barHeight),
-      ],
+    return GestureDetector(
+      onTap: () {
+        _cancelAndRestartTimer();
+      },
+      child: AbsorbPointer(
+        absorbing: _hideStuff,
+        child: Column(
+          children: <Widget>[
+            _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
+            _buildHitArea(),
+            _buildBottomBar(backgroundColor, iconColor, barHeight),
+          ],
+        ),
+      ),
     );
   }
 
