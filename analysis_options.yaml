@@ -5,6 +5,7 @@ analyzer:
 
 linter:
   rules:
+    - await_only_futures
     - cancel_subscriptions
     - close_sinks
     - hash_and_equals
