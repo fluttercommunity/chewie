@@ -381,8 +381,10 @@ class _CupertinoControlsState extends State<CupertinoControls> {
                   backgroundColor, iconColor, barHeight, buttonPadding)
               : Container(),
           Expanded(child: Container()),
-          _buildMuteButton(
-              controller, backgroundColor, iconColor, barHeight, buttonPadding),
+          chewieController.allowMuting
+              ? _buildMuteButton(controller, backgroundColor, iconColor,
+                  barHeight, buttonPadding)
+              : Container(),
         ],
       ),
     );
