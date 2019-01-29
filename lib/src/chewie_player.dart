@@ -125,13 +125,10 @@ class ChewieState extends State<Chewie> {
       Screen.keepOn(false);
     }
 
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
+    SystemChrome.setEnabledSystemUIOverlays(
+        widget.controller.systemOverlaysAfterFullScreen);
+    SystemChrome.setPreferredOrientations(
+        widget.controller.deviceOrientationsAfterFullScreen);
   }
 }
 
@@ -162,6 +159,13 @@ class ChewieController extends ChangeNotifier {
     this.allowedScreenSleep = true,
     this.isLive = false,
     this.allowFullScreen = true,
+    this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
+    this.deviceOrientationsAfterFullScreen = const [
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ],
   }) : assert(videoPlayerController != null,
             'You must provide a controller to play a video') {
     _initialize();
@@ -218,6 +222,12 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines if the fullscreen control should be shown
   final bool allowFullScreen;
+
+  /// Defines the system overlays visible after exiting fullscreen
+  final List<SystemUiOverlay> systemOverlaysAfterFullScreen;
+
+  /// Defines the set of allowed device orientations after exiting fullscreen
+  final List<DeviceOrientation> deviceOrientationsAfterFullScreen;
 
   static ChewieController of(BuildContext context) {
     final _ChewieControllerProvider chewieControllerProvider =
