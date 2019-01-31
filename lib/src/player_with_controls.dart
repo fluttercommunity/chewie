@@ -42,6 +42,7 @@ class PlayerWithControls extends StatelessWidget {
               ),
             ),
           ),
+          chewieController.overlay ?? Container(),
           _buildControls(context, chewieController),
         ],
       ),

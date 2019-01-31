@@ -154,6 +154,8 @@ class ChewieController extends ChangeNotifier {
     this.cupertinoProgressColors,
     this.materialProgressColors,
     this.placeholder,
+    this.overlay,
+    this.fit = BoxFit.contain,
     this.showControls = true,
     this.customControls,
     this.allowedScreenSleep = true,
@@ -211,6 +213,12 @@ class ChewieController extends ChangeNotifier {
   /// The placeholder is displayed underneath the Video before it is initialized
   /// or played.
   final Widget placeholder;
+
+  /// A widget which is placed between the video and the controls
+  final Widget overlay;
+
+  /// How to fit
+  final BoxFit fit;
 
   /// Defines if the player will start in fullscreen when play is pressed
   final bool fullScreenByDefault;
