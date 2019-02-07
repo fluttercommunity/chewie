@@ -3,6 +3,7 @@
 ## 0.9.4
 
   * Add overlay option to place a widget between the video and the controls
+  * Update to work with `video_player: ">=0.7.0 <0.10.0"`
 
 ## 0.9.3
 
