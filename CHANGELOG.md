@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.5
+
+  * Cosmetic change -> remove unfinished fit property which slipped into the last release
+
 ## 0.9.4
 
   * Add overlay option to place a widget between the video and the controls
