@@ -1,133 +1,165 @@
 import 'package:chewie/chewie.dart';
+import 'package:chewie/src/chewie_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(
-    new ChewieDemo(),
+    ChewieDemo(),
   );
 }
 
 class ChewieDemo extends StatefulWidget {
-  final String title;
-
   ChewieDemo({this.title = 'Chewie Demo'});
+
+  final String title;
 
   @override
   State<StatefulWidget> createState() {
-    return new _ChewieDemoState();
+    return _ChewieDemoState();
   }
 }
 
 class _ChewieDemoState extends State<ChewieDemo> {
   TargetPlatform _platform;
-  VideoPlayerController _controller;
+  VideoPlayerController _videoPlayerController1;
+  VideoPlayerController _videoPlayerController2;
+  ChewieController _chewieController;
 
   @override
   void initState() {
     super.initState();
-    _controller = new VideoPlayerController.network(
-      'https://github.com/flutter/assets-for-api-docs/blob/master/assets/videos/butterfly.mp4?raw=true',
+    _videoPlayerController1 = VideoPlayerController.network(
+        'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
+    _videoPlayerController2 = VideoPlayerController.network(
+        'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_20mb.mp4');
+    _chewieController = ChewieController(
+      videoPlayerController: _videoPlayerController1,
+      aspectRatio: 3 / 2,
+      autoPlay: true,
+      looping: true,
+      // Try playing around with some of these other options:
+
+      // showControls: false,
+      // materialProgressColors: ChewieProgressColors(
+      //   playedColor: Colors.red,
+      //   handleColor: Colors.blue,
+      //   backgroundColor: Colors.grey,
+      //   bufferedColor: Colors.lightGreen,
+      // ),
+      // placeholder: Container(
+      //   color: Colors.grey,
+      // ),
+      // autoInitialize: true,
     );
   }
 
   @override
+  void dispose() {
+    _videoPlayerController1.dispose();
+    _videoPlayerController2.dispose();
+    _chewieController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
+    return MaterialApp(
       title: widget.title,
-      theme: new ThemeData.light().copyWith(
+      theme: ThemeData.light().copyWith(
         platform: _platform ?? Theme.of(context).platform,
       ),
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text(widget.title),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-        body: new Column(
+        body: Column(
           children: <Widget>[
-            new Expanded(
-              child: new Center(
-                child: new Chewie(
-                  _controller,
-                  aspectRatio: 3 / 2,
-                  autoPlay: true,
-                  looping: true,
-
-                  // Try playing around with some of these other options:
-
-                  // showControls: false,
-                  // materialProgressColors: new ChewieProgressColors(
-                  //   playedColor: Colors.red,
-                  //   handleColor: Colors.blue,
-                  //   backgroundColor: Colors.grey,
-                  //   bufferedColor: Colors.lightGreen,
-                  // ),
-                  // placeholder: new Container(
-                  //   color: Colors.grey,
-                  // ),
-                  // autoInitialize: true,
+            Expanded(
+              child: Center(
+                child: Chewie(
+                  controller: _chewieController,
                 ),
               ),
             ),
-            new Row(
+            FlatButton(
+              onPressed: () {
+                _chewieController.enterFullScreen();
+              },
+              child: Text('Fullscreen'),
+            ),
+            Row(
               children: <Widget>[
-                new Expanded(
-                  child: new FlatButton(
+                Expanded(
+                  child: FlatButton(
                     onPressed: () {
                       setState(() {
-                        _controller = new VideoPlayerController.network(
-                          'https://github.com/flutter/assets-for-api-docs/blob/master/assets/videos/butterfly.mp4?raw=true',
+                        _chewieController.dispose();
+                        _videoPlayerController2.pause();
+                        _videoPlayerController2.seekTo(Duration(seconds: 0));
+                        _chewieController = ChewieController(
+                          videoPlayerController: _videoPlayerController1,
+                          aspectRatio: 3 / 2,
+                          autoPlay: true,
+                          looping: true,
                         );
                       });
                     },
-                    child: new Padding(
-                      child: new Text("Video 1"),
-                      padding: new EdgeInsets.symmetric(vertical: 16.0),
+                    child: Padding(
+                      child: Text("Video 1"),
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
                     ),
                   ),
                 ),
-                new Expanded(
-                  child: new FlatButton(
+                Expanded(
+                  child: FlatButton(
                     onPressed: () {
                       setState(() {
-                        _controller = new VideoPlayerController.network(
-                          'http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4',
+                        _chewieController.dispose();
+                        _videoPlayerController1.pause();
+                        _videoPlayerController1.seekTo(Duration(seconds: 0));
+                        _chewieController = ChewieController(
+                          videoPlayerController: _videoPlayerController2,
+                          aspectRatio: 3 / 2,
+                          autoPlay: true,
+                          looping: true,
                         );
                       });
                     },
-                    child: new Padding(
-                      padding: new EdgeInsets.symmetric(vertical: 16.0),
-                      child: new Text("Video 2"),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("Video 2"),
                     ),
                   ),
                 )
               ],
             ),
-            new Row(
+            Row(
               children: <Widget>[
-                new Expanded(
-                  child: new FlatButton(
+                Expanded(
+                  child: FlatButton(
                     onPressed: () {
                       setState(() {
                         _platform = TargetPlatform.android;
                       });
                     },
-                    child: new Padding(
-                      child: new Text("Android controls"),
-                      padding: new EdgeInsets.symmetric(vertical: 16.0),
+                    child: Padding(
+                      child: Text("Android controls"),
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
                     ),
                   ),
                 ),
-                new Expanded(
-                  child: new FlatButton(
+                Expanded(
+                  child: FlatButton(
                     onPressed: () {
                       setState(() {
                         _platform = TargetPlatform.iOS;
                       });
                     },
-                    child: new Padding(
-                      padding: new EdgeInsets.symmetric(vertical: 16.0),
-                      child: new Text("iOS controls"),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("iOS controls"),
                     ),
                   ),
                 )
