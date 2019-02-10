@@ -193,7 +193,7 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines customised controls. Check [MaterialControls] or
   /// [CupertinoControls] for reference.
-  final Widget customControls;
+  final dynamic customControls;
 
   /// The Aspect Ratio of the Video. Important to get the correct size of the
   /// video!

@@ -55,7 +55,7 @@ class PlayerWithControls extends StatelessWidget {
   ) {
     return chewieController.showControls
         ? chewieController.customControls != null
-            ? chewieController.customControls
+            ? (chewieController.customControls is Function ? chewieController.customControls(chewieController) : chewieController.customControls)
             : Theme.of(context).platform == TargetPlatform.android
                 ? MaterialControls()
                 : CupertinoControls(
