@@ -4,6 +4,7 @@ description: An example of how to use the chewie for Flutter
 dependencies:
   chewie:
     path: ../
+  video_player: ^0.10.0+2
   flutter:
     sdk: flutter
 
@@ -56,5 +57,5 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
-  # For details regarding fonts from package dependencies, 
+  # For details regarding fonts from package dependencies,
   # see https://flutter.io/custom-fonts/#from-packages
