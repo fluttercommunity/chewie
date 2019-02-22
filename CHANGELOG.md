@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.6
+
+  * Update to work with `video_player: ">=0.7.0 <0.11.0"`
+
 ## 0.9.5
 
   * Cosmetic change -> remove unfinished fit property which slipped into the last release
