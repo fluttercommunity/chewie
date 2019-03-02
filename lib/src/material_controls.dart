@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class MaterialControls extends StatefulWidget {
-  MaterialControls({Key key}) : super(key: key);
+  const MaterialControls({Key key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -33,10 +33,23 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   @override
   Widget build(BuildContext context) {
+    if (_latestValue.hasError) {
+      return chewieController.errorBuilder != null
+          ? chewieController.errorBuilder(
+              context,
+              chewieController.videoPlayerController.value.errorDescription,
+            )
+          : Center(
+              child: Icon(
+                Icons.error,
+                color: Colors.white,
+                size: 42,
+              ),
+            );
+    }
+
     return GestureDetector(
-      onTap: () {
-        _cancelAndRestartTimer();
-      },
+      onTap: () => _cancelAndRestartTimer(),
       child: AbsorbPointer(
         absorbing: _hideStuff,
         child: Column(
@@ -45,9 +58,9 @@ class _MaterialControlsState extends State<MaterialControls> {
                         !_latestValue.isPlaying &&
                         _latestValue.duration == null ||
                     _latestValue.isBuffering
-                ? Expanded(
-                    child: Center(
-                      child: CircularProgressIndicator(),
+                ? const Expanded(
+                    child: const Center(
+                      child: const CircularProgressIndicator(),
                     ),
                   )
                 : _buildHitArea(),

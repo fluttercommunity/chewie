@@ -78,8 +78,7 @@ class ChewieState extends State<Chewie> {
   Widget _buildFullScreenVideo(
       BuildContext context,
       Animation<double> animation,
-      _ChewieControllerProvider controllerProvider
-  ) {
+      _ChewieControllerProvider controllerProvider) {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       body: Container(
@@ -94,8 +93,7 @@ class ChewieState extends State<Chewie> {
       BuildContext context,
       Animation<double> animation,
       Animation<double> secondaryAnimation,
-      _ChewieControllerProvider controllerProvider
-  ) {
+      _ChewieControllerProvider controllerProvider) {
     return AnimatedBuilder(
       animation: animation,
       builder: (BuildContext context, Widget child) {
@@ -115,9 +113,11 @@ class ChewieState extends State<Chewie> {
     );
 
     if (widget.controller.routePageBuilder == null) {
-      return _defaultRoutePageBuilder(context, animation, secondaryAnimation, controllerProvider);
+      return _defaultRoutePageBuilder(
+          context, animation, secondaryAnimation, controllerProvider);
     }
-    return widget.controller.routePageBuilder(context, animation, secondaryAnimation, controllerProvider);
+    return widget.controller.routePageBuilder(
+        context, animation, secondaryAnimation, controllerProvider);
   }
 
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
@@ -180,6 +180,7 @@ class ChewieController extends ChangeNotifier {
     this.overlay,
     this.showControls = true,
     this.customControls,
+    this.errorBuilder,
     this.allowedScreenSleep = true,
     this.isLive = false,
     this.allowFullScreen = true,
@@ -219,6 +220,10 @@ class ChewieController extends ChangeNotifier {
   /// [CupertinoControls] for reference.
   final Widget customControls;
 
+  /// When the video playback runs  into an error, you can build a custom
+  /// error message.
+  final Widget Function(BuildContext context, String errorMessage) errorBuilder;
+
   /// The Aspect Ratio of the Video. Important to get the correct size of the
   /// video!
   ///
@@ -239,7 +244,6 @@ class ChewieController extends ChangeNotifier {
 
   /// A widget which is placed between the video and the controls
   final Widget overlay;
-
 
   /// Defines if the player will start in fullscreen when play is pressed
   final bool fullScreenByDefault;
@@ -266,7 +270,9 @@ class ChewieController extends ChangeNotifier {
   final ChewieRoutePageBuilder routePageBuilder;
 
   static ChewieController of(BuildContext context) {
-    final chewieControllerProvider = _ChewieControllerProvider.of(context);
+    final chewieControllerProvider =
+        context.inheritFromWidgetOfExactType(_ChewieControllerProvider)
+            as _ChewieControllerProvider;
 
     return chewieControllerProvider.controller;
   }
@@ -350,9 +356,6 @@ class _ChewieControllerProvider extends InheritedWidget {
         super(key: key, child: child);
 
   final ChewieController controller;
-
-  static _ChewieControllerProvider of(BuildContext context) => context.inheritFromWidgetOfExactType(_ChewieControllerProvider) as _ChewieControllerProvider;
-
 
   @override
   bool updateShouldNotify(_ChewieControllerProvider old) =>
