@@ -353,6 +353,7 @@ class _ChewieControllerProvider extends InheritedWidget {
 
   static _ChewieControllerProvider of(BuildContext context) => context.inheritFromWidgetOfExactType(_ChewieControllerProvider) as _ChewieControllerProvider;
 
+
   @override
   bool updateShouldNotify(_ChewieControllerProvider old) =>
       controller != old.controller;
