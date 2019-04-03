@@ -239,7 +239,8 @@ class ChewieController extends ChangeNotifier {
   final List<DeviceOrientation> deviceOrientationsAfterFullScreen;
 
   static ChewieController of(BuildContext context) {
-    final chewieControllerProvider = _ChewieControllerProvider.of(context);
+    final _ChewieControllerProvider chewieControllerProvider =
+        context.inheritFromWidgetOfExactType(_ChewieControllerProvider);
 
     return chewieControllerProvider.controller;
   }
@@ -323,9 +324,6 @@ class _ChewieControllerProvider extends InheritedWidget {
         super(key: key, child: child);
 
   final ChewieController controller;
-
-  static _ChewieControllerProvider of(BuildContext context) => context.inheritFromWidgetOfExactType(_ChewieControllerProvider) as _ChewieControllerProvider;
-
 
   @override
   bool updateShouldNotify(_ChewieControllerProvider old) =>
