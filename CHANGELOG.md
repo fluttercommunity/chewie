@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.7
+
+  * Errors are properly handled. You can provide the Widget to display when an error occurs by providing an `errorBuilder` function to the `ChewieController` constructor.
+  * Add ability to override the fullscreen page builder. Allows folks to customize that functionality!
+
 ## 0.9.6
 
   * Update to work with `video_player: ">=0.7.0 <0.11.0"`
