@@ -266,8 +266,7 @@ class ChewieController extends ChangeNotifier {
   final ChewieRoutePageBuilder routePageBuilder;
 
   static ChewieController of(BuildContext context) {
-    final _ChewieControllerProvider chewieControllerProvider =
-        context.inheritFromWidgetOfExactType(_ChewieControllerProvider) as _ChewieControllerProvider;
+    final chewieControllerProvider = _ChewieControllerProvider.of(context);
 
     return chewieControllerProvider.controller;
   }
@@ -351,6 +350,8 @@ class _ChewieControllerProvider extends InheritedWidget {
         super(key: key, child: child);
 
   final ChewieController controller;
+
+  static _ChewieControllerProvider of(BuildContext context) => context.inheritFromWidgetOfExactType(_ChewieControllerProvider) as _ChewieControllerProvider;
 
   @override
   bool updateShouldNotify(_ChewieControllerProvider old) =>
