@@ -5,6 +5,7 @@ dependencies:
   chewie:
     path: ../
   video_player: ^0.10.0+2
+  auto_orientation: ^0.0.2
   flutter:
     sdk: flutter
 

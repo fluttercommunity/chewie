@@ -8,6 +8,12 @@ import 'package:flutter/widgets.dart';
 import 'package:screen/screen.dart';
 import 'package:video_player/video_player.dart';
 
+typedef Widget ChewieRoutePageBuilder(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    _ChewieControllerProvider controllerProvider);
+
 /// A Video Player with Material and Cupertino skins.
 ///
 /// `video_player` is pretty low level. Chewie wraps it in a friendly skin to
@@ -70,17 +76,31 @@ class ChewieState extends State<Chewie> {
   }
 
   Widget _buildFullScreenVideo(
-      BuildContext context, Animation<double> animation) {
+      BuildContext context,
+      Animation<double> animation,
+      _ChewieControllerProvider controllerProvider
+  ) {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       body: Container(
         alignment: Alignment.center,
         color: Colors.black,
-        child: _ChewieControllerProvider(
-          controller: widget.controller,
-          child: PlayerWithControls(),
-        ),
+        child: controllerProvider,
       ),
+    );
+  }
+
+  AnimatedWidget _defaultRoutePageBuilder(
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      _ChewieControllerProvider controllerProvider
+  ) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (BuildContext context, Widget child) {
+        return _buildFullScreenVideo(context, animation, controllerProvider);
+      },
     );
   }
 
@@ -89,12 +109,15 @@ class ChewieState extends State<Chewie> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (BuildContext context, Widget child) {
-        return _buildFullScreenVideo(context, animation);
-      },
+    var controllerProvider = _ChewieControllerProvider(
+      controller: widget.controller,
+      child: PlayerWithControls(),
     );
+
+    if (widget.controller.routePageBuilder == null) {
+      return _defaultRoutePageBuilder(context, animation, secondaryAnimation, controllerProvider);
+    }
+    return widget.controller.routePageBuilder(context, animation, secondaryAnimation, controllerProvider);
   }
 
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
@@ -168,6 +191,7 @@ class ChewieController extends ChangeNotifier {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ],
+    this.routePageBuilder = null,
   }) : assert(videoPlayerController != null,
             'You must provide a controller to play a video') {
     _initialize();
@@ -237,6 +261,9 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines the set of allowed device orientations after exiting fullscreen
   final List<DeviceOrientation> deviceOrientationsAfterFullScreen;
+
+  /// Defines a custom RoutePageBuilder for the fullscreen
+  final ChewieRoutePageBuilder routePageBuilder;
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider = _ChewieControllerProvider.of(context);
