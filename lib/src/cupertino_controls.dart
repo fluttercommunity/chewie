@@ -12,7 +12,7 @@ import 'package:open_iconic_flutter/open_iconic_flutter.dart';
 import 'package:video_player/video_player.dart';
 
 class CupertinoControls extends StatefulWidget {
-  CupertinoControls({
+  const CupertinoControls({
     @required this.backgroundColor,
     @required this.iconColor,
   });
@@ -40,6 +40,23 @@ class _CupertinoControlsState extends State<CupertinoControls> {
 
   @override
   Widget build(BuildContext context) {
+    chewieController = ChewieController.of(context);
+
+    if (_latestValue.hasError) {
+      return chewieController.errorBuilder != null
+          ? chewieController.errorBuilder(
+              context,
+              chewieController.videoPlayerController.value.errorDescription,
+            )
+          : Center(
+              child: Icon(
+                OpenIconicIcons.ban,
+                color: Colors.white,
+                size: 42,
+              ),
+            );
+    }
+
     final backgroundColor = widget.backgroundColor;
     final iconColor = widget.iconColor;
     chewieController = ChewieController.of(context);

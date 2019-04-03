@@ -33,7 +33,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
     _videoPlayerController1 = VideoPlayerController.network(
         'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
     _videoPlayerController2 = VideoPlayerController.network(
-        'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_20mb.mp4');
+        'https://www.sample-videos.com/video123/mp4/480/asdasdas.mp4');
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController1,
       aspectRatio: 3 / 2,
@@ -129,7 +129,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     },
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("Video 2"),
+                      child: Text("Error Video"),
                     ),
                   ),
                 )
