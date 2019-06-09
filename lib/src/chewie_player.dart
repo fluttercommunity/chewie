@@ -129,10 +129,7 @@ class ChewieState extends State<Chewie> {
 
     SystemChrome.setEnabledSystemUIOverlays([]);
     if (isAndroid) {
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
+      SystemChrome.setPreferredOrientations(widget.controller.deviceOrientationsDuringFullScreen);
     }
 
     if (!widget.controller.allowedScreenSleep) {
@@ -189,6 +186,10 @@ class ChewieController extends ChangeNotifier {
     this.deviceOrientationsAfterFullScreen = const [
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ],
+    this.deviceOrientationsDuringFullScreen = const [
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ],
@@ -265,6 +266,9 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines the set of allowed device orientations after exiting fullscreen
   final List<DeviceOrientation> deviceOrientationsAfterFullScreen;
+
+  /// Defines the set of allowed device orientations during fullscreen
+  final List<DeviceOrientation> deviceOrientationsDuringFullScreen;
 
   /// Defines a custom RoutePageBuilder for the fullscreen
   final ChewieRoutePageBuilder routePageBuilder;
