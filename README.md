@@ -15,6 +15,7 @@ In your `pubspec.yaml` file within your Flutter Project:
 ```yaml
 dependencies:
   chewie: <latest_version>
+  video_player: <latest_version>
 ```
 
 ## Use it
