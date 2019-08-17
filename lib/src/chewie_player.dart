@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/player_with_controls.dart';
+import 'package:chewie/src/subtitle_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -269,6 +270,8 @@ class ChewieController extends ChangeNotifier {
   /// Defines a custom RoutePageBuilder for the fullscreen
   final ChewieRoutePageBuilder routePageBuilder;
 
+  Subtitles subtitle;
+
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider =
         context.inheritFromWidgetOfExactType(_ChewieControllerProvider)
@@ -284,8 +287,8 @@ class ChewieController extends ChangeNotifier {
   Future _initialize() async {
     await videoPlayerController.setLooping(looping);
 
-    if ((autoInitialize || autoPlay) &&
-        !videoPlayerController.value.initialized) {
+    if ((autoInitialize || autoPlay)
+        && !videoPlayerController.value.initialized) {
       await videoPlayerController.initialize();
     }
 
@@ -346,6 +349,14 @@ class ChewieController extends ChangeNotifier {
 
   Future<void> setVolume(double volume) async {
     await videoPlayerController.setVolume(volume);
+  }
+
+  void setSubtitle(String newSubtitle) {
+    subtitle = Subtitles.fromString(newSubtitle);
+  }
+
+  void addSubtitleListener() {
+
   }
 }
 

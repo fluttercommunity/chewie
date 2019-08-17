@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/material_progress_bar.dart';
+import 'package:chewie/src/subtitle_model.dart';
 import 'package:chewie/src/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -24,6 +25,8 @@ class _MaterialControlsState extends State<MaterialControls> {
   Timer _showTimer;
   Timer _showAfterExpandCollapseTimer;
   bool _dragging = false;
+  Duration _subtitlesPosition = Duration();
+  bool _subtitleOn;
 
   final barHeight = 48.0;
   final marginSize = 5.0;
@@ -33,6 +36,8 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   @override
   Widget build(BuildContext context) {
+    _subtitleOn ??= chewieController.subtitle?.isNotEmpty ?? false;
+
     if (_latestValue.hasError) {
       return chewieController.errorBuilder != null
           ? chewieController.errorBuilder(
@@ -64,6 +69,7 @@ class _MaterialControlsState extends State<MaterialControls> {
                     ),
                   )
                 : _buildHitArea(),
+            _buildSubtitles(context, chewieController.subtitle),
             _buildBottomBar(context),
           ],
         ),
@@ -122,7 +128,34 @@ class _MaterialControlsState extends State<MaterialControls> {
             chewieController.allowFullScreen
                 ? _buildExpandButton()
                 : Container(),
+            _buildSubtitleToggle(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubtitles(BuildContext context, Subtitles subtitles) {
+    if (_subtitlesPosition == null) {
+      return Container();
+    }
+    final currentSubtitle = subtitles.getByPosition(_subtitlesPosition);
+    if (currentSubtitle.isEmpty) {
+      return Container();
+    }
+
+    return Padding(
+      padding: EdgeInsets.all(marginSize),
+      child: Container(
+        padding: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+            color: Color(0x96000000),
+            borderRadius: BorderRadius.circular(10.0)
+        ),
+        child: Text(
+          '${currentSubtitle.first.texts.join('\n')}',
+          style: TextStyle(fontSize: 18, ),
+          textAlign: TextAlign.center,
         ),
       ),
     );
@@ -267,6 +300,34 @@ class _MaterialControlsState extends State<MaterialControls> {
     );
   }
 
+  Widget _buildSubtitleToggle() {
+    //if don't have subtitle hiden button
+    if (chewieController.subtitle?.isEmpty ?? true) {
+      return Container();
+    }
+    return GestureDetector(
+      onTap: _subtitleToggle,
+      child: Container(
+        height: barHeight,
+        color: Colors.transparent,
+        margin: EdgeInsets.only(right: 10.0),
+        padding: EdgeInsets.only(
+          left: 12.0,
+          right: 12.0,
+        ),
+        child: Icon(Icons.subtitles,
+          color: _subtitleOn ? Theme.of(context).accentColor : Colors.grey[700],
+        ),
+      ),
+    );
+  }
+
+  void _subtitleToggle() {
+    setState(() {
+      _subtitleOn = !_subtitleOn;
+    });
+  }
+
   void _cancelAndRestartTimer() {
     _hideTimer?.cancel();
     _startHideTimer();
@@ -337,6 +398,7 @@ class _MaterialControlsState extends State<MaterialControls> {
   void _updateState() {
     setState(() {
       _latestValue = controller.value;
+      _subtitlesPosition = controller.value.position;
     });
   }
 

@@ -5,6 +5,7 @@ import 'dart:ui' as ui;
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino_progress_bar.dart';
+import 'package:chewie/src/subtitle_model.dart';
 import 'package:chewie/src/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +35,8 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   final marginSize = 5.0;
   Timer _expandCollapseTimer;
   Timer _initTimer;
+  Duration _subtitlesPosition;
+  bool _subtitleOn;
 
   VideoPlayerController controller;
   ChewieController chewieController;
@@ -41,6 +44,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   @override
   Widget build(BuildContext context) {
     chewieController = ChewieController.of(context);
+    _subtitleOn ??= chewieController.subtitle?.isNotEmpty ?? false;
 
     if (_latestValue.hasError) {
       return chewieController.errorBuilder != null
@@ -75,6 +79,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
           children: <Widget>[
             _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
             _buildHitArea(),
+            _buildSubtitles(chewieController.subtitle),
             _buildBottomBar(backgroundColor, iconColor, barHeight),
           ],
         ),
@@ -107,6 +112,35 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     }
 
     super.didChangeDependencies();
+  }
+
+  Widget _buildSubtitles(Subtitles subtitles) {
+    if (!_subtitleOn) {
+      return Container();
+    }
+    if (_subtitlesPosition == null) {
+      return Container();
+    }
+    final currentSubtitle = subtitles.getByPosition(_subtitlesPosition);
+    if (currentSubtitle.isEmpty) {
+      return Container();
+    }
+
+    return Padding(
+      padding: EdgeInsets.only(left: marginSize, right: marginSize),
+      child: Container(
+        padding: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+          color: Color(0x96000000),
+          borderRadius: BorderRadius.circular(10.0)
+        ),
+        child: Text(
+          '${currentSubtitle.first.texts.join('\n')}',
+          style: TextStyle(fontSize: 18, ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 
   AnimatedOpacity _buildBottomBar(
@@ -146,7 +180,8 @@ class _CupertinoControlsState extends State<CupertinoControls> {
                         _buildSkipForward(iconColor, barHeight),
                         _buildPosition(iconColor),
                         _buildProgressBar(),
-                        _buildRemaining(iconColor)
+                        _buildRemaining(iconColor),
+                        _buildSubtitleToggle(iconColor, barHeight)
                       ],
                     ),
 
@@ -319,12 +354,41 @@ class _CupertinoControlsState extends State<CupertinoControls> {
         : Duration(seconds: 0);
 
     return Padding(
-      padding: EdgeInsets.only(right: 12.0),
+      padding: EdgeInsets.only(right: 6.0),
       child: Text(
         '-${formatDuration(position)}',
         style: TextStyle(color: iconColor, fontSize: 12.0),
       ),
     );
+  }
+
+  Widget _buildSubtitleToggle(Color iconColor, double barHeight) {
+    //if don't have subtitle hiden button
+    if (chewieController.subtitle?.isEmpty ?? true) {
+      return Container();
+    }
+    return GestureDetector(
+      onTap: _subtitleToggle,
+      child: Container(
+        height: barHeight,
+        color: Colors.transparent,
+        margin: EdgeInsets.only(right: 10.0),
+        padding: EdgeInsets.only(
+          left: 6.0,
+          right: 6.0,
+        ),
+        child: Icon(Icons.subtitles,
+          color: _subtitleOn ? iconColor : Colors.grey[700],
+          size: 16.0,
+        ),
+      ),
+    );
+  }
+
+  void _subtitleToggle() {
+    setState(() {
+      _subtitleOn = !_subtitleOn;
+    });
   }
 
   GestureDetector _buildSkipBack(Color iconColor, double barHeight) {
@@ -533,6 +597,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   void _updateState() {
     setState(() {
       _latestValue = controller.value;
+      _subtitlesPosition = controller.value.position;
     });
   }
 }
