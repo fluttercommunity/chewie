@@ -121,6 +121,7 @@ class ChewieState extends State<Chewie> {
   }
 
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
+    final _rotationChannel = const MethodChannel('zgadula/orientation');
     final isAndroid = Theme.of(context).platform == TargetPlatform.android;
     final TransitionRoute<Null> route = PageRouteBuilder<Null>(
       settings: RouteSettings(isInitialRoute: false),
@@ -128,9 +129,25 @@ class ChewieState extends State<Chewie> {
     );
 
     SystemChrome.setEnabledSystemUIOverlays([]);
-    if (isAndroid) {
-      SystemChrome.setPreferredOrientations(widget.controller.deviceOrientationsDuringFullScreen);
+
+    if (widget.controller.aspectRatio > 1.0) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeLeft,
+        DeviceOrientation.landscapeRight,
+      ]);
+    } else {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
     }
+
+
+    try {
+      widget.controller.aspectRatio > 1.0
+        ? _rotationChannel.invokeMethod('setLandscape')
+        : _rotationChannel.invokeMethod('setPortrait');
+    } catch (error) {}
 
     if (!widget.controller.allowedScreenSleep) {
       Screen.keepOn(true);
@@ -149,6 +166,12 @@ class ChewieState extends State<Chewie> {
         widget.controller.systemOverlaysAfterFullScreen);
     SystemChrome.setPreferredOrientations(
         widget.controller.deviceOrientationsAfterFullScreen);
+
+    try {
+      widget.controller.deviceOrientationsAfterFullScreen.contains(DeviceOrientation.portraitUp)
+        ? _rotationChannel.invokeMethod('setPortrait')
+        : _rotationChannel.invokeMethod('setLandscape');
+    } catch (error) {}
   }
 }
 
@@ -186,10 +209,6 @@ class ChewieController extends ChangeNotifier {
     this.deviceOrientationsAfterFullScreen = const [
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ],
-    this.deviceOrientationsDuringFullScreen = const [
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ],
@@ -266,9 +285,6 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines the set of allowed device orientations after exiting fullscreen
   final List<DeviceOrientation> deviceOrientationsAfterFullScreen;
-
-  /// Defines the set of allowed device orientations during fullscreen
-  final List<DeviceOrientation> deviceOrientationsDuringFullScreen;
 
   /// Defines a custom RoutePageBuilder for the fullscreen
   final ChewieRoutePageBuilder routePageBuilder;
