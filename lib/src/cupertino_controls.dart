@@ -126,6 +126,13 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       return Container();
     }
 
+    if (chewieController.subtitleBuilder != null) {
+      return chewieController.subtitleBuilder(
+        context,
+        currentSubtitle.first.texts.join('\n'),
+      );
+    }
+
     return Padding(
       padding: EdgeInsets.only(left: marginSize, right: marginSize),
       child: Container(

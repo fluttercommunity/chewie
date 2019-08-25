@@ -182,6 +182,7 @@ class ChewieController extends ChangeNotifier {
     this.showControls = true,
     this.customControls,
     this.errorBuilder,
+    this.subtitleBuilder,
     this.allowedScreenSleep = true,
     this.isLive = false,
     this.allowFullScreen = true,
@@ -270,6 +271,8 @@ class ChewieController extends ChangeNotifier {
   /// Defines a custom RoutePageBuilder for the fullscreen
   final ChewieRoutePageBuilder routePageBuilder;
 
+  final Widget Function(BuildContext context, String subtitle) subtitleBuilder;
+
   Subtitles subtitle;
 
   static ChewieController of(BuildContext context) {
@@ -353,10 +356,6 @@ class ChewieController extends ChangeNotifier {
 
   void setSubtitle(String newSubtitle) {
     subtitle = Subtitles.fromString(newSubtitle);
-  }
-
-  void addSubtitleListener() {
-
   }
 }
 

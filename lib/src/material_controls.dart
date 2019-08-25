@@ -136,12 +136,22 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   Widget _buildSubtitles(BuildContext context, Subtitles subtitles) {
+    if (!_subtitleOn) {
+      return Container();
+    }
     if (_subtitlesPosition == null) {
       return Container();
     }
     final currentSubtitle = subtitles.getByPosition(_subtitlesPosition);
     if (currentSubtitle.isEmpty) {
       return Container();
+    }
+
+    if (chewieController.subtitleBuilder != null) {
+      return chewieController.subtitleBuilder(
+        context,
+        currentSubtitle.first.texts.join('\n'),
+      );
     }
 
     return Padding(
