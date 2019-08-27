@@ -149,7 +149,6 @@ class _CupertinoControlsState extends State<CupertinoControls> {
                         _buildRemaining(iconColor)
                       ],
                     ),
-
             ),
           ),
         ),
@@ -489,6 +488,8 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   }
 
   void _playPause() {
+    bool isFinished = _latestValue.position >= _latestValue.duration;
+
     setState(() {
       if (controller.value.isPlaying) {
         _hideStuff = false;
@@ -502,6 +503,9 @@ class _CupertinoControlsState extends State<CupertinoControls> {
             controller.play();
           });
         } else {
+          if (isFinished) {
+            controller.seekTo(Duration(seconds: 0));
+          }
           controller.play();
         }
       }
