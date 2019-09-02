@@ -178,6 +178,7 @@ class ChewieController extends ChangeNotifier {
     this.materialProgressColors,
     this.placeholder,
     this.overlay,
+    this.showControlsOnInitialize = true,
     this.showControls = true,
     this.customControls,
     this.errorBuilder,
@@ -213,7 +214,10 @@ class ChewieController extends ChangeNotifier {
   /// Whether or not the video should loop
   final bool looping;
 
-  /// Whether or not to show the controls
+  /// Weather or not to show the controls when initializing the widget.
+  final bool showControlsOnInitialize;
+
+  /// Whether or not to show the controls at all
   final bool showControls;
 
   /// Defines customised controls. Check [MaterialControls] or
