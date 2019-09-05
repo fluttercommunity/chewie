@@ -10,3 +10,4 @@ packages
 pubspec.lock
 .flutter-plugins
 Podfile.lock
+lib/generated_plugin_registrant.dart
