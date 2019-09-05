@@ -429,11 +429,13 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       _startHideTimer();
     }
 
-    _initTimer = Timer(Duration(milliseconds: 200), () {
-      setState(() {
-        _hideStuff = false;
+    if (chewieController.showControlsOnInitialize) {
+      _initTimer = Timer(Duration(milliseconds: 200), () {
+        setState(() {
+          _hideStuff = false;
+        });
       });
-    });
+    }
   }
 
   void _onExpandCollapse() {
