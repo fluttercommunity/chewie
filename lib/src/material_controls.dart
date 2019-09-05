@@ -48,24 +48,29 @@ class _MaterialControlsState extends State<MaterialControls> {
             );
     }
 
-    return GestureDetector(
-      onTap: () => _cancelAndRestartTimer(),
-      child: AbsorbPointer(
-        absorbing: _hideStuff,
-        child: Column(
-          children: <Widget>[
-            _latestValue != null &&
-                        !_latestValue.isPlaying &&
-                        _latestValue.duration == null ||
-                    _latestValue.isBuffering
-                ? const Expanded(
-                    child: const Center(
-                      child: const CircularProgressIndicator(),
-                    ),
-                  )
-                : _buildHitArea(),
-            _buildBottomBar(context),
-          ],
+    return MouseRegion(
+      onHover: (_) {
+        _cancelAndRestartTimer();
+      },
+      child: GestureDetector(
+        onTap: () => _cancelAndRestartTimer(),
+        child: AbsorbPointer(
+          absorbing: _hideStuff,
+          child: Column(
+            children: <Widget>[
+              _latestValue != null &&
+                          !_latestValue.isPlaying &&
+                          _latestValue.duration == null ||
+                      _latestValue.isBuffering
+                  ? const Expanded(
+                      child: const Center(
+                        child: const CircularProgressIndicator(),
+                      ),
+                    )
+                  : _buildHitArea(),
+              _buildBottomBar(context),
+            ],
+          ),
         ),
       ),
     );
