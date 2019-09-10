@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.8
+
+  * Hero Widget is no longer used (thanks @localpcguy)
+  * Tap to hide controls (thanks @bostrot)
+  * Replay on play when video is finished (thanks @VictorUvarov)
+
 ## 0.9.7
 
   * Errors are properly handled. You can provide the Widget to display when an error occurs by providing an `errorBuilder` function to the `ChewieController` constructor.
