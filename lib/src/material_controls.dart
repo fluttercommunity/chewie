@@ -24,6 +24,7 @@ class _MaterialControlsState extends State<MaterialControls> {
   Timer _initTimer;
   Timer _showAfterExpandCollapseTimer;
   bool _dragging = false;
+  bool _displayTapped = false;
 
   final barHeight = 48.0;
   final marginSize = 5.0;
@@ -161,15 +162,22 @@ class _MaterialControlsState extends State<MaterialControls> {
   Expanded _buildHitArea() {
     return Expanded(
       child: GestureDetector(
-        onTap: _latestValue != null && _latestValue.isPlaying
-            ? _cancelAndRestartTimer
-            : () {
-                _playPause();
+        onTap: () {
+          if (_latestValue != null && _latestValue.isPlaying) {
+            if (_displayTapped) {
+              setState(() {
+                _hideStuff = true;
+              });
+            } else
+              _cancelAndRestartTimer();
+          } else {
+            _playPause();
 
-                setState(() {
-                  _hideStuff = true;
-                });
-              },
+            setState(() {
+              _hideStuff = true;
+            });
+          }
+        },
         child: Container(
           color: Colors.transparent,
           child: Center(
@@ -278,6 +286,7 @@ class _MaterialControlsState extends State<MaterialControls> {
 
     setState(() {
       _hideStuff = false;
+      _displayTapped = true;
     });
   }
 
