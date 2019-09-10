@@ -323,6 +323,8 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   void _playPause() {
+    bool isFinished = _latestValue.position >= _latestValue.duration;
+
     setState(() {
       if (controller.value.isPlaying) {
         _hideStuff = false;
@@ -336,6 +338,9 @@ class _MaterialControlsState extends State<MaterialControls> {
             controller.play();
           });
         } else {
+          if (isFinished) {
+            controller.seekTo(Duration(seconds: 0));
+          }
           controller.play();
         }
       }
