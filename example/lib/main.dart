@@ -1,17 +1,17 @@
-import 'package:chewie/chewie.dart';
-import 'package:chewie/src/chewie_player.dart';
+import 'package:chewie_audio/chewie_audio.dart';
+import 'package:chewie_audio/src/chewie_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(
-    ChewieDemo(),
+    ChewieAudioDemo(),
   );
 }
 
-class ChewieDemo extends StatefulWidget {
-  ChewieDemo({this.title = 'Chewie Demo'});
+class ChewieAudioDemo extends StatefulWidget {
+  ChewieAudioDemo({this.title = 'Chewie Audio Demo'});
 
   final String title;
 
@@ -21,22 +21,21 @@ class ChewieDemo extends StatefulWidget {
   }
 }
 
-class _ChewieDemoState extends State<ChewieDemo> {
+class _ChewieDemoState extends State<ChewieAudioDemo> {
   TargetPlatform _platform;
   VideoPlayerController _videoPlayerController1;
   VideoPlayerController _videoPlayerController2;
-  ChewieController _chewieController;
+  ChewieAudioController _chewieAudioController;
 
   @override
   void initState() {
     super.initState();
     _videoPlayerController1 = VideoPlayerController.network(
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
+        'https://www.w3schools.com/tags/horse.mp3');
     _videoPlayerController2 = VideoPlayerController.network(
         'https://www.sample-videos.com/video123/mp4/480/asdasdas.mp4');
-    _chewieController = ChewieController(
+    _chewieAudioController = ChewieAudioController(
       videoPlayerController: _videoPlayerController1,
-      aspectRatio: 3 / 2,
       autoPlay: true,
       looping: true,
       // Try playing around with some of these other options:
@@ -48,9 +47,6 @@ class _ChewieDemoState extends State<ChewieDemo> {
       //   backgroundColor: Colors.grey,
       //   bufferedColor: Colors.lightGreen,
       // ),
-      // placeholder: Container(
-      //   color: Colors.grey,
-      // ),
       // autoInitialize: true,
     );
   }
@@ -59,7 +55,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   void dispose() {
     _videoPlayerController1.dispose();
     _videoPlayerController2.dispose();
-    _chewieController.dispose();
+    _chewieAudioController.dispose();
     super.dispose();
   }
 
@@ -76,18 +72,10 @@ class _ChewieDemoState extends State<ChewieDemo> {
         ),
         body: Column(
           children: <Widget>[
-            Expanded(
-              child: Center(
-                child: Chewie(
-                  controller: _chewieController,
-                ),
+            Center(
+              child: ChewieAudio(
+                controller: _chewieAudioController,
               ),
-            ),
-            FlatButton(
-              onPressed: () {
-                _chewieController.enterFullScreen();
-              },
-              child: Text('Fullscreen'),
             ),
             Row(
               children: <Widget>[
@@ -95,12 +83,11 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: FlatButton(
                     onPressed: () {
                       setState(() {
-                        _chewieController.dispose();
+                        _chewieAudioController.dispose();
                         _videoPlayerController2.pause();
                         _videoPlayerController2.seekTo(Duration(seconds: 0));
-                        _chewieController = ChewieController(
+                        _chewieAudioController = ChewieAudioController(
                           videoPlayerController: _videoPlayerController1,
-                          aspectRatio: 3 / 2,
                           autoPlay: true,
                           looping: true,
                         );
@@ -116,12 +103,11 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: FlatButton(
                     onPressed: () {
                       setState(() {
-                        _chewieController.dispose();
+                        _chewieAudioController.dispose();
                         _videoPlayerController1.pause();
                         _videoPlayerController1.seekTo(Duration(seconds: 0));
-                        _chewieController = ChewieController(
+                        _chewieAudioController = ChewieAudioController(
                           videoPlayerController: _videoPlayerController2,
-                          aspectRatio: 3 / 2,
                           autoPlay: true,
                           looping: true,
                         );

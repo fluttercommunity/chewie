@@ -1,8 +1,8 @@
 import 'dart:ui';
 
-import 'package:chewie/src/chewie_player.dart';
-import 'package:chewie/src/cupertino_controls.dart';
-import 'package:chewie/src/material_controls.dart';
+import 'package:chewie_audio/src/chewie_player.dart';
+import 'package:chewie_audio/src/cupertino_controls.dart';
+import 'package:chewie_audio/src/material_controls.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -12,34 +12,30 @@ class PlayerWithControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ChewieController chewieController = ChewieController.of(context);
+    final ChewieAudioController chewieController =
+        ChewieAudioController.of(context);
 
     return Center(
       child: Container(
         width: MediaQuery.of(context).size.width,
-        child: AspectRatio(
-          aspectRatio:
-              chewieController.aspectRatio ?? _calculateAspectRatio(context),
-          child: _buildPlayerWithControls(chewieController, context),
-        ),
+        child: _buildPlayerWithControls(chewieController, context),
       ),
     );
   }
 
   Container _buildPlayerWithControls(
-      ChewieController chewieController, BuildContext context) {
+      ChewieAudioController chewieController, BuildContext context) {
     return Container(
       child: Stack(
         children: <Widget>[
-          chewieController.placeholder ?? Container(),
-          Center(
-            child: AspectRatio(
-              aspectRatio: chewieController.aspectRatio ??
-                  _calculateAspectRatio(context),
+          Offstage(
+            offstage: true,
+            child: Container(
+              width: 3,
+              height: 1,
               child: VideoPlayer(chewieController.videoPlayerController),
             ),
           ),
-          chewieController.overlay ?? Container(),
           _buildControls(context, chewieController),
         ],
       ),
@@ -48,7 +44,7 @@ class PlayerWithControls extends StatelessWidget {
 
   Widget _buildControls(
     BuildContext context,
-    ChewieController chewieController,
+    ChewieAudioController chewieController,
   ) {
     return chewieController.showControls
         ? chewieController.customControls != null
@@ -60,13 +56,5 @@ class PlayerWithControls extends StatelessWidget {
                     iconColor: Color.fromARGB(255, 200, 200, 200),
                   )
         : Container();
-  }
-
-  double _calculateAspectRatio(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    final width = size.width;
-    final height = size.height;
-
-    return width > height ? width / height : height / width;
   }
 }

@@ -1,12 +1,12 @@
-# chewie
+# chewie_audio
 
-The video player for Flutter with a heart of gold. 
+The audio player for Flutter with a heart of gold. 
 
-The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI! 
+The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video/audio playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI! 
 
 ## Demo
 
-![Demo](https://github.com/brianegan/chewie/raw/master/assets/chewie_demo.gif)
+<!--![Demo](https://github.com/brianegan/chewie/raw/master/assets/chewie_demo.gif)-->
 
 ## Installation
 
@@ -14,26 +14,25 @@ In your `pubspec.yaml` file within your Flutter Project:
 
 ```yaml
 dependencies:
-  chewie: <latest_version>
+  chewie_audio: <latest_version>
   video_player: <latest_version>
 ```
 
 ## Use it
 
 ```dart
-import 'package:chewie/chewie.dart';
+import 'package:chewie_audio/chewie_audio.dart';
 final videoPlayerController = VideoPlayerController.network(
     'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4');
 
-final chewieController = ChewieController(
+final chewieAudioController = ChewieAudioController(
   videoPlayerController: videoPlayerController,
-  aspectRatio: 3 / 2,
   autoPlay: true,
   looping: true,
 );
 
-final playerWidget = Chewie(
-  controller: chewieController,
+final playerWidget = ChewieAudio(
+  controller: chewieAudioController,
 );
 ```
 
@@ -42,41 +41,14 @@ Please make sure to dispose both controller widgets after use. For example by ov
 @override
 void dispose() {
   videoPlayerController.dispose();
-  chewieController.dispose();
+  chewieAudioController.dispose();
   super.dispose();
 }
 ```
 
 ## Example
 
-Please run the app in the [`example/`](https://github.com/brianegan/chewie/tree/master/example) folder to start playing!
-
-## Migrating from Chewie < 0.9.0
-Instead of passing the `VideoPlayerController` and your options to the `Chewie` widget you now pass them to the `ChewieController` and pass that latter to the `Chewie` widget.
-
-```dart
-final playerWidget = Chewie(
-  videoPlayerController,
-  aspectRatio: 3 / 2,
-  autoPlay: true,
-  looping: true,
-);
-```
-
-becomes
-
-```dart
-final chewieController = ChewieController(
-  videoPlayerController: videoPlayerController,
-  aspectRatio: 3 / 2,
-  autoPlay: true,
-  looping: true,
-);
-
-final playerWidget = Chewie(
-  controller: chewieController,
-);
-```
+Please run the app in the [`example/`](https://github.com/Sub6Resources/chewie_audio/tree/master/example) folder to start playing!
 
 ## iOS warning
 

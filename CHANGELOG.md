@@ -1,4 +1,14 @@
-# Changelog
+# Chewie Audio Changelog
+
+## 1.0.0
+
+Initial version of Chewie Audio, the audio player with a heart of gold.
+
+Forked from https://github.com/brianegan/chewie
+  
+  * Removed video components from Chewie to make an audio-only player.
+
+# [Chewie](https://github.com/brianegan/chewie) Changelog
 
 ## 0.9.8
 

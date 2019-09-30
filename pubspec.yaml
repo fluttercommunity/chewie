@@ -1,10 +1,11 @@
-name: chewie
-description: A video player for Flutter with Cupertino and Material play controls
-version: 0.9.8
-homepage: https://github.com/brianegan/chewie
+name: chewie_audio
+description: An audio player for Flutter with Cupertino and Material play controls
+version: 1.0.0
+homepage: https://github.com/Sub6Resources/chewie_audio
 authors:
   - Brian Egan <brian@brianegan.com>
   - Ben Hagen <ben@ottomatic.io>
+  - Matthew Whitaker <sub6resources@gmail.com>
 
 environment:
   sdk: ">=2.0.0-dev.28.0 <3.0.0"
