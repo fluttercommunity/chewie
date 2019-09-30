@@ -1,4 +1,4 @@
-import 'package:chewie/chewie.dart';
+import 'package:chewie_audio/chewie_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -66,7 +66,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
   @override
   Widget build(BuildContext context) {
-    final ChewieController chewieController = ChewieController.of(context);
+    final ChewieAudioController chewieController = ChewieAudioController.of(context);
     final child = Center(
       child: StaticProgressBar(
         value: controller.value,

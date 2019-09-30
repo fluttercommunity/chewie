@@ -1,4 +1,4 @@
-import 'package:chewie/src/animated_play_pause.dart';
+import 'package:chewie_audio/src/animated_play_pause.dart';
 import 'package:flutter/material.dart';
 
 class CenterPlayButton extends StatelessWidget {

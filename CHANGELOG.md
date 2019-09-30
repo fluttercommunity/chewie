@@ -1,3 +1,17 @@
+=======
+# Chewie Audio Changelog
+
+## 1.0.0
+
+Initial version of Chewie Audio, the audio player with a heart of gold.
+
+Forked from https://github.com/brianegan/chewie
+
+* Removed video components from Chewie to make an audio-only player.
+
+
+# [Chewie](https://github.com/brianegan/chewie) Changelog
+
 ## 1.5.0
 * 🛠️ [#712](https://github.com/fluttercommunity/chewie/pull/712): Progress Bars can now be disabled by setting `ChewieController.draggableProgressBar` to `false`. Thanks [shiyiya](https://github.com/shiyiya).
 * ⬆️ Increased Dart SDK constraint to cover Dart `3.0.0` and higher.

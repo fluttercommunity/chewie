@@ -1,6 +1,6 @@
-import 'package:chewie/src/chewie_player.dart';
-import 'package:chewie/src/helpers/adaptive_controls.dart';
-import 'package:chewie/src/notifiers/index.dart';
+import 'package:chewie_audio/src/chewie_player.dart';
+import 'package:chewie_audio/src/helpers/adaptive_controls.dart';
+import 'package:chewie_audio/src/notifiers/index.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -10,7 +10,8 @@ class PlayerWithControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ChewieController chewieController = ChewieController.of(context);
+    final ChewieAudioController chewieController =
+        ChewieAudioController.of(context);
 
     double calculateAspectRatio(BuildContext context) {
       final size = MediaQuery.of(context).size;
@@ -22,7 +23,7 @@ class PlayerWithControls extends StatelessWidget {
 
     Widget buildControls(
       BuildContext context,
-      ChewieController chewieController,
+      ChewieAudioController chewieController,
     ) {
       return chewieController.showControls
           ? chewieController.customControls ?? const AdaptiveControls()
@@ -30,27 +31,20 @@ class PlayerWithControls extends StatelessWidget {
     }
 
     Widget buildPlayerWithControls(
-      ChewieController chewieController,
+      ChewieAudioController chewieController,
       BuildContext context,
     ) {
       return Stack(
         children: <Widget>[
-          if (chewieController.placeholder != null)
-            chewieController.placeholder!,
           InteractiveViewer(
             transformationController: chewieController.transformationController,
             maxScale: chewieController.maxScale,
             panEnabled: chewieController.zoomAndPan,
             scaleEnabled: chewieController.zoomAndPan,
             child: Center(
-              child: AspectRatio(
-                aspectRatio: chewieController.aspectRatio ??
-                    chewieController.videoPlayerController.value.aspectRatio,
-                child: VideoPlayer(chewieController.videoPlayerController),
-              ),
+              child: VideoPlayer(chewieController.videoPlayerController),
             ),
           ),
-          if (chewieController.overlay != null) chewieController.overlay!,
           if (Theme.of(context).platform != TargetPlatform.iOS)
             Consumer<PlayerNotifier>(
               builder: (
@@ -72,13 +66,10 @@ class PlayerWithControls extends StatelessWidget {
                 ),
               ),
             ),
-          if (!chewieController.isFullScreen)
-            buildControls(context, chewieController)
-          else
-            SafeArea(
-              bottom: false,
-              child: buildControls(context, chewieController),
-            ),
+          SafeArea(
+            bottom: false,
+            child: buildControls(context, chewieController),
+          ),
         ],
       );
     }

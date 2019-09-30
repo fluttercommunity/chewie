@@ -1,30 +1,30 @@
 import 'dart:io';
 
-import 'package:chewie/chewie.dart';
+import 'package:chewie_audio/chewie_audio.dart';
 import 'package:chewie_example/app/theme.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:video_player/video_player.dart';
 
-class ChewieDemo extends StatefulWidget {
-  const ChewieDemo({
+class ChewieAudioDemo extends StatefulWidget {
+  const ChewieAudioDemo({
     Key? key,
-    this.title = 'Chewie Demo',
+    this.title = 'Chewie Audio Demo',
   }) : super(key: key);
 
   final String title;
 
   @override
   State<StatefulWidget> createState() {
-    return _ChewieDemoState();
+    return _ChewieAudioDemoState();
   }
 }
 
-class _ChewieDemoState extends State<ChewieDemo> {
+class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
   TargetPlatform? _platform;
   late VideoPlayerController _videoPlayerController1;
   late VideoPlayerController _videoPlayerController2;
-  ChewieController? _chewieController;
+  ChewieAudioController? _chewieController;
   int? bufferDelay;
 
   @override
@@ -110,7 +110,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       ),
     ];
 
-    _chewieController = ChewieController(
+    _chewieController = ChewieAudioController(
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
       looping: true,
@@ -138,8 +138,6 @@ class _ChewieDemoState extends State<ChewieDemo> {
                 style: const TextStyle(color: Colors.black),
               ),
       ),
-
-      hideControlsTimer: const Duration(seconds: 1),
 
       // Try playing around with some of these other options:
 
@@ -186,7 +184,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                 child: _chewieController != null &&
                         _chewieController!
                             .videoPlayerController.value.isInitialized
-                    ? Chewie(
+                    ? ChewieAudio(
                         controller: _chewieController!,
                       )
                     : const Column(
@@ -198,12 +196,6 @@ class _ChewieDemoState extends State<ChewieDemo> {
                         ],
                       ),
               ),
-            ),
-            TextButton(
-              onPressed: () {
-                _chewieController?.enterFullScreen();
-              },
-              child: const Text('Fullscreen'),
             ),
             Row(
               children: <Widget>[

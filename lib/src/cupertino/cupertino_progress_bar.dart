@@ -1,5 +1,5 @@
-import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/progress_bar.dart';
+import 'package:chewie_audio/src/chewie_progress_colors.dart';
+import 'package:chewie_audio/src/progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';

@@ -1,4 +1,4 @@
-import 'package:chewie/src/models/option_item.dart';
+import 'package:chewie_audio/src/models/option_item.dart';
 import 'package:flutter/cupertino.dart';
 
 class CupertinoOptionsDialog extends StatefulWidget {
