@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.8+1
+  * Require latest flutter stable version
+
 ## 0.9.8
 
   * Hero Widget is no longer used (thanks @localpcguy)
