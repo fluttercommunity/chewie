@@ -25,6 +25,13 @@ class MaterialVideoProgressBar extends StatefulWidget {
 }
 
 class _VideoProgressBarState extends State<MaterialVideoProgressBar> {
+  @override
+  void setState(fn) {
+    if(mounted){
+      super.setState(fn);
+    }
+  }
+  
   _VideoProgressBarState() {
     listener = () {
       setState(() {});

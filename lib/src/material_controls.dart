@@ -32,6 +32,13 @@ class _MaterialControlsState extends State<MaterialControls> {
   ChewieController chewieController;
 
   @override
+  void setState(fn) {
+    if(mounted){
+      super.setState(fn);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (_latestValue.hasError) {
       return chewieController.errorBuilder != null

@@ -25,6 +25,13 @@ class CupertinoVideoProgressBar extends StatefulWidget {
 }
 
 class _VideoProgressBarState extends State<CupertinoVideoProgressBar> {
+  @override
+  void setState(fn) {
+    if(mounted){
+      super.setState(fn);
+    }
+  }
+  
   _VideoProgressBarState() {
     listener = () {
       setState(() {});
