@@ -169,6 +169,7 @@ class ChewieController extends ChangeNotifier {
   ChewieController({
     this.videoPlayerController,
     this.aspectRatio,
+    this.alignment,
     this.autoInitialize = false,
     this.autoPlay = false,
     this.startAt,
@@ -233,6 +234,10 @@ class ChewieController extends ChangeNotifier {
   ///
   /// Will fallback to fitting within the space allowed.
   final double aspectRatio;
+  
+  /// video alignment
+  /// default Alignment.center
+  final Alignment alignment;
 
   /// The colors to use for controls on iOS. By default, the iOS player uses
   /// colors sampled from the original iOS 11 designs.
