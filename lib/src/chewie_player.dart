@@ -128,11 +128,15 @@ class ChewieState extends State<Chewie> {
     );
 
     SystemChrome.setEnabledSystemUIOverlays([]);
-    if (isAndroid) {
+    final List<DeviceOrientation> fullScreenDeviceOrientations = widget.controller.deviceOrientationsOnFullScreen;
+
+    if (fullScreenDeviceOrientations == null && isAndroid) {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ]);
+    } else if (fullScreenDeviceOrientations?.isNotEmpty ?? false) {
+      SystemChrome.setPreferredOrientations(fullScreenDeviceOrientations);
     }
 
     if (!widget.controller.allowedScreenSleep) {
@@ -193,9 +197,9 @@ class ChewieController extends ChangeNotifier {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ],
+    this.deviceOrientationsOnFullScreen,
     this.routePageBuilder = null,
-  }) : assert(videoPlayerController != null,
-            'You must provide a controller to play a video') {
+  }) : assert(videoPlayerController != null, 'You must provide a controller to play a video') {
     _initialize();
   }
 
@@ -269,6 +273,9 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines the set of allowed device orientations after exiting fullscreen
   final List<DeviceOrientation> deviceOrientationsAfterFullScreen;
+
+  /// Defines the set of allowed device orientations when entering in fullscreen
+  final List<DeviceOrientation> deviceOrientationsOnFullScreen;
 
   /// Defines a custom RoutePageBuilder for the fullscreen
   final ChewieRoutePageBuilder routePageBuilder;

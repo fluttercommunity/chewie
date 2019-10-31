@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.9
+  * Adds the possibility to set on full screen preferred screen orientations.
+
 ## 0.9.8+1
   * Require latest flutter stable version
 
