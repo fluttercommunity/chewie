@@ -13,6 +13,9 @@ class PlayerWithControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ChewieController chewieController = ChewieController.of(context);
+    if (chewieController.isFullScreen) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => chewieController.play());
+    }
 
     return Center(
       child: Container(
