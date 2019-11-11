@@ -13,7 +13,9 @@ dependencies:
   open_iconic_flutter: ">=0.3.0 <0.4.0"
 #  video_player: ">=0.7.0 <0.11.0"
   video_player:
-    path: ../video_player-0.10.1+3
+    git:
+      url: https://github.com/rashedoz/plugins.git
+      path: packages/video_player
 
   screen: ">=0.0.4 <0.1.0"
   flutter:
