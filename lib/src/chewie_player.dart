@@ -124,6 +124,7 @@ class ChewieState extends State<Chewie> {
     final isAndroid = Theme.of(context).platform == TargetPlatform.android;
     final TransitionRoute<Null> route = PageRouteBuilder<Null>(
       settings: RouteSettings(isInitialRoute: false),
+      opaque: false,
       pageBuilder: _fullScreenRoutePageBuilder,
     );
 
