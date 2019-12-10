@@ -11,3 +11,4 @@ pubspec.lock
 .iml
 Podfile.lock
 chewie.iml
+example/ios/Flutter/flutter_export_environment.sh
