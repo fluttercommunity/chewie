@@ -3,6 +3,7 @@ import 'package:chewie/src/chewie_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(
@@ -26,7 +27,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   VideoPlayerController _videoPlayerController1;
   VideoPlayerController _videoPlayerController2;
   ChewieController _chewieController;
-
+  Locale locale;
   @override
   void initState() {
     super.initState();
@@ -66,10 +67,19 @@ class _ChewieDemoState extends State<ChewieDemo> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      supportedLocales: [
+        const Locale('fa', 'IR'),
+        const Locale('en', 'US'),
+      ],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
       title: widget.title,
       theme: ThemeData.light().copyWith(
         platform: _platform ?? Theme.of(context).platform,
       ),
+      locale:Locale('fa', 'IR'),
       home: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),

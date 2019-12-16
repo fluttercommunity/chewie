@@ -1,0 +1,95 @@
+Flutter crash report; please file at https://github.com/flutter/flutter/issues.
+
+## command
+
+flutter --no-color run --machine --track-widget-creation --device-id=emulator-5554 lib/main.dart
+
+## exception
+
+NoSuchMethodError: NoSuchMethodError: The method 'matchAsPrefix' was called on null.
+Receiver: null
+Tried calling: matchAsPrefix("       ^", 0)
+
+```
+#0      Object.noSuchMethod (dart:core-patch/object_patch.dart:51:5)
+#1      _StringBase.startsWith (dart:core-patch/string_patch.dart:331:20)
+#2      StdoutHandler.handler (package:flutter_tools/src/compile.dart:109:17)
+#3      _rootRunUnary (dart:async/zone.dart:1132:38)
+#4      _CustomZone.runUnary (dart:async/zone.dart:1029:19)
+#5      _CustomZone.runUnaryGuarded (dart:async/zone.dart:931:7)
+#6      _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:336:11)
+#7      _BufferingStreamSubscription._add (dart:async/stream_impl.dart:263:7)
+#8      _SinkTransformerStreamSubscription._add (dart:async/stream_transformers.dart:68:11)
+#9      _EventSinkWrapper.add (dart:async/stream_transformers.dart:15:11)
+#10     _StringAdapterSink.add (dart:convert/string_conversion.dart:236:11)
+#11     _LineSplitterSink._addLines (dart:convert/line_splitter.dart:150:13)
+#12     _LineSplitterSink.addSlice (dart:convert/line_splitter.dart:125:5)
+#13     StringConversionSinkMixin.add (dart:convert/string_conversion.dart:163:5)
+#14     _SinkTransformerStreamSubscription._handleData (dart:async/stream_transformers.dart:120:24)
+#15     _rootRunUnary (dart:async/zone.dart:1132:38)
+#16     _CustomZone.runUnary (dart:async/zone.dart:1029:19)
+#17     _CustomZone.runUnaryGuarded (dart:async/zone.dart:931:7)
+#18     _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:336:11)
+#19     _BufferingStreamSubscription._add (dart:async/stream_impl.dart:263:7)
+#20     _SinkTransformerStreamSubscription._add (dart:async/stream_transformers.dart:68:11)
+#21     _EventSinkWrapper.add (dart:async/stream_transformers.dart:15:11)
+#22     _StringAdapterSink.add (dart:convert/string_conversion.dart:236:11)
+#23     _StringAdapterSink.addSlice (dart:convert/string_conversion.dart:241:7)
+#24     _Utf8ConversionSink.addSlice (dart:convert/string_conversion.dart:312:20)
+#25     _Utf8ConversionSink.add (dart:convert/string_conversion.dart:305:5)
+#26     _ConverterStreamEventSink.add (dart:convert/chunked_conversion.dart:72:18)
+#27     _SinkTransformerStreamSubscription._handleData (dart:async/stream_transformers.dart:120:24)
+#28     _rootRunUnary (dart:async/zone.dart:1132:38)
+#29     _CustomZone.runUnary (dart:async/zone.dart:1029:19)
+#30     _CustomZone.runUnaryGuarded (dart:async/zone.dart:931:7)
+#31     _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:336:11)
+#32     _BufferingStreamSubscription._add (dart:async/stream_impl.dart:263:7)
+#33     _SyncStreamControllerDispatch._sendData (dart:async/stream_controller.dart:764:19)
+#34     _StreamController._add (dart:async/stream_controller.dart:640:7)
+#35     _StreamController.add (dart:async/stream_controller.dart:586:5)
+#36     _Socket._onData (dart:io-patch/socket_patch.dart:1791:41)
+#37     _rootRunUnary (dart:async/zone.dart:1136:13)
+#38     _CustomZone.runUnary (dart:async/zone.dart:1029:19)
+#39     _CustomZone.runUnaryGuarded (dart:async/zone.dart:931:7)
+#40     _BufferingStreamSubscription._sendData (dart:async/stream_impl.dart:336:11)
+#41     _BufferingStreamSubscription._add (dart:async/stream_impl.dart:263:7)
+#42     _SyncStreamControllerDispatch._sendData (dart:async/stream_controller.dart:764:19)
+#43     _StreamController._add (dart:async/stream_controller.dart:640:7)
+#44     _StreamController.add (dart:async/stream_controller.dart:586:5)
+#45     new _RawSocket.<anonymous closure> (dart:io-patch/socket_patch.dart:1339:33)
+#46     _NativeSocket.issueReadEvent.issue (dart:io-patch/socket_patch.dart:860:14)
+#47     _microtaskLoop (dart:async/schedule_microtask.dart:41:21)
+#48     _startMicrotaskLoop (dart:async/schedule_microtask.dart:50:5)
+#49     _runPendingImmediateCallback (dart:isolate-patch/isolate_patch.dart:116:13)
+#50     _RawReceivePortImpl._handleMessage (dart:isolate-patch/isolate_patch.dart:173:5)
+```
+
+## flutter doctor
+
+```
+[✓] Flutter (Channel stable, v1.9.1+hotfix.6, on Linux, locale en_US.utf8)
+    • Flutter version 1.9.1+hotfix.6 at /home/kasbokar/flutter/flutter
+    • Framework revision 68587a0916 (3 months ago), 2019-09-13 19:46:58 -0700
+    • Engine revision b863200c37
+    • Dart version 2.5.0
+
+[✓] Android toolchain - develop for Android devices (Android SDK version 28.0.3)
+    • Android SDK at /home/kasbokar/app/sdk
+    • Android NDK location not configured (optional; useful for native profiling support)
+    • Platform android-29, build-tools 28.0.3
+    • ANDROID_HOME = /home/kasbokar/app/sdk
+    • Java binary at: /home/kasbokar/app/android-studio/jre/bin/java
+    • Java version OpenJDK Runtime Environment (build 1.8.0_202-release-1483-b49-5587405)
+    • All Android licenses accepted.
+
+[✓] Android Studio (version 3.5)
+    • Android Studio at /home/kasbokar/app/android-studio
+    • Flutter plugin version 42.1.1
+    • Dart plugin version 191.8593
+    • Java version OpenJDK Runtime Environment (build 1.8.0_202-release-1483-b49-5587405)
+
+[✓] Connected device (1 available)
+    • Android SDK built for x86 • emulator-5554 • android-x86 • Android 9 (API 28) (emulator)
+
+• No issues found!
+```

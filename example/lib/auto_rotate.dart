@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(
@@ -90,10 +91,20 @@ class _ChewieDemoState extends State<ChewieDemo> {
       theme: ThemeData.light().copyWith(
         platform: _platform ?? Theme.of(context).platform,
       ),
+      locale:Locale('fa', 'IR'),
+      supportedLocales: [
+        const Locale('fa', 'IR'),
+        const Locale('en', 'US'),
+      ],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
       home: Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
         ),
+
         body: Column(
           children: <Widget>[
             Expanded(
