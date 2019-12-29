@@ -5,12 +5,12 @@ import 'package:video_player/video_player.dart';
 
 class MaterialVideoProgressBar extends StatefulWidget {
   MaterialVideoProgressBar(
-    this.controller, {
-    ChewieProgressColors colors,
-    this.onDragEnd,
-    this.onDragStart,
-    this.onDragUpdate,
-  }) : colors = colors ?? ChewieProgressColors();
+      this.controller, {
+        ChewieProgressColors colors,
+        this.onDragEnd,
+        this.onDragStart,
+        this.onDragUpdate,
+      }) : colors = colors ?? ChewieProgressColors();
 
   final VideoPlayerController controller;
   final ChewieProgressColors colors;
@@ -99,6 +99,12 @@ class _VideoProgressBarState extends State<MaterialVideoProgressBar> {
         if (_controllerWasPlaying) {
           controller.play();
         }
+        /// Seek playes video without resuming the controls to play state
+        /// Check if seeked from video end then play video controller
+        if(controller.value.position == controller.value.duration){
+          controller.pause();
+        }
+        ////////
 
         if (widget.onDragEnd != null) {
           widget.onDragEnd();
@@ -108,6 +114,13 @@ class _VideoProgressBarState extends State<MaterialVideoProgressBar> {
         if (!controller.value.initialized) {
           return;
         }
+        /// Seek playes video without resuming the controls to play state
+        /// Check and play video if the controller is in pause state
+        if(!controller.value.isPlaying){
+          controller.play();
+        }
+        ////////
+
         seekToRelativePosition(details.globalPosition);
       },
     );
@@ -145,7 +158,7 @@ class _ProgressBarPainter extends CustomPainter {
     final double playedPartPercent =
         value.position.inMilliseconds / value.duration.inMilliseconds;
     final double playedPart =
-        playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
+    playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
     for (DurationRange range in value.buffered) {
       final double start = range.startFraction(value.duration) * size.width;
       final double end = range.endFraction(value.duration) * size.width;
