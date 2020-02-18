@@ -139,7 +139,10 @@ class ChewieState extends State<Chewie> {
       Wakelock.enable();
     }
 
+    widget.controller.beforeFullScreen();
+
     await Navigator.of(context, rootNavigator: true).push(route);
+    widget.controller.afterFullScreen();
     _isFullScreen = false;
     widget.controller.exitFullScreen();
 
@@ -184,6 +187,8 @@ class ChewieController extends ChangeNotifier {
     this.allowedScreenSleep = true,
     this.isLive = false,
     this.allowFullScreen = true,
+    this.beforeFullScreen,
+    this.afterFullScreen,
     this.allowMuting = true,
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
     this.deviceOrientationsAfterFullScreen = const [
@@ -259,6 +264,12 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines if the fullscreen control should be shown
   final bool allowFullScreen;
+
+  /// Custom Function to execute before going into FullScreen
+  final Function beforeFullScreen;
+
+  /// Custom Function to execute after exiting FullScreen
+  final Function afterFullScreen;
 
   /// Defines if the mute control should be shown
   final bool allowMuting;
