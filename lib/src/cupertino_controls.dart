@@ -39,6 +39,13 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   ChewieController chewieController;
 
   @override
+  void setState(fn) {
+    if(mounted){
+      super.setState(fn);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     chewieController = ChewieController.of(context);
 
