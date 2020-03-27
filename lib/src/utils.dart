@@ -20,3 +20,16 @@ String formatDuration(Duration position) {
 
   return formattedTime;
 }
+///isRtlLanguage return bool rtl
+///RegExp is taken from intl dart package
+bool isRtlLanguage(String language) {
+   final _rtlLocaleRegex = RegExp(
+      r'^(ar|dv|he|iw|fa|nqo|ps|sd|ug|ur|yi|.*[-_]'
+      r'(Arab|Hebr|Thaa|Nkoo|Tfng))(?!.*[-_](Latn|Cyrl)($|-|_))'
+      r'($|-|_)',
+      caseSensitive: false);
+
+   final bool _rtlCheck = _rtlLocaleRegex.hasMatch(language);
+
+return _rtlCheck;
+}

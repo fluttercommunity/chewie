@@ -6,7 +6,6 @@ import 'package:chewie/src/material_progress_bar.dart';
 import 'package:chewie/src/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-
 class MaterialControls extends StatefulWidget {
   const MaterialControls({Key key}) : super(key: key);
 
@@ -108,7 +107,6 @@ class _MaterialControlsState extends State<MaterialControls> {
     BuildContext context,
   ) {
     final iconColor = Theme.of(context).textTheme.button.color;
-
     return AnimatedOpacity(
       opacity: _hideStuff ? 0.0 : 1.0,
       duration: Duration(milliseconds: 300),
@@ -116,22 +114,30 @@ class _MaterialControlsState extends State<MaterialControls> {
         height: barHeight,
         color: Theme.of(context).dialogBackgroundColor,
         child: Row(
-          children: <Widget>[
-            _buildPlayPause(controller),
-            chewieController.isLive
-                ? Expanded(child: const Text('LIVE'))
-                : _buildPosition(iconColor),
-            chewieController.isLive ? const SizedBox() : _buildProgressBar(),
-            chewieController.allowMuting
-                ? _buildMuteButton(controller)
-                : Container(),
-            chewieController.allowFullScreen
-                ? _buildExpandButton()
-                : Container(),
-          ],
+          children: createWidget(iconColor)
         ),
       ),
     );
+  }
+
+ List<Widget> createWidget(Color iconColor){
+   Locale myLocale = Localizations.localeOf(context);
+   isRtlLanguage( myLocale.languageCode);
+   List<Widget> showTabBar=[ _buildPlayPause(controller),
+     chewieController.isLive
+         ? Expanded(child: const Text('LIVE'))
+         : _buildPosition(iconColor),
+     chewieController.isLive ? const SizedBox() : _buildProgressBar(),
+     chewieController.allowMuting
+         ? _buildMuteButton(controller)
+         : Container(),
+     chewieController.allowFullScreen
+         ? _buildExpandButton()
+         : Container(),];
+   if(chewieController.rtl||isRtlLanguage( myLocale.languageCode)){
+     showTabBar =showTabBar.reversed.toList();
+   }
+   return showTabBar;
   }
 
   GestureDetector _buildExpandButton() {
