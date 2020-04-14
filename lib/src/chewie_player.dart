@@ -121,18 +121,29 @@ class ChewieState extends State<Chewie> {
   }
 
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
-    final isAndroid = Theme.of(context).platform == TargetPlatform.android;
+    final _rotationChannel = const MethodChannel('zgadula/orientation');
     final TransitionRoute<Null> route = PageRouteBuilder<Null>(
       pageBuilder: _fullScreenRoutePageBuilder,
     );
 
     SystemChrome.setEnabledSystemUIOverlays([]);
-    if (isAndroid) {
+    if (widget.controller.aspectRatio > 1.0) {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ]);
+    } else {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
     }
+
+    try {
+      widget.controller.aspectRatio > 1.0
+          ? _rotationChannel.invokeMethod<dynamic>('setLandscape')
+          : _rotationChannel.invokeMethod<dynamic>('setPortrait');
+    } catch (error) {}
 
     if (!widget.controller.allowedScreenSleep) {
       Wakelock.enable();
@@ -150,6 +161,13 @@ class ChewieState extends State<Chewie> {
         widget.controller.systemOverlaysAfterFullScreen);
     SystemChrome.setPreferredOrientations(
         widget.controller.deviceOrientationsAfterFullScreen);
+
+    try {
+      widget.controller.deviceOrientationsAfterFullScreen
+              .contains(DeviceOrientation.portraitUp)
+          ? _rotationChannel.invokeMethod<dynamic>('setPortrait')
+          : _rotationChannel.invokeMethod<dynamic>('setLandscape');
+    } catch (error) {}
   }
 }
 
