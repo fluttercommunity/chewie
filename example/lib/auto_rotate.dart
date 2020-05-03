@@ -208,7 +208,7 @@ class _VideoScaffoldState extends State<VideoScaffold> {
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
-    AutoOrientation.landscapeMode();
+    AutoOrientation.landscapeAutoMode();
     super.initState();
   }
 
@@ -218,7 +218,7 @@ class _VideoScaffoldState extends State<VideoScaffold> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    AutoOrientation.portraitMode();
+    AutoOrientation.portraitAutoMode();
     super.dispose();
   }
 
