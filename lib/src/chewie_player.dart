@@ -274,7 +274,7 @@ class ChewieController extends ChangeNotifier {
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider =
-        context.inheritFromWidgetOfExactType(_ChewieControllerProvider)
+        context.dependOnInheritedWidgetOfExactType()
             as _ChewieControllerProvider;
 
     return chewieControllerProvider.controller;
