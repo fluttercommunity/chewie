@@ -122,19 +122,11 @@ class ChewieState extends State<Chewie> {
   }
 
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
-    final isAndroid = Theme.of(context).platform == TargetPlatform.android;
     final TransitionRoute<Null> route = PageRouteBuilder<Null>(
       pageBuilder: _fullScreenRoutePageBuilder,
     );
 
-    SystemChrome.setEnabledSystemUIOverlays([]);
-    if (isAndroid) {
-      SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-    }
+    onEnterFullScreen();
 
     if (!widget.controller.allowedScreenSleep) {
       Wakelock.enable();
@@ -150,6 +142,46 @@ class ChewieState extends State<Chewie> {
 
     SystemChrome.setEnabledSystemUIOverlays(widget.controller.systemOverlaysAfterFullScreen);
     SystemChrome.setPreferredOrientations(widget.controller.deviceOrientationsAfterFullScreen);
+  }
+
+  void onEnterFullScreen() {
+    final videoWidth = widget.controller.videoPlayerController.value.size.width;
+    final videoHeight = widget.controller.videoPlayerController.value.size.height;
+
+    if (widget.controller.systemOverlaysOnEnterFullScreen != null) {
+      /// Optional user preferred settings
+      SystemChrome.setEnabledSystemUIOverlays(widget.controller.systemOverlaysOnEnterFullScreen);
+    } else {
+      /// Default behavior
+      SystemChrome.setEnabledSystemUIOverlays([]);
+    }
+
+    if (widget.controller.deviceOrientationsOnEnterFullScreen != null) {
+      /// Optional user preferred settings
+      SystemChrome.setPreferredOrientations(widget.controller.deviceOrientationsOnEnterFullScreen);
+    } else {
+      /// Default behavior
+      /// Video w > h means we force landscape
+      if (videoWidth > videoHeight) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ]);
+      }
+
+      /// Video h > w means we force portrait
+      else if (videoHeight > videoWidth) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+      }
+
+      /// Otherwise if h == w (square video)
+      else {
+        SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+      }
+    }
   }
 }
 
@@ -184,13 +216,10 @@ class ChewieController extends ChangeNotifier {
     this.isLive = false,
     this.allowFullScreen = true,
     this.allowMuting = true,
+    this.systemOverlaysOnEnterFullScreen,
+    this.deviceOrientationsOnEnterFullScreen,
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
-    this.deviceOrientationsAfterFullScreen = const [
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ],
+    this.deviceOrientationsAfterFullScreen = DeviceOrientation.values,
     this.routePageBuilder = null,
   }) : assert(videoPlayerController != null, 'You must provide a controller to play a video') {
     _initialize();
@@ -260,6 +289,12 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines if the mute control should be shown
   final bool allowMuting;
+
+  /// Defines the system overlays visible on entering fullscreen
+  final List<SystemUiOverlay> systemOverlaysOnEnterFullScreen;
+
+  /// Defines the set of allowed device orientations on entering fullscreen
+  final List<DeviceOrientation> deviceOrientationsOnEnterFullScreen;
 
   /// Defines the system overlays visible after exiting fullscreen
   final List<SystemUiOverlay> systemOverlaysAfterFullScreen;
