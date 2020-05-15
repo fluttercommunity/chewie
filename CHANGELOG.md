@@ -1,3 +1,9 @@
+## 0.10.0
+
+  * Fix portrait mode
+  * Add auto-detect orientation based on video aspect-ratio
+  * Add optional parameters for `onEnterFullScreen`
+
 ## 0.9.10
 
 * Remove `isInitialRoute` from full screen page route
