@@ -9,10 +9,11 @@ import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
 
 typedef Widget ChewieRoutePageBuilder(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    _ChewieControllerProvider controllerProvider);
+  BuildContext context,
+  Animation<double> animation,
+  Animation<double> secondaryAnimation,
+  _ChewieControllerProvider controllerProvider,
+);
 
 /// A Video Player with Material and Cupertino skins.
 ///
@@ -76,9 +77,10 @@ class ChewieState extends State<Chewie> {
   }
 
   Widget _buildFullScreenVideo(
-      BuildContext context,
-      Animation<double> animation,
-      _ChewieControllerProvider controllerProvider) {
+    BuildContext context,
+    Animation<double> animation,
+    _ChewieControllerProvider controllerProvider,
+  ) {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       body: Container(
@@ -90,10 +92,11 @@ class ChewieState extends State<Chewie> {
   }
 
   AnimatedWidget _defaultRoutePageBuilder(
-      BuildContext context,
-      Animation<double> animation,
-      Animation<double> secondaryAnimation,
-      _ChewieControllerProvider controllerProvider) {
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    _ChewieControllerProvider controllerProvider,
+  ) {
     return AnimatedBuilder(
       animation: animation,
       builder: (BuildContext context, Widget child) {
@@ -113,11 +116,9 @@ class ChewieState extends State<Chewie> {
     );
 
     if (widget.controller.routePageBuilder == null) {
-      return _defaultRoutePageBuilder(
-          context, animation, secondaryAnimation, controllerProvider);
+      return _defaultRoutePageBuilder(context, animation, secondaryAnimation, controllerProvider);
     }
-    return widget.controller.routePageBuilder(
-        context, animation, secondaryAnimation, controllerProvider);
+    return widget.controller.routePageBuilder(context, animation, secondaryAnimation, controllerProvider);
   }
 
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
@@ -147,10 +148,8 @@ class ChewieState extends State<Chewie> {
     // so we do not need to check Wakelock.isEnabled.
     Wakelock.disable();
 
-    SystemChrome.setEnabledSystemUIOverlays(
-        widget.controller.systemOverlaysAfterFullScreen);
-    SystemChrome.setPreferredOrientations(
-        widget.controller.deviceOrientationsAfterFullScreen);
+    SystemChrome.setEnabledSystemUIOverlays(widget.controller.systemOverlaysAfterFullScreen);
+    SystemChrome.setPreferredOrientations(widget.controller.deviceOrientationsAfterFullScreen);
   }
 }
 
@@ -193,8 +192,7 @@ class ChewieController extends ChangeNotifier {
       DeviceOrientation.landscapeRight,
     ],
     this.routePageBuilder = null,
-  }) : assert(videoPlayerController != null,
-            'You must provide a controller to play a video') {
+  }) : assert(videoPlayerController != null, 'You must provide a controller to play a video') {
     _initialize();
   }
 
@@ -273,9 +271,7 @@ class ChewieController extends ChangeNotifier {
   final ChewieRoutePageBuilder routePageBuilder;
 
   static ChewieController of(BuildContext context) {
-    final chewieControllerProvider =
-        context.inheritFromWidgetOfExactType(_ChewieControllerProvider)
-            as _ChewieControllerProvider;
+    final chewieControllerProvider = context.dependOnInheritedWidgetOfExactType<_ChewieControllerProvider>();
 
     return chewieControllerProvider.controller;
   }
@@ -287,8 +283,7 @@ class ChewieController extends ChangeNotifier {
   Future _initialize() async {
     await videoPlayerController.setLooping(looping);
 
-    if ((autoInitialize || autoPlay) &&
-        !videoPlayerController.value.initialized) {
+    if ((autoInitialize || autoPlay) && !videoPlayerController.value.initialized) {
       await videoPlayerController.initialize();
     }
 
@@ -364,6 +359,5 @@ class _ChewieControllerProvider extends InheritedWidget {
   final ChewieController controller;
 
   @override
-  bool updateShouldNotify(_ChewieControllerProvider old) =>
-      controller != old.controller;
+  bool updateShouldNotify(_ChewieControllerProvider old) => controller != old.controller;
 }
