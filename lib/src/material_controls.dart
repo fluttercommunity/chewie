@@ -26,6 +26,8 @@ class _MaterialControlsState extends State<MaterialControls> {
   bool _dragging = false;
   bool _displayTapped = false;
 
+  double _videoPlaySpeed = 1.0;
+
   final barHeight = 48.0;
   final marginSize = 5.0;
 
@@ -122,6 +124,7 @@ class _MaterialControlsState extends State<MaterialControls> {
                 ? Expanded(child: const Text('LIVE'))
                 : _buildPosition(iconColor),
             chewieController.isLive ? const SizedBox() : _buildProgressBar(),
+            _buildSpeedButton(controller),
             chewieController.allowMuting
                 ? _buildMuteButton(controller)
                 : Container(),
@@ -206,7 +209,7 @@ class _MaterialControlsState extends State<MaterialControls> {
     );
   }
 
-  GestureDetector _buildMuteButton(
+  Widget _buildMuteButton(
     VideoPlayerController controller,
   ) {
     return GestureDetector(
@@ -236,6 +239,40 @@ class _MaterialControlsState extends State<MaterialControls> {
                     ? Icons.volume_up
                     : Icons.volume_off,
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _updateVideoPlaySpeed() {
+    setState(() {
+      _videoPlaySpeed += 0.25;
+      if (_videoPlaySpeed > 2.0) {
+        _videoPlaySpeed = 1.0;
+      }
+      controller.setPlaybackSpeed(_videoPlaySpeed);
+    });
+  }
+
+  Widget _buildSpeedButton(
+      VideoPlayerController controller,
+      ) {
+    return GestureDetector(
+      onTap: () => _updateVideoPlaySpeed(),
+      child: AnimatedOpacity(
+        opacity: _hideStuff ? 0.0 : 1.0,
+        duration: Duration(milliseconds: 300),
+        child: ClipRect(
+          child: Container(
+            child: Container(
+              height: barHeight,
+              padding: EdgeInsets.only(
+                left: 8.0,
+                right: 8.0,
+              ),
+              child: Align(alignment: Alignment.center,child: Text(_videoPlaySpeed.toString())),
             ),
           ),
         ),
