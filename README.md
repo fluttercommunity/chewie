@@ -23,7 +23,7 @@ dependencies:
 ```dart
 import 'package:chewie/chewie.dart';
 final videoPlayerController = VideoPlayerController.network(
-    'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
+    'https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4');
 
 final chewieController = ChewieController(
   videoPlayerController: videoPlayerController,
