@@ -6,9 +6,9 @@ import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino_progress_bar.dart';
 import 'package:chewie/src/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:open_iconic_flutter/open_iconic_flutter.dart';
 import 'package:video_player/video_player.dart';
 
 class CupertinoControls extends StatefulWidget {
@@ -50,7 +50,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
             )
           : Center(
               child: Icon(
-                OpenIconicIcons.ban,
+                CupertinoIcons.exclamationmark_circle,
                 color: Colors.white,
                 size: 42,
               ),
@@ -77,8 +77,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
           absorbing: _hideStuff,
           child: Column(
             children: <Widget>[
-              _buildTopBar(
-                  backgroundColor, iconColor, barHeight, buttonPadding),
+              _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
               _buildHitArea(),
               _buildBottomBar(backgroundColor, iconColor, barHeight),
             ],
@@ -197,10 +196,10 @@ class _CupertinoControlsState extends State<CupertinoControls> {
               child: Center(
                 child: Icon(
                   chewieController.isFullScreen
-                      ? OpenIconicIcons.fullscreenExit
-                      : OpenIconicIcons.fullscreenEnter,
+                      ? CupertinoIcons.arrow_down_right_arrow_up_left
+                      : CupertinoIcons.arrow_up_left_arrow_down_right,
                   color: iconColor,
-                  size: 12.0,
+                  size: 16,
                 ),
               ),
             ),
@@ -263,11 +262,9 @@ class _CupertinoControlsState extends State<CupertinoControls> {
                   right: buttonPadding,
                 ),
                 child: Icon(
-                  (_latestValue != null && _latestValue.volume > 0)
-                      ? Icons.volume_up
-                      : Icons.volume_off,
+                  (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
                   color: iconColor,
-                  size: 16.0,
+                  size: 16,
                 ),
               ),
             ),
@@ -292,19 +289,15 @@ class _CupertinoControlsState extends State<CupertinoControls> {
           right: 6.0,
         ),
         child: Icon(
-          controller.value.isPlaying
-              ? OpenIconicIcons.mediaPause
-              : OpenIconicIcons.mediaPlay,
+          controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
           color: iconColor,
-          size: 16.0,
         ),
       ),
     );
   }
 
   Widget _buildPosition(Color iconColor) {
-    final position =
-        _latestValue != null ? _latestValue.position : Duration(seconds: 0);
+    final position = _latestValue != null ? _latestValue.position : Duration(seconds: 0);
 
     return Padding(
       padding: EdgeInsets.only(right: 12.0),
@@ -345,13 +338,11 @@ class _CupertinoControlsState extends State<CupertinoControls> {
         ),
         child: Transform(
           alignment: Alignment.center,
-          transform: Matrix4.skewY(0.0)
-            ..rotateX(math.pi)
-            ..rotateZ(math.pi),
+          transform: Matrix4.rotationZ(math.pi * 1.8),
           child: Icon(
-            OpenIconicIcons.reload,
+            Icons.replay,
             color: iconColor,
-            size: 12.0,
+            size: 18.0,
           ),
         ),
       ),
@@ -371,10 +362,16 @@ class _CupertinoControlsState extends State<CupertinoControls> {
         margin: EdgeInsets.only(
           right: 8.0,
         ),
-        child: Icon(
-          OpenIconicIcons.reload,
-          color: iconColor,
-          size: 12.0,
+        child: Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.skewY(0.0)
+            ..rotateX(math.pi)
+            ..rotateZ(math.pi * 0.8),
+          child: Icon(
+            Icons.replay,
+            color: iconColor,
+            size: 18.0,
+          ),
         ),
       ),
     );
@@ -396,13 +393,11 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       child: Row(
         children: <Widget>[
           chewieController.allowFullScreen
-              ? _buildExpandButton(
-                  backgroundColor, iconColor, barHeight, buttonPadding)
+              ? _buildExpandButton(backgroundColor, iconColor, barHeight, buttonPadding)
               : Container(),
           Expanded(child: Container()),
           chewieController.allowMuting
-              ? _buildMuteButton(controller, backgroundColor, iconColor,
-                  barHeight, buttonPadding)
+              ? _buildMuteButton(controller, backgroundColor, iconColor, barHeight, buttonPadding)
               : Container(),
         ],
       ),
@@ -424,8 +419,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
 
     _updateState();
 
-    if ((controller.value != null && controller.value.isPlaying) ||
-        chewieController.autoPlay) {
+    if ((controller.value != null && controller.value.isPlaying) || chewieController.autoPlay) {
       _startHideTimer();
     }
 
@@ -496,15 +490,12 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   }
 
   void _playPause() {
-      bool isFinished;
-      if( _latestValue.duration != null)
-      {
-        isFinished = _latestValue.position >= _latestValue.duration;
-      }
-      else
-      {
-        isFinished = false;
-      }
+    bool isFinished;
+    if (_latestValue.duration != null) {
+      isFinished = _latestValue.position >= _latestValue.duration;
+    } else {
+      isFinished = false;
+    }
 
     setState(() {
       if (controller.value.isPlaying) {
