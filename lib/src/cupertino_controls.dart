@@ -542,6 +542,7 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   }
 
   void _updateState() {
+    if (!this.mounted) return;
     setState(() {
       _latestValue = controller.value;
     });
