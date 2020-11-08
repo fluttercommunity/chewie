@@ -1,0 +1,42 @@
+name: App CI
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check-format:
+      name: Check format
+      runs-on: ubuntu-latest
+      container: cirrusci/flutter:beta
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+        - name: Check format
+          run: flutter format -l 120 -n . --set-exit-if-changed
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    container: cirrusci/flutter:beta
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Lint
+        run: flutter analyze
+
+  # test:
+  #   name: Test
+  #   runs-on: ubuntu-latest
+  #   container: cirrusci/flutter:beta
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+  #     - name: Test
+  #       run: flutter test
