@@ -1,4 +1,6 @@
 # chewie
+[![Version](https://img.shields.io/badge/pub-v0.10.1-blue)](https://pub.dev/packages/chewie)
+[![Generic badge](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20-blue.svg)](https://pub.dev/packages/chewie)
 
 The video player for Flutter with a heart of gold. 
 
@@ -25,9 +27,10 @@ import 'package:chewie/chewie.dart';
 final videoPlayerController = VideoPlayerController.network(
     'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
 
+await videoPlayerController.initialize();
+
 final chewieController = ChewieController(
   videoPlayerController: videoPlayerController,
-  aspectRatio: 3 / 2,
   autoPlay: true,
   looping: true,
 );
@@ -57,7 +60,6 @@ Instead of passing the `VideoPlayerController` and your options to the `Chewie` 
 ```dart
 final playerWidget = Chewie(
   videoPlayerController,
-  aspectRatio: 3 / 2,
   autoPlay: true,
   looping: true,
 );
@@ -68,7 +70,6 @@ becomes
 ```dart
 final chewieController = ChewieController(
   videoPlayerController: videoPlayerController,
-  aspectRatio: 3 / 2,
   autoPlay: true,
   looping: true,
 );
