@@ -1,5 +1,5 @@
 # chewie
-[![Version](https://img.shields.io/badge/pub-v0.10.0-blue)](https://pub.dev/packages/chewie)
+[![Version](https://img.shields.io/badge/pub-v0.10.1-blue)](https://pub.dev/packages/chewie)
 [![Generic badge](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20-blue.svg)](https://pub.dev/packages/chewie)
 
 The video player for Flutter with a heart of gold. 
