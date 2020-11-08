@@ -77,7 +77,8 @@ class _CupertinoControlsState extends State<CupertinoControls> {
           absorbing: _hideStuff,
           child: Column(
             children: <Widget>[
-              _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
+              _buildTopBar(
+                  backgroundColor, iconColor, barHeight, buttonPadding),
               _buildHitArea(),
               _buildBottomBar(backgroundColor, iconColor, barHeight),
             ],
@@ -262,7 +263,9 @@ class _CupertinoControlsState extends State<CupertinoControls> {
                   right: buttonPadding,
                 ),
                 child: Icon(
-                  (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
+                  (_latestValue != null && _latestValue.volume > 0)
+                      ? Icons.volume_up
+                      : Icons.volume_off,
                   color: iconColor,
                   size: 16,
                 ),
@@ -297,7 +300,8 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   }
 
   Widget _buildPosition(Color iconColor) {
-    final position = _latestValue != null ? _latestValue.position : Duration(seconds: 0);
+    final position =
+        _latestValue != null ? _latestValue.position : Duration(seconds: 0);
 
     return Padding(
       padding: EdgeInsets.only(right: 12.0),
@@ -393,11 +397,13 @@ class _CupertinoControlsState extends State<CupertinoControls> {
       child: Row(
         children: <Widget>[
           chewieController.allowFullScreen
-              ? _buildExpandButton(backgroundColor, iconColor, barHeight, buttonPadding)
+              ? _buildExpandButton(
+                  backgroundColor, iconColor, barHeight, buttonPadding)
               : Container(),
           Expanded(child: Container()),
           chewieController.allowMuting
-              ? _buildMuteButton(controller, backgroundColor, iconColor, barHeight, buttonPadding)
+              ? _buildMuteButton(controller, backgroundColor, iconColor,
+                  barHeight, buttonPadding)
               : Container(),
         ],
       ),
@@ -419,7 +425,8 @@ class _CupertinoControlsState extends State<CupertinoControls> {
 
     _updateState();
 
-    if ((controller.value != null && controller.value.isPlaying) || chewieController.autoPlay) {
+    if ((controller.value != null && controller.value.isPlaying) ||
+        chewieController.autoPlay) {
       _startHideTimer();
     }
 
