@@ -1,4 +1,4 @@
-## 0.10.2
+## 0.10.3
 
 * Bugfix: only `setState` if widget is mounted (cupertino + material)
   - Thanks to: [#309](https://github.com/brianegan/chewie/pull/309)
