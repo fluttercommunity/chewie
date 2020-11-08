@@ -1,3 +1,7 @@
+## 0.10.3+1
+
+* Format using `dartfmt -w .` for pub.dev
+
 ## 0.10.3
 
 * Bugfix: only `setState` if widget is mounted (cupertino + material)
