@@ -4,7 +4,7 @@ version: 0.10.0
 homepage: https://github.com/brianegan/chewie
 
 environment:
-  sdk: ">=2.0.0-dev.28.0 <3.0.0"
+  sdk: ">=2.2.2 <3.0.0"
   flutter: ">=1.9.1 <2.0.0"
 
 dependencies:
