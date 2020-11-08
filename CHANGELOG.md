@@ -1,3 +1,8 @@
+## 0.10.2
+
+* Replace `open_iconic_flutter` with `cupertino_icons` to resolve Apple App-Store rejection (ITMS-90853)
+  - Fixes: [#381](https://github.com/brianegan/chewie/issues/381)
+
 ## 0.10.1
 
 * Update `video_player` dependecy (stable release)
