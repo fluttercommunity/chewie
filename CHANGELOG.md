@@ -1,3 +1,7 @@
+## 0.10.1
+
+* Update `video_player` dependecy (stable release)
+
 ## 0.10.0
 
   * Fix portrait mode
