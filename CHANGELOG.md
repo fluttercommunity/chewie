@@ -3,6 +3,7 @@
   * Fix portrait mode
   * Add auto-detect orientation based on video aspect-ratio
   * Add optional parameters for `onEnterFullScreen`
+  * Support iOS 14 with SafeArea in FullScreen
 
 ## 0.9.10
 
