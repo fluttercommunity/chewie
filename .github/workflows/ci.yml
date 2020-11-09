@@ -27,6 +27,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Get dependencies for example
+        run: flutter pub get
+        working-directory: example
       - name: Lint
         run: flutter analyze
 
