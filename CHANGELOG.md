@@ -1,3 +1,11 @@
+## 0.10.4
+
+* Update Android example to latest support
+* Update Dart SDK
+* Update Flutter SDK
+* Update `wakelock` dependency
+
+
 ## 0.10.3+1
 
 * Format using `dartfmt -w .` for pub.dev
