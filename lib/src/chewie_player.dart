@@ -223,13 +223,17 @@ class ChewieController extends ChangeNotifier {
     this.isLive = false,
     this.allowFullScreen = true,
     this.allowMuting = true,
+    this.allowPlaybackSpeedChanging = true,
+    this.playbackSpeeds = const [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
     this.systemOverlaysOnEnterFullScreen,
     this.deviceOrientationsOnEnterFullScreen,
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
     this.deviceOrientationsAfterFullScreen = DeviceOrientation.values,
     this.routePageBuilder = null,
-  }) : assert(videoPlayerController != null,
-            'You must provide a controller to play a video') {
+  })  : assert(videoPlayerController != null,
+            'You must provide a controller to play a video'),
+        assert(playbackSpeeds.every((speed) => speed > 0),
+            'The playbackSpeeds values must all be greater than 0') {
     _initialize();
   }
 
@@ -297,6 +301,12 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines if the mute control should be shown
   final bool allowMuting;
+
+  /// Defines if the playback speed control should be shown
+  final bool allowPlaybackSpeedChanging;
+
+  /// Defines the set of allowed playback speeds user can change
+  final List<double> playbackSpeeds;
 
   /// Defines the system overlays visible on entering fullscreen
   final List<SystemUiOverlay> systemOverlaysOnEnterFullScreen;
