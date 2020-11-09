@@ -340,14 +340,10 @@ class _CupertinoControlsState extends State<CupertinoControls> {
           left: 6.0,
           right: 6.0,
         ),
-        child: Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.rotationZ(math.pi * 1.8),
-          child: Icon(
-            Icons.replay,
-            color: iconColor,
-            size: 18.0,
-          ),
+        child: Icon(
+          CupertinoIcons.gobackward_15,
+          color: iconColor,
+          size: 18.0,
         ),
       ),
     );
@@ -366,16 +362,10 @@ class _CupertinoControlsState extends State<CupertinoControls> {
         margin: EdgeInsets.only(
           right: 8.0,
         ),
-        child: Transform(
-          alignment: Alignment.center,
-          transform: Matrix4.skewY(0.0)
-            ..rotateX(math.pi)
-            ..rotateZ(math.pi * 0.8),
-          child: Icon(
-            Icons.replay,
-            color: iconColor,
-            size: 18.0,
-          ),
+        child: Icon(
+          CupertinoIcons.goforward_15,
+          color: iconColor,
+          size: 18.0,
         ),
       ),
     );
