@@ -1,18 +1,10 @@
+include: package:lint/analysis_options_package.yaml
+
 analyzer:
   strong-mode:
-    implicit-casts: false
     implicit-dynamic: false
 
 linter:
   rules:
-    - await_only_futures
-    - cancel_subscriptions
     - close_sinks
-    - hash_and_equals
-    - iterable_contains_unrelated_type
-    - list_remove_unrelated_type
     - sort_constructors_first
-    - test_types_in_equals
-    - unnecessary_new
-    - unrelated_type_equality_checks
-    - valid_regexps
