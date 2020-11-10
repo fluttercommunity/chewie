@@ -637,13 +637,6 @@ class _PlaybackSpeedDialog extends StatelessWidget {
             ),
           )
           .toList(),
-      cancelButton: CupertinoActionSheetAction(
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
-        child: Text('Cancel'),
-        isDestructiveAction: true,
-      ),
     );
   }
 }
