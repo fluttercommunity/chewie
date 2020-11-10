@@ -477,7 +477,7 @@ class _PlaybackSpeedDialog extends StatelessWidget {
                           )
                         : Container(width: 20.0),
                     SizedBox(width: 16.0),
-                    Text(e == 1.0 ? 'Normal' : '${e}x'),
+                    Text(e.toString()),
                   ],
                 ),
                 selected: e == _selected,
