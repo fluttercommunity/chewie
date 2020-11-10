@@ -1,10 +1,11 @@
 # chewie
-[![Version](https://img.shields.io/badge/pub-v0.10.3+1-blue)](https://pub.dev/packages/chewie)
+[![Version](https://img.shields.io/badge/pub-v0.10.4-blue)](https://pub.dev/packages/chewie)
+![CI](https://github.com/brianegan/chewie/workflows/CI/badge.svg)
 [![Generic badge](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20-blue.svg)](https://pub.dev/packages/chewie)
 
 The video player for Flutter with a heart of gold. 
 
-The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI! 
+The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
 
 ## Demo
 
