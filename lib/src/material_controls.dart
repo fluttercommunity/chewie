@@ -461,33 +461,33 @@ class _PlaybackSpeedDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color selectedColor = Theme.of(context).primaryColor;
 
-    return SingleChildScrollView(
-      child: Wrap(
-        children: _speeds
-            .map(
-              (e) => ListTile(
-                dense: true,
-                title: Row(
-                  children: [
-                    e == _selected
-                        ? Icon(
-                            Icons.check,
-                            size: 20.0,
-                            color: selectedColor,
-                          )
-                        : Container(width: 20.0),
-                    SizedBox(width: 16.0),
-                    Text(e.toString()),
-                  ],
-                ),
-                selected: e == _selected,
-                onTap: () {
-                  Navigator.of(context).pop(e);
-                },
-              ),
-            )
-            .toList(),
-      ),
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ScrollPhysics(),
+      itemBuilder: (context, index) {
+        final _speed = _speeds[index];
+        return ListTile(
+          dense: true,
+          title: Row(
+            children: [
+              _speed == _selected
+                  ? Icon(
+                      Icons.check,
+                      size: 20.0,
+                      color: selectedColor,
+                    )
+                  : Container(width: 20.0),
+              SizedBox(width: 16.0),
+              Text(_speed.toString()),
+            ],
+          ),
+          selected: _speed == _selected,
+          onTap: () {
+            Navigator.of(context).pop(_speed);
+          },
+        );
+      },
+      itemCount: _speeds.length,
     );
   }
 }
