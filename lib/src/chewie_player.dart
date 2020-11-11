@@ -229,7 +229,7 @@ class ChewieController extends ChangeNotifier {
     this.deviceOrientationsOnEnterFullScreen,
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
     this.deviceOrientationsAfterFullScreen = DeviceOrientation.values,
-    this.routePageBuilder = null,
+    this.routePageBuilder,
   })  : assert(videoPlayerController != null,
             'You must provide a controller to play a video'),
         assert(playbackSpeeds.every((speed) => speed > 0),
