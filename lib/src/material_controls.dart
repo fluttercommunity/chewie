@@ -122,6 +122,9 @@ class _MaterialControlsState extends State<MaterialControls> {
                 ? Expanded(child: const Text('LIVE'))
                 : _buildPosition(iconColor),
             chewieController.isLive ? const SizedBox() : _buildProgressBar(),
+            chewieController.allowPlaybackSpeedChanging
+                ? _buildSpeedButton(controller)
+                : Container(),
             chewieController.allowMuting
                 ? _buildMuteButton(controller)
                 : Container(),
@@ -199,6 +202,50 @@ class _MaterialControlsState extends State<MaterialControls> {
                   ),
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpeedButton(
+    VideoPlayerController controller,
+  ) {
+    return GestureDetector(
+      onTap: () async {
+        _hideTimer?.cancel();
+
+        final chosenSpeed = await showModalBottomSheet<double>(
+          context: context,
+          isScrollControlled: true,
+          useRootNavigator: true,
+          builder: (context) => _PlaybackSpeedDialog(
+            speeds: chewieController.playbackSpeeds,
+            selected: _latestValue.playbackSpeed,
+          ),
+        );
+
+        if (chosenSpeed != null) {
+          controller.setPlaybackSpeed(chosenSpeed);
+        }
+
+        if (_latestValue.isPlaying) {
+          _startHideTimer();
+        }
+      },
+      child: AnimatedOpacity(
+        opacity: _hideStuff ? 0.0 : 1.0,
+        duration: Duration(milliseconds: 300),
+        child: ClipRect(
+          child: Container(
+            child: Container(
+              height: barHeight,
+              padding: EdgeInsets.only(
+                left: 8.0,
+                right: 8.0,
+              ),
+              child: Icon(Icons.speed),
             ),
           ),
         ),
@@ -394,6 +441,53 @@ class _MaterialControlsState extends State<MaterialControls> {
                   backgroundColor: Theme.of(context).disabledColor),
         ),
       ),
+    );
+  }
+}
+
+class _PlaybackSpeedDialog extends StatelessWidget {
+  const _PlaybackSpeedDialog({
+    Key key,
+    @required List<double> speeds,
+    @required double selected,
+  })  : _speeds = speeds,
+        _selected = selected,
+        super(key: key);
+
+  final List<double> _speeds;
+  final double _selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color selectedColor = Theme.of(context).primaryColor;
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ScrollPhysics(),
+      itemBuilder: (context, index) {
+        final _speed = _speeds[index];
+        return ListTile(
+          dense: true,
+          title: Row(
+            children: [
+              _speed == _selected
+                  ? Icon(
+                      Icons.check,
+                      size: 20.0,
+                      color: selectedColor,
+                    )
+                  : Container(width: 20.0),
+              SizedBox(width: 16.0),
+              Text(_speed.toString()),
+            ],
+          ),
+          selected: _speed == _selected,
+          onTap: () {
+            Navigator.of(context).pop(_speed);
+          },
+        );
+      },
+      itemCount: _speeds.length,
     );
   }
 }
