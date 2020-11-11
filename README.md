@@ -1,5 +1,5 @@
 # chewie
-[![Version](https://img.shields.io/badge/pub-v0.10.4-blue)](https://pub.dev/packages/chewie)
+[![Version](https://img.shields.io/badge/pub-v0.11.0-blue)](https://pub.dev/packages/chewie)
 ![CI](https://github.com/brianegan/chewie/workflows/CI/badge.svg)
 [![Generic badge](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20-blue.svg)](https://pub.dev/packages/chewie)
 

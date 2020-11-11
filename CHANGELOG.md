@@ -1,10 +1,16 @@
+## 0.11.0
+
+* Add playback speed controls:
+  - Thanks to: [#390](https://github.com/brianegan/chewie/pull/390)
+* Correct dependencies:
+  - Thanks to: [#395](https://github.com/brianegan/chewie/pull/395)
+
 ## 0.10.4
 
 * Update Android example to latest support
 * Update Dart SDK
 * Update Flutter SDK
 * Update `wakelock` dependency
-
 
 ## 0.10.3+1
 
