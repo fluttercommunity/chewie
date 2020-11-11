@@ -9,8 +9,8 @@ environment:
 
 dependencies:
   video_player: ">=0.10.12+5 <2.0.0"
-  cupertino_icons: ">=1.0.0 <2.0.0"
-  wakelock: ">=0.1.2 <1.0.0"
+  cupertino_icons: ^1.0.0
+  wakelock: ">=0.1.2 <0.3.0"
 
   flutter:
     sdk: flutter
