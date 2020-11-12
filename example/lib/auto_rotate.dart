@@ -32,13 +32,18 @@ class _ChewieDemoState extends State<ChewieDemo> {
   @override
   void initState() {
     super.initState();
+    this.initializeAutoRotatePlayer();
+  }
+
+  Future<void> initializeAutoRotatePlayer() async {
     _videoPlayerController1 = VideoPlayerController.network(
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
+        'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4');
+    await _videoPlayerController1.initialize();
     _videoPlayerController2 = VideoPlayerController.network(
-        'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_20mb.mp4');
+        'https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4');
+    await _videoPlayerController2.initialize();
     _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController1,
-        aspectRatio: 3 / 2,
         autoPlay: true,
         looping: true,
         routePageBuilder: (BuildContext context, Animation<double> animation,
@@ -73,6 +78,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
         // ),
         // autoInitialize: true,
         );
+    setState(() {});
   }
 
   @override
@@ -98,9 +104,21 @@ class _ChewieDemoState extends State<ChewieDemo> {
           children: <Widget>[
             Expanded(
               child: Center(
-                child: Chewie(
-                  controller: _chewieController,
-                ),
+                child: _chewieController != null &&
+                        _chewieController
+                            .videoPlayerController.value.initialized
+                    ? Chewie(
+                        controller: _chewieController,
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 20),
+                          Text('Loading'),
+                        ],
+                      ),
               ),
             ),
             FlatButton(
@@ -116,18 +134,17 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     onPressed: () {
                       setState(() {
                         _chewieController.dispose();
-                        _videoPlayerController2.pause();
-                        _videoPlayerController2.seekTo(Duration(seconds: 0));
+                        _videoPlayerController1.pause();
+                        _videoPlayerController1.seekTo(Duration(seconds: 0));
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController1,
-                          aspectRatio: 3 / 2,
                           autoPlay: true,
                           looping: true,
                         );
                       });
                     },
                     child: Padding(
-                      child: Text("Video 1"),
+                      child: Text("Landscape Video"),
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                     ),
                   ),
@@ -137,11 +154,10 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     onPressed: () {
                       setState(() {
                         _chewieController.dispose();
-                        _videoPlayerController1.pause();
-                        _videoPlayerController1.seekTo(Duration(seconds: 0));
+                        _videoPlayerController2.pause();
+                        _videoPlayerController2.seekTo(Duration(seconds: 0));
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController2,
-                          aspectRatio: 3 / 2,
                           autoPlay: true,
                           looping: true,
                         );
@@ -149,7 +165,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     },
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("Video 2"),
+                      child: Text("Portrait Video"),
                     ),
                   ),
                 )
@@ -208,7 +224,7 @@ class _VideoScaffoldState extends State<VideoScaffold> {
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
-    AutoOrientation.landscapeMode();
+    AutoOrientation.portraitUpMode();
     super.initState();
   }
 
@@ -218,7 +234,7 @@ class _VideoScaffoldState extends State<VideoScaffold> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    AutoOrientation.portraitMode();
+    AutoOrientation.portraitUpMode();
     super.dispose();
   }
 

@@ -17,22 +17,25 @@ class MaterialControls extends StatefulWidget {
   }
 }
 
-class _MaterialControlsState extends State<MaterialControls> {
+class _MaterialControlsState extends State<MaterialControls>
+    with SingleTickerProviderStateMixin {
   VideoPlayerValue _latestValue;
   double _latestVolume;
   bool _hideStuff = true;
   Timer _hideTimer;
-  Timer _showTimer;
+  Timer _initTimer;
   Timer _showAfterExpandCollapseTimer;
   bool _dragging = false;
   Duration _subtitlesPosition = Duration();
   bool _subtitleOn;
+  bool _displayTapped = false;
 
   final barHeight = 48.0;
   final marginSize = 5.0;
 
   VideoPlayerController controller;
   ChewieController chewieController;
+  AnimationController playPauseIconAnimationController;
 
   @override
   Widget build(BuildContext context) {
@@ -53,25 +56,30 @@ class _MaterialControlsState extends State<MaterialControls> {
             );
     }
 
-    return GestureDetector(
-      onTap: () => _cancelAndRestartTimer(),
-      child: AbsorbPointer(
-        absorbing: _hideStuff,
-        child: Column(
-          children: <Widget>[
-            _latestValue != null &&
-                        !_latestValue.isPlaying &&
-                        _latestValue.duration == null ||
-                    _latestValue.isBuffering
-                ? const Expanded(
-                    child: const Center(
-                      child: const CircularProgressIndicator(),
-                    ),
-                  )
-                : _buildHitArea(),
-            _buildSubtitles(context, chewieController.subtitle),
-            _buildBottomBar(context),
-          ],
+    return MouseRegion(
+      onHover: (_) {
+        _cancelAndRestartTimer();
+      },
+      child: GestureDetector(
+        onTap: () => _cancelAndRestartTimer(),
+        child: AbsorbPointer(
+          absorbing: _hideStuff,
+          child: Column(
+            children: <Widget>[
+              _latestValue != null &&
+                          !_latestValue.isPlaying &&
+                          _latestValue.duration == null ||
+                      _latestValue.isBuffering
+                  ? const Expanded(
+                      child: const Center(
+                        child: const CircularProgressIndicator(),
+                      ),
+                    )
+                  : _buildHitArea(),
+              _buildSubtitles(context, chewieController.subtitle),
+              _buildBottomBar(context),
+            ],
+          ),
         ),
       ),
     );
@@ -86,7 +94,7 @@ class _MaterialControlsState extends State<MaterialControls> {
   void _dispose() {
     controller.removeListener(_updateState);
     _hideTimer?.cancel();
-    _showTimer?.cancel();
+    _initTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
   }
 
@@ -95,6 +103,14 @@ class _MaterialControlsState extends State<MaterialControls> {
     final _oldController = chewieController;
     chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
+
+    if (playPauseIconAnimationController == null) {
+      playPauseIconAnimationController = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 400),
+        reverseDuration: Duration(milliseconds: 400),
+      );
+    }
 
     if (_oldController != chewieController) {
       _dispose();
@@ -122,6 +138,9 @@ class _MaterialControlsState extends State<MaterialControls> {
                 ? Expanded(child: const Text('LIVE'))
                 : _buildPosition(iconColor),
             chewieController.isLive ? const SizedBox() : _buildProgressBar(),
+            chewieController.allowPlaybackSpeedChanging
+                ? _buildSpeedButton(controller)
+                : Container(),
             chewieController.allowMuting
                 ? _buildMuteButton(controller)
                 : Container(),
@@ -197,17 +216,26 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   Expanded _buildHitArea() {
+    bool isFinished = _latestValue.position >= _latestValue.duration;
+
     return Expanded(
       child: GestureDetector(
-        onTap: _latestValue != null && _latestValue.isPlaying
-            ? _cancelAndRestartTimer
-            : () {
-                _playPause();
+        onTap: () {
+          if (_latestValue != null && _latestValue.isPlaying) {
+            if (_displayTapped) {
+              setState(() {
+                _hideStuff = true;
+              });
+            } else
+              _cancelAndRestartTimer();
+          } else {
+            _playPause();
 
-                setState(() {
-                  _hideStuff = true;
-                });
-              },
+            setState(() {
+              _hideStuff = true;
+            });
+          }
+        },
         child: Container(
           color: Colors.transparent,
           child: Center(
@@ -225,10 +253,64 @@ class _MaterialControlsState extends State<MaterialControls> {
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(12.0),
-                    child: Icon(Icons.play_arrow, size: 32.0),
+                    child: IconButton(
+                        icon: isFinished
+                            ? Icon(Icons.replay, size: 32.0)
+                            : AnimatedIcon(
+                                icon: AnimatedIcons.play_pause,
+                                progress: playPauseIconAnimationController,
+                                size: 32.0,
+                              ),
+                        onPressed: () {
+                          _playPause();
+                        }),
                   ),
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSpeedButton(
+    VideoPlayerController controller,
+  ) {
+    return GestureDetector(
+      onTap: () async {
+        _hideTimer?.cancel();
+
+        final chosenSpeed = await showModalBottomSheet<double>(
+          context: context,
+          isScrollControlled: true,
+          useRootNavigator: true,
+          builder: (context) => _PlaybackSpeedDialog(
+            speeds: chewieController.playbackSpeeds,
+            selected: _latestValue.playbackSpeed,
+          ),
+        );
+
+        if (chosenSpeed != null) {
+          controller.setPlaybackSpeed(chosenSpeed);
+        }
+
+        if (_latestValue.isPlaying) {
+          _startHideTimer();
+        }
+      },
+      child: AnimatedOpacity(
+        opacity: _hideStuff ? 0.0 : 1.0,
+        duration: Duration(milliseconds: 300),
+        child: ClipRect(
+          child: Container(
+            child: Container(
+              height: barHeight,
+              padding: EdgeInsets.only(
+                left: 8.0,
+                right: 8.0,
+              ),
+              child: Icon(Icons.speed),
             ),
           ),
         ),
@@ -344,6 +426,7 @@ class _MaterialControlsState extends State<MaterialControls> {
 
     setState(() {
       _hideStuff = false;
+      _displayTapped = true;
     });
   }
 
@@ -357,11 +440,13 @@ class _MaterialControlsState extends State<MaterialControls> {
       _startHideTimer();
     }
 
-    _showTimer = Timer(Duration(milliseconds: 200), () {
-      setState(() {
-        _hideStuff = false;
+    if (chewieController.showControlsOnInitialize) {
+      _initTimer = Timer(Duration(milliseconds: 200), () {
+        setState(() {
+          _hideStuff = false;
+        });
       });
-    });
+    }
   }
 
   void _onExpandCollapse() {
@@ -378,8 +463,16 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   void _playPause() {
+    bool isFinished;
+    if (_latestValue.duration != null) {
+      isFinished = _latestValue.position >= _latestValue.duration;
+    } else {
+      isFinished = false;
+    }
+
     setState(() {
       if (controller.value.isPlaying) {
+        playPauseIconAnimationController.reverse();
         _hideStuff = false;
         _hideTimer?.cancel();
         controller.pause();
@@ -389,8 +482,13 @@ class _MaterialControlsState extends State<MaterialControls> {
         if (!controller.value.initialized) {
           controller.initialize().then((_) {
             controller.play();
+            playPauseIconAnimationController.forward();
           });
         } else {
+          if (isFinished) {
+            controller.seekTo(Duration(seconds: 0));
+          }
+          playPauseIconAnimationController.forward();
           controller.play();
         }
       }
@@ -440,6 +538,53 @@ class _MaterialControlsState extends State<MaterialControls> {
                   backgroundColor: Theme.of(context).disabledColor),
         ),
       ),
+    );
+  }
+}
+
+class _PlaybackSpeedDialog extends StatelessWidget {
+  const _PlaybackSpeedDialog({
+    Key key,
+    @required List<double> speeds,
+    @required double selected,
+  })  : _speeds = speeds,
+        _selected = selected,
+        super(key: key);
+
+  final List<double> _speeds;
+  final double _selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color selectedColor = Theme.of(context).primaryColor;
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: ScrollPhysics(),
+      itemBuilder: (context, index) {
+        final _speed = _speeds[index];
+        return ListTile(
+          dense: true,
+          title: Row(
+            children: [
+              _speed == _selected
+                  ? Icon(
+                      Icons.check,
+                      size: 20.0,
+                      color: selectedColor,
+                    )
+                  : Container(width: 20.0),
+              SizedBox(width: 16.0),
+              Text(_speed.toString()),
+            ],
+          ),
+          selected: _speed == _selected,
+          onTap: () {
+            Navigator.of(context).pop(_speed);
+          },
+        );
+      },
+      itemCount: _speeds.length,
     );
   }
 }

@@ -25,28 +25,9 @@ class CupertinoVideoProgressBar extends StatefulWidget {
 }
 
 class _VideoProgressBarState extends State<CupertinoVideoProgressBar> {
-  _VideoProgressBarState() {
-    listener = () {
-      setState(() {});
-    };
-  }
-
-  VoidCallback listener;
   bool _controllerWasPlaying = false;
 
   VideoPlayerController get controller => widget.controller;
-
-  @override
-  void initState() {
-    super.initState();
-    controller.addListener(listener);
-  }
-
-  @override
-  void deactivate() {
-    controller.removeListener(listener);
-    super.deactivate();
-  }
 
   @override
   Widget build(BuildContext context) {

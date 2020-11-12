@@ -1,8 +1,11 @@
 # chewie
+[![Version](https://img.shields.io/badge/pub-v0.12.0-blue)](https://pub.dev/packages/chewie)
+![CI](https://github.com/brianegan/chewie/workflows/CI/badge.svg)
+[![Generic badge](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20-blue.svg)](https://pub.dev/packages/chewie)
 
 The video player for Flutter with a heart of gold. 
 
-The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI! 
+The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
 
 ## Demo
 
@@ -23,11 +26,12 @@ dependencies:
 ```dart
 import 'package:chewie/chewie.dart';
 final videoPlayerController = VideoPlayerController.network(
-    'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4');
+    'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
+
+await videoPlayerController.initialize();
 
 final chewieController = ChewieController(
   videoPlayerController: videoPlayerController,
-  aspectRatio: 3 / 2,
   autoPlay: true,
   looping: true,
 );
@@ -57,7 +61,6 @@ Instead of passing the `VideoPlayerController` and your options to the `Chewie` 
 ```dart
 final playerWidget = Chewie(
   videoPlayerController,
-  aspectRatio: 3 / 2,
   autoPlay: true,
   looping: true,
 );
@@ -68,7 +71,6 @@ becomes
 ```dart
 final chewieController = ChewieController(
   videoPlayerController: videoPlayerController,
-  aspectRatio: 3 / 2,
   autoPlay: true,
   looping: true,
 );
