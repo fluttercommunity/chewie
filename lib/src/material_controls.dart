@@ -16,7 +16,7 @@ class MaterialControls extends StatefulWidget {
   }
 }
 
-class _MaterialControlsState extends State<MaterialControls> {
+class _MaterialControlsState extends State<MaterialControls> with SingleTickerProviderStateMixin{
   VideoPlayerValue _latestValue;
   double _latestVolume;
   bool _hideStuff = true;
@@ -31,6 +31,7 @@ class _MaterialControlsState extends State<MaterialControls> {
 
   VideoPlayerController controller;
   ChewieController chewieController;
+  AnimationController playPauseIconAnimationController;
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +96,14 @@ class _MaterialControlsState extends State<MaterialControls> {
     final _oldController = chewieController;
     chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
+
+    if(playPauseIconAnimationController == null) {
+      playPauseIconAnimationController = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 400),
+        reverseDuration: Duration(milliseconds: 400),
+      );
+    }
 
     if (_oldController != chewieController) {
       _dispose();
@@ -163,6 +172,8 @@ class _MaterialControlsState extends State<MaterialControls> {
   }
 
   Expanded _buildHitArea() {
+    bool isFinished = _latestValue.position >= _latestValue.duration;
+
     return Expanded(
       child: GestureDetector(
         onTap: () {
@@ -198,7 +209,18 @@ class _MaterialControlsState extends State<MaterialControls> {
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(12.0),
-                    child: Icon(Icons.play_arrow, size: 32.0),
+                    child: IconButton(
+                      icon: isFinished
+                          ? Icon(Icons.replay, size: 32.0)
+                          : AnimatedIcon(
+                              icon: AnimatedIcons.play_pause,
+                              progress: playPauseIconAnimationController,
+                              size: 32.0,
+                            ),
+                      onPressed: (){
+                        _playPause();
+                      }
+                    ),
                   ),
                 ),
               ),
@@ -379,6 +401,7 @@ class _MaterialControlsState extends State<MaterialControls> {
 
     setState(() {
       if (controller.value.isPlaying) {
+        playPauseIconAnimationController.reverse();
         _hideStuff = false;
         _hideTimer?.cancel();
         controller.pause();
@@ -388,11 +411,13 @@ class _MaterialControlsState extends State<MaterialControls> {
         if (!controller.value.initialized) {
           controller.initialize().then((_) {
             controller.play();
+            playPauseIconAnimationController.forward();
           });
         } else {
           if (isFinished) {
             controller.seekTo(Duration(seconds: 0));
           }
+          playPauseIconAnimationController.forward();
           controller.play();
         }
       }

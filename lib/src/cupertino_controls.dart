@@ -26,7 +26,7 @@ class CupertinoControls extends StatefulWidget {
   }
 }
 
-class _CupertinoControlsState extends State<CupertinoControls> {
+class _CupertinoControlsState extends State<CupertinoControls> with SingleTickerProviderStateMixin {
   VideoPlayerValue _latestValue;
   double _latestVolume;
   bool _hideStuff = true;
@@ -34,9 +34,11 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   final marginSize = 5.0;
   Timer _expandCollapseTimer;
   Timer _initTimer;
+  bool _dragging = false;
 
   VideoPlayerController controller;
   ChewieController chewieController;
+  AnimationController playPauseIconAnimationController;
 
   @override
   Widget build(BuildContext context) {
@@ -106,6 +108,14 @@ class _CupertinoControlsState extends State<CupertinoControls> {
     final _oldController = chewieController;
     chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
+
+    if(playPauseIconAnimationController == null) {
+      playPauseIconAnimationController = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 400),
+        reverseDuration: Duration(milliseconds: 400),
+      );
+    }
 
     if (_oldController != chewieController) {
       _dispose();
@@ -215,6 +225,8 @@ class _CupertinoControlsState extends State<CupertinoControls> {
   }
 
   Expanded _buildHitArea() {
+    bool isFinished = _latestValue.position >= _latestValue.duration;
+
     return Expanded(
       child: GestureDetector(
         onTap: _latestValue != null && _latestValue.isPlaying
@@ -228,6 +240,39 @@ class _CupertinoControlsState extends State<CupertinoControls> {
               },
         child: Container(
           color: Colors.transparent,
+          child: Center(
+            child: AnimatedOpacity(
+              opacity:
+                  _latestValue != null && !_latestValue.isPlaying && !_dragging
+                      ? 1.0
+                      : 0.0,
+              duration: Duration(milliseconds: 300),
+              child: GestureDetector(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: widget.backgroundColor,
+                    borderRadius: BorderRadius.circular(48.0),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: IconButton(
+                      icon: isFinished
+                          ? Icon(Icons.replay, size: 32.0, color: widget.iconColor)
+                          : AnimatedIcon(
+                              icon: AnimatedIcons.play_pause,
+                              progress: playPauseIconAnimationController,
+                              size: 32.0,
+                              color: widget.iconColor
+                            ),
+                      onPressed: (){
+                        _playPause();
+                      }
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -505,9 +550,17 @@ class _CupertinoControlsState extends State<CupertinoControls> {
         child: CupertinoVideoProgressBar(
           controller,
           onDragStart: () {
+            setState(() {
+              _dragging = true;
+            });
+
             _hideTimer?.cancel();
           },
           onDragEnd: () {
+            setState(() {
+              _dragging = false;
+            });
+
             _startHideTimer();
           },
           colors: chewieController.cupertinoProgressColors ??
