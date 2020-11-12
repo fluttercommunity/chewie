@@ -16,7 +16,7 @@ class MaterialControls extends StatefulWidget {
   }
 }
 
-class _MaterialControlsState extends State<MaterialControls> with SingleTickerProviderStateMixin {
+class _MaterialControlsState extends State<MaterialControls> with SingleTickerProviderStateMixin{
   VideoPlayerValue _latestValue;
   double _latestVolume;
   bool _hideStuff = true;
@@ -89,7 +89,6 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     _hideTimer?.cancel();
     _initTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
-    playPauseIconAnimationController?.dispose();
   }
 
   @override
