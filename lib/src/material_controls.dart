@@ -16,7 +16,8 @@ class MaterialControls extends StatefulWidget {
   }
 }
 
-class _MaterialControlsState extends State<MaterialControls> with SingleTickerProviderStateMixin{
+class _MaterialControlsState extends State<MaterialControls>
+    with SingleTickerProviderStateMixin {
   VideoPlayerValue _latestValue;
   double _latestVolume;
   bool _hideStuff = true;
@@ -97,7 +98,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
-    if(playPauseIconAnimationController == null) {
+    if (playPauseIconAnimationController == null) {
       playPauseIconAnimationController = AnimationController(
         vsync: this,
         duration: Duration(milliseconds: 400),
@@ -210,17 +211,16 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
                   child: Padding(
                     padding: EdgeInsets.all(12.0),
                     child: IconButton(
-                      icon: isFinished
-                          ? Icon(Icons.replay, size: 32.0)
-                          : AnimatedIcon(
-                              icon: AnimatedIcons.play_pause,
-                              progress: playPauseIconAnimationController,
-                              size: 32.0,
-                            ),
-                      onPressed: (){
-                        _playPause();
-                      }
-                    ),
+                        icon: isFinished
+                            ? Icon(Icons.replay, size: 32.0)
+                            : AnimatedIcon(
+                                icon: AnimatedIcons.play_pause,
+                                progress: playPauseIconAnimationController,
+                                size: 32.0,
+                              ),
+                        onPressed: () {
+                          _playPause();
+                        }),
                   ),
                 ),
               ),

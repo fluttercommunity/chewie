@@ -26,7 +26,8 @@ class CupertinoControls extends StatefulWidget {
   }
 }
 
-class _CupertinoControlsState extends State<CupertinoControls> with SingleTickerProviderStateMixin {
+class _CupertinoControlsState extends State<CupertinoControls>
+    with SingleTickerProviderStateMixin {
   VideoPlayerValue _latestValue;
   double _latestVolume;
   bool _hideStuff = true;
@@ -109,7 +110,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
     chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
-    if(playPauseIconAnimationController == null) {
+    if (playPauseIconAnimationController == null) {
       playPauseIconAnimationController = AnimationController(
         vsync: this,
         duration: Duration(milliseconds: 400),
@@ -256,18 +257,17 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
                   child: Padding(
                     padding: EdgeInsets.all(12.0),
                     child: IconButton(
-                      icon: isFinished
-                          ? Icon(Icons.replay, size: 32.0, color: widget.iconColor)
-                          : AnimatedIcon(
-                              icon: AnimatedIcons.play_pause,
-                              progress: playPauseIconAnimationController,
-                              size: 32.0,
-                              color: widget.iconColor
-                            ),
-                      onPressed: (){
-                        _playPause();
-                      }
-                    ),
+                        icon: isFinished
+                            ? Icon(Icons.replay,
+                                size: 32.0, color: widget.iconColor)
+                            : AnimatedIcon(
+                                icon: AnimatedIcons.play_pause,
+                                progress: playPauseIconAnimationController,
+                                size: 32.0,
+                                color: widget.iconColor),
+                        onPressed: () {
+                          _playPause();
+                        }),
                   ),
                 ),
               ),
