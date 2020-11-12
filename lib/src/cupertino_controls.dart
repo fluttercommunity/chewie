@@ -101,6 +101,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
     _hideTimer?.cancel();
     _expandCollapseTimer?.cancel();
     _initTimer?.cancel();
+    playPauseIconAnimationController?.dispose();
   }
 
   @override
