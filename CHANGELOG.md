@@ -1,3 +1,9 @@
+## 0.12.0
+
+* Add replay feature
+* Add Animated Play/Pause Button
+  - Thanks to: [#228](https://github.com/brianegan/chewie/pull/228)
+
 ## 0.11.0
 
 * Add playback speed controls:
