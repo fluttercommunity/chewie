@@ -27,8 +27,7 @@ class CupertinoControls extends StatefulWidget {
   }
 }
 
-class _CupertinoControlsState extends State<CupertinoControls>
-    with SingleTickerProviderStateMixin {
+class _CupertinoControlsState extends State<CupertinoControls> with SingleTickerProviderStateMixin {
   VideoPlayerValue _latestValue;
   double _latestVolume;
   bool _hideStuff = true;
@@ -84,8 +83,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
           absorbing: _hideStuff,
           child: Column(
             children: <Widget>[
-              _buildTopBar(
-                  backgroundColor, iconColor, barHeight, buttonPadding),
+              _buildTopBar(backgroundColor, iconColor, barHeight, buttonPadding),
               _buildHitArea(),
               _buildSubtitles(chewieController.subtitle),
               _buildBottomBar(backgroundColor, iconColor, barHeight),
@@ -154,13 +152,12 @@ class _CupertinoControlsState extends State<CupertinoControls>
       padding: EdgeInsets.only(left: marginSize, right: marginSize),
       child: Container(
         padding: EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          color: Color(0x96000000),
-          borderRadius: BorderRadius.circular(10.0)
-        ),
+        decoration: BoxDecoration(color: Color(0x96000000), borderRadius: BorderRadius.circular(10.0)),
         child: Text(
           '${currentSubtitle.first.texts.join('\n')}',
-          style: TextStyle(fontSize: 18, ),
+          style: TextStyle(
+            fontSize: 18,
+          ),
           textAlign: TextAlign.center,
         ),
       ),
@@ -207,8 +204,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
                         _buildRemaining(iconColor),
                         _buildSubtitleToggle(iconColor, barHeight),
                         chewieController.allowPlaybackSpeedChanging
-                            ? _buildSpeedButton(
-                                controller, iconColor, barHeight)
+                            ? _buildSpeedButton(controller, iconColor, barHeight)
                             : Container(),
                       ],
                     ),
@@ -285,10 +281,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
           color: Colors.transparent,
           child: Center(
             child: AnimatedOpacity(
-              opacity:
-                  _latestValue != null && !_latestValue.isPlaying && !_dragging
-                      ? 1.0
-                      : 0.0,
+              opacity: _latestValue != null && !_latestValue.isPlaying && !_dragging ? 1.0 : 0.0,
               duration: Duration(milliseconds: 300),
               child: GestureDetector(
                 child: Container(
@@ -300,8 +293,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
                     padding: EdgeInsets.all(12.0),
                     child: IconButton(
                         icon: isFinished
-                            ? Icon(Icons.replay,
-                                size: 32.0, color: widget.iconColor)
+                            ? Icon(Icons.replay, size: 32.0, color: widget.iconColor)
                             : AnimatedIcon(
                                 icon: AnimatedIcons.play_pause,
                                 progress: playPauseIconAnimationController,
@@ -354,9 +346,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
                   right: buttonPadding,
                 ),
                 child: Icon(
-                  (_latestValue != null && _latestValue.volume > 0)
-                      ? Icons.volume_up
-                      : Icons.volume_off,
+                  (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
                   color: iconColor,
                   size: 16,
                 ),
@@ -391,8 +381,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
   }
 
   Widget _buildPosition(Color iconColor) {
-    final position =
-        _latestValue != null ? _latestValue.position : Duration(seconds: 0);
+    final position = _latestValue != null ? _latestValue.position : Duration(seconds: 0);
 
     return Padding(
       padding: EdgeInsets.only(right: 12.0),
@@ -435,7 +424,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
           left: 6.0,
           right: 6.0,
         ),
-        child: Icon(Icons.subtitles,
+        child: Icon(
+          Icons.subtitles,
           color: _subtitleOn ? iconColor : Colors.grey[700],
           size: 16.0,
         ),
@@ -559,13 +549,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
       child: Row(
         children: <Widget>[
           chewieController.allowFullScreen
-              ? _buildExpandButton(
-                  backgroundColor, iconColor, barHeight, buttonPadding)
+              ? _buildExpandButton(backgroundColor, iconColor, barHeight, buttonPadding)
               : Container(),
           Expanded(child: Container()),
           chewieController.allowMuting
-              ? _buildMuteButton(controller, backgroundColor, iconColor,
-                  barHeight, buttonPadding)
+              ? _buildMuteButton(controller, backgroundColor, iconColor, barHeight, buttonPadding)
               : Container(),
         ],
       ),
@@ -587,8 +575,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
     _updateState();
 
-    if ((controller.value != null && controller.value.isPlaying) ||
-        chewieController.autoPlay) {
+    if ((controller.value != null && controller.value.isPlaying) || chewieController.autoPlay) {
       _startHideTimer();
     }
 
@@ -753,9 +740,7 @@ class _PlaybackSpeedDialog extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  e == _selected
-                      ? Icon(Icons.check, size: 20.0, color: selectedColor)
-                      : Container(),
+                  e == _selected ? Icon(Icons.check, size: 20.0, color: selectedColor) : Container(),
                   Text(e.toString()),
                 ],
               ),

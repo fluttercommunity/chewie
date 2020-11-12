@@ -17,8 +17,7 @@ class MaterialControls extends StatefulWidget {
   }
 }
 
-class _MaterialControlsState extends State<MaterialControls>
-    with SingleTickerProviderStateMixin {
+class _MaterialControlsState extends State<MaterialControls> with SingleTickerProviderStateMixin {
   VideoPlayerValue _latestValue;
   double _latestVolume;
   bool _hideStuff = true;
@@ -66,9 +65,7 @@ class _MaterialControlsState extends State<MaterialControls>
           absorbing: _hideStuff,
           child: Column(
             children: <Widget>[
-              _latestValue != null &&
-                          !_latestValue.isPlaying &&
-                          _latestValue.duration == null ||
+              _latestValue != null && !_latestValue.isPlaying && _latestValue.duration == null ||
                       _latestValue.isBuffering
                   ? const Expanded(
                       child: const Center(
@@ -134,19 +131,11 @@ class _MaterialControlsState extends State<MaterialControls>
         child: Row(
           children: <Widget>[
             _buildPlayPause(controller),
-            chewieController.isLive
-                ? Expanded(child: const Text('LIVE'))
-                : _buildPosition(iconColor),
+            chewieController.isLive ? Expanded(child: const Text('LIVE')) : _buildPosition(iconColor),
             chewieController.isLive ? const SizedBox() : _buildProgressBar(),
-            chewieController.allowPlaybackSpeedChanging
-                ? _buildSpeedButton(controller)
-                : Container(),
-            chewieController.allowMuting
-                ? _buildMuteButton(controller)
-                : Container(),
-            chewieController.allowFullScreen
-                ? _buildExpandButton()
-                : Container(),
+            chewieController.allowPlaybackSpeedChanging ? _buildSpeedButton(controller) : Container(),
+            chewieController.allowMuting ? _buildMuteButton(controller) : Container(),
+            chewieController.allowFullScreen ? _buildExpandButton() : Container(),
             _buildSubtitleToggle(),
           ],
         ),
@@ -177,13 +166,12 @@ class _MaterialControlsState extends State<MaterialControls>
       padding: EdgeInsets.all(marginSize),
       child: Container(
         padding: EdgeInsets.all(5),
-        decoration: BoxDecoration(
-            color: Color(0x96000000),
-            borderRadius: BorderRadius.circular(10.0)
-        ),
+        decoration: BoxDecoration(color: Color(0x96000000), borderRadius: BorderRadius.circular(10.0)),
         child: Text(
           '${currentSubtitle.first.texts.join('\n')}',
-          style: TextStyle(fontSize: 18, ),
+          style: TextStyle(
+            fontSize: 18,
+          ),
           textAlign: TextAlign.center,
         ),
       ),
@@ -205,9 +193,7 @@ class _MaterialControlsState extends State<MaterialControls>
           ),
           child: Center(
             child: Icon(
-              chewieController.isFullScreen
-                  ? Icons.fullscreen_exit
-                  : Icons.fullscreen,
+              chewieController.isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen,
             ),
           ),
         ),
@@ -240,10 +226,7 @@ class _MaterialControlsState extends State<MaterialControls>
           color: Colors.transparent,
           child: Center(
             child: AnimatedOpacity(
-              opacity:
-                  _latestValue != null && !_latestValue.isPlaying && !_dragging
-                      ? 1.0
-                      : 0.0,
+              opacity: _latestValue != null && !_latestValue.isPlaying && !_dragging ? 1.0 : 0.0,
               duration: Duration(milliseconds: 300),
               child: GestureDetector(
                 child: Container(
@@ -344,9 +327,7 @@ class _MaterialControlsState extends State<MaterialControls>
                 right: 8.0,
               ),
               child: Icon(
-                (_latestValue != null && _latestValue.volume > 0)
-                    ? Icons.volume_up
-                    : Icons.volume_off,
+                (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
               ),
             ),
           ),
@@ -374,12 +355,8 @@ class _MaterialControlsState extends State<MaterialControls>
   }
 
   Widget _buildPosition(Color iconColor) {
-    final position = _latestValue != null && _latestValue.position != null
-        ? _latestValue.position
-        : Duration.zero;
-    final duration = _latestValue != null && _latestValue.duration != null
-        ? _latestValue.duration
-        : Duration.zero;
+    final position = _latestValue != null && _latestValue.position != null ? _latestValue.position : Duration.zero;
+    final duration = _latestValue != null && _latestValue.duration != null ? _latestValue.duration : Duration.zero;
 
     return Padding(
       padding: EdgeInsets.only(right: 24.0),
@@ -407,7 +384,8 @@ class _MaterialControlsState extends State<MaterialControls>
           left: 12.0,
           right: 12.0,
         ),
-        child: Icon(Icons.subtitles,
+        child: Icon(
+          Icons.subtitles,
           color: _subtitleOn ? Theme.of(context).accentColor : Colors.grey[700],
         ),
       ),
@@ -435,8 +413,7 @@ class _MaterialControlsState extends State<MaterialControls>
 
     _updateState();
 
-    if ((controller.value != null && controller.value.isPlaying) ||
-        chewieController.autoPlay) {
+    if ((controller.value != null && controller.value.isPlaying) || chewieController.autoPlay) {
       _startHideTimer();
     }
 

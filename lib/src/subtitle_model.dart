@@ -9,8 +9,7 @@
 class Subtitles {
   Subtitles(this.subtitle);
 
-  Subtitles.fromString(String value)
-      : subtitle = parseString(value);
+  Subtitles.fromString(String value) : subtitle = parseString(value);
 
   final List<Subtitle> subtitle;
 
@@ -41,9 +40,10 @@ class Subtitles {
   bool get isNotEmpty => !isEmpty;
 
   List<Subtitle> getByPosition(Duration position) {
-    final found = subtitle.where(
-            (item) => position >= item.start && position <= item.end
-    ).toList();
+    final found = subtitle.where((item) {
+      if (item != null) return position >= item.start && position <= item.end;
+      return false;
+    }).toList();
 
     return found;
   }
@@ -76,10 +76,20 @@ class Subtitle {
 
   static Duration stringToDuration(String value) {
     final component = value.split(':');
-    return Duration(
+
+    if (component.length < 4) {
+      return Duration(
+        hours: int.parse(component[0]),
+        minutes: int.parse(component[1]),
+        seconds: int.parse(component[2]),
+      );
+    } else {
+      return Duration(
         hours: int.parse(component[0]),
         minutes: int.parse(component[1]),
         seconds: int.parse(component[2].split('.')[0]),
-        milliseconds: int.parse(component[2].split('.')[1]));
+        milliseconds: int.parse(component[2].split('.')[1]),
+      );
+    }
   }
 }
