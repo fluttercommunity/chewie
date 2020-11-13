@@ -110,10 +110,10 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
     controller = chewieController.videoPlayerController;
 
     playPauseIconAnimationController ??= AnimationController(
-        vsync: this,
-        duration: Duration(milliseconds: 400),
-        reverseDuration: Duration(milliseconds: 400),
-      );
+      vsync: this,
+      duration: Duration(milliseconds: 400),
+      reverseDuration: Duration(milliseconds: 400),
+    );
 
     if (_oldController != chewieController) {
       _dispose();
@@ -161,7 +161,8 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
                         _buildPosition(iconColor),
                         _buildProgressBar(),
                         _buildRemaining(iconColor),
-                        if (chewieController.allowPlaybackSpeedChanging) _buildSpeedButton(controller, iconColor, barHeight),
+                        if (chewieController.allowPlaybackSpeedChanging)
+                          _buildSpeedButton(controller, iconColor, barHeight),
                       ],
                     ),
             ),
@@ -474,9 +475,11 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
       ),
       child: Row(
         children: <Widget>[
-          if (chewieController.allowFullScreen) _buildExpandButton(backgroundColor, iconColor, barHeight, buttonPadding),
+          if (chewieController.allowFullScreen)
+            _buildExpandButton(backgroundColor, iconColor, barHeight, buttonPadding),
           Spacer(),
-          if (chewieController.allowMuting) _buildMuteButton(controller, backgroundColor, iconColor, barHeight, buttonPadding),
+          if (chewieController.allowMuting)
+            _buildMuteButton(controller, backgroundColor, iconColor, barHeight, buttonPadding),
         ],
       ),
     );

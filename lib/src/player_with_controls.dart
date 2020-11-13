@@ -29,12 +29,10 @@ class PlayerWithControls extends StatelessWidget {
       final controls = Theme.of(context).platform == TargetPlatform.android
           ? MaterialControls()
           : CupertinoControls(
-        backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
-        iconColor: Color.fromARGB(255, 200, 200, 200),
-      );
-      return chewieController.showControls
-          ? chewieController.customControls ?? controls
-          : Container();
+              backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
+              iconColor: Color.fromARGB(255, 200, 200, 200),
+            );
+      return chewieController.showControls ? chewieController.customControls ?? controls : Container();
     }
 
     Stack _buildPlayerWithControls(ChewieController chewieController, BuildContext context) {
