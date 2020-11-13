@@ -1,5 +1,4 @@
 import 'package:chewie/chewie.dart';
-import 'package:chewie/src/chewie_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -11,7 +10,8 @@ void main() {
 }
 
 class ChewieDemo extends StatefulWidget {
-  ChewieDemo({this.title = 'Chewie Demo'});
+  // ignore: use_key_in_widget_constructors
+  const ChewieDemo({this.title = 'Chewie Demo'});
 
   final String title;
 
@@ -30,7 +30,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   @override
   void initState() {
     super.initState();
-    this.initializePlayer();
+    initializePlayer();
   }
 
   @override
@@ -84,16 +84,13 @@ class _ChewieDemoState extends State<ChewieDemo> {
           children: <Widget>[
             Expanded(
               child: Center(
-                child: _chewieController != null &&
-                        _chewieController
-                            .videoPlayerController.value.initialized
+                child: _chewieController != null && _chewieController.videoPlayerController.value.initialized
                     ? Chewie(
                         controller: _chewieController,
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
+                        children: const [
                           CircularProgressIndicator(),
                           SizedBox(height: 20),
                           Text('Loading'),
@@ -115,7 +112,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       setState(() {
                         _chewieController.dispose();
                         _videoPlayerController1.pause();
-                        _videoPlayerController1.seekTo(Duration(seconds: 0));
+                        _videoPlayerController1.seekTo(Duration());
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController1,
                           autoPlay: true,
@@ -124,8 +121,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       });
                     },
                     child: Padding(
-                      child: Text("Landscape Video"),
                       padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("Landscape Video"),
                     ),
                   ),
                 ),
@@ -135,7 +132,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       setState(() {
                         _chewieController.dispose();
                         _videoPlayerController2.pause();
-                        _videoPlayerController2.seekTo(Duration(seconds: 0));
+                        _videoPlayerController2.seekTo(Duration());
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,
@@ -161,8 +158,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       });
                     },
                     child: Padding(
-                      child: Text("Android controls"),
                       padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("Android controls"),
                     ),
                   ),
                 ),

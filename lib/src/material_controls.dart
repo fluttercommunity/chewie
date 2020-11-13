@@ -65,15 +65,15 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           absorbing: _hideStuff,
           child: Column(
             children: <Widget>[
-              _latestValue != null && !_latestValue.isPlaying && _latestValue.duration == null ||
-                      _latestValue.isBuffering
-                  ? const Expanded(
-                      child: const Center(
-                        child: const CircularProgressIndicator(),
-                      ),
-                    )
-                  : _buildHitArea(),
-              _buildSubtitles(context, chewieController.subtitle),
+              if (_latestValue != null && !_latestValue.isPlaying && _latestValue.duration == null ||
+                  _latestValue.isBuffering)
+                const Expanded(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else
+                _buildHitArea(),
               _buildBottomBar(context),
             ],
           ),
@@ -101,13 +101,11 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
-    if (playPauseIconAnimationController == null) {
-      playPauseIconAnimationController = AnimationController(
-        vsync: this,
-        duration: Duration(milliseconds: 400),
-        reverseDuration: Duration(milliseconds: 400),
-      );
-    }
+    playPauseIconAnimationController ??= AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 400),
+      reverseDuration: Duration(milliseconds: 400),
+    );
 
     if (_oldController != chewieController) {
       _dispose();
@@ -131,12 +129,11 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
         child: Row(
           children: <Widget>[
             _buildPlayPause(controller),
-            chewieController.isLive ? Expanded(child: const Text('LIVE')) : _buildPosition(iconColor),
-            chewieController.isLive ? const SizedBox() : _buildProgressBar(),
-            chewieController.allowPlaybackSpeedChanging ? _buildSpeedButton(controller) : Container(),
-            chewieController.allowMuting ? _buildMuteButton(controller) : Container(),
-            chewieController.allowFullScreen ? _buildExpandButton() : Container(),
-            _buildSubtitleToggle(),
+            if (chewieController.isLive) Expanded(child: const Text('LIVE')) else _buildPosition(iconColor),
+            if (chewieController.isLive) const SizedBox() else _buildProgressBar(),
+            if (chewieController.allowPlaybackSpeedChanging) _buildSpeedButton(controller),
+            if (chewieController.allowMuting) _buildMuteButton(controller),
+            if (chewieController.allowFullScreen) _buildExpandButton(),
           ],
         ),
       ),
@@ -168,7 +165,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
         padding: EdgeInsets.all(5),
         decoration: BoxDecoration(color: Color(0x96000000), borderRadius: BorderRadius.circular(10.0)),
         child: Text(
-          '${currentSubtitle.first.texts.join('\n')}',
+          currentSubtitle.first.texts.join('\n'),
           style: TextStyle(
             fontSize: 18,
           ),
@@ -202,7 +199,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
   }
 
   Expanded _buildHitArea() {
-    bool isFinished = _latestValue.position >= _latestValue.duration;
+    final bool isFinished = _latestValue.position >= _latestValue.duration;
 
     return Expanded(
       child: GestureDetector(
@@ -212,8 +209,9 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
               setState(() {
                 _hideStuff = true;
               });
-            } else
+            } else {
               _cancelAndRestartTimer();
+            }
           } else {
             _playPause();
 
@@ -287,14 +285,12 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
         duration: Duration(milliseconds: 300),
         child: ClipRect(
           child: Container(
-            child: Container(
-              height: barHeight,
-              padding: EdgeInsets.only(
-                left: 8.0,
-                right: 8.0,
-              ),
-              child: Icon(Icons.speed),
+            height: barHeight,
+            padding: EdgeInsets.only(
+              left: 8.0,
+              right: 8.0,
             ),
+            child: Icon(Icons.speed),
           ),
         ),
       ),
@@ -320,15 +316,13 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
         duration: Duration(milliseconds: 300),
         child: ClipRect(
           child: Container(
-            child: Container(
-              height: barHeight,
-              padding: EdgeInsets.only(
-                left: 8.0,
-                right: 8.0,
-              ),
-              child: Icon(
-                (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
-              ),
+            height: barHeight,
+            padding: EdgeInsets.only(
+              left: 8.0,
+              right: 8.0,
+            ),
+            child: Icon(
+              (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
             ),
           ),
         ),
@@ -408,7 +402,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     });
   }
 
-  Future<Null> _initialize() async {
+  Future<void> _initialize() async {
     controller.addListener(_updateState);
 
     _updateState();
@@ -463,7 +457,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           });
         } else {
           if (isFinished) {
-            controller.seekTo(Duration(seconds: 0));
+            controller.seekTo(Duration());
           }
           playPauseIconAnimationController.forward();
           controller.play();
@@ -544,13 +538,14 @@ class _PlaybackSpeedDialog extends StatelessWidget {
           dense: true,
           title: Row(
             children: [
-              _speed == _selected
-                  ? Icon(
-                      Icons.check,
-                      size: 20.0,
-                      color: selectedColor,
-                    )
-                  : Container(width: 20.0),
+              if (_speed == _selected)
+                Icon(
+                  Icons.check,
+                  size: 20.0,
+                  color: selectedColor,
+                )
+              else
+                Container(width: 20.0),
               SizedBox(width: 16.0),
               Text(_speed.toString()),
             ],
