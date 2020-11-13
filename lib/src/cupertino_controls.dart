@@ -161,7 +161,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
                         _buildPosition(iconColor),
                         _buildProgressBar(),
                         _buildRemaining(iconColor),
-                        if (chewieController.allowPlaybackSpeedChanging) _buildSpeedButton(controller, iconColor, barHeight) else Container(),
+                        if (chewieController.allowPlaybackSpeedChanging) _buildSpeedButton(controller, iconColor, barHeight),
                       ],
                     ),
             ),
@@ -474,9 +474,9 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
       ),
       child: Row(
         children: <Widget>[
-          if (chewieController.allowFullScreen) _buildExpandButton(backgroundColor, iconColor, barHeight, buttonPadding) else Container(),
-          Expanded(child: Container()),
-          if (chewieController.allowMuting) _buildMuteButton(controller, backgroundColor, iconColor, barHeight, buttonPadding) else Container(),
+          if (chewieController.allowFullScreen) _buildExpandButton(backgroundColor, iconColor, barHeight, buttonPadding),
+          Spacer(),
+          if (chewieController.allowMuting) _buildMuteButton(controller, backgroundColor, iconColor, barHeight, buttonPadding),
         ],
       ),
     );
@@ -661,7 +661,7 @@ class _PlaybackSpeedDialog extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (e == _selected) Icon(Icons.check, size: 20.0, color: selectedColor) else Container(),
+                  if (e == _selected) Icon(Icons.check, size: 20.0, color: selectedColor),
                   Text(e.toString()),
                 ],
               ),
