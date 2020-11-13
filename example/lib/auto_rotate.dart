@@ -46,8 +46,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
         videoPlayerController: _videoPlayerController1,
         autoPlay: true,
         looping: true,
-        routePageBuilder: (BuildContext context, Animation<double> animation,
-            Animation<double> secondAnimation, provider) {
+        routePageBuilder:
+            (BuildContext context, Animation<double> animation, Animation<double> secondAnimation, provider) {
           return AnimatedBuilder(
             animation: animation,
             builder: (BuildContext context, Widget child) {
@@ -104,9 +104,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
           children: <Widget>[
             Expanded(
               child: Center(
-                child: _chewieController != null &&
-                        _chewieController
-                            .videoPlayerController.value.initialized
+                child: _chewieController != null && _chewieController.videoPlayerController.value.initialized
                     ? Chewie(
                         controller: _chewieController,
                       )

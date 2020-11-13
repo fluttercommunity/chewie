@@ -84,9 +84,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
           children: <Widget>[
             Expanded(
               child: Center(
-                child: _chewieController != null &&
-                        _chewieController
-                            .videoPlayerController.value.initialized
+                child: _chewieController != null && _chewieController.videoPlayerController.value.initialized
                     ? Chewie(
                         controller: _chewieController,
                       )
