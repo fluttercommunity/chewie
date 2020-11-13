@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
 
-typedef Widget ChewieRoutePageBuilder(
+typedef ChewieRoutePageBuilder = Widget Function(
   BuildContext context,
   Animation<double> animation,
   Animation<double> secondaryAnimation,
@@ -20,9 +20,9 @@ typedef Widget ChewieRoutePageBuilder(
 /// `video_player` is pretty low level. Chewie wraps it in a friendly skin to
 /// make it easy to use!
 class Chewie extends StatefulWidget {
-  Chewie({
+  const Chewie({
     Key key,
-    this.controller,
+    @required this.controller,
   })  : assert(controller != null, 'You must provide a chewie controller'),
         super(key: key);
 
@@ -58,7 +58,7 @@ class ChewieState extends State<Chewie> {
     super.didUpdateWidget(oldWidget);
   }
 
-  void listener() async {
+  Future<void> listener() async {
     if (widget.controller.isFullScreen && !_isFullScreen) {
       _isFullScreen = true;
       await _pushFullScreenWidget(context);
@@ -110,7 +110,7 @@ class ChewieState extends State<Chewie> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    var controllerProvider = _ChewieControllerProvider(
+    final controllerProvider = _ChewieControllerProvider(
       controller: widget.controller,
       child: PlayerWithControls(),
     );
@@ -122,7 +122,7 @@ class ChewieState extends State<Chewie> {
   }
 
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
-    final TransitionRoute<Null> route = PageRouteBuilder<Null>(
+    final TransitionRoute<void> route = PageRouteBuilder<void>(
       pageBuilder: _fullScreenRoutePageBuilder,
     );
 
@@ -197,7 +197,7 @@ class ChewieState extends State<Chewie> {
 /// `VideoPlayerController`.
 class ChewieController extends ChangeNotifier {
   ChewieController({
-    this.videoPlayerController,
+    @required this.videoPlayerController,
     this.aspectRatio,
     this.autoInitialize = false,
     this.autoPlay = false,
@@ -350,7 +350,7 @@ class ChewieController extends ChangeNotifier {
     }
   }
 
-  void _fullScreenListener() async {
+  Future<void> _fullScreenListener() async {
     if (videoPlayerController.value.isPlaying && !_isFullScreen) {
       enterFullScreen();
       videoPlayerController.removeListener(_fullScreenListener);
@@ -380,6 +380,7 @@ class ChewieController extends ChangeNotifier {
     await videoPlayerController.play();
   }
 
+  // ignore: avoid_positional_boolean_parameters
   Future<void> setLooping(bool looping) async {
     await videoPlayerController.setLooping(looping);
   }

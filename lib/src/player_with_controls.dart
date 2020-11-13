@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class PlayerWithControls extends StatelessWidget {
-  PlayerWithControls({Key key}) : super(key: key);
+  const PlayerWithControls({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,43 +26,40 @@ class PlayerWithControls extends StatelessWidget {
       BuildContext context,
       ChewieController chewieController,
     ) {
+      final controls = Theme.of(context).platform == TargetPlatform.android
+          ? MaterialControls()
+          : CupertinoControls(
+        backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
+        iconColor: Color.fromARGB(255, 200, 200, 200),
+      );
       return chewieController.showControls
-          ? chewieController.customControls != null
-              ? chewieController.customControls
-              : Theme.of(context).platform == TargetPlatform.android
-                  ? MaterialControls()
-                  : CupertinoControls(
-                      backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
-                      iconColor: Color.fromARGB(255, 200, 200, 200),
-                    )
+          ? chewieController.customControls ?? controls
           : Container();
     }
 
-    Container _buildPlayerWithControls(ChewieController chewieController, BuildContext context) {
-      return Container(
-        child: Stack(
-          children: <Widget>[
-            chewieController.placeholder ?? Container(),
-            Center(
-              child: AspectRatio(
-                aspectRatio: chewieController.aspectRatio ?? chewieController.videoPlayerController.value.aspectRatio,
-                child: VideoPlayer(chewieController.videoPlayerController),
-              ),
+    Stack _buildPlayerWithControls(ChewieController chewieController, BuildContext context) {
+      return Stack(
+        children: <Widget>[
+          chewieController.placeholder ?? Container(),
+          Center(
+            child: AspectRatio(
+              aspectRatio: chewieController.aspectRatio ?? chewieController.videoPlayerController.value.aspectRatio,
+              child: VideoPlayer(chewieController.videoPlayerController),
             ),
-            chewieController.overlay ?? Container(),
-            if (!chewieController.isFullScreen)
-              _buildControls(context, chewieController)
-            else
-              SafeArea(
-                child: _buildControls(context, chewieController),
-              ),
-          ],
-        ),
+          ),
+          chewieController.overlay ?? Container(),
+          if (!chewieController.isFullScreen)
+            _buildControls(context, chewieController)
+          else
+            SafeArea(
+              child: _buildControls(context, chewieController),
+            ),
+        ],
       );
     }
 
     return Center(
-      child: Container(
+      child: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: AspectRatio(
