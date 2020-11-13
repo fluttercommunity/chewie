@@ -15,7 +15,8 @@ class CupertinoControls extends StatefulWidget {
   const CupertinoControls({
     @required this.backgroundColor,
     @required this.iconColor,
-  });
+    Key key,
+  }) : super(key: key);
 
   final Color backgroundColor;
   final Color iconColor;
