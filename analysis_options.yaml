@@ -6,5 +6,7 @@ analyzer:
 
 linter:
   rules:
-    - close_sinks
-    - sort_constructors_first
+    prefer_const_constructors: false
+    close_sinks: true
+    sort_constructors_first: true
+
