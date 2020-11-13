@@ -9,7 +9,7 @@ on:
 
 jobs:
   check-format:
-      name: Check format
+      name: Check format using flutter format -l 120
       runs-on: ubuntu-latest
       container: cirrusci/flutter:beta
 
@@ -30,7 +30,7 @@ jobs:
       - name: Get dependencies for example
         run: flutter pub get
         working-directory: example
-      - name: Lint
+      - name: Lint using flutter analyze
         run: flutter analyze
 
   # test:
