@@ -61,11 +61,14 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           child: Column(
             children: <Widget>[
               if (_latestValue != null && !_latestValue.isPlaying && _latestValue.duration == null ||
-                      _latestValue.isBuffering) const Expanded(
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ) else _buildHitArea(),
+                  _latestValue.isBuffering)
+                const Expanded(
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else
+                _buildHitArea(),
               _buildBottomBar(context),
             ],
           ),
@@ -94,10 +97,10 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     controller = chewieController.videoPlayerController;
 
     playPauseIconAnimationController ??= AnimationController(
-        vsync: this,
-        duration: Duration(milliseconds: 400),
-        reverseDuration: Duration(milliseconds: 400),
-      );
+      vsync: this,
+      duration: Duration(milliseconds: 400),
+      reverseDuration: Duration(milliseconds: 400),
+    );
 
     if (_oldController != chewieController) {
       _dispose();
@@ -465,11 +468,14 @@ class _PlaybackSpeedDialog extends StatelessWidget {
           dense: true,
           title: Row(
             children: [
-              if (_speed == _selected) Icon(
-                      Icons.check,
-                      size: 20.0,
-                      color: selectedColor,
-                    ) else Container(width: 20.0),
+              if (_speed == _selected)
+                Icon(
+                  Icons.check,
+                  size: 20.0,
+                  color: selectedColor,
+                )
+              else
+                Container(width: 20.0),
               SizedBox(width: 16.0),
               Text(_speed.toString()),
             ],
