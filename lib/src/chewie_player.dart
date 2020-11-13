@@ -160,9 +160,11 @@ class ChewieState extends State<Chewie> {
       /// Optional user preferred settings
       SystemChrome.setPreferredOrientations(widget.controller.deviceOrientationsOnEnterFullScreen);
     } else {
+      final isLandscapeVideo = videoWidth > videoHeight;
+      final isPortraitVideo = videoWidth < videoHeight;
       /// Default behavior
       /// Video w > h means we force landscape
-      if (videoWidth > videoHeight) {
+      if (isLandscapeVideo) {
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.landscapeLeft,
           DeviceOrientation.landscapeRight,
@@ -170,7 +172,7 @@ class ChewieState extends State<Chewie> {
       }
 
       /// Video h > w means we force portrait
-      else if (videoHeight > videoWidth) {
+      else if (isPortraitVideo) {
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
           DeviceOrientation.portraitDown,
