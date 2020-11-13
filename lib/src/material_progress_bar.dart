@@ -27,7 +27,7 @@ class MaterialVideoProgressBar extends StatefulWidget {
 class _VideoProgressBarState extends State<MaterialVideoProgressBar> {
   _VideoProgressBarState() {
     listener = () {
-      if (!this.mounted) return;
+      if (!mounted) return;
       setState(() {});
     };
   }
@@ -60,19 +60,6 @@ class _VideoProgressBarState extends State<MaterialVideoProgressBar> {
     }
 
     return GestureDetector(
-      child: Center(
-        child: Container(
-          height: MediaQuery.of(context).size.height / 2,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.transparent,
-          child: CustomPaint(
-            painter: _ProgressBarPainter(
-              controller.value,
-              widget.colors,
-            ),
-          ),
-        ),
-      ),
       onHorizontalDragStart: (DragStartDetails details) {
         if (!controller.value.initialized) {
           return;
@@ -111,6 +98,19 @@ class _VideoProgressBarState extends State<MaterialVideoProgressBar> {
         }
         seekToRelativePosition(details.globalPosition);
       },
+      child: Center(
+        child: Container(
+          height: MediaQuery.of(context).size.height / 2,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.transparent,
+          child: CustomPaint(
+            painter: _ProgressBarPainter(
+              controller.value,
+              widget.colors,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -128,7 +128,7 @@ class _ProgressBarPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final height = 2.0;
+    const height = 2.0;
 
     canvas.drawRRect(
       RRect.fromRectAndRadius(
@@ -145,7 +145,7 @@ class _ProgressBarPainter extends CustomPainter {
     }
     final double playedPartPercent = value.position.inMilliseconds / value.duration.inMilliseconds;
     final double playedPart = playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
-    for (DurationRange range in value.buffered) {
+    for (final DurationRange range in value.buffered) {
       final double start = range.startFraction(value.duration) * size.width;
       final double end = range.endFraction(value.duration) * size.width;
       canvas.drawRRect(
