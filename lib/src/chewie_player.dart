@@ -73,7 +73,7 @@ class ChewieState extends State<Chewie> {
   Widget build(BuildContext context) {
     return _ChewieControllerProvider(
       controller: widget.controller,
-      child: PlayerWithControls(),
+      child: const PlayerWithControls(),
     );
   }
 
@@ -113,7 +113,7 @@ class ChewieState extends State<Chewie> {
   ) {
     final controllerProvider = _ChewieControllerProvider(
       controller: widget.controller,
-      child: PlayerWithControls(),
+      child: const PlayerWithControls(),
     );
 
     if (widget.controller.routePageBuilder == null) {

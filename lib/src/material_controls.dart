@@ -46,7 +46,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
               context,
               chewieController.videoPlayerController.value.errorDescription,
             )
-          : Center(
+          : const Center(
               child: Icon(
                 Icons.error,
                 color: Colors.white,
@@ -104,8 +104,8 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
 
     playPauseIconAnimationController ??= AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 400),
-      reverseDuration: Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 400),
+      reverseDuration: const Duration(milliseconds: 400),
     );
 
     if (_oldController != chewieController) {
@@ -123,14 +123,14 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
 
     return AnimatedOpacity(
       opacity: _hideStuff ? 0.0 : 1.0,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       child: Container(
         height: barHeight,
         color: Theme.of(context).dialogBackgroundColor,
         child: Row(
           children: <Widget>[
             _buildPlayPause(controller),
-            if (chewieController.isLive) Expanded(child: const Text('LIVE')) else _buildPosition(iconColor),
+            if (chewieController.isLive) const Expanded(child: Text('LIVE')) else _buildPosition(iconColor),
             if (chewieController.isLive) const SizedBox() else _buildProgressBar(),
             if (chewieController.allowPlaybackSpeedChanging) _buildSpeedButton(controller),
             if (chewieController.allowMuting) _buildMuteButton(controller),
@@ -181,11 +181,11 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
       onTap: _onExpandCollapse,
       child: AnimatedOpacity(
         opacity: _hideStuff ? 0.0 : 1.0,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         child: Container(
           height: barHeight,
-          margin: EdgeInsets.only(right: 12.0),
-          padding: EdgeInsets.only(
+          margin: const EdgeInsets.only(right: 12.0),
+          padding: const EdgeInsets.only(
             left: 8.0,
             right: 8.0,
           ),
@@ -226,7 +226,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           child: Center(
             child: AnimatedOpacity(
               opacity: _latestValue != null && !_latestValue.isPlaying && !_dragging ? 1.0 : 0.0,
-              duration: Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 300),
               child: GestureDetector(
                 child: Container(
                   decoration: BoxDecoration(
@@ -234,10 +234,10 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
                     borderRadius: BorderRadius.circular(48.0),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(12.0),
+                    padding: const EdgeInsets.all(12.0),
                     child: IconButton(
                         icon: isFinished
-                            ? Icon(Icons.replay, size: 32.0)
+                            ? const Icon(Icons.replay, size: 32.0)
                             : AnimatedIcon(
                                 icon: AnimatedIcons.play_pause,
                                 progress: playPauseIconAnimationController,
@@ -283,15 +283,15 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
       },
       child: AnimatedOpacity(
         opacity: _hideStuff ? 0.0 : 1.0,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         child: ClipRect(
           child: Container(
             height: barHeight,
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
               left: 8.0,
               right: 8.0,
             ),
-            child: Icon(Icons.speed),
+            child: const Icon(Icons.speed),
           ),
         ),
       ),
@@ -314,11 +314,11 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
       },
       child: AnimatedOpacity(
         opacity: _hideStuff ? 0.0 : 1.0,
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         child: ClipRect(
           child: Container(
             height: barHeight,
-            padding: EdgeInsets.only(
+            padding: const EdgeInsets.only(
               left: 8.0,
               right: 8.0,
             ),
@@ -337,8 +337,8 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
       child: Container(
         height: barHeight,
         color: Colors.transparent,
-        margin: EdgeInsets.only(left: 8.0, right: 4.0),
-        padding: EdgeInsets.only(
+        margin: const EdgeInsets.only(left: 8.0, right: 4.0),
+        padding: const EdgeInsets.only(
           left: 12.0,
           right: 12.0,
         ),
@@ -354,10 +354,10 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     final duration = _latestValue != null && _latestValue.duration != null ? _latestValue.duration : Duration.zero;
 
     return Padding(
-      padding: EdgeInsets.only(right: 24.0),
+      padding: const EdgeInsets.only(right: 24.0),
       child: Text(
         '${formatDuration(position)} / ${formatDuration(duration)}',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 14.0,
         ),
       ),
@@ -413,7 +413,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     }
 
     if (chewieController.showControlsOnInitialize) {
-      _initTimer = Timer(Duration(milliseconds: 200), () {
+      _initTimer = Timer(const Duration(milliseconds: 200), () {
         setState(() {
           _hideStuff = false;
         });
@@ -426,7 +426,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
       _hideStuff = true;
 
       chewieController.toggleFullScreen();
-      _showAfterExpandCollapseTimer = Timer(Duration(milliseconds: 300), () {
+      _showAfterExpandCollapseTimer = Timer(const Duration(milliseconds: 300), () {
         setState(() {
           _cancelAndRestartTimer();
         });
@@ -458,7 +458,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           });
         } else {
           if (isFinished) {
-            controller.seekTo(Duration());
+            controller.seekTo(const Duration());
           }
           playPauseIconAnimationController.forward();
           controller.play();
@@ -485,7 +485,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
   Widget _buildProgressBar() {
     return Expanded(
       child: Padding(
-        padding: EdgeInsets.only(right: 20.0),
+        padding: const EdgeInsets.only(right: 20.0),
         child: MaterialVideoProgressBar(
           controller,
           onDragStart: () {
@@ -532,7 +532,7 @@ class _PlaybackSpeedDialog extends StatelessWidget {
 
     return ListView.builder(
       shrinkWrap: true,
-      physics: ScrollPhysics(),
+      physics: const ScrollPhysics(),
       itemBuilder: (context, index) {
         final _speed = _speeds[index];
         return ListTile(
@@ -547,7 +547,7 @@ class _PlaybackSpeedDialog extends StatelessWidget {
                 )
               else
                 Container(width: 20.0),
-              SizedBox(width: 16.0),
+              const SizedBox(width: 16.0),
               Text(_speed.toString()),
             ],
           ),

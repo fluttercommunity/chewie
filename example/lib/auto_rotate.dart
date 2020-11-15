@@ -7,7 +7,7 @@ import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(
-    ChewieDemo(),
+    const ChewieDemo(),
   );
 }
 
@@ -122,7 +122,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
               onPressed: () {
                 _chewieController.enterFullScreen();
               },
-              child: Text('Fullscreen'),
+              child: const Text('Fullscreen'),
             ),
             Row(
               children: <Widget>[
@@ -132,7 +132,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       setState(() {
                         _chewieController.dispose();
                         _videoPlayerController1.pause();
-                        _videoPlayerController1.seekTo(Duration());
+                        _videoPlayerController1.seekTo(const Duration());
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController1,
                           autoPlay: true,
@@ -140,7 +140,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                         );
                       });
                     },
-                    child: Padding(
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       child: Text("Landscape Video"),
                     ),
@@ -152,7 +152,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       setState(() {
                         _chewieController.dispose();
                         _videoPlayerController2.pause();
-                        _videoPlayerController2.seekTo(Duration());
+                        _videoPlayerController2.seekTo(const Duration());
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,
@@ -160,7 +160,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                         );
                       });
                     },
-                    child: Padding(
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       child: Text("Portrait Video"),
                     ),
@@ -177,7 +177,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                         _platform = TargetPlatform.android;
                       });
                     },
-                    child: Padding(
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       child: Text("Android controls"),
                     ),
@@ -190,7 +190,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                         _platform = TargetPlatform.iOS;
                       });
                     },
-                    child: Padding(
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       child: Text("iOS controls"),
                     ),
