@@ -407,8 +407,8 @@ class ChewieController extends ChangeNotifier {
     await videoPlayerController.setVolume(volume);
   }
 
-  void setSubtitle(String newSubtitle) {
-    subtitle = Subtitles.fromString(newSubtitle);
+  void setSubtitle(List<Subtitle> newSubtitle) {
+    subtitle = Subtitles(newSubtitle);
   }
 }
 

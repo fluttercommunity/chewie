@@ -74,6 +74,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
                 )
               else
                 _buildHitArea(),
+              _buildSubtitles(context, chewieController.subtitle),
               _buildBottomBar(context),
             ],
           ),
@@ -155,7 +156,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     if (chewieController.subtitleBuilder != null) {
       return chewieController.subtitleBuilder(
         context,
-        currentSubtitle.first.texts.join('\n'),
+        currentSubtitle.first.text,
       );
     }
 
@@ -165,7 +166,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
         padding: EdgeInsets.all(5),
         decoration: BoxDecoration(color: Color(0x96000000), borderRadius: BorderRadius.circular(10.0)),
         child: Text(
-          currentSubtitle.first.texts.join('\n'),
+          currentSubtitle.first.text,
           style: TextStyle(
             fontSize: 18,
           ),

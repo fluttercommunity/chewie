@@ -52,6 +52,27 @@ class _ChewieDemoState extends State<ChewieDemo> {
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
       looping: true,
+      subtitle: Subtitles([
+        Subtitle(
+          index: 0,
+          start: Duration.zero,
+          end: Duration(seconds: 10),
+          text: 'Hello from subtitles',
+        ),
+        Subtitle(
+          index: 0,
+          start: Duration(seconds: 10),
+          end: Duration(seconds: 20),
+          text: 'Whats up? :)',
+        ),
+      ]),
+      subtitleBuilder: (context, subtitle) => Container(
+        padding: const EdgeInsets.all(10.0),
+        child: Text(
+          subtitle,
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
       // Try playing around with some of these other options:
 
       // showControls: false,
@@ -117,6 +138,27 @@ class _ChewieDemoState extends State<ChewieDemo> {
                           videoPlayerController: _videoPlayerController1,
                           autoPlay: true,
                           looping: true,
+                          subtitle: Subtitles([
+                            Subtitle(
+                              index: 0,
+                              start: Duration.zero,
+                              end: Duration(seconds: 10),
+                              text: 'Hello from subtitles',
+                            ),
+                            Subtitle(
+                              index: 0,
+                              start: Duration(seconds: 10),
+                              end: Duration(seconds: 20),
+                              text: 'Whats up? :)',
+                            ),
+                          ]),
+                          subtitleBuilder: (context, subtitle) => Container(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Text(
+                              subtitle,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
                         );
                       });
                     },
@@ -137,6 +179,27 @@ class _ChewieDemoState extends State<ChewieDemo> {
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,
                           looping: true,
+                          subtitle: Subtitles([
+                            Subtitle(
+                              index: 0,
+                              start: Duration.zero,
+                              end: Duration(seconds: 10),
+                              text: 'Hello from subtitles',
+                            ),
+                            Subtitle(
+                              index: 0,
+                              start: Duration(seconds: 10),
+                              end: Duration(seconds: 20),
+                              text: 'Whats up? :)',
+                            ),
+                          ]),
+                          subtitleBuilder: (context, subtitle) => Container(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Text(
+                              subtitle,
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
                         );
                       });
                     },
