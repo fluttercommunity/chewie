@@ -364,7 +364,6 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
   }
 
   void _updateState() {
-    if (!mounted) return;
     setState(() {
       _latestValue = controller.value;
     });
