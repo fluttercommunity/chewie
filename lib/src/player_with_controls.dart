@@ -12,37 +12,33 @@ class PlayerWithControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ChewieAudioController chewieController =
-    ChewieAudioController.of(context);
+    final ChewieAudioController chewieController = ChewieAudioController.of(context);
 
-    Widget _buildControls(BuildContext context,
-        ChewieAudioController chewieController,) {
-      final controls = Theme
-          .of(context)
-          .platform == TargetPlatform.android
+    Widget _buildControls(
+      BuildContext context,
+      ChewieAudioController chewieController,
+    ) {
+      final controls = Theme.of(context).platform == TargetPlatform.android
           ? const MaterialControls()
           : const CupertinoControls(
-        backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
-        iconColor: Color.fromARGB(255, 200, 200, 200),
-      );
+              backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
+              iconColor: Color.fromARGB(255, 200, 200, 200),
+            );
       return chewieController.showControls ? chewieController.customControls ?? controls : Container();
     }
 
-    Container _buildPlayerWithControls(ChewieAudioController chewieController, BuildContext context) {
-      return Container(
-        child: Stack(
-          children: <Widget>[
-            Offstage(
-              offstage: true,
-              child: Container(
-                width: 3,
-                height: 1,
-                child: VideoPlayer(chewieController.videoPlayerController),
-              ),
+    Widget _buildPlayerWithControls(ChewieAudioController chewieController, BuildContext context) {
+      return Stack(
+        children: <Widget>[
+          Offstage(
+            child: SizedBox(
+              width: 3,
+              height: 1,
+              child: VideoPlayer(chewieController.videoPlayerController),
             ),
-            _buildControls(context, chewieController),
-          ],
-        ),
+          ),
+          _buildControls(context, chewieController),
+        ],
       );
     }
 

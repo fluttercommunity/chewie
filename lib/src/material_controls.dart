@@ -21,7 +21,6 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
   double _latestVolume;
   Timer _initTimer;
   Timer _showAfterExpandCollapseTimer;
-  bool _dragging = false;
 
   final barHeight = 48.0;
   final marginSize = 5.0;
@@ -95,51 +94,8 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           _buildPlayPause(controller),
           if (chewieController.isLive) const Expanded(child: Text('LIVE')) else _buildPosition(iconColor),
           if (chewieController.isLive) const SizedBox() else _buildProgressBar(),
-          if (chewieController.allowPlaybackSpeedChanging) _buildSpeedButton(controller),
           if (chewieController.allowMuting) _buildMuteButton(controller),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSpeedButton(
-      VideoPlayerController controller,
-      ) {
-    return GestureDetector(
-      onTap: () async {
-        _hideTimer?.cancel();
-
-        final chosenSpeed = await showModalBottomSheet<double>(
-          context: context,
-          isScrollControlled: true,
-          useRootNavigator: true,
-          builder: (context) => _PlaybackSpeedDialog(
-            speeds: chewieController.playbackSpeeds,
-            selected: _latestValue.playbackSpeed,
-          ),
-        );
-
-        if (chosenSpeed != null) {
-          controller.setPlaybackSpeed(chosenSpeed);
-        }
-
-        if (_latestValue.isPlaying) {
-          _startHideTimer();
-        }
-      },
-      child: AnimatedOpacity(
-        opacity: _hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
-        child: ClipRect(
-          child: Container(
-            height: barHeight,
-            padding: const EdgeInsets.only(
-              left: 8.0,
-              right: 8.0,
-            ),
-            child: const Icon(Icons.speed),
-          ),
-        ),
       ),
     );
   }
@@ -158,15 +114,13 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
       },
       child: ClipRect(
         child: Container(
-          child: Container(
-            height: barHeight,
-            padding: const EdgeInsets.only(
-              left: 8.0,
-              right: 8.0,
-            ),
-            child: Icon(
-              (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
-            ),
+          height: barHeight,
+          padding: const EdgeInsets.only(
+            left: 8.0,
+            right: 8.0,
+          ),
+          child: Icon(
+            (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
           ),
         ),
       ),
@@ -253,16 +207,8 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
         padding: const EdgeInsets.only(right: 20.0),
         child: MaterialVideoProgressBar(
           controller,
-          onDragStart: () {
-            setState(() {
-              _dragging = true;
-            });
-          },
-          onDragEnd: () {
-            setState(() {
-              _dragging = false;
-            });
-          },
+          onDragStart: () {},
+          onDragEnd: () {},
           colors: chewieController.materialProgressColors ??
               ChewieProgressColors(
                   playedColor: Theme.of(context).accentColor,
@@ -271,54 +217,6 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
                   backgroundColor: Theme.of(context).disabledColor),
         ),
       ),
-    );
-  }
-}
-
-class _PlaybackSpeedDialog extends StatelessWidget {
-  const _PlaybackSpeedDialog({
-    Key key,
-    @required List<double> speeds,
-    @required double selected,
-  })  : _speeds = speeds,
-        _selected = selected,
-        super(key: key);
-
-  final List<double> _speeds;
-  final double _selected;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color selectedColor = Theme.of(context).primaryColor;
-
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const ScrollPhysics(),
-      itemBuilder: (context, index) {
-        final _speed = _speeds[index];
-        return ListTile(
-          dense: true,
-          title: Row(
-            children: [
-              if (_speed == _selected)
-                Icon(
-                  Icons.check,
-                  size: 20.0,
-                  color: selectedColor,
-                )
-              else
-                Container(width: 20.0),
-              const SizedBox(width: 16.0),
-              Text(_speed.toString()),
-            ],
-          ),
-          selected: _speed == _selected,
-          onTap: () {
-            Navigator.of(context).pop(_speed);
-          },
-        );
-      },
-      itemCount: _speeds.length,
     );
   }
 }

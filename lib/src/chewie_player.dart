@@ -5,67 +5,26 @@ import 'package:chewie_audio/src/player_with_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
-import 'package:wakelock/wakelock.dart';
 
 /// An Audio Player with Material and Cupertino skins.
 ///
 /// `video_player` is pretty low level. ChewieAudio wraps it in a friendly skin to
 /// make it easy to use!
-class ChewieAudio extends StatefulWidget {
+class ChewieAudio extends StatelessWidget {
   const ChewieAudio({
     Key key,
     @required this.controller,
-  })  : assert(
-            controller != null, 'You must provide a chewie audio controller'),
+  })  : assert(controller != null, 'You must provide a chewie audio controller'),
         super(key: key);
 
   /// The [ChewieAudioController]
   final ChewieAudioController controller;
 
   @override
-  ChewieAudioState createState() {
-    return ChewieState();
-  }
-}
-
-class ChewieAudioState extends State<ChewieAudio> {
-  bool _isFullScreen = false;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(listener);
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(listener);
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(ChewieAudio oldWidget) {
-    if (oldWidget.controller != widget.controller) {
-      widget.controller.addListener(listener);
-    }
-    super.didUpdateWidget(oldWidget);
-  }
-
-  Future<void> listener() async {
-    if (widget.controller.isFullScreen && !_isFullScreen) {
-      _isFullScreen = true;
-      await _pushFullScreenWidget(context);
-    } else if (_isFullScreen) {
-      Navigator.of(context, rootNavigator: true).pop();
-      _isFullScreen = false;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return _ChewieAudioControllerProvider(
-      controller: widget.controller,
-      child: const layerWithControls(),
+      controller: controller,
+      child: const PlayerWithControls(),
     );
   }
 }
@@ -91,8 +50,7 @@ class ChewieAudioController extends ChangeNotifier {
     this.errorBuilder,
     this.isLive = false,
     this.allowMuting = true,
-  }) : assert(videoPlayerController != null,
-            'You must provide a controller to play a video') {
+  }) : assert(videoPlayerController != null, 'You must provide a controller to play a video') {
     _initialize();
   }
 
@@ -138,8 +96,7 @@ class ChewieAudioController extends ChangeNotifier {
 
   static ChewieAudioController of(BuildContext context) {
     final chewieAudioControllerProvider =
-        context.inheritFromWidgetOfExactType(_ChewieAudioControllerProvider)
-            as _ChewieAudioControllerProvider;
+        context.inheritFromWidgetOfExactType(_ChewieAudioControllerProvider) as _ChewieAudioControllerProvider;
 
     return chewieAudioControllerProvider.controller;
   }

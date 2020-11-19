@@ -1,5 +1,4 @@
 import 'package:chewie_audio/chewie_audio.dart';
-import 'package:chewie_audio/src/chewie_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -10,7 +9,7 @@ void main() {
   );
 }
 
-class ChewieDemo extends StatefulWidget {
+class ChewieAudioDemo extends StatefulWidget {
   // ignore: use_key_in_widget_constructors
   const ChewieAudioDemo({this.title = 'Chewie Demo'});
 
@@ -18,11 +17,11 @@ class ChewieDemo extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _ChewieDemoState();
+    return _ChewieAudioDemoState();
   }
 }
 
-class _ChewieDemoState extends State<ChewieAudioDemo> {
+class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
   TargetPlatform _platform;
   VideoPlayerController _videoPlayerController1;
   VideoPlayerController _videoPlayerController2;
@@ -43,12 +42,10 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
   }
 
   Future<void> initializePlayer() async {
-    _videoPlayerController1 = VideoPlayerController.network(
-        'https://www.w3schools.com/tags/horse.mp3');
+    _videoPlayerController1 = VideoPlayerController.network('https://www.w3schools.com/tags/horse.mp3');
     await _videoPlayerController1.initialize();
-    _videoPlayerController2 = VideoPlayerController.network(
-        'https://www.sample-videos.com/video123/mp4/480/asdasdas.mp4');
-    await _videoPlayerController2.initialize();
+    _videoPlayerController2 =
+        VideoPlayerController.network('https://www.sample-videos.com/video123/mp4/480/asdasdas.mp4');
     _chewieAudioController = ChewieAudioController(
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
@@ -114,7 +111,7 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
                     },
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("Landscape Video"),
+                      child: Text("Video 1"),
                     ),
                   ),
                 ),
@@ -124,7 +121,6 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
                       setState(() {
                         _chewieAudioController.dispose();
                         _videoPlayerController2.pause();
-                        _videoPlayerController2.seekTo(const Duration());
                         _chewieAudioController = ChewieAudioController(
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,
@@ -134,7 +130,7 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
                     },
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("Portrait Video"),
+                      child: Text("Error Video"),
                     ),
                   ),
                 )
