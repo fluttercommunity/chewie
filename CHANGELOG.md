@@ -1,3 +1,18 @@
+# Chewie Audio Changelog
+
+## 1.0.1
+
+Merged in chewie 0.12.0 with, among others, dependency updates and iconic fotn removal.
+
+## 1.0.0
+
+Initial version of Chewie Audio, the audio player with a heart of gold.
+
+Forked from https://github.com/brianegan/chewie
+
+  * Removed video components from Chewie to make an audio-only player.
+
+# [Chewie](https://github.com/brianegan/chewie) Changelog
 ## 0.12.0
 
 * Add replay feature
@@ -49,7 +64,7 @@
 
 ## 0.9.9
 
-* Changed wakelock plugin from `flutter_screen` to `wakelock` due to lack of maintenance of `flutter_screen`. 
+* Changed wakelock plugin from `flutter_screen` to `wakelock` due to lack of maintenance of `flutter_screen`.
 
 ## 0.9.8+1
   * Require latest flutter stable version

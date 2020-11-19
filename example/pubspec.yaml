@@ -2,7 +2,7 @@ name: chewie_example
 description: An example of how to use the chewie for Flutter
 
 dependencies:
-  chewie:
+  chewie_audio:
     path: ../
   video_player: ^1.0.0
   auto_orientation: ^1.0.6
