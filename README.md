@@ -1,32 +1,21 @@
-<<<<<<< HEAD
-# chewie
-[![Version](https://img.shields.io/pub/v/chewie.svg)](https://pub.dev/packages/chewie)
-![CI](https://github.com/brianegan/chewie/workflows/CI/badge.svg)
-[![Generic badge](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20-blue.svg)](https://pub.dev/packages/chewie)
-=======
 # chewie_audio
->>>>>>> e01a56e (chewie_audio version 1.0.0)
+[![Version](https://img.shields.io/pub/v/chewie_audio.svg)](https://pub.dev/packages/chewie_audio)
+![CI](https://github.com/Sub6Resources/chewie_audio/workflows/CI/badge.svg)
+[![Generic badge](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20-blue.svg)](https://pub.dev/packages/chewie_audio)
+
 
 The audio player for Flutter with a heart of gold. 
 
-<<<<<<< HEAD
-The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
-=======
-The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video/audio playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI! 
->>>>>>> e01a56e (chewie_audio version 1.0.0)
+The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video/audio playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
 
 ## Preview
 
-<<<<<<< HEAD
 | MaterialControls | MaterialDesktopControls |
 | :--------------: | :---------------------: |
 |     ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialControls.png)     |    ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialDesktopControls.png)     |
 
 ### CupertinoControls
 ![](https://github.com/brianegan/chewie/raw/master/assets/CupertinoControls.png)
-=======
-<!--![Demo](https://github.com/brianegan/chewie/raw/master/assets/chewie_demo.gif)-->
->>>>>>> e01a56e (chewie_audio version 1.0.0)
 
 ## Installation
 
@@ -180,36 +169,7 @@ Subtitle(
 
 ## Example
 
-<<<<<<< HEAD
-Please run the app in the [`example/`](https://github.com/brianegan/chewie/tree/master/example) folder to start playing!
-
-## Migrating from Chewie < 0.9.0
-Instead of passing the `VideoPlayerController` and your options to the `Chewie` widget you now pass them to the `ChewieController` and pass that latter to the `Chewie` widget.
-
-```dart
-final playerWidget = Chewie(
-  videoPlayerController,
-  autoPlay: true,
-  looping: true,
-);
-```
-
-becomes
-
-```dart
-final chewieController = ChewieController(
-  videoPlayerController: videoPlayerController,
-  autoPlay: true,
-  looping: true,
-);
-
-final playerWidget = Chewie(
-  controller: chewieController,
-);
-```
-=======
 Please run the app in the [`example/`](https://github.com/Sub6Resources/chewie_audio/tree/master/example) folder to start playing!
->>>>>>> e01a56e (chewie_audio version 1.0.0)
 
 ## Roadmap
 
