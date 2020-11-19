@@ -106,7 +106,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
   ) {
     return Container(
       color: Colors.transparent,
-      alignment: Alignment.bottomCenter,
+      alignment: Alignment.center,
       margin: EdgeInsets.all(marginSize),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10.0),

@@ -42,12 +42,9 @@ class PlayerWithControls extends StatelessWidget {
       );
     }
 
-    return Center(
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: _buildPlayerWithControls(chewieController, context),
-      ),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: _buildPlayerWithControls(chewieController, context),
     );
   }
 }

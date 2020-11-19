@@ -42,7 +42,8 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
   }
 
   Future<void> initializePlayer() async {
-    _videoPlayerController1 = VideoPlayerController.network('https://www.w3schools.com/tags/horse.mp3');
+    _videoPlayerController1 =
+        VideoPlayerController.network('https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4');
     await _videoPlayerController1.initialize();
     _videoPlayerController2 =
         VideoPlayerController.network('https://www.sample-videos.com/video123/mp4/480/asdasdas.mp4');
@@ -61,7 +62,6 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
       // ),
       // autoInitialize: true,
     );
-    setState(() {});
   }
 
   @override
