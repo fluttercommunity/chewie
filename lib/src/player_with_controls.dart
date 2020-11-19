@@ -13,14 +13,6 @@ class PlayerWithControls extends StatelessWidget {
     final ChewieAudioController chewieController =
         ChewieAudioController.of(context);
 
-    double calculateAspectRatio(BuildContext context) {
-      final size = MediaQuery.of(context).size;
-      final width = size.width;
-      final height = size.height;
-
-      return width > height ? width / height : height / width;
-    }
-
     Widget buildControls(
       BuildContext context,
       ChewieAudioController chewieController,
@@ -74,15 +66,9 @@ class PlayerWithControls extends StatelessWidget {
       );
     }
 
-    return Center(
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        child: AspectRatio(
-          aspectRatio: calculateAspectRatio(context),
-          child: buildPlayerWithControls(chewieController, context),
-        ),
-      ),
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: buildPlayerWithControls(chewieController, context),
     );
   }
 }
