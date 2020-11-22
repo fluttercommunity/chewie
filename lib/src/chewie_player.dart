@@ -11,11 +11,10 @@ import 'package:video_player/video_player.dart';
 /// `video_player` is pretty low level. ChewieAudio wraps it in a friendly skin to
 /// make it easy to use!
 class ChewieAudio extends StatelessWidget {
-  ChewieAudio({
+  const ChewieAudio({
     Key key,
-    this.controller,
-  })  : assert(
-            controller != null, 'You must provide a chewie audio controller'),
+    @required this.controller,
+  })  : assert(controller != null, 'You must provide a chewie audio controller'),
         super(key: key);
 
   /// The [ChewieAudioController]
@@ -25,7 +24,7 @@ class ChewieAudio extends StatelessWidget {
   Widget build(BuildContext context) {
     return _ChewieAudioControllerProvider(
       controller: controller,
-      child: PlayerWithControls(),
+      child: const PlayerWithControls(),
     );
   }
 }
@@ -39,7 +38,7 @@ class ChewieAudio extends StatelessWidget {
 /// `VideoPlayerController`.
 class ChewieAudioController extends ChangeNotifier {
   ChewieAudioController({
-    this.videoPlayerController,
+    @required this.videoPlayerController,
     this.autoInitialize = false,
     this.autoPlay = false,
     this.startAt,
@@ -51,8 +50,7 @@ class ChewieAudioController extends ChangeNotifier {
     this.errorBuilder,
     this.isLive = false,
     this.allowMuting = true,
-  }) : assert(videoPlayerController != null,
-            'You must provide a controller to play a video') {
+  }) : assert(videoPlayerController != null, 'You must provide a controller to play a video') {
     _initialize();
   }
 
@@ -98,17 +96,17 @@ class ChewieAudioController extends ChangeNotifier {
 
   static ChewieAudioController of(BuildContext context) {
     final chewieAudioControllerProvider =
-        context.inheritFromWidgetOfExactType(_ChewieAudioControllerProvider)
-            as _ChewieAudioControllerProvider;
+        context.inheritFromWidgetOfExactType(_ChewieAudioControllerProvider) as _ChewieAudioControllerProvider;
 
     return chewieAudioControllerProvider.controller;
   }
 
+  bool get isPlaying => videoPlayerController.value.isPlaying;
+
   Future _initialize() async {
     await videoPlayerController.setLooping(looping);
 
-    if ((autoInitialize || autoPlay) &&
-        !videoPlayerController.value.initialized) {
+    if ((autoInitialize || autoPlay) && !videoPlayerController.value.initialized) {
       await videoPlayerController.initialize();
     }
 
@@ -121,10 +119,15 @@ class ChewieAudioController extends ChangeNotifier {
     }
   }
 
+  void togglePause() {
+    isPlaying ? pause() : play();
+  }
+
   Future<void> play() async {
     await videoPlayerController.play();
   }
 
+  // ignore: avoid_positional_boolean_parameters
   Future<void> setLooping(bool looping) async {
     await videoPlayerController.setLooping(looping);
   }
@@ -154,6 +157,5 @@ class _ChewieAudioControllerProvider extends InheritedWidget {
   final ChewieAudioController controller;
 
   @override
-  bool updateShouldNotify(_ChewieAudioControllerProvider old) =>
-      controller != old.controller;
+  bool updateShouldNotify(_ChewieAudioControllerProvider old) => controller != old.controller;
 }

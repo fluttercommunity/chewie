@@ -1,27 +1,27 @@
 import 'package:chewie_audio/chewie_audio.dart';
-import 'package:chewie_audio/src/chewie_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(
-    ChewieAudioDemo(),
+    const ChewieAudioDemo(),
   );
 }
 
 class ChewieAudioDemo extends StatefulWidget {
-  ChewieAudioDemo({this.title = 'Chewie Audio Demo'});
+  // ignore: use_key_in_widget_constructors
+  const ChewieAudioDemo({this.title = 'Chewie Demo'});
 
   final String title;
 
   @override
   State<StatefulWidget> createState() {
-    return _ChewieDemoState();
+    return _ChewieAudioDemoState();
   }
 }
 
-class _ChewieDemoState extends State<ChewieAudioDemo> {
+class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
   TargetPlatform _platform;
   VideoPlayerController _videoPlayerController1;
   VideoPlayerController _videoPlayerController2;
@@ -30,10 +30,23 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
   @override
   void initState() {
     super.initState();
-    _videoPlayerController1 = VideoPlayerController.network(
-        'https://www.w3schools.com/tags/horse.mp3');
-    _videoPlayerController2 = VideoPlayerController.network(
-        'https://www.sample-videos.com/video123/mp4/480/asdasdas.mp4');
+    initializePlayer();
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController1.dispose();
+    _videoPlayerController2.dispose();
+    _chewieAudioController.dispose();
+    super.dispose();
+  }
+
+  Future<void> initializePlayer() async {
+    _videoPlayerController1 =
+        VideoPlayerController.network('https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4');
+    await _videoPlayerController1.initialize();
+    _videoPlayerController2 =
+        VideoPlayerController.network('https://www.sample-videos.com/video123/mp4/480/asdasdas.mp4');
     _chewieAudioController = ChewieAudioController(
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
@@ -52,14 +65,6 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
   }
 
   @override
-  void dispose() {
-    _videoPlayerController1.dispose();
-    _videoPlayerController2.dispose();
-    _chewieAudioController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: widget.title,
@@ -72,9 +77,20 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
         ),
         body: Column(
           children: <Widget>[
-            Center(
-              child: ChewieAudio(
-                controller: _chewieAudioController,
+            Expanded(
+              child: Center(
+                child: _chewieAudioController != null && _chewieAudioController.videoPlayerController.value.initialized
+                    ? ChewieAudio(
+                        controller: _chewieAudioController,
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 20),
+                          Text('Loading'),
+                        ],
+                      ),
               ),
             ),
             Row(
@@ -84,8 +100,8 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
                     onPressed: () {
                       setState(() {
                         _chewieAudioController.dispose();
-                        _videoPlayerController2.pause();
-                        _videoPlayerController2.seekTo(Duration(seconds: 0));
+                        _videoPlayerController1.pause();
+                        _videoPlayerController1.seekTo(const Duration());
                         _chewieAudioController = ChewieAudioController(
                           videoPlayerController: _videoPlayerController1,
                           autoPlay: true,
@@ -93,9 +109,9 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
                         );
                       });
                     },
-                    child: Padding(
-                      child: Text("Video 1"),
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("Video 1"),
                     ),
                   ),
                 ),
@@ -104,8 +120,7 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
                     onPressed: () {
                       setState(() {
                         _chewieAudioController.dispose();
-                        _videoPlayerController1.pause();
-                        _videoPlayerController1.seekTo(Duration(seconds: 0));
+                        _videoPlayerController2.pause();
                         _chewieAudioController = ChewieAudioController(
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,
@@ -113,7 +128,7 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
                         );
                       });
                     },
-                    child: Padding(
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       child: Text("Error Video"),
                     ),
@@ -130,9 +145,9 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
                         _platform = TargetPlatform.android;
                       });
                     },
-                    child: Padding(
-                      child: Text("Android controls"),
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("Android controls"),
                     ),
                   ),
                 ),
@@ -143,7 +158,7 @@ class _ChewieDemoState extends State<ChewieAudioDemo> {
                         _platform = TargetPlatform.iOS;
                       });
                     },
-                    child: Padding(
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       child: Text("iOS controls"),
                     ),

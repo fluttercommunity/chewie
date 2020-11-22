@@ -1,8 +1,8 @@
 # chewie_audio
 
-The audio player for Flutter with a heart of gold. 
+The audio player for Flutter with a heart of gold.
 
-The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video/audio playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI! 
+The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video/audio playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
 
 ## Demo
 
@@ -23,7 +23,9 @@ dependencies:
 ```dart
 import 'package:chewie_audio/chewie_audio.dart';
 final videoPlayerController = VideoPlayerController.network(
-    'https://flutter.github.io/assets-for-api-docs/videos/butterfly.mp4');
+    'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
+
+await videoPlayerController.initialize();
 
 final chewieAudioController = ChewieAudioController(
   videoPlayerController: videoPlayerController,
