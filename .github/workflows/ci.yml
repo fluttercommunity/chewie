@@ -11,22 +11,26 @@ jobs:
   check-format:
       name: Check format using flutter format -l 120
       runs-on: ubuntu-latest
-      container: cirrusci/flutter:beta
 
       steps:
         - name: Checkout code
           uses: actions/checkout@v2
+        - uses: subosito/flutter-action@v1
+          with:
+            channel: beta
         - name: Check format
           run: flutter format -l 120 -n . --set-exit-if-changed
 
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    container: cirrusci/flutter:beta
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: beta
       - name: Get dependencies for example
         run: flutter pub get
         working-directory: example
@@ -34,12 +38,14 @@ jobs:
         run: flutter analyze
 
   # test:
-  #   name: Test
+  #   name: Test2
   #   runs-on: ubuntu-latest
-  #   container: cirrusci/flutter:beta
 
   #   steps:
   #     - name: Checkout code
   #       uses: actions/checkout@v2
+  #     - uses: subosito/flutter-action@v1
+  #       with:
+  #         channel: beta
   #     - name: Test
   #       run: flutter test
