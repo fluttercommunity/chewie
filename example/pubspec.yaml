@@ -5,17 +5,13 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  auto_orientation: ^1.0.6
   chewie:
     path: ../
-  video_player: ^1.0.0
-  auto_orientation: ^1.0.6
+  cupertino_icons: ^1.0.0
   flutter:
     sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-
-  cupertino_icons: ^1.0.0
+  video_player: ^1.0.0
 
 dev_dependencies:
   flutter_test:
