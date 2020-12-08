@@ -1,6 +1,5 @@
 import 'package:auto_orientation/auto_orientation.dart';
 import 'package:chewie/chewie.dart';
-import 'package:chewie/src/chewie_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,12 +7,13 @@ import 'package:video_player/video_player.dart';
 
 void main() {
   runApp(
-    ChewieDemo(),
+    const ChewieDemo(),
   );
 }
 
 class ChewieDemo extends StatefulWidget {
-  ChewieDemo({this.title = 'Chewie Demo'});
+  // ignore: use_key_in_widget_constructors
+  const ChewieDemo({this.title = 'Chewie Demo'});
 
   final String title;
 
@@ -32,17 +32,22 @@ class _ChewieDemoState extends State<ChewieDemo> {
   @override
   void initState() {
     super.initState();
+    initializeAutoRotatePlayer();
+  }
+
+  Future<void> initializeAutoRotatePlayer() async {
     _videoPlayerController1 = VideoPlayerController.network(
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
+        'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4');
+    await _videoPlayerController1.initialize();
     _videoPlayerController2 = VideoPlayerController.network(
-        'https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_20mb.mp4');
+        'https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4');
+    await _videoPlayerController2.initialize();
     _chewieController = ChewieController(
         videoPlayerController: _videoPlayerController1,
-        aspectRatio: 3 / 2,
         autoPlay: true,
         looping: true,
-        routePageBuilder: (BuildContext context, Animation<double> animation,
-            Animation<double> secondAnimation, provider) {
+        routePageBuilder:
+            (BuildContext context, Animation<double> animation, Animation<double> secondAnimation, provider) {
           return AnimatedBuilder(
             animation: animation,
             builder: (BuildContext context, Widget child) {
@@ -73,6 +78,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
         // ),
         // autoInitialize: true,
         );
+    setState(() {});
   }
 
   @override
@@ -98,16 +104,25 @@ class _ChewieDemoState extends State<ChewieDemo> {
           children: <Widget>[
             Expanded(
               child: Center(
-                child: Chewie(
-                  controller: _chewieController,
-                ),
+                child: _chewieController != null && _chewieController.videoPlayerController.value.initialized
+                    ? Chewie(
+                        controller: _chewieController,
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 20),
+                          Text('Loading'),
+                        ],
+                      ),
               ),
             ),
             FlatButton(
               onPressed: () {
                 _chewieController.enterFullScreen();
               },
-              child: Text('Fullscreen'),
+              child: const Text('Fullscreen'),
             ),
             Row(
               children: <Widget>[
@@ -116,19 +131,18 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     onPressed: () {
                       setState(() {
                         _chewieController.dispose();
-                        _videoPlayerController2.pause();
-                        _videoPlayerController2.seekTo(Duration(seconds: 0));
+                        _videoPlayerController1.pause();
+                        _videoPlayerController1.seekTo(const Duration());
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController1,
-                          aspectRatio: 3 / 2,
                           autoPlay: true,
                           looping: true,
                         );
                       });
                     },
-                    child: Padding(
-                      child: Text("Video 1"),
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("Landscape Video"),
                     ),
                   ),
                 ),
@@ -137,19 +151,18 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     onPressed: () {
                       setState(() {
                         _chewieController.dispose();
-                        _videoPlayerController1.pause();
-                        _videoPlayerController1.seekTo(Duration(seconds: 0));
+                        _videoPlayerController2.pause();
+                        _videoPlayerController2.seekTo(const Duration());
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController2,
-                          aspectRatio: 3 / 2,
                           autoPlay: true,
                           looping: true,
                         );
                       });
                     },
-                    child: Padding(
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("Video 2"),
+                      child: Text("Portrait Video"),
                     ),
                   ),
                 )
@@ -164,9 +177,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
                         _platform = TargetPlatform.android;
                       });
                     },
-                    child: Padding(
-                      child: Text("Android controls"),
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("Android controls"),
                     ),
                   ),
                 ),
@@ -177,7 +190,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                         _platform = TargetPlatform.iOS;
                       });
                     },
-                    child: Padding(
+                    child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
                       child: Text("iOS controls"),
                     ),
@@ -208,17 +221,17 @@ class _VideoScaffoldState extends State<VideoScaffold> {
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,
     ]);
-    AutoOrientation.landscapeMode();
+    AutoOrientation.portraitUpMode();
     super.initState();
   }
 
   @override
-  dispose() {
+  void dispose() {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    AutoOrientation.portraitMode();
+    AutoOrientation.portraitUpMode();
     super.dispose();
   }
 
