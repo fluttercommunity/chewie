@@ -1,3 +1,48 @@
+## 0.12.0
+
+* Add replay feature
+* Add Animated Play/Pause Button
+  - Thanks to: [#228](https://github.com/brianegan/chewie/pull/228)
+
+## 0.11.0
+
+* Add playback speed controls:
+  - Thanks to: [#390](https://github.com/brianegan/chewie/pull/390)
+* Correct dependencies:
+  - Thanks to: [#395](https://github.com/brianegan/chewie/pull/395)
+
+## 0.10.4
+
+* Update Android example to latest support
+* Update Dart SDK
+* Update Flutter SDK
+* Update `wakelock` dependency
+
+## 0.10.3+1
+
+* Format using `dartfmt -w .` for pub.dev
+
+## 0.10.3
+
+* Bugfix: only `setState` if widget is mounted (cupertino + material)
+  - Thanks to: [#309](https://github.com/brianegan/chewie/pull/309)
+
+## 0.10.2
+
+* Replace `open_iconic_flutter` with `cupertino_icons` to resolve Apple App-Store rejection (ITMS-90853)
+  - Fixes: [#381](https://github.com/brianegan/chewie/issues/381)
+
+## 0.10.1
+
+* Update `video_player` dependecy (stable release)
+
+## 0.10.0
+
+  * Fix portrait mode
+  * Add auto-detect orientation based on video aspect-ratio
+  * Add optional parameters for `onEnterFullScreen`
+  * Support iOS 14 with SafeArea in FullScreen
+
 ## 0.9.10
 
 * Remove `isInitialRoute` from full screen page route

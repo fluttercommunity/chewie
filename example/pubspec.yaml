@@ -1,22 +1,22 @@
 name: chewie_example
 description: An example of how to use the chewie for Flutter
 
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
 dependencies:
+  auto_orientation: ^1.0.6
   chewie:
     path: ../
-  video_player: ^0.10.0+2
-  auto_orientation: ^0.0.2
+  cupertino_icons: ^1.0.0
   flutter:
     sdk: flutter
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-
-  cupertino_icons: ^0.1.0
+  video_player: ^1.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  lint: ^1.3.0
 
 
 # For information on the generic Dart part of this file, see the
