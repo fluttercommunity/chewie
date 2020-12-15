@@ -173,6 +173,7 @@ class ChewieController extends ChangeNotifier {
     this.overlay,
     this.showControlsOnInitialize = true,
     this.showControls = true,
+    this.showControlsInFullScreen = true,
     this.customControls,
     this.errorBuilder,
     this.allowedScreenSleep = true,
@@ -211,6 +212,9 @@ class ChewieController extends ChangeNotifier {
 
   /// Whether or not to show the controls at all
   final bool showControls;
+
+  /// Whether or not to show controls in fullscreen mode
+  final bool showControlsInFullScreen;
 
   /// Defines customised controls. Check [MaterialControls] or
   /// [CupertinoControls] for reference.
