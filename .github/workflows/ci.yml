@@ -9,7 +9,7 @@ on:
 
 jobs:
   check-format:
-      name: Check format using flutter format -l 120
+      name: Check format using flutter format .
       runs-on: ubuntu-latest
 
       steps:
@@ -19,7 +19,7 @@ jobs:
           with:
             channel: beta
         - name: Check format
-          run: flutter format -l 120 -n . --set-exit-if-changed
+          run: flutter format -n . --set-exit-if-changed
 
   lint:
     name: Lint
