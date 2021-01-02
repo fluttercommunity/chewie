@@ -1,3 +1,14 @@
+## 0.12.1
+
+* Fix: Duration called on null for cupertino controls
+  - Thanks to: [#406](https://github.com/brianegan/chewie/pull/406)
+* Bump required Flutter version 1.20 -> 1.22
+  - Thanks to: [#401](https://github.com/brianegan/chewie/pull/401)
+* Export controls in chewie.dart.
+  - Thanks to: [#355](https://github.com/brianegan/chewie/pull/355)
+* Add `lint` linter
+* Add CI to analyze and check format
+
 ## 0.12.0
 
 * Add replay feature
