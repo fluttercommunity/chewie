@@ -11,18 +11,28 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Conventional Changelog Action
-        id: changelog
-        uses: TriPSs/conventional-changelog-action@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          version-file: ./pubspec.yaml
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: autochangelog-action
+        id: ac
+        uses: rubenfiszel/autochangelog-action@v0.16.0
         with:
-          tag_name: ${{ steps.changelog.outputs.tag }}
-          release_name: ${{ steps.changelog.outputs.tag }}
-          body: ${{ steps.changelog.outputs.clean_changelog }}
+          changelog_file: './CHANGELOG.md'
+          manifest_file: './pubspec.yaml'
+          issues_url_prefix: 'https://github.com/brianegan/chewie/issues/'
+          tag_prefix: 'v'
+      #      - name: Conventional Changelog Action
+#        id: changelog
+#        uses: TriPSs/conventional-changelog-action@v3
+#        with:
+#          github-token: ${{ secrets.GITHUB_TOKEN }}
+#          version-file: ./pubspec.yaml
+#      - name: Create Release
+#        id: create_release
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: ${{ steps.changelog.outputs.tag }}
+#          release_name: ${{ steps.changelog.outputs.tag }}
+#          body: ${{ steps.changelog.outputs.clean_changelog }}
