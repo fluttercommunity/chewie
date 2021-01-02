@@ -1,3 +1,7 @@
+## 0.12.1+1
+
+* Lint: Format to line length 80 for pub score
+
 ## 0.12.1
 
 * Fix: Duration called on null for cupertino controls
