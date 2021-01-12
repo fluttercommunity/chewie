@@ -96,7 +96,7 @@ class ChewieAudioController extends ChangeNotifier {
 
   static ChewieAudioController of(BuildContext context) {
     final chewieAudioControllerProvider =
-        context.inheritFromWidgetOfExactType(_ChewieAudioControllerProvider) as _ChewieAudioControllerProvider;
+      context.dependOnInheritedWidgetOfExactType<_ChewieAudioControllerProvider>();
 
     return chewieAudioControllerProvider.controller;
   }
