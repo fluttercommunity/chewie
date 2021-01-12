@@ -6,6 +6,9 @@ publish_to: none
 environment:
   sdk: '>=2.12.0-0 <3.0.0'
 
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
 dependencies:
   chewie_audio:
     path: ../
