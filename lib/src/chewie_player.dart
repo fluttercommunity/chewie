@@ -95,8 +95,7 @@ class ChewieAudioController extends ChangeNotifier {
   final bool allowMuting;
 
   static ChewieAudioController of(BuildContext context) {
-    final chewieAudioControllerProvider =
-      context.dependOnInheritedWidgetOfExactType<_ChewieAudioControllerProvider>();
+    final chewieAudioControllerProvider = context.dependOnInheritedWidgetOfExactType<_ChewieAudioControllerProvider>();
 
     return chewieAudioControllerProvider.controller;
   }

@@ -96,7 +96,7 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
             Row(
               children: <Widget>[
                 Expanded(
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {
                       setState(() {
                         _chewieAudioController.dispose();
@@ -116,7 +116,7 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
                   ),
                 ),
                 Expanded(
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {
                       setState(() {
                         _chewieAudioController.dispose();
@@ -139,7 +139,7 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
             Row(
               children: <Widget>[
                 Expanded(
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {
                       setState(() {
                         _platform = TargetPlatform.android;
@@ -152,7 +152,7 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
                   ),
                 ),
                 Expanded(
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {
                       setState(() {
                         _platform = TargetPlatform.iOS;
