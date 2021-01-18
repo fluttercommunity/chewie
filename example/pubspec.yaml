@@ -1,6 +1,9 @@
 name: chewie_example
 description: An example of how to use the chewie for Flutter
 
+environment:
+  sdk: '>=2.10.0 <3.0.0'
+
 dependencies:
   chewie_audio:
     path: ../
