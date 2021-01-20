@@ -53,7 +53,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
             builder: (BuildContext context, Widget child) {
               return VideoScaffold(
                 child: Scaffold(
-                  resizeToAvoidBottomPadding: false,
+                  resizeToAvoidBottomInset: false,
                   body: Container(
                     alignment: Alignment.center,
                     color: Colors.black,
