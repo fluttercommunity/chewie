@@ -2,6 +2,11 @@
 
 * Lint: Format to line length 80 for pub score
 
+## 0.12.2
+
+* Fix: Deprecation of [`resizeToAvoidBottomPadding`](https://api.flutter.dev/flutter/material/Scaffold/resizeToAvoidBottomPadding.html). Replaced by `resizeToAvoidBottomInset`
+  - Thanks to: [#423](https://github.com/brianegan/chewie/pull/423)
+
 ## 0.12.1
 
 * Fix: Duration called on null for cupertino controls
