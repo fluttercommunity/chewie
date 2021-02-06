@@ -1,6 +1,6 @@
 name: chewie_audio
 description: An audio player for Flutter with Cupertino and Material play controls
-version: 1.1.1
+version: 1.1.2
 homepage: https://github.com/Sub6Resources/chewie_audio
 authors:
   - Brian Egan <brian@brianegan.com>
