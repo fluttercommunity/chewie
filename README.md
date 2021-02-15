@@ -80,9 +80,6 @@ final playerWidget = Chewie(
 );
 ```
 
-## iOS warning
-
-The video player plugin used by chewie is not functional on iOS simulators. An iOS device must be used during development/testing. Please refer to this [issue](https://github.com/flutter/flutter/issues/14647).
 
 
 ```
