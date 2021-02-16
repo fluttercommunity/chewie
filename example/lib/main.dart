@@ -100,7 +100,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       ),
               ),
             ),
-            FlatButton(
+            TextButton(
               onPressed: () {
                 _chewieController.enterFullScreen();
               },
@@ -109,7 +109,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
             Row(
               children: <Widget>[
                 Expanded(
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {
                       setState(() {
                         _chewieController.dispose();
@@ -129,7 +129,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   ),
                 ),
                 Expanded(
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {
                       setState(() {
                         _chewieController.dispose();
@@ -153,7 +153,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
             Row(
               children: <Widget>[
                 Expanded(
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {
                       setState(() {
                         _platform = TargetPlatform.android;
@@ -166,7 +166,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   ),
                 ),
                 Expanded(
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {
                       setState(() {
                         _platform = TargetPlatform.iOS;
