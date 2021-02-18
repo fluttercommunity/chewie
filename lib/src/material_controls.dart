@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class MaterialControls extends StatefulWidget {
-  const MaterialControls({Key key}) : super(key: key);
+  const MaterialControls({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -17,25 +17,25 @@ class MaterialControls extends StatefulWidget {
 }
 
 class _MaterialControlsState extends State<MaterialControls> with SingleTickerProviderStateMixin {
-  VideoPlayerValue _latestValue;
-  double _latestVolume;
-  Timer _initTimer;
-  Timer _showAfterExpandCollapseTimer;
+  VideoPlayerValue? _latestValue;
+  double? _latestVolume;
+  Timer? _initTimer;
+  Timer? _showAfterExpandCollapseTimer;
 
   final barHeight = 48.0;
   final marginSize = 5.0;
 
-  VideoPlayerController controller;
-  ChewieAudioController chewieController;
-  AnimationController playPauseIconAnimationController;
+  VideoPlayerController? controller;
+  ChewieAudioController? chewieController;
+  AnimationController? playPauseIconAnimationController;
 
   @override
   Widget build(BuildContext context) {
-    if (_latestValue.hasError) {
-      return chewieController.errorBuilder != null
-          ? chewieController.errorBuilder(
+    if (_latestValue!.hasError) {
+      return chewieController!.errorBuilder != null
+          ? chewieController!.errorBuilder!(
               context,
-              chewieController.videoPlayerController.value.errorDescription,
+              chewieController!.videoPlayerController.value.errorDescription,
             )
           : const Center(
               child: Icon(
@@ -56,7 +56,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
   }
 
   void _dispose() {
-    controller.removeListener(_updateState);
+    controller!.removeListener(_updateState);
     _initTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
   }
@@ -65,7 +65,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
   void didChangeDependencies() {
     final _oldController = chewieController;
     chewieController = ChewieAudioController.of(context);
-    controller = chewieController.videoPlayerController;
+    controller = chewieController!.videoPlayerController;
 
     playPauseIconAnimationController ??= AnimationController(
       vsync: this,
@@ -84,31 +84,31 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
   Widget _buildBottomBar(
     BuildContext context,
   ) {
-    final iconColor = Theme.of(context).textTheme.button.color;
+    final iconColor = Theme.of(context).textTheme.button!.color;
 
     return Container(
       height: barHeight,
       color: Theme.of(context).dialogBackgroundColor,
       child: Row(
         children: <Widget>[
-          _buildPlayPause(controller),
-          if (chewieController.isLive) const Expanded(child: Text('LIVE')) else _buildPosition(iconColor),
-          if (chewieController.isLive) const SizedBox() else _buildProgressBar(),
-          if (chewieController.allowMuting) _buildMuteButton(controller),
+          _buildPlayPause(controller!),
+          if (chewieController!.isLive) const Expanded(child: Text('LIVE')) else _buildPosition(iconColor),
+          if (chewieController!.isLive) const SizedBox() else _buildProgressBar(),
+          if (chewieController!.allowMuting) _buildMuteButton(controller),
         ],
       ),
     );
   }
 
   GestureDetector _buildMuteButton(
-    VideoPlayerController controller,
+    VideoPlayerController? controller,
   ) {
     return GestureDetector(
       onTap: () {
-        if (_latestValue.volume == 0) {
-          controller.setVolume(_latestVolume ?? 0.5);
+        if (_latestValue!.volume == 0) {
+          controller!.setVolume(_latestVolume ?? 0.5);
         } else {
-          _latestVolume = controller.value.volume;
+          _latestVolume = controller!.value.volume;
           controller.setVolume(0.0);
         }
       },
@@ -120,7 +120,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
             right: 8.0,
           ),
           child: Icon(
-            (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
+            (_latestValue != null && _latestValue!.volume > 0) ? Icons.volume_up : Icons.volume_off,
           ),
         ),
       ),
@@ -145,9 +145,9 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     );
   }
 
-  Widget _buildPosition(Color iconColor) {
-    final position = _latestValue != null && _latestValue.position != null ? _latestValue.position : Duration.zero;
-    final duration = _latestValue != null && _latestValue.duration != null ? _latestValue.duration : Duration.zero;
+  Widget _buildPosition(Color? iconColor) {
+    final position = _latestValue != null && _latestValue!.position != null ? _latestValue!.position : Duration.zero;
+    final duration = _latestValue != null && _latestValue!.duration != null ? _latestValue!.duration : Duration.zero;
 
     return Padding(
       padding: const EdgeInsets.only(right: 24.0),
@@ -161,35 +161,35 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
   }
 
   Future<void> _initialize() async {
-    controller.addListener(_updateState);
+    controller!.addListener(_updateState);
 
     _updateState();
   }
 
   void _playPause() {
     bool isFinished;
-    if (_latestValue.duration != null) {
-      isFinished = _latestValue.position >= _latestValue.duration;
+    if (_latestValue!.duration != null) {
+      isFinished = _latestValue!.position >= _latestValue!.duration;
     } else {
       isFinished = false;
     }
 
     setState(() {
-      if (controller.value.isPlaying) {
-        playPauseIconAnimationController.reverse();
-        controller.pause();
+      if (controller!.value.isPlaying) {
+        playPauseIconAnimationController!.reverse();
+        controller!.pause();
       } else {
-        if (!controller.value.initialized) {
-          controller.initialize().then((_) {
-            controller.play();
-            playPauseIconAnimationController.forward();
+        if (!controller!.value.isInitialized) {
+          controller!.initialize().then((_) {
+            controller!.play();
+            playPauseIconAnimationController!.forward();
           });
         } else {
           if (isFinished) {
-            controller.seekTo(const Duration());
+            controller!.seekTo(const Duration());
           }
-          playPauseIconAnimationController.forward();
-          controller.play();
+          playPauseIconAnimationController!.forward();
+          controller!.play();
         }
       }
     });
@@ -197,7 +197,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
 
   void _updateState() {
     setState(() {
-      _latestValue = controller.value;
+      _latestValue = controller!.value;
     });
   }
 
@@ -209,7 +209,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           controller,
           onDragStart: () {},
           onDragEnd: () {},
-          colors: chewieController.materialProgressColors ??
+          colors: chewieController!.materialProgressColors ??
               ChewieProgressColors(
                   playedColor: Theme.of(context).accentColor,
                   handleColor: Theme.of(context).accentColor,

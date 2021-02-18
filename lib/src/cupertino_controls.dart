@@ -13,9 +13,9 @@ import 'package:video_player/video_player.dart';
 
 class CupertinoControls extends StatefulWidget {
   const CupertinoControls({
-    @required this.backgroundColor,
-    @required this.iconColor,
-    Key key,
+    required this.backgroundColor,
+    required this.iconColor,
+    Key? key,
   }) : super(key: key);
 
   final Color backgroundColor;
@@ -28,25 +28,25 @@ class CupertinoControls extends StatefulWidget {
 }
 
 class _CupertinoControlsState extends State<CupertinoControls> with SingleTickerProviderStateMixin {
-  VideoPlayerValue _latestValue;
-  double _latestVolume;
+  VideoPlayerValue? _latestValue;
+  double? _latestVolume;
   final marginSize = 5.0;
-  Timer _expandCollapseTimer;
-  Timer _initTimer;
+  Timer? _expandCollapseTimer;
+  Timer? _initTimer;
 
-  VideoPlayerController controller;
-  ChewieAudioController chewieController;
-  AnimationController playPauseIconAnimationController;
+  VideoPlayerController? controller;
+  ChewieAudioController? chewieController;
+  AnimationController? playPauseIconAnimationController;
 
   @override
   Widget build(BuildContext context) {
     chewieController = ChewieAudioController.of(context);
 
-    if (_latestValue.hasError) {
-      return chewieController.errorBuilder != null
-          ? chewieController.errorBuilder(
+    if (_latestValue!.hasError) {
+      return chewieController!.errorBuilder != null
+          ? chewieController!.errorBuilder!(
               context,
-              chewieController.videoPlayerController.value.errorDescription,
+              chewieController!.videoPlayerController.value.errorDescription,
             )
           : const Center(
               child: Icon(
@@ -60,7 +60,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
     final backgroundColor = widget.backgroundColor;
     final iconColor = widget.iconColor;
     chewieController = ChewieAudioController.of(context);
-    controller = chewieController.videoPlayerController;
+    controller = chewieController!.videoPlayerController;
     final orientation = MediaQuery.of(context).orientation;
     final barHeight = orientation == Orientation.portrait ? 30.0 : 47.0;
 
@@ -74,7 +74,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
   }
 
   void _dispose() {
-    controller.removeListener(_updateState);
+    controller!.removeListener(_updateState);
     _expandCollapseTimer?.cancel();
     _initTimer?.cancel();
   }
@@ -83,7 +83,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
   void didChangeDependencies() {
     final _oldController = chewieController;
     chewieController = ChewieAudioController.of(context);
-    controller = chewieController.videoPlayerController;
+    controller = chewieController!.videoPlayerController;
 
     playPauseIconAnimationController ??= AnimationController(
       vsync: this,
@@ -118,11 +118,11 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
           child: Container(
             height: barHeight,
             color: backgroundColor,
-            child: chewieController.isLive
+            child: chewieController!.isLive
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      _buildPlayPause(controller, iconColor, barHeight),
+                      _buildPlayPause(controller!, iconColor, barHeight),
                       _buildLive(iconColor),
                       _buildMuteButton(controller, iconColor, barHeight),
                     ],
@@ -130,7 +130,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
                 : Row(
                     children: <Widget>[
                       _buildSkipBack(iconColor, barHeight),
-                      _buildPlayPause(controller, iconColor, barHeight),
+                      _buildPlayPause(controller!, iconColor, barHeight),
                       _buildSkipForward(iconColor, barHeight),
                       _buildPosition(iconColor),
                       _buildProgressBar(),
@@ -155,11 +155,11 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
   }
 
   Widget _buildMuteButton(
-    VideoPlayerController controller,
+    VideoPlayerController? controller,
     Color iconColor,
     double barHeight,
   ) {
-    if (!chewieController.allowMuting) {
+    if (!chewieController!.allowMuting) {
       return Container();
     }
 
@@ -167,17 +167,17 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
       padding: const EdgeInsets.only(right: 12),
       child: GestureDetector(
         onTap: () {
-          if (_latestValue.volume == 0) {
-            controller.setVolume(_latestVolume ?? 0.5);
+          if (_latestValue!.volume == 0) {
+            controller!.setVolume(_latestVolume ?? 0.5);
           } else {
-            _latestVolume = controller.value.volume;
+            _latestVolume = controller!.value.volume;
             controller.setVolume(0.0);
           }
         },
         child: SizedBox(
           height: barHeight,
           child: Icon(
-            (_latestValue != null && _latestValue.volume > 0) ? Icons.volume_up : Icons.volume_off,
+            (_latestValue != null && _latestValue!.volume > 0) ? Icons.volume_up : Icons.volume_off,
             color: iconColor,
             size: 16.0,
           ),
@@ -209,7 +209,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
   }
 
   Widget _buildPosition(Color iconColor) {
-    final position = _latestValue != null ? _latestValue.position : const Duration();
+    final position = _latestValue != null ? _latestValue!.position : const Duration();
 
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
@@ -224,8 +224,8 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
   }
 
   Widget _buildRemaining(Color iconColor) {
-    final position = _latestValue != null && _latestValue.duration != null
-        ? _latestValue.duration - _latestValue.position
+    final position = _latestValue != null && _latestValue!.duration != null
+        ? _latestValue!.duration - _latestValue!.position
         : const Duration();
 
     return Padding(
@@ -280,7 +280,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
   }
 
   Future<void> _initialize() async {
-    controller.addListener(_updateState);
+    controller!.addListener(_updateState);
 
     _updateState();
   }
@@ -293,7 +293,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
           controller,
           onDragStart: () {},
           onDragEnd: () {},
-          colors: chewieController.cupertinoProgressColors ??
+          colors: chewieController!.cupertinoProgressColors ??
               ChewieProgressColors(
                 playedColor: const Color.fromARGB(
                   120,
@@ -327,25 +327,25 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
 
   void _playPause() {
     bool isFinished;
-    if (_latestValue.duration != null) {
-      isFinished = _latestValue.position >= _latestValue.duration;
+    if (_latestValue!.duration != null) {
+      isFinished = _latestValue!.position >= _latestValue!.duration;
     } else {
       isFinished = false;
     }
 
     setState(() {
-      if (controller.value.isPlaying) {
-        controller.pause();
+      if (controller!.value.isPlaying) {
+        controller!.pause();
       } else {
-        if (!controller.value.initialized) {
-          controller.initialize().then((_) {
-            controller.play();
+        if (!controller!.value.isInitialized) {
+          controller!.initialize().then((_) {
+            controller!.play();
           });
         } else {
           if (isFinished) {
-            controller.seekTo(const Duration());
+            controller!.seekTo(const Duration());
           }
-          controller.play();
+          controller!.play();
         }
       }
     });
@@ -353,19 +353,19 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
 
   void _skipBack() {
     final beginning = const Duration().inMilliseconds;
-    final skip = (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
-    controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
+    final skip = (_latestValue!.position - const Duration(seconds: 15)).inMilliseconds;
+    controller!.seekTo(Duration(milliseconds: math.max(skip, beginning)));
   }
 
   void _skipForward() {
-    final end = _latestValue.duration.inMilliseconds;
-    final skip = (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
-    controller.seekTo(Duration(milliseconds: math.min(skip, end)));
+    final end = _latestValue!.duration.inMilliseconds;
+    final skip = (_latestValue!.position + const Duration(seconds: 15)).inMilliseconds;
+    controller!.seekTo(Duration(milliseconds: math.min(skip, end)));
   }
 
   void _updateState() {
     setState(() {
-      _latestValue = controller.value;
+      _latestValue = controller!.value;
     });
   }
 }

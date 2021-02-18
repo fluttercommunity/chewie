@@ -12,8 +12,8 @@ import 'package:video_player/video_player.dart';
 /// make it easy to use!
 class ChewieAudio extends StatelessWidget {
   const ChewieAudio({
-    Key key,
-    @required this.controller,
+    Key? key,
+    required this.controller,
   })  : assert(controller != null, 'You must provide a chewie audio controller'),
         super(key: key);
 
@@ -38,7 +38,7 @@ class ChewieAudio extends StatelessWidget {
 /// `VideoPlayerController`.
 class ChewieAudioController extends ChangeNotifier {
   ChewieAudioController({
-    @required this.videoPlayerController,
+    required this.videoPlayerController,
     this.autoInitialize = false,
     this.autoPlay = false,
     this.startAt,
@@ -64,7 +64,7 @@ class ChewieAudioController extends ChangeNotifier {
   final bool autoPlay;
 
   /// Start audio at a certain position
-  final Duration startAt;
+  final Duration? startAt;
 
   /// Whether or not the audio should loop
   final bool looping;
@@ -74,19 +74,19 @@ class ChewieAudioController extends ChangeNotifier {
 
   /// Defines customised controls. Check [MaterialControls] or
   /// [CupertinoControls] for reference.
-  final Widget customControls;
+  final Widget? customControls;
 
   /// When the video playback runs  into an error, you can build a custom
   /// error message.
-  final Widget Function(BuildContext context, String errorMessage) errorBuilder;
+  final Widget Function(BuildContext context, String? errorMessage)? errorBuilder;
 
   /// The colors to use for controls on iOS. By default, the iOS player uses
   /// colors sampled from the original iOS 11 designs.
-  final ChewieProgressColors cupertinoProgressColors;
+  final ChewieProgressColors? cupertinoProgressColors;
 
   /// The colors to use for the Material Progress Bar. By default, the Material
   /// player uses the colors from your Theme.
-  final ChewieProgressColors materialProgressColors;
+  final ChewieProgressColors? materialProgressColors;
 
   /// Defines if the controls should be for live stream audio
   final bool isLive;
@@ -95,7 +95,7 @@ class ChewieAudioController extends ChangeNotifier {
   final bool allowMuting;
 
   static ChewieAudioController of(BuildContext context) {
-    final chewieAudioControllerProvider = context.dependOnInheritedWidgetOfExactType<_ChewieAudioControllerProvider>();
+    final chewieAudioControllerProvider = context.dependOnInheritedWidgetOfExactType<_ChewieAudioControllerProvider>()!;
 
     return chewieAudioControllerProvider.controller;
   }
@@ -105,7 +105,7 @@ class ChewieAudioController extends ChangeNotifier {
   Future _initialize() async {
     await videoPlayerController.setLooping(looping);
 
-    if ((autoInitialize || autoPlay) && !videoPlayerController.value.initialized) {
+    if ((autoInitialize || autoPlay) && !videoPlayerController.value.isInitialized) {
       await videoPlayerController.initialize();
     }
 
@@ -114,7 +114,7 @@ class ChewieAudioController extends ChangeNotifier {
     }
 
     if (startAt != null) {
-      await videoPlayerController.seekTo(startAt);
+      await videoPlayerController.seekTo(startAt!);
     }
   }
 
@@ -146,9 +146,9 @@ class ChewieAudioController extends ChangeNotifier {
 
 class _ChewieAudioControllerProvider extends InheritedWidget {
   const _ChewieAudioControllerProvider({
-    Key key,
-    @required this.controller,
-    @required Widget child,
+    Key? key,
+    required this.controller,
+    required Widget child,
   })  : assert(controller != null),
         assert(child != null),
         super(key: key, child: child);
