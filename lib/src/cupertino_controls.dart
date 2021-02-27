@@ -39,8 +39,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
   bool _dragging = false;
 
   late VideoPlayerController controller;
+  // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
-
   ChewieController? _chewieController;
   late AnimationController playPauseIconAnimationController =
       AnimationController(
