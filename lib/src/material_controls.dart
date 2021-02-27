@@ -171,7 +171,8 @@ class _MaterialControlsState extends State<MaterialControls>
   }
 
   Expanded _buildHitArea() {
-    final bool isFinished = _latestValue.position >= _latestValue.duration;
+    final bool isFinished = _latestValue.duration != null &&
+        _latestValue.position >= _latestValue.duration;
 
     return Expanded(
       child: GestureDetector(
