@@ -1,3 +1,8 @@
+## 1.0.0
+
+* Migrate to Null Safety
+  - Thanks to miDeb: [#406](https://github.com/brianegan/chewie/pull/443)
+
 ## 0.12.1+1
 
 * Lint: Format to line length 80 for pub score
