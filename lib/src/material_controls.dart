@@ -36,6 +36,7 @@ class _MaterialControlsState extends State<MaterialControls>
   ChewieController get chewieController => _chewieController!;
   late AnimationController playPauseIconAnimationController =
       AnimationController(
+    value: controller.value.isPlaying ? 0 : 1,
     vsync: this,
     duration: const Duration(milliseconds: 400),
     reverseDuration: const Duration(milliseconds: 400),
@@ -310,8 +311,11 @@ class _MaterialControlsState extends State<MaterialControls>
           left: 12.0,
           right: 12.0,
         ),
-        child: Icon(
-          controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+        child: Center(
+          child: AnimatedIcon(
+            icon: AnimatedIcons.play_pause,
+            progress: playPauseIconAnimationController,
+          ),
         ),
       ),
     );
@@ -379,7 +383,6 @@ class _MaterialControlsState extends State<MaterialControls>
 
     setState(() {
       if (controller.value.isPlaying) {
-        playPauseIconAnimationController.reverse();
         _hideStuff = false;
         _hideTimer?.cancel();
         controller.pause();
@@ -389,13 +392,11 @@ class _MaterialControlsState extends State<MaterialControls>
         if (!controller.value.isInitialized) {
           controller.initialize().then((_) {
             controller.play();
-            playPauseIconAnimationController.forward();
           });
         } else {
           if (isFinished) {
             controller.seekTo(const Duration());
           }
-          playPauseIconAnimationController.forward();
           controller.play();
         }
       }
@@ -411,6 +412,13 @@ class _MaterialControlsState extends State<MaterialControls>
   }
 
   void _updateState() {
+    if (controller.value.isPlaying &&
+        !playPauseIconAnimationController.isCompleted) {
+      playPauseIconAnimationController.forward();
+    } else if (!controller.value.isPlaying &&
+        !playPauseIconAnimationController.isDismissed) {
+      playPauseIconAnimationController.reverse();
+    }
     setState(() {
       _latestValue = controller.value;
     });
