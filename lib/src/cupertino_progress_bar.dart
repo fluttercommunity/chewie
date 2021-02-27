@@ -6,19 +6,19 @@ import 'package:video_player/video_player.dart';
 class CupertinoVideoProgressBar extends StatefulWidget {
   CupertinoVideoProgressBar(
     this.controller, {
-    ChewieProgressColors colors,
+    ChewieProgressColors? colors,
     this.onDragEnd,
     this.onDragStart,
     this.onDragUpdate,
-    Key key,
+    Key? key,
   })  : colors = colors ?? ChewieProgressColors(),
         super(key: key);
 
   final VideoPlayerController controller;
   final ChewieProgressColors colors;
-  final Function() onDragStart;
-  final Function() onDragEnd;
-  final Function() onDragUpdate;
+  final Function()? onDragStart;
+  final Function()? onDragEnd;
+  final Function()? onDragUpdate;
 
   @override
   _VideoProgressBarState createState() {
@@ -43,7 +43,7 @@ class _VideoProgressBarState extends State<CupertinoVideoProgressBar> {
 
     return GestureDetector(
       onHorizontalDragStart: (DragStartDetails details) {
-        if (!controller.value.initialized) {
+        if (!controller.value.isInitialized) {
           return;
         }
         _controllerWasPlaying = controller.value.isPlaying;
@@ -51,31 +51,25 @@ class _VideoProgressBarState extends State<CupertinoVideoProgressBar> {
           controller.pause();
         }
 
-        if (widget.onDragStart != null) {
-          widget.onDragStart();
-        }
+        widget.onDragStart?.call();
       },
       onHorizontalDragUpdate: (DragUpdateDetails details) {
-        if (!controller.value.initialized) {
+        if (!controller.value.isInitialized) {
           return;
         }
         seekToRelativePosition(details.globalPosition);
 
-        if (widget.onDragUpdate != null) {
-          widget.onDragUpdate();
-        }
+        widget.onDragUpdate?.call();
       },
       onHorizontalDragEnd: (DragEndDetails details) {
         if (_controllerWasPlaying) {
           controller.play();
         }
 
-        if (widget.onDragEnd != null) {
-          widget.onDragEnd();
-        }
+        widget.onDragEnd?.call();
       },
       onTapDown: (TapDownDetails details) {
-        if (!controller.value.initialized) {
+        if (!controller.value.isInitialized) {
           return;
         }
         seekToRelativePosition(details.globalPosition);
@@ -124,7 +118,7 @@ class _ProgressBarPainter extends CustomPainter {
       ),
       colors.backgroundPaint,
     );
-    if (!value.initialized) {
+    if (!value.isInitialized) {
       return;
     }
     final double playedPartPercent =

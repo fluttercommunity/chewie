@@ -2,29 +2,26 @@ name: chewie_example
 description: An example of how to use the chewie for Flutter
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=2.12.0-0 <3.0.0'
 
 dependencies:
-  auto_orientation: ^1.0.6
   chewie:
     path: ../
   cupertino_icons: ^1.0.0
   flutter:
     sdk: flutter
-  video_player: ^1.0.0
+  video_player: ^2.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   lint: ^1.3.0
 
-
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
