@@ -5,7 +5,6 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  auto_orientation: ^1.0.6
   chewie:
     path: ../
   cupertino_icons: ^1.0.0
