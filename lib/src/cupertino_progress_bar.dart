@@ -25,11 +25,9 @@ class CupertinoVideoProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return VideoProgressBar(
       controller,
-      configuration: const ChewieProgressBarConfiguration(
-        barHeight: 5,
-        handleHeight: 6,
-        drawShadow: true,
-      ),
+      barHeight: 5,
+      handleHeight: 6,
+      drawShadow: true,
       colors: colors,
       onDragEnd: onDragEnd,
       onDragStart: onDragStart,

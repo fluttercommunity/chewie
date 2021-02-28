@@ -3,36 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
 
-class ChewieProgressBarConfiguration {
-  const ChewieProgressBarConfiguration({
-    required this.barHeight,
-    required this.handleHeight,
-    required this.drawShadow,
-  });
-
-  final double barHeight;
-  final double handleHeight;
-  final bool drawShadow;
-}
-
 class VideoProgressBar extends StatefulWidget {
   VideoProgressBar(
     this.controller, {
-    required this.configuration,
     ChewieProgressColors? colors,
     this.onDragEnd,
     this.onDragStart,
     this.onDragUpdate,
     Key? key,
-  })  : colors = colors ?? ChewieProgressColors(),
+    required this.barHeight,
+    required this.handleHeight,
+    required this.drawShadow,
+  })   : colors = colors ?? ChewieProgressColors(),
         super(key: key);
 
   final VideoPlayerController controller;
   final ChewieProgressColors colors;
-  final ChewieProgressBarConfiguration configuration;
   final Function()? onDragStart;
   final Function()? onDragEnd;
   final Function()? onDragUpdate;
+
+  final double barHeight;
+  final double handleHeight;
+  final bool drawShadow;
 
   @override
   _VideoProgressBarState createState() {
@@ -112,9 +105,11 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
           color: Colors.transparent,
           child: CustomPaint(
             painter: _ProgressBarPainter(
-              controller.value,
-              widget.colors,
-              widget.configuration,
+              value: controller.value,
+              colors: widget.colors,
+              barHeight: widget.barHeight,
+              handleHeight: widget.handleHeight,
+              drawShadow: widget.drawShadow,
             ),
           ),
         ),
@@ -124,12 +119,20 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 }
 
 class _ProgressBarPainter extends CustomPainter {
-  _ProgressBarPainter(this.value, this.colors, this.configuration);
+  _ProgressBarPainter({
+    required this.value,
+    required this.colors,
+    required this.barHeight,
+    required this.handleHeight,
+    required this.drawShadow,
+  });
 
   VideoPlayerValue value;
   ChewieProgressColors colors;
 
-  ChewieProgressBarConfiguration configuration;
+  final double barHeight;
+  final double handleHeight;
+  final bool drawShadow;
 
   @override
   bool shouldRepaint(CustomPainter painter) {
@@ -138,8 +141,6 @@ class _ProgressBarPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final barHeight = configuration.barHeight;
-    final handleHeight = configuration.handleHeight;
     final baseOffset = size.height / 2 - barHeight / 2;
 
     canvas.drawRRect(
@@ -184,7 +185,7 @@ class _ProgressBarPainter extends CustomPainter {
       colors.playedPaint,
     );
 
-    if (configuration.drawShadow) {
+    if (drawShadow) {
       final shadowPath = Path()
         ..addOval(
           Rect.fromCircle(
