@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:chewie/src/animated_play_pause.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino_progress_bar.dart';
@@ -42,12 +43,6 @@ class _CupertinoControlsState extends State<CupertinoControls>
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
   ChewieController? _chewieController;
-  late AnimationController playPauseIconAnimationController =
-      AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 400),
-    reverseDuration: const Duration(milliseconds: 400),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -251,11 +246,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
                         icon: isFinished
                             ? Icon(Icons.replay,
                                 size: 32.0, color: widget.iconColor)
-                            : AnimatedIcon(
-                                icon: AnimatedIcons.play_pause,
-                                progress: playPauseIconAnimationController,
+                            : AnimatedPlayPause(
                                 size: 32.0,
-                                color: widget.iconColor),
+                                color: widget.iconColor,
+                                playing: controller.value.isPlaying,
+                              ),
                         onPressed: () {
                           _playPause();
                         }),
@@ -329,9 +324,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
           left: 6.0,
           right: 6.0,
         ),
-        child: Icon(
-          controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-          color: iconColor,
+        child: AnimatedPlayPause(
+          color: widget.iconColor,
+          playing: controller.value.isPlaying,
         ),
       ),
     );
