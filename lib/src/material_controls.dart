@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chewie/src/animated_play_pause.dart';
+import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/material_progress_bar.dart';
@@ -184,35 +185,12 @@ class _MaterialControlsState extends State<MaterialControls>
             });
           }
         },
-        child: Container(
-          color: Colors.transparent,
-          child: Center(
-            child: AnimatedOpacity(
-              opacity: !_latestValue.isPlaying && !_dragging ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 300),
-              child: GestureDetector(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).dialogBackgroundColor,
-                    borderRadius: BorderRadius.circular(48.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: IconButton(
-                        icon: isFinished
-                            ? const Icon(Icons.replay, size: 32.0)
-                            : AnimatedPlayPause(
-                                size: 32,
-                                playing: controller.value.isPlaying,
-                              ),
-                        onPressed: () {
-                          _playPause();
-                        }),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        child: CenterPlayButton(
+          backgroundColor: Theme.of(context).dialogBackgroundColor,
+          isFinished: isFinished,
+          isPlaying: controller.value.isPlaying,
+          show: !_latestValue.isPlaying && !_dragging,
+          onPressed: _playPause,
         ),
       ),
     );
