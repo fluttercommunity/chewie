@@ -38,6 +38,12 @@ class AnimatedPlayPauseState extends State<AnimatedPlayPause>
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    animationController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Center(
       child: AnimatedIcon(
