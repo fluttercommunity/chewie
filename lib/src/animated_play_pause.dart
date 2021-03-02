@@ -39,8 +39,8 @@ class AnimatedPlayPauseState extends State<AnimatedPlayPause>
 
   @override
   void dispose() {
-    super.dispose();
     animationController.dispose();
+    super.dispose();
   }
 
   @override
