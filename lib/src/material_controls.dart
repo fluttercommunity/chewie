@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:chewie/src/animated_play_pause.dart';
+import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/material_progress_bar.dart';
@@ -34,12 +36,6 @@ class _MaterialControlsState extends State<MaterialControls>
   ChewieController? _chewieController;
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
-  late AnimationController playPauseIconAnimationController =
-      AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 400),
-    reverseDuration: const Duration(milliseconds: 400),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -189,36 +185,12 @@ class _MaterialControlsState extends State<MaterialControls>
             });
           }
         },
-        child: Container(
-          color: Colors.transparent,
-          child: Center(
-            child: AnimatedOpacity(
-              opacity: !_latestValue.isPlaying && !_dragging ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 300),
-              child: GestureDetector(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).dialogBackgroundColor,
-                    borderRadius: BorderRadius.circular(48.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: IconButton(
-                        icon: isFinished
-                            ? const Icon(Icons.replay, size: 32.0)
-                            : AnimatedIcon(
-                                icon: AnimatedIcons.play_pause,
-                                progress: playPauseIconAnimationController,
-                                size: 32.0,
-                              ),
-                        onPressed: () {
-                          _playPause();
-                        }),
-                  ),
-                ),
-              ),
-            ),
-          ),
+        child: CenterPlayButton(
+          backgroundColor: Theme.of(context).dialogBackgroundColor,
+          isFinished: isFinished,
+          isPlaying: controller.value.isPlaying,
+          show: !_latestValue.isPlaying && !_dragging,
+          onPressed: _playPause,
         ),
       ),
     );
@@ -310,8 +282,8 @@ class _MaterialControlsState extends State<MaterialControls>
           left: 12.0,
           right: 12.0,
         ),
-        child: Icon(
-          controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+        child: AnimatedPlayPause(
+          playing: controller.value.isPlaying,
         ),
       ),
     );
@@ -379,7 +351,6 @@ class _MaterialControlsState extends State<MaterialControls>
 
     setState(() {
       if (controller.value.isPlaying) {
-        playPauseIconAnimationController.reverse();
         _hideStuff = false;
         _hideTimer?.cancel();
         controller.pause();
@@ -389,13 +360,11 @@ class _MaterialControlsState extends State<MaterialControls>
         if (!controller.value.isInitialized) {
           controller.initialize().then((_) {
             controller.play();
-            playPauseIconAnimationController.forward();
           });
         } else {
           if (isFinished) {
             controller.seekTo(const Duration());
           }
-          playPauseIconAnimationController.forward();
           controller.play();
         }
       }
