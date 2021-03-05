@@ -2,11 +2,7 @@
 
 The audio player for Flutter with a heart of gold.
 
-The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video/audio playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
-
-## Demo
-
-<!--![Demo](https://github.com/brianegan/chewie/raw/master/assets/chewie_demo.gif)-->
+The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video/audio playback. chewie_audio uses the `video_player` under the hood and wraps the controls in a friendly Material or Cupertino UI!
 
 ## Installation
 
@@ -53,7 +49,7 @@ void dispose() {
 Please run the app in the [`example/`](https://github.com/Sub6Resources/chewie_audio/tree/master/example) folder to start playing!
 
 ## iOS warning 
-The video_player plugin used by chewie_audio will only work in iOS simulators if you are on flutter 1.26.0 or above. You may need to switch to the beta channel `flutter channel beta`
+The video_player plugin used by chewie_audio will only work in iOS simulators if you are on Flutter 1.26.0+.
 Please refer to this [issue](https://github.com/flutter/flutter/issues/14647).
 
 
