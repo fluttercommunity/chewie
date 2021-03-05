@@ -52,9 +52,10 @@ void dispose() {
 
 Please run the app in the [`example/`](https://github.com/Sub6Resources/chewie_audio/tree/master/example) folder to start playing!
 
-## iOS warning
+## iOS warning 
+The video_player plugin used by chewie_audio will only work in iOS simulators if you are on flutter 1.26.0 or above. You may need to switch to the beta channel `flutter channel beta`
+Please refer to this [issue](https://github.com/flutter/flutter/issues/14647).
 
-The video player plugin used by chewie is not functional on iOS simulators. An iOS device must be used during development/testing. Please refer to this [issue](https://github.com/flutter/flutter/issues/14647).
 
 
 ```

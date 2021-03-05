@@ -1,5 +1,14 @@
 # Chewie Audio Changelog
 
+## 1.2.0
+
+* Merged in chewie 1.0.0
+   * Nullsafety support
+   * Fixed iOS "Duration called on null"
+   * Add animated play/pause
+   * Add playback speed control
+   * Other changes
+
 ## 1.0.1
 
 Merged in chewie 0.12.0 with, among others, dependency updates and iconic fotn removal.

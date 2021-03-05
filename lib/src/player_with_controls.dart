@@ -14,6 +14,14 @@ class PlayerWithControls extends StatelessWidget {
   Widget build(BuildContext context) {
     final ChewieAudioController chewieController = ChewieAudioController.of(context);
 
+    double _calculateAspectRatio(BuildContext context) {
+      final size = MediaQuery.of(context).size;
+      final width = size.width;
+      final height = size.height;
+
+      return width > height ? width / height : height / width;
+    }
+
     Widget _buildControls(
       BuildContext context,
       ChewieAudioController chewieController,
@@ -24,10 +32,13 @@ class PlayerWithControls extends StatelessWidget {
               backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
               iconColor: Color.fromARGB(255, 200, 200, 200),
             );
-      return chewieController.showControls ? chewieController.customControls ?? controls : Container();
+      return chewieController.showControls
+          ? chewieController.customControls ?? controls
+          : Container();
     }
 
-    Widget _buildPlayerWithControls(ChewieAudioController chewieController, BuildContext context) {
+    Stack _buildPlayerWithControls(
+        ChewieAudioController chewieController, BuildContext context) {
       return Stack(
         children: <Widget>[
           Offstage(
@@ -42,9 +53,14 @@ class PlayerWithControls extends StatelessWidget {
       );
     }
 
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      child: _buildPlayerWithControls(chewieController, context),
+    return Center(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: AspectRatio(
+          aspectRatio: _calculateAspectRatio(context),
+          child: _buildPlayerWithControls(chewieController, context),
+        ),
+      ),
     );
   }
 }

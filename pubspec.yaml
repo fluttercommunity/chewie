@@ -9,19 +9,19 @@ authors:
   - Eric Kok <erickok@gmail.com>
 
 environment:
-  sdk: '>=2.12.0-259.12.beta <3.0.0'
-  flutter: ">=1.20.0 <2.0.0"
+  sdk: '>=2.12.0-0 <3.0.0'
+  flutter: '>=1.22.0'
 
 dependencies:
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
-  video_player: ^2.0.0-nullsafety.9
+  video_player: ^2.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  lint: ^1.5.1
+  lint: ^1.5.2
 
 flutter:
   uses-material-design: true
