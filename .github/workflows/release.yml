@@ -7,7 +7,6 @@ jobs:
   changelog:
     name: Create changelog
     runs-on: ubuntu-latest
-    container: cirrusci/flutter:beta
 
     steps:
       - name: Checkout code
@@ -18,8 +17,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           version-file: ./pubspec.yaml
-      - name: Build StudyU app apk
-        run: flutter build apk --no-tree-shake-icons
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1

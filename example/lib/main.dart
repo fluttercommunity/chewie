@@ -11,7 +11,7 @@ void main() {
 
 class ChewieAudioDemo extends StatefulWidget {
   // ignore: use_key_in_widget_constructors
-  const ChewieAudioDemo({this.title = 'Chewie Demo'});
+  const ChewieAudioDemo({this.title = 'Chewie Audio Demo'});
 
   final String title;
 
@@ -22,10 +22,10 @@ class ChewieAudioDemo extends StatefulWidget {
 }
 
 class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
-  TargetPlatform _platform;
-  VideoPlayerController _videoPlayerController1;
-  VideoPlayerController _videoPlayerController2;
-  ChewieAudioController _chewieAudioController;
+  TargetPlatform? _platform;
+  late VideoPlayerController _videoPlayerController1;
+  late VideoPlayerController _videoPlayerController2;
+  ChewieAudioController? _chewieAudioController;
 
   @override
   void initState() {
@@ -37,16 +37,19 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
   void dispose() {
     _videoPlayerController1.dispose();
     _videoPlayerController2.dispose();
-    _chewieAudioController.dispose();
+    _chewieAudioController!.dispose();
     super.dispose();
   }
 
   Future<void> initializePlayer() async {
-    _videoPlayerController1 =
-        VideoPlayerController.network('https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4');
-    await _videoPlayerController1.initialize();
-    _videoPlayerController2 =
-        VideoPlayerController.network('https://www.sample-videos.com/video123/mp4/480/asdasdas.mp4');
+    _videoPlayerController1 = VideoPlayerController.network(
+        'https://www.w3schools.com/html/mov_bbb.mp4');
+    _videoPlayerController2 = VideoPlayerController.network(
+        'https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4');
+    await Future.wait([
+      _videoPlayerController1.initialize(),
+      _videoPlayerController2.initialize()
+    ]);
     _chewieAudioController = ChewieAudioController(
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
@@ -59,6 +62,9 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
       //   handleColor: Colors.blue,
       //   backgroundColor: Colors.grey,
       //   bufferedColor: Colors.lightGreen,
+      // ),
+      // placeholder: Container(
+      //   color: Colors.grey,
       // ),
       // autoInitialize: true,
     );
@@ -79,9 +85,9 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
           children: <Widget>[
             Expanded(
               child: Center(
-                child: _chewieAudioController != null && _chewieAudioController.videoPlayerController.value.initialized
+                child: _chewieAudioController != null && _chewieAudioController!.videoPlayerController.value.isInitialized
                     ? ChewieAudio(
-                        controller: _chewieAudioController,
+                        controller: _chewieAudioController!,
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -99,7 +105,7 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        _chewieAudioController.dispose();
+                        if (_chewieAudioController != null) _chewieAudioController!.dispose();
                         _videoPlayerController1.pause();
                         _videoPlayerController1.seekTo(const Duration());
                         _chewieAudioController = ChewieAudioController(
@@ -111,7 +117,7 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
                     },
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("Video 1"),
+                      child: Text("Audio 1"),
                     ),
                   ),
                 ),
@@ -119,8 +125,9 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        _chewieAudioController.dispose();
+                        if (_chewieAudioController != null) _chewieAudioController!.dispose();
                         _videoPlayerController2.pause();
+                        _videoPlayerController2.seekTo(const Duration());
                         _chewieAudioController = ChewieAudioController(
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,
@@ -130,7 +137,7 @@ class _ChewieAudioDemoState extends State<ChewieAudioDemo> {
                     },
                     child: const Padding(
                       padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("Error Video"),
+                      child: Text("Audio 2"),
                     ),
                   ),
                 )

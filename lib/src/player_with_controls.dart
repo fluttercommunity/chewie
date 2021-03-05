@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class PlayerWithControls extends StatelessWidget {
-  const PlayerWithControls({Key key}) : super(key: key);
+  const PlayerWithControls({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +24,13 @@ class PlayerWithControls extends StatelessWidget {
               backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
               iconColor: Color.fromARGB(255, 200, 200, 200),
             );
-      return chewieController.showControls ? chewieController.customControls ?? controls : Container();
+      return chewieController.showControls
+          ? chewieController.customControls ?? controls
+          : Container();
     }
 
-    Widget _buildPlayerWithControls(ChewieAudioController chewieController, BuildContext context) {
+    Stack _buildPlayerWithControls(
+        ChewieAudioController chewieController, BuildContext context) {
       return Stack(
         children: <Widget>[
           Offstage(
@@ -42,9 +45,12 @@ class PlayerWithControls extends StatelessWidget {
       );
     }
 
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      child: _buildPlayerWithControls(chewieController, context),
+    return Center(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: Theme.of(context).platform == TargetPlatform.android ? 48 : 75,
+        child: _buildPlayerWithControls(chewieController, context),
+      ),
     );
   }
 }
