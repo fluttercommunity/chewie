@@ -48,6 +48,7 @@ class PlayerWithControls extends StatelessWidget {
     return Center(
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
+        height: 48,
         child: _buildPlayerWithControls(chewieController, context),
       ),
     );
