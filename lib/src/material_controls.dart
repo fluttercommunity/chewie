@@ -37,7 +37,7 @@ class _MaterialControlsState extends State<MaterialControls>
     if (_latestValue.hasError) {
       return chewieController.errorBuilder?.call(
             context,
-            chewieController.videoPlayerController.value.errorDescription!,
+            chewieController.videoPlayerController.value.errorDescription,
           ) ??
           const Center(
             child: Icon(
@@ -48,18 +48,7 @@ class _MaterialControlsState extends State<MaterialControls>
           );
     }
 
-    return Column(
-      children: <Widget>[
-        if (_latestValue.isBuffering)
-          const Expanded(
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          )
-        else
-        _buildBottomBar(context),
-      ],
-    );
+    return _buildBottomBar(context);
   }
 
   @override

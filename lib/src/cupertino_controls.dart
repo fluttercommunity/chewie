@@ -47,7 +47,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
       return chewieController.errorBuilder != null
           ? chewieController.errorBuilder!(
               context,
-              chewieController.videoPlayerController.value.errorDescription!,
+              chewieController.videoPlayerController.value.errorDescription,
             )
           : const Center(
               child: Icon(

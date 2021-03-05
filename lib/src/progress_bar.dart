@@ -56,11 +56,13 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   }
 
   void _seekToRelativePosition(Offset globalPosition) {
-    final box = context.findRenderObject() as RenderBox;
-    final Offset tapPos = box.globalToLocal(globalPosition);
-    final double relative = tapPos.dx / box.size.width;
-    final Duration position = controller.value.duration * relative;
-    controller.seekTo(position);
+    final box = context.findRenderObject() as RenderBox?;
+    if (box != null) {
+      final Offset tapPos = box.globalToLocal(globalPosition);
+      final double relative = tapPos.dx / box.size.width;
+      final Duration position = controller.value.duration * relative;
+      controller.seekTo(position);
+    }
   }
 
   @override
