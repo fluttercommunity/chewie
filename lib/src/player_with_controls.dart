@@ -6,6 +6,7 @@ import 'package:chewie/src/material_controls.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PlayerWithControls extends StatelessWidget {
   const PlayerWithControls({Key? key}) : super(key: key);
@@ -23,15 +24,15 @@ class PlayerWithControls extends StatelessWidget {
     }
 
     Widget _buildControls(
-      BuildContext context,
-      ChewieController chewieController,
-    ) {
+        BuildContext context,
+        ChewieController chewieController,
+        ) {
       final controls = Theme.of(context).platform == TargetPlatform.android
           ? const MaterialControls()
           : const CupertinoControls(
-              backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
-              iconColor: Color.fromARGB(255, 200, 200, 200),
-            );
+        backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
+        iconColor: Color.fromARGB(255, 200, 200, 200),
+      );
       return chewieController.showControls
           ? chewieController.customControls ?? controls
           : Container();
@@ -43,11 +44,13 @@ class PlayerWithControls extends StatelessWidget {
         children: <Widget>[
           chewieController.placeholder ?? Container(),
           Center(
-            child: AspectRatio(
-              aspectRatio: chewieController.aspectRatio ??
-                  chewieController.videoPlayerController.value.aspectRatio,
-              child: VideoPlayer(chewieController.videoPlayerController),
-            ),
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(12.w),
+                child: AspectRatio(
+                  aspectRatio: chewieController.aspectRatio ??
+                      chewieController.videoPlayerController.value.aspectRatio,
+                  child: VideoPlayer(chewieController.videoPlayerController),
+                )),
           ),
           chewieController.overlay ?? Container(),
           if (!chewieController.isFullScreen)
