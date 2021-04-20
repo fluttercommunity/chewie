@@ -12,7 +12,7 @@ dependencies:
 
   cupertino_icons: ^1.0.2
 
-  flutter_screenutil: ^4.0.3+1
+  flutter_screenutil: ^5.0.0
 
   flutter:
     sdk: flutter
