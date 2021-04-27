@@ -41,7 +41,7 @@ class PlayerWithControls extends StatelessWidget {
         ChewieController chewieController, BuildContext context) {
       return Stack(
         children: <Widget>[
-          chewieController.placeholder ?? Container(),
+          _buildPlaceholder(chewieController, context) ?? Container(),
           Center(
             child: AspectRatio(
               aspectRatio: chewieController.aspectRatio ??
@@ -70,5 +70,22 @@ class PlayerWithControls extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget? _buildPlaceholder(
+      ChewieController chewieController, BuildContext context) {
+    if (chewieController.placeholder == null) return null;
+    const aspectRatio = 16 / 9;
+    final size = MediaQuery.of(context).size;
+    double width;
+    if (size.width < size.height) {
+      return chewieController.placeholder;
+    }
+    width = size.height * aspectRatio;
+
+    return Positioned.fill(
+        left: (size.width - width) / 2,
+        right: (size.width - width) / 2,
+        child: chewieController.placeholder!);
   }
 }
