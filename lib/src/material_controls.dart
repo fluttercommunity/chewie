@@ -380,6 +380,7 @@ class _MaterialControlsState extends State<MaterialControls>
   }
 
   void _updateState() {
+    if (!mounted) return;
     setState(() {
       _latestValue = controller.value;
     });
