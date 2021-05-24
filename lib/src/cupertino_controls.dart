@@ -88,7 +88,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
               _buildTopBar(
                   backgroundColor, iconColor, barHeight, buttonPadding),
               _buildHitArea(),
-              if (_subtitleOn) _buildSubtitles(chewieController.subtitle!),
+              if (_subtitleOn)
+                Transform.translate(
+                  offset: Offset(0.0, _hideStuff ? kToolbarHeight * 0.8 : 0.0),
+                  child: _buildSubtitles(chewieController.subtitle!),
+                ),
               _buildBottomBar(backgroundColor, iconColor, barHeight),
             ],
           ),
@@ -390,8 +394,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
       child: Container(
         height: barHeight,
         color: Colors.transparent,
-        margin: EdgeInsets.only(right: 10.0),
-        padding: EdgeInsets.only(
+        margin: const EdgeInsets.only(right: 10.0),
+        padding: const EdgeInsets.only(
           left: 6.0,
           right: 6.0,
         ),

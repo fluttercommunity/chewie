@@ -77,7 +77,10 @@ class _MaterialControlsState extends State<MaterialControls>
               else
                 _buildHitArea(),
               if (_subtitleOn)
-                _buildSubtitles(context, chewieController.subtitle!),
+                Transform.translate(
+                  offset: Offset(0.0, _hideStuff ? kToolbarHeight * 0.8 : 0.0),
+                  child: _buildSubtitles(context, chewieController.subtitle!),
+                ),
               _buildBottomBar(context),
             ],
           ),
