@@ -14,7 +14,7 @@ class VideoProgressBar extends StatefulWidget {
     required this.barHeight,
     required this.handleHeight,
     required this.drawShadow,
-  })   : colors = colors ?? ChewieProgressColors(),
+  })  : colors = colors ?? ChewieProgressColors(),
         super(key: key);
 
   final VideoPlayerController controller;
@@ -56,7 +56,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   }
 
   void _seekToRelativePosition(Offset globalPosition) {
-    final box = context.findRenderObject() as RenderBox;
+    final box = context.findRenderObject()! as RenderBox;
     final Offset tapPos = box.globalToLocal(globalPosition);
     final double relative = tapPos.dx / box.size.width;
     final Duration position = controller.value.duration * relative;
