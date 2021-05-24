@@ -104,7 +104,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
             ),
             TextButton(
               onPressed: () {
-                _chewieController!.enterFullScreen();
+                _chewieController?.enterFullScreen();
               },
               child: const Text('Fullscreen'),
             ),
@@ -114,7 +114,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        _chewieController!.dispose();
+                        _chewieController?.dispose();
                         _videoPlayerController1.pause();
                         _videoPlayerController1.seekTo(const Duration());
                         _chewieController = ChewieController(
@@ -134,7 +134,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        _chewieController!.dispose();
+                        _chewieController?.dispose();
                         _videoPlayerController2.pause();
                         _videoPlayerController2.seekTo(const Duration());
                         _chewieController = ChewieController(
