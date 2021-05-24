@@ -43,7 +43,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
 
   Future<void> initializePlayer() async {
     _videoPlayerController1 = VideoPlayerController.network(
-        'https://assets.mixkit.co/videos/preview/mixkit-forest-stream-in-the-sunlight-529-large.mp4');
+        'https://vod-progressive.akamaized.net/exp=1621866467~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F2747%2F14%2F363737105%2F1496953606.mp4~hmac=338a92b333db6f4c0bfbcb79de889d01ee5e426bfbdf1e9b664456e4b76042bd/vimeo-prod-skyfire-std-us/01/2747/14/363737105/1496953606.mp4');
     _videoPlayerController2 = VideoPlayerController.network(
         'https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4');
     await Future.wait([
@@ -54,6 +54,27 @@ class _ChewieDemoState extends State<ChewieDemo> {
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
       looping: true,
+      subtitle: Subtitles([
+        Subtitle(
+          index: 0,
+          start: Duration.zero,
+          end: const Duration(seconds: 10),
+          text: 'Hello from subtitles',
+        ),
+        Subtitle(
+          index: 0,
+          start: const Duration(seconds: 10),
+          end: const Duration(seconds: 20),
+          text: 'Whats up? :)',
+        ),
+      ]),
+      subtitleBuilder: (context, subtitle) => Container(
+        padding: const EdgeInsets.all(10.0),
+        child: Text(
+          subtitle,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
       // Try playing around with some of these other options:
 
       // showControls: false,
@@ -104,7 +125,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
             ),
             TextButton(
               onPressed: () {
-                _chewieController!.enterFullScreen();
+                _chewieController?.enterFullScreen();
               },
               child: const Text('Fullscreen'),
             ),
@@ -114,13 +135,34 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        _chewieController!.dispose();
+                        _chewieController?.dispose();
                         _videoPlayerController1.pause();
                         _videoPlayerController1.seekTo(const Duration());
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController1,
                           autoPlay: true,
                           looping: true,
+                          subtitle: Subtitles([
+                            Subtitle(
+                              index: 0,
+                              start: Duration.zero,
+                              end: const Duration(seconds: 10),
+                              text: 'Hello from subtitles',
+                            ),
+                            Subtitle(
+                              index: 0,
+                              start: const Duration(seconds: 10),
+                              end: const Duration(seconds: 20),
+                              text: 'Whats up? :)',
+                            ),
+                          ]),
+                          subtitleBuilder: (context, subtitle) => Container(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Text(
+                              subtitle,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
                         );
                       });
                     },
@@ -134,13 +176,34 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        _chewieController!.dispose();
+                        _chewieController?.dispose();
                         _videoPlayerController2.pause();
                         _videoPlayerController2.seekTo(const Duration());
                         _chewieController = ChewieController(
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,
                           looping: true,
+                          subtitle: Subtitles([
+                            Subtitle(
+                              index: 0,
+                              start: Duration.zero,
+                              end: const Duration(seconds: 10),
+                              text: 'Hello from subtitles',
+                            ),
+                            Subtitle(
+                              index: 0,
+                              start: const Duration(seconds: 10),
+                              end: const Duration(seconds: 20),
+                              text: 'Whats up? :)',
+                            ),
+                          ]),
+                          subtitleBuilder: (context, subtitle) => Container(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Text(
+                              subtitle,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ),
                         );
                       });
                     },

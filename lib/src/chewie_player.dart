@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:chewie/src/subtitle_model.dart';
 
 typedef ChewieRoutePageBuilder = Widget Function(
   BuildContext context,
@@ -219,6 +220,8 @@ class ChewieController extends ChangeNotifier {
     this.overlay,
     this.showControlsOnInitialize = true,
     this.showControls = true,
+    this.subtitle,
+    this.subtitleBuilder,
     this.customControls,
     this.errorBuilder,
     this.allowedScreenSleep = true,
@@ -236,6 +239,10 @@ class ChewieController extends ChangeNotifier {
             'The playbackSpeeds values must all be greater than 0') {
     _initialize();
   }
+
+  final Widget Function(BuildContext context, String subtitle)? subtitleBuilder;
+
+  Subtitles? subtitle;
 
   /// The controller for the video you want to play
   final VideoPlayerController videoPlayerController;
@@ -407,6 +414,10 @@ class ChewieController extends ChangeNotifier {
 
   Future<void> setVolume(double volume) async {
     await videoPlayerController.setVolume(volume);
+  }
+
+  void setSubtitle(List<Subtitle> newSubtitle) {
+    subtitle = Subtitles(newSubtitle);
   }
 }
 

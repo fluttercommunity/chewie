@@ -1,3 +1,10 @@
+## 1.1.0
+
+* Add subtitle functionality
+  - Thanks to kirill09: [#188](https://github.com/brianegan/chewie/pull/188) with which we've improved and optimized subtitles
+
+> See readme on how to create subtitles and provide your own subtitleBuilder: [Subtitles](https://github.com/brianegan/chewie#Subtitles)
+
 ## 1.0.0
 
 * Migrate to Null Safety

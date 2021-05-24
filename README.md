@@ -51,6 +51,56 @@ void dispose() {
 }
 ```
 
+## Subtitles
+
+> Since version 1.1.0 chewie supports subtitles. Here you can see how to use them
+
+You can provide an `List<Subtitle>` and customize your subtitles with the `subtitleBuilder` function.
+
+Just add subtitles as following code is showing into your `ChewieController`:
+
+```dart
+ChewieController(
+  videoPlayerController: _videoPlayerController,
+  autoPlay: true,
+  looping: true,
+  subtitle: Subtitles([
+    Subtitle(
+      index: 0,
+      start: Duration.zero,
+      end: const Duration(seconds: 10),
+      text: 'Hello from subtitles',
+    ),
+    Subtitle(
+      index: 1,
+      start: const Duration(seconds: 10),
+      end: const Duration(seconds: 20),
+      text: 'Whats up? :)',
+    ),
+  ]),
+  subtitleBuilder: (context, subtitle) => Container(
+    padding: const EdgeInsets.all(10.0),
+    child: Text(
+      subtitle,
+      style: const TextStyle(color: Colors.white),
+    ),
+  ),
+);
+```
+
+The `index` attribute is just for purpases if you want to structure your subtitles in your database and provide your indexes here. `start`, `end` and `text` are here the key attributes. 
+
+The Duration defines on which part of your video your subtitles should start and end. For example: Your video is 10 minutes long and you want to add a subtitle between: `00:00` and `00:10`'th second you've to provide:
+
+```dart
+Subtitle(
+  index: 0,
+  start: Duration.zero,
+  end: const Duration(seconds: 10),
+  text: 'Hello from subtitles',
+),
+```
+
 ## Example
 
 Please run the app in the [`example/`](https://github.com/brianegan/chewie/tree/master/example) folder to start playing!

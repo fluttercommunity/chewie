@@ -1,5 +1,7 @@
 name: chewie_example
 description: An example of how to use the chewie for Flutter
+version: 1.0.0
+publish_to: none
 
 environment:
   sdk: '>=2.12.0-0 <3.0.0'
@@ -7,10 +9,8 @@ environment:
 dependencies:
   chewie:
     path: ../
-  cupertino_icons: ^1.0.0
   flutter:
     sdk: flutter
-  video_player: ^2.0.0
 
 dev_dependencies:
   flutter_test:
