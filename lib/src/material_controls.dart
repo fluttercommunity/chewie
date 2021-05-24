@@ -42,8 +42,6 @@ class _MaterialControlsState extends State<MaterialControls>
 
   @override
   Widget build(BuildContext context) {
-    _subtitleOn = chewieController.subtitle?.isNotEmpty ?? false;
-
     if (_latestValue.hasError) {
       return chewieController.errorBuilder?.call(
             context,
@@ -173,6 +171,7 @@ class _MaterialControlsState extends State<MaterialControls>
               const SizedBox()
             else
               _buildProgressBar(),
+            _buildSubtitleToggle(),
             if (chewieController.allowPlaybackSpeedChanging)
               _buildSpeedButton(controller),
             if (chewieController.allowMuting) _buildMuteButton(controller),
@@ -389,6 +388,7 @@ class _MaterialControlsState extends State<MaterialControls>
   }
 
   Future<void> _initialize() async {
+    _subtitleOn = chewieController.subtitle?.isNotEmpty ?? false;
     controller.addListener(_updateState);
 
     _updateState();
