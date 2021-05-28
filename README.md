@@ -51,6 +51,64 @@ void dispose() {
 }
 ```
 
+## Options
+
+Chewie got some options which controls the video you provide. These options appear on default on a `showModalBottomSheet` (like you already know from YT maybe). Chewie is passing on default `Playback speed` and `Subtitles` options as an `OptionItem`.
+
+To add additional options just add these lines to your `ChewieController`:
+
+```dart
+additionalOptions: (context) {
+  return <OptionItem>[
+    OptionItem(
+      onTap: () => debugPrint('My option works!'),
+      iconData: Icons.chat,
+      title: 'My localized title',
+    ),
+    OptionItem(
+      onTap: () =>
+          debugPrint('Another option working!'),
+      iconData: Icons.chat,
+      title: 'Another localized title',
+    ),
+  ];
+},
+```
+
+If you don't like to show your options with the default `showModalBottomSheet` just override the View with the `optionsBuilder` method:
+
+```dart
+optionsBuilder: (context, defaultOptions) async {
+  await showDialog<void>(
+    context: context,
+    builder: (ctx) {
+      return AlertDialog(
+        content: ListView.builder(
+          itemCount: defaultOptions.length,
+          itemBuilder: (_, i) => ActionChip(
+            label: Text(defaultOptions[i].title),
+            onPressed: () =>
+                defaultOptions[i].onTap!(),
+          ),
+        ),
+      );
+    },
+  );
+},
+```
+
+Your `additionalOptions` are already included here (if you provided `additionalOptions`)!
+
+Last but not least: What is an option without proper translation. To add your strings to them just add:
+
+```dart
+optionsTranslation: OptionsTranslation(
+  playbackSpeedButtonText: 'Wiedergabegeschwindigkeit',
+  subtitlesButtonText: 'Untertitel',
+  cancelButtonText: 'Abbrechen',
+),
+```
+
 ## Subtitles
 
 > Since version 1.1.0 chewie supports subtitles. Here you can see how to use them
