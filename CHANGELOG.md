@@ -6,6 +6,8 @@
 * Fix squeeze of `CenterPlayButton`
 * Add: `optionsTranslation`, `additionalOptions` and `optionsBuilder` to create and design your Video-Options like Playback speed, subtitles and other options you want to add (use here: `additionalOptions`!). Use `optionsTranslation` to provide your localized strings!
 
+> See [Options](https://github.com/brianegan/chewie#options) to customize your Chewie options
+
 ## 1.1.0
 
 * Add subtitle functionality
