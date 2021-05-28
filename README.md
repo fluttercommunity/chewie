@@ -7,9 +7,16 @@ The video player for Flutter with a heart of gold.
 
 The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
 
-## Demo
+## Preview
 
-![Demo](https://github.com/brianegan/chewie/raw/master/assets/chewie_demo.gif)
+### MaterialControls
+![](https://github.com/brianegan/chewie/raw/master/assets/MaterialControls.png)
+
+### MaterialDesktopControls
+![](https://github.com/brianegan/chewie/raw/master/assets/MaterialDesktopControls.png)
+
+### CupertinoControls
+![](https://github.com/brianegan/chewie/raw/master/assets/CupertinoControls.png)
 
 ## Installation
 
@@ -52,6 +59,8 @@ void dispose() {
 ```
 
 ## Options
+
+![](https://github.com/brianegan/chewie/raw/master/assets/Options.png)
 
 Chewie got some options which controls the video you provide. These options appear on default on a `showModalBottomSheet` (like you already know from YT maybe). Chewie is passing on default `Playback speed` and `Subtitles` options as an `OptionItem`.
 
