@@ -1,10 +1,9 @@
-import 'dart:ui';
-
 import 'package:chewie/src/chewie_player.dart';
-import 'package:chewie/src/cupertino_controls.dart';
-import 'package:chewie/src/material_controls.dart';
+import 'package:chewie/src/helpers/adaptive_controls.dart';
+import 'package:chewie/src/notifiers/index.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 class PlayerWithControls extends StatelessWidget {
@@ -26,18 +25,12 @@ class PlayerWithControls extends StatelessWidget {
       BuildContext context,
       ChewieController chewieController,
     ) {
-      final controls = Theme.of(context).platform == TargetPlatform.android
-          ? const MaterialControls()
-          : const CupertinoControls(
-              backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
-              iconColor: Color.fromARGB(255, 200, 200, 200),
-            );
       return chewieController.showControls
-          ? chewieController.customControls ?? controls
+          ? chewieController.customControls ?? const AdaptiveControls()
           : Container();
     }
 
-    Stack _buildPlayerWithControls(
+    Widget _buildPlayerWithControls(
         ChewieController chewieController, BuildContext context) {
       return Stack(
         children: <Widget>[
@@ -50,10 +43,29 @@ class PlayerWithControls extends StatelessWidget {
             ),
           ),
           chewieController.overlay ?? Container(),
+          if (Theme.of(context).platform != TargetPlatform.iOS)
+            Consumer<PlayerNotifier>(
+              builder: (
+                BuildContext context,
+                PlayerNotifier notifier,
+                Widget? widget,
+              ) =>
+                  AnimatedOpacity(
+                opacity: notifier.hideStuff ? 0.0 : 0.8,
+                duration: const Duration(
+                  milliseconds: 250,
+                ),
+                child: Container(
+                  decoration: const BoxDecoration(color: Colors.black54),
+                  child: Container(),
+                ),
+              ),
+            ),
           if (!chewieController.isFullScreen)
             _buildControls(context, chewieController)
           else
             SafeArea(
+              bottom: false,
               child: _buildControls(context, chewieController),
             ),
         ],

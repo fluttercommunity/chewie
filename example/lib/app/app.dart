@@ -1,3 +1,4 @@
+import 'package:chewie_example/app/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,7 +41,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
 
   Future<void> initializePlayer() async {
     _videoPlayerController1 = VideoPlayerController.network(
-        'https://vod-progressive.akamaized.net/exp=1621866467~acl=%2Fvimeo-prod-skyfire-std-us%2F01%2F2747%2F14%2F363737105%2F1496953606.mp4~hmac=338a92b333db6f4c0bfbcb79de889d01ee5e426bfbdf1e9b664456e4b76042bd/vimeo-prod-skyfire-std-us/01/2747/14/363737105/1496953606.mp4');
+        'https://assets.mixkit.co/videos/preview/mixkit-daytime-city-traffic-aerial-view-56-large.mp4');
     _videoPlayerController2 = VideoPlayerController.network(
         'https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4');
     await Future.wait([
@@ -93,7 +94,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: widget.title,
-      theme: ThemeData.light().copyWith(
+      theme: AppTheme.light.copyWith(
         platform: _platform ?? Theme.of(context).platform,
       ),
       home: Scaffold(
@@ -180,7 +181,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,
                           looping: true,
-                          subtitle: Subtitles([
+                          /* subtitle: Subtitles([
                             Subtitle(
                               index: 0,
                               start: Duration.zero,
@@ -200,7 +201,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                               subtitle,
                               style: const TextStyle(color: Colors.white),
                             ),
-                          ),
+                          ), */
                         );
                       });
                     },
@@ -241,7 +242,24 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   ),
                 )
               ],
-            )
+            ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _platform = TargetPlatform.windows;
+                      });
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16.0),
+                      child: Text("Desktop controls"),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

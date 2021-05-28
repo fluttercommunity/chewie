@@ -1,3 +1,11 @@
+## 1.2.0
+
+* 🖥 __Desktop-UI__: Added `AdaptiveControls` where `MaterialDesktopControls` is now the default for Desktop-Platforms (start [ChewieDemo](https://github.com/brianegan/chewie/blob/master/example/lib/app/app.dart) for a preview)
+  - Fixes: [#188](https://github.com/brianegan/chewie/issues/478)
+* Redesign `MaterialControls` (inspired by Youtube Mobile and Desktop)
+* Fix squeeze of `CenterPlayButton`
+* Add: `optionsTranslation`, `additionalOptions` and `optionsBuilder` to create and design your Video-Options like Playback speed, subtitles and other options you want to add (use here: `additionalOptions`!). Use `optionsTranslation` to provide your localized strings!
+
 ## 1.1.0
 
 * Add subtitle functionality

@@ -1,13 +1,18 @@
 import 'dart:async';
 
 import 'package:chewie/src/chewie_progress_colors.dart';
+import 'package:chewie/src/material/models/options_translation.dart';
+import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
-import 'package:chewie/src/subtitle_model.dart';
+import 'package:chewie/src/models/subtitle_model.dart';
+
+import 'material/models/option_item.dart';
 
 typedef ChewieRoutePageBuilder = Widget Function(
   BuildContext context,
@@ -37,11 +42,13 @@ class Chewie extends StatefulWidget {
 
 class ChewieState extends State<Chewie> {
   bool _isFullScreen = false;
+  late PlayerNotifier notifier;
 
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(listener);
+    notifier = PlayerNotifier.init();
   }
 
   @override
@@ -72,7 +79,10 @@ class ChewieState extends State<Chewie> {
   Widget build(BuildContext context) {
     return _ChewieControllerProvider(
       controller: widget.controller,
-      child: const PlayerWithControls(),
+      child: ChangeNotifierProvider<PlayerNotifier>.value(
+        value: notifier,
+        builder: (context, w) => const PlayerWithControls(),
+      ),
     );
   }
 
@@ -112,7 +122,10 @@ class ChewieState extends State<Chewie> {
   ) {
     final controllerProvider = _ChewieControllerProvider(
       controller: widget.controller,
-      child: const PlayerWithControls(),
+      child: ChangeNotifierProvider<PlayerNotifier>.value(
+        value: notifier,
+        builder: (context, w) => const PlayerWithControls(),
+      ),
     );
 
     if (widget.controller.routePageBuilder == null) {
@@ -208,6 +221,7 @@ class ChewieState extends State<Chewie> {
 class ChewieController extends ChangeNotifier {
   ChewieController({
     required this.videoPlayerController,
+    this.optionsTranslation,
     this.aspectRatio,
     this.autoInitialize = false,
     this.autoPlay = false,
@@ -219,6 +233,8 @@ class ChewieController extends ChangeNotifier {
     this.placeholder,
     this.overlay,
     this.showControlsOnInitialize = true,
+    this.optionsBuilder,
+    this.additionalOptions,
     this.showControls = true,
     this.subtitle,
     this.subtitleBuilder,
@@ -240,8 +256,30 @@ class ChewieController extends ChangeNotifier {
     _initialize();
   }
 
+  /// Pass your translations for the options like:
+  /// - PlaybackSpeed
+  /// - Subtitles
+  /// - Cancel
+  ///
+  /// Buttons
+  ///
+  /// These are required for the default `OptionItem`'s
+  final OptionsTranslation? optionsTranslation;
+
+  /// Build your own options with default chewieOptions shiped through
+  /// the builder method. Just add your own options to the Widget
+  /// you'll build. If you want to hide the chewieOptions, just leave them
+  /// out from your Widget.
+  final Future<void> Function(
+      BuildContext context, List<OptionItem> chewieOptions)? optionsBuilder;
+
+  /// Add your own additional options on top of chewie options
+  final List<OptionItem> Function(BuildContext context)? additionalOptions;
+
+  /// Define here your own Widget on how your n'th subtitle will look like
   final Widget Function(BuildContext context, String subtitle)? subtitleBuilder;
 
+  /// Add a List of Subtitles here in `Subtitles.subtitle`
   Subtitles? subtitle;
 
   /// The controller for the video you want to play
