@@ -9,11 +9,9 @@ The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin prov
 
 ## Preview
 
-### MaterialControls
-![](https://github.com/brianegan/chewie/raw/master/assets/MaterialControls.png)
-
-### MaterialDesktopControls
-![](https://github.com/brianegan/chewie/raw/master/assets/MaterialDesktopControls.png)
+| MaterialControls | MaterialDesktopControls |
+| :--------------: | :---------------------: |
+|     ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialControls.png)     |    ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialDesktopControls.png)     |
 
 ### CupertinoControls
 ![](https://github.com/brianegan/chewie/raw/master/assets/CupertinoControls.png)
