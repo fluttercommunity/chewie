@@ -1,3 +1,6 @@
+import 'package:flutter/widgets.dart';
+import 'package:chewie/chewie.dart';
+
 class Subtitles {
   Subtitles(this.subtitle);
 
@@ -42,7 +45,10 @@ class Subtitle {
   final int index;
   final Duration start;
   final Duration end;
-  final String text;
+
+  /// Subtitle text. A [String] or another type, e.g. [InlineSpan], [TextSpan], etc.
+  /// Custom types need to be handled by [ChewieController.subtitleBuilder].
+  final dynamic text;
 
   @override
   String toString() {
