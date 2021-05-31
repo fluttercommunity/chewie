@@ -218,7 +218,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     if (chewieController.subtitleBuilder != null) {
       return chewieController.subtitleBuilder!(
         context,
-        currentSubtitle.first!.text,
+        currentSubtitle.first!,
       );
     }
 

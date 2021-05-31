@@ -159,7 +159,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     if (chewieController.subtitleBuilder != null) {
       return chewieController.subtitleBuilder!(
         context,
-        currentSubtitle.first!.text,
+        currentSubtitle.first!,
       );
     }
 
@@ -171,11 +171,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
             color: const Color(0x96000000),
             borderRadius: BorderRadius.circular(10.0)),
         child: Text(
-          currentSubtitle.first!.text,
-          style: const TextStyle(
-            fontSize: 18,
-          ),
-          textAlign: TextAlign.center,
+            currentSubtitle.first!.text,
+            style: const TextStyle(
+              fontSize: 18,
+            ),
+            textAlign: TextAlign.center,
         ),
       ),
     );

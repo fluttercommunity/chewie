@@ -232,7 +232,7 @@ class _MaterialControlsState extends State<MaterialControls>
     if (chewieController.subtitleBuilder != null) {
       return chewieController.subtitleBuilder!(
         context,
-        currentSubtitle.first!.text,
+        currentSubtitle.first!,
       );
     }
 

@@ -277,7 +277,7 @@ class ChewieController extends ChangeNotifier {
   final List<OptionItem> Function(BuildContext context)? additionalOptions;
 
   /// Define here your own Widget on how your n'th subtitle will look like
-  final Widget Function(BuildContext context, String subtitle)? subtitleBuilder;
+  final Widget Function(BuildContext context, Subtitle subtitle)? subtitleBuilder;
 
   /// Add a List of Subtitles here in `Subtitles.subtitle`
   Subtitles? subtitle;
