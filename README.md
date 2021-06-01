@@ -195,6 +195,31 @@ final playerWidget = Chewie(
 );
 ```
 
+## Roadmap
+
+- [x] MaterialUI
+- [x] MaterialDesktopUI
+- [x] CupertinoUI
+- [x] Options with translations
+- [x] Subtitles
+- [x] CustomControls
+- [x] Auto-Rotate on FullScreen depending on Source Aspect-Ratio
+- [x] Live-Stream and UI
+- [x] AutoPlay
+- [x] Placeholder
+- [x] Looping
+- [x] Start video at
+- [x] Custom Progress-Bar colors
+- [x] Custom Overlay
+- [x] Allow Sleep (Wakelock)
+- [x] Playbackspeed Control 
+- [x] Custom Route-Pagebuilder
+- [x] Custom Device-Orientation and SystemOverlay before and after fullscreen
+- [x] Custom ErrorBuilder
+- [ ] Re-design State-Manager with Provider
+- [ ] Screen-Mirroring / Casting (Google Chromecast)
+
+
 ## iOS warning 
 The video_player plugin used by chewie will only work in iOS simulators if you are on flutter 1.26.0 or above. You may need to switch to the beta channel `flutter channel beta`
 Please refer to this [issue](https://github.com/flutter/flutter/issues/14647).
