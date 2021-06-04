@@ -244,13 +244,18 @@ class _MaterialControlsState extends State<MaterialControls>
           color: const Color(0x96000000),
           borderRadius: BorderRadius.circular(10.0),
         ),
-        child: Text(
-          currentSubtitle.first!.text,
-          style: const TextStyle(
-            fontSize: 18,
-          ),
-          textAlign: TextAlign.center,
-        ),
+        child: currentSubtitle.first!.text is InlineSpan
+          ? RichText(
+              text: currentSubtitle.first!.text as InlineSpan,
+              textAlign: TextAlign.center,
+            )
+          : Text(
+              currentSubtitle.first!.text.toString(),
+              style: const TextStyle(
+                fontSize: 18,
+              ),
+              textAlign: TextAlign.center,
+            ),
       ),
     );
   }

@@ -209,6 +209,71 @@ class _ChewieDemoState extends State<ChewieDemo> {
       autoPlay: true,
       looping: true,
       subtitle: Subtitles([
+        Subtitle(
+          index: 0,
+          start: Duration.zero,
+          end: const Duration(seconds: 10),
+          text: const TextSpan(
+            children: [
+              TextSpan(
+                text: 'Hello',
+                style: TextStyle(color: Colors.red, fontSize: 22),
+              ),
+              TextSpan(
+                text: ' from ',
+                style: TextStyle(color: Colors.green, fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              TextSpan(
+                text: 'subtitles',
+                style: TextStyle(color: Colors.blue, fontSize: 18, fontStyle: FontStyle.italic),
+              ),
+            ]
+          )
+        ),
+        Subtitle(
+          index: 0,
+          start: const Duration(seconds: 10),
+          end: const Duration(seconds: 20),
+          text: 'Whats up? :)',
+        ),
+      ]),
+      subtitleBuilder: (context, dynamic subtitle) => Container(
+        padding: const EdgeInsets.all(10.0),
+        child: subtitle is InlineSpan
+            ? RichText(
+                text: subtitle,
+                textAlign: TextAlign.center,
+              )
+            : Text(
+                subtitle is String ? subtitle : subtitle.toString(),
+                style: const TextStyle(
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
+              ),
+      ),
+
+      // Try playing around with some of these other options:
+
+      // showControls: false,
+      // materialProgressColors: ChewieProgressColors(
+      //   playedColor: Colors.red,
+      //   handleColor: Colors.blue,
+      //   backgroundColor: Colors.grey,
+      //   bufferedColor: Colors.lightGreen,
+      // ),
+      // placeholder: Container(
+      //   color: Colors.grey,
+      // ),
+      // autoInitialize: true,
+
+    );
+
+  ChewieController _buildChewieLandscape() => ChewieController(
+      videoPlayerController: _videoPlayerController1,
+      autoPlay: true,
+      looping: true,
+      subtitle: Subtitles([
         SubtitleSpan(
           index: 0,
           start: Duration.zero,
