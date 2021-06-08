@@ -4,13 +4,15 @@ version: 1.2.0
 homepage: https://github.com/brianegan/chewie
 
 environment:
-  sdk: '>=2.13.0 <3.0.0'
-  flutter: '>=1.22.0'
+  sdk: ">=2.13.0 <3.0.0"
+  flutter: ">=1.22.0"
 
 dependencies:
-  cupertino_icons: ^1.0.3
   flutter:
     sdk: flutter
+  cast: ^1.0.0
+  cupertino_icons: ^1.0.3
+  flutter_mdns_plugin: ^0.0.3
   provider: ^5.0.0
   video_player: ^2.1.1
   wakelock: ^0.5.2

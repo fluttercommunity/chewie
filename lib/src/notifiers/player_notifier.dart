@@ -1,3 +1,4 @@
+import 'package:cast/cast.dart';
 import 'package:flutter/material.dart';
 
 ///
@@ -8,9 +9,13 @@ import 'package:flutter/material.dart';
 class PlayerNotifier extends ChangeNotifier {
   PlayerNotifier._(
     bool hideStuff,
-  ) : _hideStuff = hideStuff;
+    CastSessionState castState,
+  )   : _hideStuff = hideStuff,
+        _castState = castState;
 
   bool _hideStuff;
+
+  CastSessionState _castState;
 
   bool get hideStuff => _hideStuff;
 
@@ -19,10 +24,18 @@ class PlayerNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  CastSessionState get castState => _castState;
+
+  set castState(CastSessionState value) {
+    _castState = value;
+    notifyListeners();
+  }
+
   // ignore: prefer_constructors_over_static_methods
   static PlayerNotifier init() {
     return PlayerNotifier._(
       true,
+      CastSessionState.closed,
     );
   }
 }
