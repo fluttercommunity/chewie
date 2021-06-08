@@ -143,7 +143,7 @@ class _MaterialControlsState extends State<MaterialControls>
           child: Row(
             children: [
               _buildSubtitleToggle(),
-              _buildOptionsButton(),
+              if (chewieController.showOptions) _buildOptionsButton(),
             ],
           ),
         ),

@@ -270,7 +270,8 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
                     else
                       _buildPosition(iconColor),
                     const Spacer(),
-                    _buildOptionsButton(icon: Icons.settings),
+                    if (chewieController.showOptions)
+                      _buildOptionsButton(icon: Icons.settings),
                     if (chewieController.allowFullScreen) _buildExpandButton(),
                   ],
                 ),

@@ -233,6 +233,7 @@ class ChewieController extends ChangeNotifier {
     this.placeholder,
     this.overlay,
     this.showControlsOnInitialize = true,
+    this.showOptions = true,
     this.optionsBuilder,
     this.additionalOptions,
     this.showControls = true,
@@ -255,6 +256,10 @@ class ChewieController extends ChangeNotifier {
             'The playbackSpeeds values must all be greater than 0') {
     _initialize();
   }
+
+  /// If false, the options button in MaterialUI and MaterialDesktopUI
+  /// won't be shown.
+  final bool showOptions;
 
   /// Pass your translations for the options like:
   /// - PlaybackSpeed
