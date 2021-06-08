@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/material/models/options_translation.dart';
@@ -13,6 +14,9 @@ import 'package:wakelock/wakelock.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 
 import 'material/models/option_item.dart';
+
+import 'models/video_player_controller_extension.dart'
+    show VideoPlayerControllerExtension;
 
 typedef ChewieRoutePageBuilder = Widget Function(
   BuildContext context,
@@ -43,12 +47,20 @@ class Chewie extends StatefulWidget {
 class ChewieState extends State<Chewie> {
   bool _isFullScreen = false;
   late PlayerNotifier notifier;
+  late _ChewieControllerProvider controllerProvider;
 
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(listener);
     notifier = PlayerNotifier.init();
+    controllerProvider = _ChewieControllerProvider(
+      controller: widget.controller,
+      child: ChangeNotifierProvider<PlayerNotifier>.value(
+        value: notifier,
+        builder: (context, w) => const PlayerWithControls(),
+      ),
+    );
   }
 
   @override
@@ -77,13 +89,7 @@ class ChewieState extends State<Chewie> {
 
   @override
   Widget build(BuildContext context) {
-    return _ChewieControllerProvider(
-      controller: widget.controller,
-      child: ChangeNotifierProvider<PlayerNotifier>.value(
-        value: notifier,
-        builder: (context, w) => const PlayerWithControls(),
-      ),
-    );
+    return controllerProvider;
   }
 
   Widget _buildFullScreenVideo(
@@ -120,14 +126,6 @@ class ChewieState extends State<Chewie> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    final controllerProvider = _ChewieControllerProvider(
-      controller: widget.controller,
-      child: ChangeNotifierProvider<PlayerNotifier>.value(
-        value: notifier,
-        builder: (context, w) => const PlayerWithControls(),
-      ),
-    );
-
     if (widget.controller.routePageBuilder == null) {
       return _defaultRoutePageBuilder(
           context, animation, secondaryAnimation, controllerProvider);
@@ -221,7 +219,7 @@ class ChewieState extends State<Chewie> {
 class ChewieController extends ChangeNotifier {
   ChewieController({
     required this.videoPlayerController,
-    this.optionsTranslation,
+    this.resolutions,
     this.aspectRatio,
     this.autoInitialize = false,
     this.autoPlay = false,
@@ -234,6 +232,7 @@ class ChewieController extends ChangeNotifier {
     this.overlay,
     this.showControlsOnInitialize = true,
     this.showOptions = true,
+    this.optionsTranslation,
     this.optionsBuilder,
     this.additionalOptions,
     this.showControls = true,
@@ -257,11 +256,27 @@ class ChewieController extends ChangeNotifier {
     _initialize();
   }
 
+  /// Set your custom resolutions here like for example:
+  /// ```dart
+  /// {
+  ///   '144p': 'video_144p.mp4',
+  ///   '240p': 'video_240p.mp4',
+  ///   '360p': 'video_360p.mp4',
+  ///   '480p': 'video_480p.mp4',
+  ///   '720p': 'video_720p.mp4',
+  ///   '1080p': 'video_1080p.mp4',
+  /// }
+  /// ```
+  ///
+  /// Default: `null` -> resolutions/quality button will be hidden
+  final Map<String, String>? resolutions;
+
   /// If false, the options button in MaterialUI and MaterialDesktopUI
   /// won't be shown.
   final bool showOptions;
 
   /// Pass your translations for the options like:
+  /// - Resolution
   /// - PlaybackSpeed
   /// - Subtitles
   /// - Cancel
@@ -288,7 +303,7 @@ class ChewieController extends ChangeNotifier {
   Subtitles? subtitle;
 
   /// The controller for the video you want to play
-  final VideoPlayerController videoPlayerController;
+  VideoPlayerController videoPlayerController;
 
   /// Initialize the Video on Startup. This will prep the video for playback.
   final bool autoInitialize;
@@ -461,6 +476,33 @@ class ChewieController extends ChangeNotifier {
 
   void setSubtitle(List<Subtitle> newSubtitle) {
     subtitle = Subtitles(newSubtitle);
+  }
+
+  Future<void> setResolution(String url) async {
+    final position = await videoPlayerController.position;
+    final wasPlayingBeforeChange = videoPlayerController.value.isPlaying;
+    await pause();
+    switch (videoPlayerController.dataSourceType) {
+      case DataSourceType.asset:
+        videoPlayerController =
+            videoPlayerController.copyWithAsset(dataSource: url);
+        break;
+      case DataSourceType.file:
+        videoPlayerController = videoPlayerController.copyWithFile(
+            file: File.fromUri(Uri.parse(url)));
+        break;
+      case DataSourceType.network:
+        videoPlayerController =
+            videoPlayerController.copyWithNetwork(dataSource: url);
+        break;
+      default:
+    }
+
+    await seekTo(position!);
+    if (wasPlayingBeforeChange) {
+      await play();
+    }
+    notifyListeners();
   }
 }
 

@@ -14,6 +14,7 @@ import 'package:video_player/video_player.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 
 import 'widgets/playback_speed_dialog.dart';
+import 'widgets/resolution_dialog.dart';
 
 class MaterialControls extends StatefulWidget {
   const MaterialControls({Key? key}) : super(key: key);
@@ -32,6 +33,7 @@ class _MaterialControlsState extends State<MaterialControls>
   Timer? _initTimer;
   late var _subtitlesPosition = const Duration();
   bool _subtitleOn = false;
+  String? _selectedResolution;
   Timer? _showAfterExpandCollapseTimer;
   bool _dragging = false;
   bool _displayTapped = false;
@@ -77,10 +79,8 @@ class _MaterialControlsState extends State<MaterialControls>
           child: Stack(
             children: [
               if (_latestValue.isBuffering)
-                const Expanded(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                const Center(
+                  child: CircularProgressIndicator(),
                 )
               else
                 _buildHitArea(),
@@ -161,7 +161,7 @@ class _MaterialControlsState extends State<MaterialControls>
         iconData: Icons.speed,
         title: chewieController.optionsTranslation?.playbackSpeedButtonText ??
             'Playback speed',
-      )
+      ),
     ];
 
     if (chewieController.subtitle != null &&
@@ -177,6 +177,21 @@ class _MaterialControlsState extends State<MaterialControls>
               : Icons.closed_caption_off_outlined,
           title: chewieController.optionsTranslation?.subtitlesButtonText ??
               'Subtitles',
+        ),
+      );
+    }
+
+    if (chewieController.resolutions != null &&
+        chewieController.resolutions!.isNotEmpty) {
+      options.add(
+        OptionItem(
+          onTap: () {
+            Navigator.pop(context);
+            _onResolutionTap();
+          },
+          iconData: Icons.settings,
+          title: chewieController.optionsTranslation?.resolutionButtonText ??
+              'Resolution',
         ),
       );
     }
@@ -442,6 +457,32 @@ class _MaterialControlsState extends State<MaterialControls>
     setState(() {
       _subtitleOn = !_subtitleOn;
     });
+  }
+
+  Future<void> _onResolutionTap() async {
+    _hideTimer?.cancel();
+
+    final choosenResolution = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: true,
+      builder: (context) => ResolutionDialog(
+        reslutions: chewieController.resolutions!,
+        selectedResolution: _selectedResolution,
+        cancelButtonText: chewieController.optionsTranslation?.cancelButtonText,
+      ),
+    );
+
+    if (choosenResolution != null) {
+      _selectedResolution = choosenResolution;
+
+      chewieController
+          .setResolution(chewieController.resolutions![choosenResolution]!);
+    }
+
+    if (_latestValue.isPlaying) {
+      _startHideTimer();
+    }
   }
 
   void _cancelAndRestartTimer() {
