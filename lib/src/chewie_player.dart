@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/material/models/options_translation.dart';
+import 'package:chewie/src/notifiers/ios_cast_service_notifier.dart';
 import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +44,7 @@ class Chewie extends StatefulWidget {
 class ChewieState extends State<Chewie> {
   bool _isFullScreen = false;
   late PlayerNotifier notifier;
+  late IOSCastServiceNotifier iosCastNotifier;
 
   @override
   void initState() {
@@ -79,8 +81,15 @@ class ChewieState extends State<Chewie> {
   Widget build(BuildContext context) {
     return _ChewieControllerProvider(
       controller: widget.controller,
-      child: ChangeNotifierProvider<PlayerNotifier>.value(
-        value: notifier,
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider<PlayerNotifier>.value(
+            value: notifier,
+          ),
+          ChangeNotifierProvider<IOSCastServiceNotifier>.value(
+            value: IOSCastServiceNotifier(),
+          ),
+        ],
         builder: (context, w) => const PlayerWithControls(),
       ),
     );
@@ -221,7 +230,7 @@ class ChewieState extends State<Chewie> {
 class ChewieController extends ChangeNotifier {
   ChewieController({
     required this.videoPlayerController,
-    this.optionsTranslation,
+    this.isCastingEnabled = false,
     this.aspectRatio,
     this.autoInitialize = false,
     this.autoPlay = false,
@@ -233,6 +242,8 @@ class ChewieController extends ChangeNotifier {
     this.placeholder,
     this.overlay,
     this.showControlsOnInitialize = true,
+    this.showOptions = true,
+    this.optionsTranslation,
     this.optionsBuilder,
     this.additionalOptions,
     this.showControls = true,
@@ -255,6 +266,14 @@ class ChewieController extends ChangeNotifier {
             'The playbackSpeeds values must all be greater than 0') {
     _initialize();
   }
+
+  /// If false, the options button in MaterialUI and MaterialDesktopUI
+  /// won't be shown.
+  final bool showOptions;
+
+  /// If enabled, a cast button is provided to the user to stream
+  /// the video content to a cast-device (e.g. Google Chromecast)
+  final bool isCastingEnabled;
 
   /// Pass your translations for the options like:
   /// - PlaybackSpeed

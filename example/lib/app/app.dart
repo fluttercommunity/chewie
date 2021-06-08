@@ -52,6 +52,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
       looping: true,
+      isCastingEnabled: true,
       subtitle: Subtitles([
         Subtitle(
           index: 0,
@@ -140,6 +141,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                           videoPlayerController: _videoPlayerController1,
                           autoPlay: true,
                           looping: true,
+                          isCastingEnabled: true,
                           subtitle: Subtitles([
                             Subtitle(
                               index: 0,
@@ -181,6 +183,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,
                           looping: true,
+                          isCastingEnabled: true,
                           /* subtitle: Subtitles([
                             Subtitle(
                               index: 0,

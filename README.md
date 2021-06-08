@@ -26,6 +26,22 @@ dependencies:
   video_player: <latest_version>
 ```
 
+### Chromecast / Casting
+
+> Since chewie 1.3.0 we support screencasting with the `cast` package
+
+No additional steps are required for all platforms expect iOS >= 14:
+
+Follow these steps to configure `cast` for your app:
+https://developers.google.com/cast/docs/ios_sender/permissions_and_discovery#updating_your_app_on_ios_14
+
+To not break existing chewie versions __casting is disabled on default__!
+You have to enable it explicitly in your `ChewieController` with the boolean:
+
+```dart
+isCastingEnabled: true
+```
+
 ## Use it
 
 ```dart
