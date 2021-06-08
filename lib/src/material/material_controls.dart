@@ -392,11 +392,24 @@ class _MaterialControlsState extends State<MaterialControls>
     final position = _latestValue.position;
     final duration = _latestValue.duration;
 
-    return Text(
-      '${formatDuration(position)} / ${formatDuration(duration)}',
-      style: const TextStyle(
-        fontSize: 14.0,
-        color: Colors.white,
+    return RichText(
+      text: TextSpan(
+        text: '${formatDuration(position)} ',
+        children: <InlineSpan>[
+          TextSpan(
+            text: '/ ${formatDuration(duration)}',
+            style: TextStyle(
+              fontSize: 14.0,
+              color: Colors.white.withOpacity(.75),
+              fontWeight: FontWeight.normal,
+            ),
+          )
+        ],
+        style: const TextStyle(
+          fontSize: 14.0,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
