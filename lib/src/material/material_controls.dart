@@ -9,6 +9,7 @@ import 'package:chewie/src/material/models/option_item.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
@@ -33,7 +34,6 @@ class _MaterialControlsState extends State<MaterialControls>
   Timer? _initTimer;
   late var _subtitlesPosition = const Duration();
   bool _subtitleOn = false;
-  String? _selectedResolution;
   Timer? _showAfterExpandCollapseTimer;
   bool _dragging = false;
   bool _displayTapped = false;
@@ -468,21 +468,26 @@ class _MaterialControlsState extends State<MaterialControls>
       useRootNavigator: true,
       builder: (context) => ResolutionDialog(
         reslutions: chewieController.resolutions!,
-        selectedResolution: _selectedResolution,
+        selectedResolution: notifier.selectedResolution,
         cancelButtonText: chewieController.optionsTranslation?.cancelButtonText,
       ),
     );
 
     if (choosenResolution != null) {
-      _selectedResolution = choosenResolution;
+      notifier.selectedResolution = choosenResolution;
 
-      chewieController
+      await chewieController
           .setResolution(chewieController.resolutions![choosenResolution]!);
     }
 
     if (_latestValue.isPlaying) {
       _startHideTimer();
     }
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   void _cancelAndRestartTimer() {

@@ -46,18 +46,16 @@ class Chewie extends StatefulWidget {
 
 class ChewieState extends State<Chewie> {
   bool _isFullScreen = false;
-  late PlayerNotifier notifier;
   late _ChewieControllerProvider controllerProvider;
 
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(listener);
-    notifier = PlayerNotifier.init();
     controllerProvider = _ChewieControllerProvider(
       controller: widget.controller,
       child: ChangeNotifierProvider<PlayerNotifier>.value(
-        value: notifier,
+        value: PlayerNotifier(),
         builder: (context, w) => const PlayerWithControls(),
       ),
     );
@@ -259,9 +257,6 @@ class ChewieController extends ChangeNotifier {
   /// Set your custom resolutions here like for example:
   /// ```dart
   /// {
-  ///   '144p': 'video_144p.mp4',
-  ///   '240p': 'video_240p.mp4',
-  ///   '360p': 'video_360p.mp4',
   ///   '480p': 'video_480p.mp4',
   ///   '720p': 'video_720p.mp4',
   ///   '1080p': 'video_1080p.mp4',
@@ -402,7 +397,9 @@ class ChewieController extends ChangeNotifier {
 
   bool get isPlaying => videoPlayerController.value.isPlaying;
 
-  Future _initialize() async {
+  Future _initialize({
+    Duration? continueAt,
+  }) async {
     await videoPlayerController.setLooping(looping);
 
     if ((autoInitialize || autoPlay) &&
@@ -418,8 +415,12 @@ class ChewieController extends ChangeNotifier {
       await videoPlayerController.play();
     }
 
-    if (startAt != null) {
-      await videoPlayerController.seekTo(startAt!);
+    if (continueAt != null) {
+      await videoPlayerController.seekTo(continueAt);
+    } else {
+      if (startAt != null) {
+        await videoPlayerController.seekTo(startAt!);
+      }
     }
 
     if (fullScreenByDefault) {
@@ -480,8 +481,7 @@ class ChewieController extends ChangeNotifier {
 
   Future<void> setResolution(String url) async {
     final position = await videoPlayerController.position;
-    final wasPlayingBeforeChange = videoPlayerController.value.isPlaying;
-    await pause();
+
     switch (videoPlayerController.dataSourceType) {
       case DataSourceType.asset:
         videoPlayerController =
@@ -498,11 +498,7 @@ class ChewieController extends ChangeNotifier {
       default:
     }
 
-    await seekTo(position!);
-    if (wasPlayingBeforeChange) {
-      await play();
-    }
-    notifyListeners();
+    await _initialize(continueAt: position);
   }
 }
 
@@ -516,6 +512,5 @@ class _ChewieControllerProvider extends InheritedWidget {
   final ChewieController controller;
 
   @override
-  bool updateShouldNotify(_ChewieControllerProvider old) =>
-      controller != old.controller;
+  bool updateShouldNotify(_ChewieControllerProvider old) => true;
 }
