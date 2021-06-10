@@ -216,6 +216,7 @@ final playerWidget = Chewie(
 - [x] Custom Route-Pagebuilder
 - [x] Custom Device-Orientation and SystemOverlay before and after fullscreen
 - [x] Custom ErrorBuilder
+- [ ] Support different resolutions of video
 - [ ] Re-design State-Manager with Provider
 - [ ] Screen-Mirroring / Casting (Google Chromecast)
 
