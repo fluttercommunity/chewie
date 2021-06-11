@@ -1,3 +1,8 @@
+## 1.2.2
+
+* 🛠️ Fix Incorrect use of ParentDataWidget.
+  - Fixes: [#485](https://github.com/brianegan/chewie/issues/485)
+
 ## 1.2.1
 
 * 💡 add `showOptions` flag to show/hide the options-menu

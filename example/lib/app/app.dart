@@ -143,10 +143,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        _chewieController?.dispose();
                         _videoPlayerController1.pause();
                         _videoPlayerController1.seekTo(const Duration());
-                        _chewieController = ChewieController(
+                        _chewieController = _chewieController!.copyWith(
                           videoPlayerController: _videoPlayerController1,
                           autoPlay: true,
                           looping: true,
@@ -194,24 +193,13 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        _chewieController?.dispose();
                         _videoPlayerController2.pause();
                         _videoPlayerController2.seekTo(const Duration());
-                        _chewieController = ChewieController(
-                            videoPlayerController: _videoPlayerController2,
-                            autoPlay: true,
-                            looping: true,
-                            resolutions: {
-                              "480p":
-                                  "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_480_1_5MG.mp4",
-                              "640p":
-                                  "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_640_3MG.mp4",
-                              "1280p":
-                                  "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1280_10MG.mp4",
-                              "1920p":
-                                  "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1920_18MG.mp4"
-                            }
-                            /* subtitle: Subtitles([
+                        _chewieController = _chewieController!.copyWith(
+                          videoPlayerController: _videoPlayerController2,
+                          autoPlay: true,
+                          looping: true,
+                          /* subtitle: Subtitles([
                             Subtitle(
                               index: 0,
                               start: Duration.zero,
@@ -232,7 +220,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                               style: const TextStyle(color: Colors.white),
                             ),
                           ), */
-                            );
+                        );
                       });
                     },
                     child: const Padding(
