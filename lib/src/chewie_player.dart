@@ -257,6 +257,88 @@ class ChewieController extends ChangeNotifier {
     _initialize();
   }
 
+  ChewieController copyWith({
+    VideoPlayerController? videoPlayerController,
+    OptionsTranslation? optionsTranslation,
+    double? aspectRatio,
+    bool? autoInitialize,
+    bool? autoPlay,
+    Duration? startAt,
+    bool? looping,
+    bool? fullScreenByDefault,
+    ChewieProgressColors? cupertinoProgressColors,
+    ChewieProgressColors? materialProgressColors,
+    Widget? placeholder,
+    Widget? overlay,
+    bool? showControlsOnInitialize,
+    bool? showOptions,
+    Future<void> Function(BuildContext, List<OptionItem>)? optionsBuilder,
+    List<OptionItem> Function(BuildContext)? additionalOptions,
+    bool? showControls,
+    Subtitles? subtitle,
+    Widget Function(BuildContext, String)? subtitleBuilder,
+    Widget? customControls,
+    Widget Function(BuildContext, String)? errorBuilder,
+    bool? allowedScreenSleep,
+    bool? isLive,
+    bool? allowFullScreen,
+    bool? allowMuting,
+    bool? allowPlaybackSpeedChanging,
+    List<double>? playbackSpeeds,
+    List<SystemUiOverlay>? systemOverlaysOnEnterFullScreen,
+    List<DeviceOrientation>? deviceOrientationsOnEnterFullScreen,
+    List<SystemUiOverlay>? systemOverlaysAfterFullScreen,
+    List<DeviceOrientation>? deviceOrientationsAfterFullScreen,
+    Widget Function(BuildContext, Animation<double>, Animation<double>,
+            _ChewieControllerProvider)?
+        routePageBuilder,
+  }) {
+    return ChewieController(
+      videoPlayerController:
+          videoPlayerController ?? this.videoPlayerController,
+      optionsTranslation: optionsTranslation ?? this.optionsTranslation,
+      aspectRatio: aspectRatio ?? this.aspectRatio,
+      autoInitialize: autoInitialize ?? this.autoInitialize,
+      autoPlay: autoPlay ?? this.autoPlay,
+      startAt: startAt ?? this.startAt,
+      looping: looping ?? this.looping,
+      fullScreenByDefault: fullScreenByDefault ?? this.fullScreenByDefault,
+      cupertinoProgressColors:
+          cupertinoProgressColors ?? this.cupertinoProgressColors,
+      materialProgressColors:
+          materialProgressColors ?? this.materialProgressColors,
+      placeholder: placeholder ?? this.placeholder,
+      overlay: overlay ?? this.overlay,
+      showControlsOnInitialize:
+          showControlsOnInitialize ?? this.showControlsOnInitialize,
+      showOptions: showOptions ?? this.showOptions,
+      optionsBuilder: optionsBuilder ?? this.optionsBuilder,
+      additionalOptions: additionalOptions ?? this.additionalOptions,
+      showControls: showControls ?? this.showControls,
+      subtitle: subtitle ?? this.subtitle,
+      subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
+      customControls: customControls ?? this.customControls,
+      errorBuilder: errorBuilder ?? this.errorBuilder,
+      allowedScreenSleep: allowedScreenSleep ?? this.allowedScreenSleep,
+      isLive: isLive ?? this.isLive,
+      allowFullScreen: allowFullScreen ?? this.allowFullScreen,
+      allowMuting: allowMuting ?? this.allowMuting,
+      allowPlaybackSpeedChanging:
+          allowPlaybackSpeedChanging ?? this.allowPlaybackSpeedChanging,
+      playbackSpeeds: playbackSpeeds ?? this.playbackSpeeds,
+      systemOverlaysOnEnterFullScreen: systemOverlaysOnEnterFullScreen ??
+          this.systemOverlaysOnEnterFullScreen,
+      deviceOrientationsOnEnterFullScreen:
+          deviceOrientationsOnEnterFullScreen ??
+              this.deviceOrientationsOnEnterFullScreen,
+      systemOverlaysAfterFullScreen:
+          systemOverlaysAfterFullScreen ?? this.systemOverlaysAfterFullScreen,
+      deviceOrientationsAfterFullScreen: deviceOrientationsAfterFullScreen ??
+          this.deviceOrientationsAfterFullScreen,
+      routePageBuilder: routePageBuilder ?? this.routePageBuilder,
+    );
+  }
+
   /// If false, the options button in MaterialUI and MaterialDesktopUI
   /// won't be shown.
   final bool showOptions;
