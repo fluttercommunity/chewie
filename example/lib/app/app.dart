@@ -179,7 +179,6 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        _chewieController?.dispose();
                         _videoPlayerController1.pause();
                         _videoPlayerController1.seekTo(const Duration());
                         _createChewieController();
@@ -195,10 +194,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   child: TextButton(
                     onPressed: () {
                       setState(() {
-                        _chewieController?.dispose();
                         _videoPlayerController2.pause();
                         _videoPlayerController2.seekTo(const Duration());
-                        _chewieController = ChewieController(
+                        _chewieController = _chewieController!.copyWith(
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,
                           looping: true,

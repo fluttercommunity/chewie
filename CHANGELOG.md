@@ -1,3 +1,15 @@
+## 1.2.2
+
+* 🛠️ Fix Incorrect use of ParentDataWidget.
+  - Fixes: [#485](https://github.com/brianegan/chewie/issues/485)
+
+## 1.2.1
+
+* 💡 add `showOptions` flag to show/hide the options-menu
+  - Fixes: [#491](https://github.com/brianegan/chewie/issues/491)
+* ⬆️ update `video_player` to 2.1.5
+* 🛠️ fix MaterialUI duration text (RichText)
+
 ## 1.2.0
 
 * 🖥 __Desktop-UI__: Added `AdaptiveControls` where `MaterialDesktopControls` is now the default for Desktop-Platforms (start [ChewieDemo](https://github.com/brianegan/chewie/blob/master/example/lib/app/app.dart) for a preview)
