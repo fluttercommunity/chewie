@@ -69,28 +69,26 @@ class _ChewieDemoState extends State<ChewieDemo> {
     //   ];
 
     final subtitles = [
-        Subtitle(
-          index: 0,
-          start: Duration.zero,
-          end: const Duration(seconds: 10),
-          text: const TextSpan(
-            children: [
-              TextSpan(
-                text: 'Hello',
-                style: TextStyle(color: Colors.red, fontSize: 22),
-              ),
-              TextSpan(
-                text: ' from ',
-                style: TextStyle(color: Colors.green, fontSize: 20),
-              ),
-              TextSpan(
-                text: 'subtitles',
-                style: TextStyle(color: Colors.blue, fontSize: 18),
-              )
-            ]
+      Subtitle(
+        index: 0,
+        start: Duration.zero,
+        end: const Duration(seconds: 10),
+        text: const TextSpan(children: [
+          TextSpan(
+            text: 'Hello',
+            style: TextStyle(color: Colors.red, fontSize: 22),
           ),
-        ),
-        Subtitle(
+          TextSpan(
+            text: ' from ',
+            style: TextStyle(color: Colors.green, fontSize: 20),
+          ),
+          TextSpan(
+            text: 'subtitles',
+            style: TextStyle(color: Colors.blue, fontSize: 18),
+          )
+        ]),
+      ),
+      Subtitle(
           index: 0,
           start: const Duration(seconds: 10),
           end: const Duration(seconds: 20),
@@ -99,8 +97,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
           //   text: 'Whats up? :)',
           //   style: TextStyle(color: Colors.amber, fontSize: 22, fontStyle: FontStyle.italic),
           // ),
-        ),
-      ];
+          ),
+    ];
 
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController1,
@@ -111,13 +109,13 @@ class _ChewieDemoState extends State<ChewieDemo> {
       subtitleBuilder: (context, dynamic subtitle) => Container(
         padding: const EdgeInsets.all(10.0),
         child: subtitle is InlineSpan
-          ? RichText(
-              text: subtitle,
-            )
-          : Text(
-              subtitle.toString(),
-              style: const TextStyle(color: Colors.black),
-            ),
+            ? RichText(
+                text: subtitle,
+              )
+            : Text(
+                subtitle.toString(),
+                style: const TextStyle(color: Colors.black),
+              ),
       ),
 
       // Try playing around with some of these other options:
