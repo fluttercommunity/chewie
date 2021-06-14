@@ -276,7 +276,7 @@ class ChewieController extends ChangeNotifier {
     List<OptionItem> Function(BuildContext)? additionalOptions,
     bool? showControls,
     Subtitles? subtitle,
-    Widget Function(BuildContext, String)? subtitleBuilder,
+    Widget Function(BuildContext, dynamic)? subtitleBuilder,
     Widget? customControls,
     Widget Function(BuildContext, String)? errorBuilder,
     bool? allowedScreenSleep,
