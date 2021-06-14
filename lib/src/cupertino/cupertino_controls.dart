@@ -171,7 +171,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
             color: const Color(0x96000000),
             borderRadius: BorderRadius.circular(10.0)),
         child: Text(
-          currentSubtitle.first!.text,
+          currentSubtitle.first!.text.toString(),
           style: const TextStyle(
             fontSize: 18,
           ),

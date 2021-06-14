@@ -29,7 +29,7 @@ class Subtitle {
     int? index,
     Duration? start,
     Duration? end,
-    String? text,
+    dynamic text,
   }) {
     return Subtitle(
       index: index ?? this.index,
@@ -42,7 +42,7 @@ class Subtitle {
   final int index;
   final Duration start;
   final Duration end;
-  final String text;
+  final dynamic text;
 
   @override
   String toString() {
