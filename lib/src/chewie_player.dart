@@ -225,7 +225,7 @@ class ChewieController extends ChangeNotifier {
     this.aspectRatio,
     this.autoInitialize = false,
     this.autoPlay = false,
-    this.dragableProgressBar = false,
+    this.dragableProgressBar = true,
     this.startAt,
     this.looping = false,
     this.fullScreenByDefault = false,
@@ -264,7 +264,7 @@ class ChewieController extends ChangeNotifier {
     double? aspectRatio,
     bool? autoInitialize,
     bool? autoPlay,
-    bool? dragableProgressBar = true,
+    bool? dragableProgressBar,
     Duration? startAt,
     bool? looping,
     bool? fullScreenByDefault,
@@ -382,7 +382,7 @@ class ChewieController extends ChangeNotifier {
   /// Play the video as soon as it's displayed
   final bool autoPlay;
 
-  /// Play the video as soon as it's displayed
+  /// Non-Dragable Progress Bar
   final bool dragableProgressBar;
 
   /// Start video at a certain position

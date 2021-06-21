@@ -43,13 +43,9 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   bool _controllerWasPlaying = false;
 
   VideoPlayerController get controller => widget.controller;
-  ChewieController? _chewieController;
+
   @override
   void initState() {
-    setState(() {
-      _chewieController = ChewieController.of(context);
-    });
-
     super.initState();
     controller.addListener(listener);
   }
@@ -70,7 +66,9 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
   @override
   Widget build(BuildContext context) {
-    return _chewieController!.dragableProgressBar
+    final ChewieController chewieController = ChewieController.of(context);
+
+    return chewieController.dragableProgressBar
         ? GestureDetector(
             onHorizontalDragStart: (DragStartDetails details) {
               if (!controller.value.isInitialized) {
