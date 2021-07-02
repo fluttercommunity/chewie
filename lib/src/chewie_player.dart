@@ -29,10 +29,13 @@ class Chewie extends StatefulWidget {
   const Chewie({
     Key? key,
     required this.controller,
+    required this.onToggleFullscreen,
   }) : super(key: key);
 
   /// The [ChewieController]
   final ChewieController controller;
+
+  final void Function(bool newState) onToggleFullscreen;
 
   @override
   ChewieState createState() {
@@ -68,11 +71,12 @@ class ChewieState extends State<Chewie> {
   Future<void> listener() async {
     if (widget.controller.isFullScreen && !_isFullScreen) {
       _isFullScreen = true;
-      await _pushFullScreenWidget(context);
+      // await _pushFullScreenWidget(context);
     } else if (_isFullScreen) {
-      Navigator.of(context, rootNavigator: true).pop();
+      // Navigator.of(context, rootNavigator: true).pop();
       _isFullScreen = false;
     }
+    widget.onToggleFullscreen(_isFullScreen);
   }
 
   @override
@@ -155,16 +159,13 @@ class ChewieState extends State<Chewie> {
     // so we do not need to check Wakelock.isEnabled.
     Wakelock.disable();
 
-    SystemChrome.setEnabledSystemUIOverlays(
-        widget.controller.systemOverlaysAfterFullScreen);
-    SystemChrome.setPreferredOrientations(
-        widget.controller.deviceOrientationsAfterFullScreen);
+    SystemChrome.setEnabledSystemUIOverlays(widget.controller.systemOverlaysAfterFullScreen);
+    SystemChrome.setPreferredOrientations(widget.controller.deviceOrientationsAfterFullScreen);
   }
 
   void onEnterFullScreen() {
     final videoWidth = widget.controller.videoPlayerController.value.size.width;
-    final videoHeight =
-        widget.controller.videoPlayerController.value.size.height;
+    final videoHeight = widget.controller.videoPlayerController.value.size.height;
 
     if (widget.controller.systemOverlaysOnEnterFullScreen != null) {
       /// Optional user preferred settings
@@ -223,6 +224,7 @@ class ChewieController extends ChangeNotifier {
     required this.videoPlayerController,
     this.optionsTranslation,
     this.aspectRatio,
+    this.isFirstPlay = false,
     this.autoInitialize = false,
     this.autoPlay = false,
     this.startAt,
@@ -261,6 +263,7 @@ class ChewieController extends ChangeNotifier {
     VideoPlayerController? videoPlayerController,
     OptionsTranslation? optionsTranslation,
     double? aspectRatio,
+    bool? isFirstPlay,
     bool? autoInitialize,
     bool? autoPlay,
     Duration? startAt,
@@ -289,28 +292,25 @@ class ChewieController extends ChangeNotifier {
     List<DeviceOrientation>? deviceOrientationsOnEnterFullScreen,
     List<SystemUiOverlay>? systemOverlaysAfterFullScreen,
     List<DeviceOrientation>? deviceOrientationsAfterFullScreen,
-    Widget Function(BuildContext, Animation<double>, Animation<double>,
-            _ChewieControllerProvider)?
+    Widget Function(
+            BuildContext, Animation<double>, Animation<double>, _ChewieControllerProvider)?
         routePageBuilder,
   }) {
     return ChewieController(
-      videoPlayerController:
-          videoPlayerController ?? this.videoPlayerController,
+      videoPlayerController: videoPlayerController ?? this.videoPlayerController,
       optionsTranslation: optionsTranslation ?? this.optionsTranslation,
       aspectRatio: aspectRatio ?? this.aspectRatio,
+      isFirstPlay: isFirstPlay ?? this.isFirstPlay,
       autoInitialize: autoInitialize ?? this.autoInitialize,
       autoPlay: autoPlay ?? this.autoPlay,
       startAt: startAt ?? this.startAt,
       looping: looping ?? this.looping,
       fullScreenByDefault: fullScreenByDefault ?? this.fullScreenByDefault,
-      cupertinoProgressColors:
-          cupertinoProgressColors ?? this.cupertinoProgressColors,
-      materialProgressColors:
-          materialProgressColors ?? this.materialProgressColors,
+      cupertinoProgressColors: cupertinoProgressColors ?? this.cupertinoProgressColors,
+      materialProgressColors: materialProgressColors ?? this.materialProgressColors,
       placeholder: placeholder ?? this.placeholder,
       overlay: overlay ?? this.overlay,
-      showControlsOnInitialize:
-          showControlsOnInitialize ?? this.showControlsOnInitialize,
+      showControlsOnInitialize: showControlsOnInitialize ?? this.showControlsOnInitialize,
       showOptions: showOptions ?? this.showOptions,
       optionsBuilder: optionsBuilder ?? this.optionsBuilder,
       additionalOptions: additionalOptions ?? this.additionalOptions,
@@ -323,18 +323,16 @@ class ChewieController extends ChangeNotifier {
       isLive: isLive ?? this.isLive,
       allowFullScreen: allowFullScreen ?? this.allowFullScreen,
       allowMuting: allowMuting ?? this.allowMuting,
-      allowPlaybackSpeedChanging:
-          allowPlaybackSpeedChanging ?? this.allowPlaybackSpeedChanging,
+      allowPlaybackSpeedChanging: allowPlaybackSpeedChanging ?? this.allowPlaybackSpeedChanging,
       playbackSpeeds: playbackSpeeds ?? this.playbackSpeeds,
-      systemOverlaysOnEnterFullScreen: systemOverlaysOnEnterFullScreen ??
-          this.systemOverlaysOnEnterFullScreen,
+      systemOverlaysOnEnterFullScreen:
+          systemOverlaysOnEnterFullScreen ?? this.systemOverlaysOnEnterFullScreen,
       deviceOrientationsOnEnterFullScreen:
-          deviceOrientationsOnEnterFullScreen ??
-              this.deviceOrientationsOnEnterFullScreen,
+          deviceOrientationsOnEnterFullScreen ?? this.deviceOrientationsOnEnterFullScreen,
       systemOverlaysAfterFullScreen:
           systemOverlaysAfterFullScreen ?? this.systemOverlaysAfterFullScreen,
-      deviceOrientationsAfterFullScreen: deviceOrientationsAfterFullScreen ??
-          this.deviceOrientationsAfterFullScreen,
+      deviceOrientationsAfterFullScreen:
+          deviceOrientationsAfterFullScreen ?? this.deviceOrientationsAfterFullScreen,
       routePageBuilder: routePageBuilder ?? this.routePageBuilder,
     );
   }
@@ -353,19 +351,20 @@ class ChewieController extends ChangeNotifier {
   /// These are required for the default `OptionItem`'s
   final OptionsTranslation? optionsTranslation;
 
+  bool isFirstPlay;
+
   /// Build your own options with default chewieOptions shiped through
   /// the builder method. Just add your own options to the Widget
   /// you'll build. If you want to hide the chewieOptions, just leave them
   /// out from your Widget.
-  final Future<void> Function(
-      BuildContext context, List<OptionItem> chewieOptions)? optionsBuilder;
+  final Future<void> Function(BuildContext context, List<OptionItem> chewieOptions)?
+      optionsBuilder;
 
   /// Add your own additional options on top of chewie options
   final List<OptionItem> Function(BuildContext context)? additionalOptions;
 
   /// Define here your own Widget on how your n'th subtitle will look like
-  final Widget Function(BuildContext context, dynamic subtitle)?
-      subtitleBuilder;
+  final Widget Function(BuildContext context, dynamic subtitle)? subtitleBuilder;
 
   /// Add a List of Subtitles here in `Subtitles.subtitle`
   Subtitles? subtitle;
@@ -397,8 +396,7 @@ class ChewieController extends ChangeNotifier {
 
   /// When the video playback runs into an error, you can build a custom
   /// error message.
-  final Widget Function(BuildContext context, String errorMessage)?
-      errorBuilder;
+  final Widget Function(BuildContext context, String errorMessage)? errorBuilder;
 
   /// The Aspect Ratio of the Video. Important to get the correct size of the
   /// video!
@@ -458,8 +456,8 @@ class ChewieController extends ChangeNotifier {
   final ChewieRoutePageBuilder? routePageBuilder;
 
   static ChewieController of(BuildContext context) {
-    final chewieControllerProvider = context
-        .dependOnInheritedWidgetOfExactType<_ChewieControllerProvider>()!;
+    final chewieControllerProvider =
+        context.dependOnInheritedWidgetOfExactType<_ChewieControllerProvider>()!;
 
     return chewieControllerProvider.controller;
   }
@@ -473,8 +471,7 @@ class ChewieController extends ChangeNotifier {
   Future _initialize() async {
     await videoPlayerController.setLooping(looping);
 
-    if ((autoInitialize || autoPlay) &&
-        !videoPlayerController.value.isInitialized) {
+    if ((autoInitialize || autoPlay) && !videoPlayerController.value.isInitialized) {
       await videoPlayerController.initialize();
     }
 
@@ -557,6 +554,5 @@ class _ChewieControllerProvider extends InheritedWidget {
   final ChewieController controller;
 
   @override
-  bool updateShouldNotify(_ChewieControllerProvider old) =>
-      controller != old.controller;
+  bool updateShouldNotify(_ChewieControllerProvider old) => controller != old.controller;
 }

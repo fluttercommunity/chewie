@@ -19,6 +19,10 @@ class PlayerNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  void hideStuffNoState(bool value) {
+    _hideStuff = value;
+  }
+
   // ignore: prefer_constructors_over_static_methods
   static PlayerNotifier init() {
     return PlayerNotifier._(

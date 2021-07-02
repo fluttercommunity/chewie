@@ -44,10 +44,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
         'https://assets.mixkit.co/videos/preview/mixkit-daytime-city-traffic-aerial-view-56-large.mp4');
     _videoPlayerController2 = VideoPlayerController.network(
         'https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4');
-    await Future.wait([
-      _videoPlayerController1.initialize(),
-      _videoPlayerController2.initialize()
-    ]);
+    await Future.wait(
+        [_videoPlayerController1.initialize(), _videoPlayerController2.initialize()]);
     _createChewieController();
     setState(() {});
   }
@@ -150,10 +148,10 @@ class _ChewieDemoState extends State<ChewieDemo> {
             Expanded(
               child: Center(
                 child: _chewieController != null &&
-                        _chewieController!
-                            .videoPlayerController.value.isInitialized
+                        _chewieController!.videoPlayerController.value.isInitialized
                     ? Chewie(
                         controller: _chewieController!,
+                        onToggleFullscreen: (newState) {},
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
