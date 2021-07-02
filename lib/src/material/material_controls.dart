@@ -41,7 +41,8 @@ class _MaterialControlsState extends State<MaterialControls>
   bool _dragging = false;
   bool _displayTapped = false;
 
-  final barHeight = 48.0 * 2;
+  // final originalBarHeight = 48.0 * 1.25;
+  final barHeight = 48.0 * 1.5;
   final marginSize = 5.0;
 
   late VideoPlayerController controller;
@@ -265,6 +266,7 @@ class _MaterialControlsState extends State<MaterialControls>
     BuildContext context,
   ) {
     // final iconColor = Theme.of(context).textTheme.button!.color;
+    final bool isFinished = _latestValue.position >= _latestValue.duration;
 
     return AnimatedOpacity(
       opacity: notifier.hideStuff ? 0.0 : 1.0,
@@ -299,9 +301,10 @@ class _MaterialControlsState extends State<MaterialControls>
                   ],
                 ),
               ),
-              SizedBox(
-                height: chewieController.isFullScreen ? 15.0 : 8,
-              ),
+              if (!isFinished)
+                SizedBox(
+                  height: chewieController.isFullScreen ? 15.0 : 8,
+                ),
               if (!chewieController.isLive && !chewieController.isFirstPlay)
                 Expanded(
                   child: Container(
@@ -321,6 +324,8 @@ class _MaterialControlsState extends State<MaterialControls>
   }
 
   GestureDetector _buildExpandButton() {
+    final bool isFinished = _latestValue.position >= _latestValue.duration;
+
     return GestureDetector(
       onTap: _onExpandCollapse,
       child: AnimatedOpacity(
@@ -403,37 +408,6 @@ class _MaterialControlsState extends State<MaterialControls>
                 onTap: closePlayer,
                 icon: Icons.close,
               ),
-              // child: GestureDetector(
-              //   onTap: closePlayer,
-              //   child: Container(
-              //     color: Colors.transparent,
-              //     child: Center(
-              //       child: AnimatedOpacity(
-              //         opacity: !_dragging && !notifier.hideStuff ? 1.0 : 0.0,
-              //         duration: const Duration(milliseconds: 300),
-              //         child: Container(
-              //           decoration: BoxDecoration(
-              //             color: Colors.black54,
-              //             shape: BoxShape.circle,
-              //           ),
-              //           child: Padding(
-              //             padding: const EdgeInsets.all(12.0),
-              //             // Always set the iconSize on the IconButton, not on the Icon itself:
-              //             // https://github.com/flutter/flutter/issues/52980
-              //             child: IconButton(
-              //               iconSize: 32,
-              //               icon: Icon(
-              //                 Icons.close,
-              //                 color: Colors.white,
-              //               ),
-              //               onPressed: closePlayer,
-              //             ),
-              //           ),
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
             ),
           if (isFinished)
             const SizedBox(
@@ -445,18 +419,18 @@ class _MaterialControlsState extends State<MaterialControls>
                 onTap: () {
                   if (_latestValue.isPlaying) {
                     if (_displayTapped) {
-                      setState(() {
-                        notifier.hideStuff = true;
-                      });
+                      // setState(() {
+                      notifier.hideStuff = true;
+                      // });
                     } else {
                       _cancelAndRestartTimer();
                     }
                   } else {
                     _playPause();
 
-                    setState(() {
-                      notifier.hideStuff = true;
-                    });
+                    // setState(() {
+                    notifier.hideStuff = true;
+                    // });
                   }
                 },
                 child: CenterPlayButton(
