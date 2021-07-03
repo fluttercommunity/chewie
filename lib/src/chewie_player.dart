@@ -225,6 +225,7 @@ class ChewieController extends ChangeNotifier {
     this.optionsTranslation,
     this.aspectRatio,
     this.isFirstPlay = false,
+    this.onCloseCallback,
     this.autoInitialize = false,
     this.autoPlay = false,
     this.startAt,
@@ -266,6 +267,7 @@ class ChewieController extends ChangeNotifier {
     bool? isFirstPlay,
     bool? autoInitialize,
     bool? autoPlay,
+    VoidCallback? onCloseCallback,
     Duration? startAt,
     bool? looping,
     bool? fullScreenByDefault,
@@ -303,6 +305,7 @@ class ChewieController extends ChangeNotifier {
       isFirstPlay: isFirstPlay ?? this.isFirstPlay,
       autoInitialize: autoInitialize ?? this.autoInitialize,
       autoPlay: autoPlay ?? this.autoPlay,
+      onCloseCallback: onCloseCallback ?? this.onCloseCallback,
       startAt: startAt ?? this.startAt,
       looping: looping ?? this.looping,
       fullScreenByDefault: fullScreenByDefault ?? this.fullScreenByDefault,
@@ -352,6 +355,8 @@ class ChewieController extends ChangeNotifier {
   final OptionsTranslation? optionsTranslation;
 
   bool isFirstPlay;
+
+  final VoidCallback? onCloseCallback;
 
   /// Build your own options with default chewieOptions shiped through
   /// the builder method. Just add your own options to the Widget
