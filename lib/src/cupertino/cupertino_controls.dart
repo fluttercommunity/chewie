@@ -16,7 +16,6 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 
-
 class CupertinoControls extends StatefulWidget {
   const CupertinoControls({
     required this.backgroundColor,
@@ -197,7 +196,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
         child: Column(
           children: [
             Container(
-              height: 100,
+              //phil
+              height: 40,
+              padding: EdgeInsets.only(right: 20, left: 20),
               child: Column(
                 children: [
                   _buildProgressBar(),
@@ -219,53 +220,47 @@ class _CupertinoControlsState extends State<CupertinoControls>
               ),
             ),
             Container(
+              padding: EdgeInsets.only(bottom: 30),
               color: Colors.transparent,
               alignment: Alignment.bottomCenter,
               // margin: EdgeInsets.all(marginSize),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
-                child:
-                BackdropFilter(
-                  filter: ui.ImageFilter.blur(
-                    // sigmaX: 10.0,
-                    // sigmaY: 10.0,
-                  ),
-                  child: Column(
-                    children: [
-                      // Container(child: Text('hello'),),
-                      Container(
-                        height: 50,
-                        // color: Colors.red,
-                        child: chewieController.isLive
-                            ? Row(
-                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  _buildPlayPause(
-                                      controller, iconColor, barHeight),
-                                  _buildLive(iconColor),
-                                ],
-                              )
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                //phil Controll 부분 테스트
-                                children: <Widget>[
-                                  _buildSkipBack(iconColor, barHeight),
-                                  _buildPlayPause(
-                                      controller, iconColor, barHeight),
-                                  _buildSkipForward(iconColor, barHeight),
-                                  // _buildPosition(iconColor),
-                                  // _buildProgressBar(),
-                                  // _buildRemaining(iconColor),
-                                  // _buildSubtitleToggle(iconColor, barHeight),
-                                  // if (chewieController
-                                  //     .allowPlaybackSpeedChanging)
-                                  //   _buildSpeedButton(
-                                  //       controller, iconColor, barHeight),
-                                ],
-                              ),
-                      ),
-                    ],
-                  ),
+                child: Column(
+                  children: [
+                    // Container(child: Text('hello'),),
+                    Container(
+                      // height: 100,
+                      // color: Colors.red,
+                      child: chewieController.isLive
+                          ? Row(
+                              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                _buildPlayPause(
+                                    controller, iconColor, barHeight),
+                                _buildLive(iconColor),
+                              ],
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              //phil Controll 부분 테스트
+                              children: <Widget>[
+                                _buildSkipBack(iconColor, barHeight),
+                                _buildPlayPause(
+                                    controller, iconColor, barHeight),
+                                _buildSkipForward(iconColor, barHeight),
+                                // _buildPosition(iconColor),
+                                // _buildProgressBar(),
+                                // _buildRemaining(iconColor),
+                                // _buildSubtitleToggle(iconColor, barHeight),
+                                // if (chewieController
+                                //     .allowPlaybackSpeedChanging)
+                                //   _buildSpeedButton(
+                                //       controller, iconColor, barHeight),
+                              ],
+                            ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -418,13 +413,17 @@ class _CupertinoControlsState extends State<CupertinoControls>
     return GestureDetector(
       onTap: _playPause,
       child: Container(
-        height: barHeight,
+        //phil 60
+        height: 60,
+        // height: barHeight,
         color: Colors.transparent,
         padding: const EdgeInsets.only(
           left: 6.0,
           right: 6.0,
         ),
         child: AnimatedPlayPause(
+          // phil 60
+          size: 60,
           color: widget.iconColor,
           playing: controller.value.isPlaying,
         ),
@@ -493,17 +492,20 @@ class _CupertinoControlsState extends State<CupertinoControls>
     return GestureDetector(
       onTap: _skipBack,
       child: Container(
-        height: barHeight,
+        //phil height 50
+        height: 60,
         color: Colors.transparent,
         margin: const EdgeInsets.only(left: 10.0),
         padding: const EdgeInsets.only(
           left: 6.0,
-          right: 6.0,
+          //phil 30
+          right: 30.0,
         ),
         child: Icon(
           CupertinoIcons.gobackward_10,
           color: iconColor,
-          size: 18.0,
+          //phil size 25
+          size: 25.0,
         ),
       ),
     );
@@ -513,19 +515,22 @@ class _CupertinoControlsState extends State<CupertinoControls>
     return GestureDetector(
       onTap: _skipForward,
       child: Container(
-        height: barHeight,
+        //phil 50
+        height: 60,
         color: Colors.transparent,
         padding: const EdgeInsets.only(
-          left: 6.0,
+          //phil 30
+          left: 30.0,
           right: 8.0,
         ),
         margin: const EdgeInsets.only(
           right: 8.0,
         ),
         child: Icon(
-          CupertinoIcons.goforward_15,
+          CupertinoIcons.goforward_10,
           color: iconColor,
-          size: 18.0,
+          //phil 25
+          size: 25.0,
         ),
       ),
     );
@@ -733,7 +738,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     _cancelAndRestartTimer();
     final beginning = const Duration().inMilliseconds;
     final skip =
-        (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
+        (_latestValue.position - const Duration(seconds: 10)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
   }
 
