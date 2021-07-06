@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 
+
 class CupertinoControls extends StatefulWidget {
   const CupertinoControls({
     required this.backgroundColor,
@@ -44,8 +45,10 @@ class _CupertinoControlsState extends State<CupertinoControls>
   bool _dragging = false;
   Duration? _subtitlesPosition;
   bool _subtitleOn = false;
+  bool _displayTapped = false;
 
   late VideoPlayerController controller;
+
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
   ChewieController? _chewieController;
@@ -98,13 +101,14 @@ class _CupertinoControlsState extends State<CupertinoControls>
                 children: <Widget>[
                   _buildTopBar(
                       backgroundColor, iconColor, barHeight, buttonPadding),
-                  const Spacer(),
-                  if (_subtitleOn)
-                    Transform.translate(
-                      offset: Offset(
-                          0.0, notifier.hideStuff ? barHeight * 0.8 : 0.0),
-                      child: _buildSubtitles(chewieController.subtitle!),
-                    ),
+                  // const Spacer(),
+                  // if (_subtitleOn)
+                  //   Transform.translate(
+                  //     offset: Offset(
+                  //         0.0, notifier.hideStuff ? barHeight * 0.8 : 0.0),
+                  //     child: _buildSubtitles(chewieController.subtitle!),
+                  //   ),
+                  // _buildProgressBar(),
                   _buildBottomBar(backgroundColor, iconColor, barHeight),
                 ],
               ),
@@ -185,48 +189,87 @@ class _CupertinoControlsState extends State<CupertinoControls>
     double barHeight,
   ) {
     return SafeArea(
-      bottom: chewieController.isFullScreen,
+      // bottom: chewieController.isFullScreen,
       child: AnimatedOpacity(
         opacity: notifier.hideStuff ? 0.0 : 1.0,
         duration: const Duration(milliseconds: 300),
-        child: Container(
-          color: Colors.transparent,
-          alignment: Alignment.bottomCenter,
-          margin: EdgeInsets.all(marginSize),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10.0),
-            child: BackdropFilter(
-              filter: ui.ImageFilter.blur(
-                sigmaX: 10.0,
-                sigmaY: 10.0,
-              ),
-              child: Container(
-                height: barHeight,
-                color: backgroundColor,
-                child: chewieController.isLive
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          _buildPlayPause(controller, iconColor, barHeight),
-                          _buildLive(iconColor),
-                        ],
-                      )
-                    : Row(
-                        children: <Widget>[
-                          _buildSkipBack(iconColor, barHeight),
-                          _buildPlayPause(controller, iconColor, barHeight),
-                          _buildSkipForward(iconColor, barHeight),
-                          _buildPosition(iconColor),
-                          _buildProgressBar(),
-                          _buildRemaining(iconColor),
-                          _buildSubtitleToggle(iconColor, barHeight),
-                          if (chewieController.allowPlaybackSpeedChanging)
-                            _buildSpeedButton(controller, iconColor, barHeight),
-                        ],
-                      ),
+        //여기에 사이즈를 가짐
+        child: Column(
+          children: [
+            Container(
+              height: 100,
+              child: Column(
+                children: [
+                  _buildProgressBar(),
+                  Row(
+                    //phil Controll 부분 테스트
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // _buildSkipBack(iconColor, barHeight),
+                      // _buildPlayPause(controller, iconColor, barHeight),
+                      // _buildSkipForward(iconColor, barHeight),
+                      _buildPosition(iconColor),
+                      _buildRemaining(iconColor),
+                      // _buildSubtitleToggle(iconColor, barHeight),
+                      // if (chewieController.allowPlaybackSpeedChanging)
+                      //   _buildSpeedButton(controller, iconColor, barHeight),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ),
+            Container(
+              color: Colors.transparent,
+              alignment: Alignment.bottomCenter,
+              // margin: EdgeInsets.all(marginSize),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child:
+                BackdropFilter(
+                  filter: ui.ImageFilter.blur(
+                    // sigmaX: 10.0,
+                    // sigmaY: 10.0,
+                  ),
+                  child: Column(
+                    children: [
+                      // Container(child: Text('hello'),),
+                      Container(
+                        height: 50,
+                        // color: Colors.red,
+                        child: chewieController.isLive
+                            ? Row(
+                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  _buildPlayPause(
+                                      controller, iconColor, barHeight),
+                                  _buildLive(iconColor),
+                                ],
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                //phil Controll 부분 테스트
+                                children: <Widget>[
+                                  _buildSkipBack(iconColor, barHeight),
+                                  _buildPlayPause(
+                                      controller, iconColor, barHeight),
+                                  _buildSkipForward(iconColor, barHeight),
+                                  // _buildPosition(iconColor),
+                                  // _buildProgressBar(),
+                                  // _buildRemaining(iconColor),
+                                  // _buildSubtitleToggle(iconColor, barHeight),
+                                  // if (chewieController
+                                  //     .allowPlaybackSpeedChanging)
+                                  //   _buildSpeedButton(
+                                  //       controller, iconColor, barHeight),
+                                ],
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -284,15 +327,32 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final bool isFinished = _latestValue.position >= _latestValue.duration;
 
     return GestureDetector(
-      onTap: _latestValue.isPlaying
-          ? _cancelAndRestartTimer
-          : () {
-              _hideTimer?.cancel();
+      onTap: () {
+        if (_latestValue.isPlaying) {
+          if (_displayTapped) {
+            setState(() {
+              notifier.hideStuff = true;
+            });
+          } else {
+            _cancelAndRestartTimer();
+          }
+        } else {
+          _playPause();
 
-              setState(() {
-                notifier.hideStuff = false;
-              });
-            },
+          setState(() {
+            notifier.hideStuff = true;
+          });
+        }
+      },
+      // onTap: _latestValue.isPlaying
+      //     ? _cancelAndRestartTimer
+      //     : () {
+      //         _hideTimer?.cancel();
+      //
+      //         setState(() {
+      //           notifier.hideStuff = false;
+      //         });
+      //       },
       child: CenterPlayButton(
         backgroundColor: widget.backgroundColor,
         iconColor: widget.iconColor,
@@ -441,7 +501,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
           right: 6.0,
         ),
         child: Icon(
-          CupertinoIcons.gobackward_15,
+          CupertinoIcons.gobackward_10,
           color: iconColor,
           size: 18.0,
         ),
@@ -552,11 +612,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   void _cancelAndRestartTimer() {
     _hideTimer?.cancel();
+    _startHideTimer();
 
     setState(() {
       notifier.hideStuff = false;
-
-      _startHideTimer();
+      _displayTapped = true;
     });
   }
 
@@ -681,7 +741,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     _cancelAndRestartTimer();
     final end = _latestValue.duration.inMilliseconds;
     final skip =
-        (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
+        (_latestValue.position + const Duration(seconds: 10)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.min(skip, end)));
   }
 
