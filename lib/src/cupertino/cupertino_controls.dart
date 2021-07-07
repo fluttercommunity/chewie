@@ -86,34 +86,64 @@ class _CupertinoControlsState extends State<CupertinoControls>
       child: GestureDetector(
         onTap: () => _cancelAndRestartTimer(),
         child: AbsorbPointer(
-          absorbing: notifier.hideStuff,
-          child: Stack(
-            children: [
-              if (_latestValue.isBuffering)
-                const Center(
-                  child: CircularProgressIndicator(),
+            absorbing: notifier.hideStuff,
+            child: notifier.hideStuff
+            //phil 누르고 안누르고에 따른 변화
+                ? SizedBox(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+                  child: Column(
+                        children: [
+                          _buildMainTopBar(backgroundColor, iconColor, barHeight,
+                              buttonPadding),
+                          Container(
+                            child: const Text(
+                              'hello',
+                              style: TextStyle(
+                                  color: Colors.yellowAccent, fontSize: 40),
+                            ),
+                          ),
+                          Container(
+                            child: const Text(
+                              'hello',
+                              style: TextStyle(
+                                  color: Colors.yellowAccent, fontSize: 40),
+                            ),
+                          ),
+
+                        ],
+                      ),
                 )
-              else
-                _buildHitArea(),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  _buildTopBar(
-                      backgroundColor, iconColor, barHeight, buttonPadding),
-                  // const Spacer(),
-                  // if (_subtitleOn)
-                  //   Transform.translate(
-                  //     offset: Offset(
-                  //         0.0, notifier.hideStuff ? barHeight * 0.8 : 0.0),
-                  //     child: _buildSubtitles(chewieController.subtitle!),
-                  //   ),
-                  // _buildProgressBar(),
-                  _buildBottomBar(backgroundColor, iconColor, barHeight),
-                ],
-              ),
-            ],
-          ),
-        ),
+                : Stack(
+                    children: [
+                      if (_latestValue.isBuffering)
+                        const Center(
+                          child: CircularProgressIndicator(
+                            //phil
+                            color: Colors.yellow,
+                          ),
+                        )
+                      else
+                        _buildHitArea(),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          _buildTopBar(backgroundColor, iconColor, barHeight,
+                              buttonPadding),
+                          // const Spacer(),
+                          // if (_subtitleOn)
+                          //   Transform.translate(
+                          //     offset: Offset(
+                          //         0.0, notifier.hideStuff ? barHeight * 0.8 : 0.0),
+                          //     child: _buildSubtitles(chewieController.subtitle!),
+                          //   ),
+                          // _buildProgressBar(),
+                          _buildBottomBar(
+                              backgroundColor, iconColor, barHeight),
+                        ],
+                      ),
+                    ],
+                  )),
       ),
     );
   }
@@ -182,6 +212,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
     );
   }
 
+
+
   Widget _buildBottomBar(
     Color backgroundColor,
     Color iconColor,
@@ -198,7 +230,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
             Container(
               //phil
               height: 40,
-              padding: EdgeInsets.only(right: 20, left: 20),
+              padding: const EdgeInsets.only(right: 20, left: 20),
               child: Column(
                 children: [
                   _buildProgressBar(),
@@ -220,7 +252,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
               ),
             ),
             Container(
-              padding: EdgeInsets.only(bottom: 30),
+              padding: const EdgeInsets.only(bottom: 30),
               color: Colors.transparent,
               alignment: Alignment.bottomCenter,
               // margin: EdgeInsets.all(marginSize),
@@ -288,33 +320,40 @@ class _CupertinoControlsState extends State<CupertinoControls>
   ) {
     return GestureDetector(
       onTap: _onExpandCollapse,
-      child: AnimatedOpacity(
-        opacity: notifier.hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
-        child: ClipRRect(
+      child:
+          //phil
+      // AnimatedOpacity(
+      //   opacity: notifier.hideStuff ? 0.0 : 1.0,
+      //   duration: const Duration(milliseconds: 300),
+      //   child:
+
+        ClipRRect(
           borderRadius: BorderRadius.circular(10.0),
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 10.0),
-            child: Container(
-              height: barHeight,
-              padding: EdgeInsets.only(
-                left: buttonPadding,
-                right: buttonPadding,
-              ),
-              color: backgroundColor,
-              child: Center(
-                child: Icon(
-                  chewieController.isFullScreen
-                      ? CupertinoIcons.arrow_down_right_arrow_up_left
-                      : CupertinoIcons.arrow_up_left_arrow_down_right,
-                  color: iconColor,
-                  size: 16,
-                ),
+          child:
+              // BackdropFilter(
+              //   filter: ui.ImageFilter.blur(sigmaX: 10.0),
+              //   child:
+              Container(
+            height: barHeight,
+            padding: EdgeInsets.only(
+              left: buttonPadding,
+              right: buttonPadding,
+            ),
+            // color: backgroundColor,
+            child: Center(
+              child: Icon(
+                chewieController.isFullScreen
+                    ? CupertinoIcons.arrow_down_right_arrow_up_left
+                    : CupertinoIcons.arrow_up_left_arrow_down_right,
+                color: iconColor,
+                //phil 25
+                size: 25,
               ),
             ),
           ),
+          // ),
         ),
-      ),
+      // ),
     );
   }
 
@@ -333,7 +372,6 @@ class _CupertinoControlsState extends State<CupertinoControls>
           }
         } else {
           _playPause();
-
           setState(() {
             notifier.hideStuff = true;
           });
@@ -377,31 +415,38 @@ class _CupertinoControlsState extends State<CupertinoControls>
           controller.setVolume(0.0);
         }
       },
-      child: AnimatedOpacity(
-        opacity: notifier.hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
-        child: ClipRRect(
+      child:
+          //phill
+      // AnimatedOpacity(
+      //   opacity: notifier.hideStuff ? 0.0 : 1.0,
+      //   duration: const Duration(milliseconds: 300),
+      //   child:
+    ClipRRect(
           borderRadius: BorderRadius.circular(10.0),
-          child: BackdropFilter(
-            filter: ui.ImageFilter.blur(sigmaX: 10.0),
+          child:
+              // BackdropFilter(
+              //   filter: ui.ImageFilter.blur(sigmaX: 10.0),
+              //   child:
+              Container(
+            //phil
+            // color: backgroundColor,
             child: Container(
-              color: backgroundColor,
-              child: Container(
-                height: barHeight,
-                padding: EdgeInsets.only(
-                  left: buttonPadding,
-                  right: buttonPadding,
-                ),
-                child: Icon(
-                  _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
-                  color: iconColor,
-                  size: 16,
-                ),
+              height: barHeight,
+              padding: EdgeInsets.only(
+                left: buttonPadding,
+                right: buttonPadding,
+              ),
+              child: Icon(
+                _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
+                color: iconColor,
+                //phil 25
+                size: 25,
               ),
             ),
           ),
-        ),
+        // ),
       ),
+      // ),
     );
   }
 
@@ -588,6 +633,34 @@ class _CupertinoControlsState extends State<CupertinoControls>
     );
   }
 
+  Widget _buildMainTopBar(
+      Color backgroundColor,
+      Color iconColor,
+      double barHeight,
+      double buttonPadding,
+      ) {
+    return Container(
+      height: 25,
+      margin: EdgeInsets.only(
+        //phil
+        top: 20,
+        right: 20,
+        left: marginSize,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          if (chewieController.allowMuting)
+            _buildMuteButton(controller, backgroundColor, iconColor, barHeight,
+                buttonPadding),
+          if (chewieController.allowFullScreen)
+            _buildExpandButton(
+                backgroundColor, iconColor, barHeight, buttonPadding),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTopBar(
     Color backgroundColor,
     Color iconColor,
@@ -595,21 +668,22 @@ class _CupertinoControlsState extends State<CupertinoControls>
     double buttonPadding,
   ) {
     return Container(
-      height: barHeight,
+      height: 25,
       margin: EdgeInsets.only(
-        top: marginSize,
-        right: marginSize,
+        //phil
+        top: 20,
+        right: 20,
         left: marginSize,
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
-          if (chewieController.allowFullScreen)
-            _buildExpandButton(
-                backgroundColor, iconColor, barHeight, buttonPadding),
-          const Spacer(),
           if (chewieController.allowMuting)
             _buildMuteButton(controller, backgroundColor, iconColor, barHeight,
                 buttonPadding),
+          if (chewieController.allowFullScreen)
+            _buildExpandButton(
+                backgroundColor, iconColor, barHeight, buttonPadding),
         ],
       ),
     );

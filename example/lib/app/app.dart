@@ -101,22 +101,24 @@ class _ChewieDemoState extends State<ChewieDemo> {
     ];
 
     _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController1,
+      //phil _videoPlayerController2
+      videoPlayerController: _videoPlayerController2,
       autoPlay: true,
       looping: true,
-
-      subtitle: Subtitles(subtitles),
-      subtitleBuilder: (context, dynamic subtitle) => Container(
-        padding: const EdgeInsets.all(10.0),
-        child: subtitle is InlineSpan
-            ? RichText(
-                text: subtitle,
-              )
-            : Text(
-                subtitle.toString(),
-                style: const TextStyle(color: Colors.black),
-              ),
-      ),
+      //phil fullScreenByDefault true
+      fullScreenByDefault: true,
+      // subtitle: Subtitles(subtitles),
+      // subtitleBuilder: (context, dynamic subtitle) => Container(
+      //   padding: const EdgeInsets.all(10.0),
+      //   child: subtitle is InlineSpan
+      //       ? RichText(
+      //           text: subtitle,
+      //         )
+      //       : Text(
+      //           subtitle.toString(),
+      //           style: const TextStyle(color: Colors.black),
+      //         ),
+      // ),
 
       // Try playing around with some of these other options:
 
@@ -137,9 +139,12 @@ class _ChewieDemoState extends State<ChewieDemo> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+
       title: widget.title,
       theme: AppTheme.light.copyWith(
-        platform: _platform ?? Theme.of(context).platform,
+        //phil IOS
+        platform: TargetPlatform.iOS,
       ),
       home: Scaffold(
         appBar: AppBar(
@@ -152,7 +157,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
                 child: _chewieController != null &&
                         _chewieController!
                             .videoPlayerController.value.isInitialized
-                    ? Chewie(
+                    ?
+                Chewie(
                         controller: _chewieController!,
                       )
                     : Column(
