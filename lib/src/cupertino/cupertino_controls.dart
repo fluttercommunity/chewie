@@ -88,32 +88,31 @@ class _CupertinoControlsState extends State<CupertinoControls>
         child: AbsorbPointer(
             absorbing: notifier.hideStuff,
             child: notifier.hideStuff
-            //phil 누르고 안누르고에 따른 변화
+                //phil 누르고 안누르고에 따른 변화
                 ? SizedBox(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-                  child: Column(
-                        children: [
-                          _buildMainTopBar(backgroundColor, iconColor, barHeight,
-                              buttonPadding),
-                          Container(
-                            child: const Text(
-                              'hello',
-                              style: TextStyle(
-                                  color: Colors.yellowAccent, fontSize: 40),
-                            ),
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    child: Column(
+                      children: [
+                        _buildMainTopBar(backgroundColor, iconColor, barHeight,
+                            buttonPadding),
+                        Container(
+                          child: const Text(
+                            'hello',
+                            style: TextStyle(
+                                color: Colors.yellowAccent, fontSize: 40),
                           ),
-                          Container(
-                            child: const Text(
-                              'hello',
-                              style: TextStyle(
-                                  color: Colors.yellowAccent, fontSize: 40),
-                            ),
+                        ),
+                        Container(
+                          child: const Text(
+                            'hello',
+                            style: TextStyle(
+                                color: Colors.yellowAccent, fontSize: 40),
                           ),
-
-                        ],
-                      ),
-                )
+                        ),
+                      ],
+                    ),
+                  )
                 : Stack(
                     children: [
                       if (_latestValue.isBuffering)
@@ -211,8 +210,6 @@ class _CupertinoControlsState extends State<CupertinoControls>
       ),
     );
   }
-
-
 
   Widget _buildBottomBar(
     Color backgroundColor,
@@ -322,37 +319,35 @@ class _CupertinoControlsState extends State<CupertinoControls>
       onTap: _onExpandCollapse,
       child:
           //phil
-      // AnimatedOpacity(
-      //   opacity: notifier.hideStuff ? 0.0 : 1.0,
-      //   duration: const Duration(milliseconds: 300),
-      //   child:
+          // AnimatedOpacity(
+          //   opacity: notifier.hideStuff ? 0.0 : 1.0,
+          //   duration: const Duration(milliseconds: 300),
+          //   child:
 
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10.0),
-          child:
-              // BackdropFilter(
-              //   filter: ui.ImageFilter.blur(sigmaX: 10.0),
-              //   child:
-              Container(
-            height: barHeight,
-            padding: EdgeInsets.only(
-              left: buttonPadding,
-              right: buttonPadding,
-            ),
-            // color: backgroundColor,
-            child: Center(
-              child: Icon(
-                chewieController.isFullScreen
-                    ? CupertinoIcons.arrow_down_right_arrow_up_left
-                    : CupertinoIcons.arrow_up_left_arrow_down_right,
-                color: iconColor,
-                //phil 25
-                size: 25,
-              ),
-            ),
-          ),
-          // ),
+          // BackdropFilter(
+          //   filter: ui.ImageFilter.blur(sigmaX: 10.0),
+          //   child:
+          Container(
+        //phill
+        height: 25,
+        padding: EdgeInsets.only(
+          left: buttonPadding,
+          right: buttonPadding,
         ),
+        // color: backgroundColor,
+        child: Center(
+          child: Icon(
+            chewieController.isFullScreen
+                ? CupertinoIcons.arrow_down_right_arrow_up_left
+                : CupertinoIcons.arrow_up_left_arrow_down_right,
+            color: iconColor,
+            //phil 25
+            size: 25,
+          ),
+        ),
+      ),
+      // ),
+
       // ),
     );
   }
@@ -417,35 +412,28 @@ class _CupertinoControlsState extends State<CupertinoControls>
       },
       child:
           //phill
-      // AnimatedOpacity(
-      //   opacity: notifier.hideStuff ? 0.0 : 1.0,
-      //   duration: const Duration(milliseconds: 300),
-      //   child:
-    ClipRRect(
-          borderRadius: BorderRadius.circular(10.0),
-          child:
-              // BackdropFilter(
-              //   filter: ui.ImageFilter.blur(sigmaX: 10.0),
-              //   child:
-              Container(
-            //phil
-            // color: backgroundColor,
-            child: Container(
-              height: barHeight,
-              padding: EdgeInsets.only(
-                left: buttonPadding,
-                right: buttonPadding,
-              ),
-              child: Icon(
-                _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
-                color: iconColor,
-                //phil 25
-                size: 25,
-              ),
-            ),
-          ),
-        // ),
+          // AnimatedOpacity(
+          //   opacity: notifier.hideStuff ? 0.0 : 1.0,
+          //   duration: const Duration(milliseconds: 300),
+          //   child:
+
+          //phil
+          // color: backgroundColor,
+          Container(
+        //phil
+        height: 25,
+        padding: EdgeInsets.only(
+          left: buttonPadding,
+          right: buttonPadding,
+        ),
+        child: Icon(
+          _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
+          color: iconColor,
+          //phil 25
+          size: 25,
+        ),
       ),
+      // ),
       // ),
     );
   }
@@ -634,11 +622,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
   }
 
   Widget _buildMainTopBar(
-      Color backgroundColor,
-      Color iconColor,
-      double barHeight,
-      double buttonPadding,
-      ) {
+    Color backgroundColor,
+    Color iconColor,
+    double barHeight,
+    double buttonPadding,
+  ) {
     return Container(
       height: 25,
       margin: EdgeInsets.only(

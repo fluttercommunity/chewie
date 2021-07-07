@@ -209,7 +209,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
                               index: 0,
                               start: Duration.zero,
                               end: const Duration(seconds: 10),
-                              text: 'Hello from subtitles',
+                              text: '
+                               from subtitles',
                             ),
                             Subtitle(
                               index: 0,
