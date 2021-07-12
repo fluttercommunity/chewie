@@ -10,9 +10,8 @@ import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
-
+import 'package:ext_video_player/ext_video_player.dart';
 import 'widgets/playback_speed_dialog.dart';
 
 class MaterialControls extends StatefulWidget {
