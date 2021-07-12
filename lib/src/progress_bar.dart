@@ -67,7 +67,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onHorizontalDragStart: (DragStartDetails details) {
-        if (!controller.value.isInitialized) {
+        if (!controller.value.initialized) {
           return;
         }
         _controllerWasPlaying = controller.value.isPlaying;
@@ -78,7 +78,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         widget.onDragStart?.call();
       },
       onHorizontalDragUpdate: (DragUpdateDetails details) {
-        if (!controller.value.isInitialized) {
+        if (!controller.value.initialized) {
           return;
         }
         _seekToRelativePosition(details.globalPosition);
@@ -93,7 +93,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         widget.onDragEnd?.call();
       },
       onTapDown: (TapDownDetails details) {
-        if (!controller.value.isInitialized) {
+        if (!controller.value.initialized) {
           return;
         }
         _seekToRelativePosition(details.globalPosition);
@@ -153,7 +153,7 @@ class _ProgressBarPainter extends CustomPainter {
       ),
       colors.backgroundPaint,
     );
-    if (!value.isInitialized) {
+    if (!value.initialized) {
       return;
     }
     final double playedPartPercent =
