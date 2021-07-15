@@ -8,23 +8,25 @@ import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino/cupertino_progress_bar.dart';
 import 'package:chewie/src/helpers/utils.dart';
+import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
-import 'package:chewie/src/models/subtitle_model.dart';
 
 class CupertinoControls extends StatefulWidget {
   const CupertinoControls({
     required this.backgroundColor,
     required this.iconColor,
+    this.showPlayButton = true,
     Key? key,
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color iconColor;
+  final bool showPlayButton;
 
   @override
   State<StatefulWidget> createState() {
@@ -46,6 +48,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
   bool _subtitleOn = false;
 
   late VideoPlayerController controller;
+
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
   ChewieController? _chewieController;
@@ -282,6 +285,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   Widget _buildHitArea() {
     final bool isFinished = _latestValue.position >= _latestValue.duration;
+    final bool showPlayButton =
+        widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
 
     return GestureDetector(
       onTap: _latestValue.isPlaying
@@ -298,7 +303,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         iconColor: widget.iconColor,
         isFinished: isFinished,
         isPlaying: controller.value.isPlaying,
-        show: !_latestValue.isPlaying && !_dragging,
+        show: showPlayButton,
         onPressed: _playPause,
       ),
     );
