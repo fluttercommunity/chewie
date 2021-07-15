@@ -4,20 +4,25 @@ import 'package:chewie/src/animated_play_pause.dart';
 import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/helpers/utils.dart';
+import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/models/option_item.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
+import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
-import 'package:chewie/src/models/subtitle_model.dart';
 
 import 'widgets/playback_speed_dialog.dart';
 
 class MaterialDesktopControls extends StatefulWidget {
-  const MaterialDesktopControls({Key? key}) : super(key: key);
+  const MaterialDesktopControls({
+    this.showPlayButton = true,
+    Key? key,
+  }) : super(key: key);
+
+  final bool showPlayButton;
 
   @override
   State<StatefulWidget> createState() {
@@ -43,6 +48,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
   late VideoPlayerController controller;
   ChewieController? _chewieController;
+
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
 
@@ -324,6 +330,8 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
   Widget _buildHitArea() {
     final bool isFinished = _latestValue.position >= _latestValue.duration;
+    final bool showPlayButton =
+        widget.showPlayButton && !_dragging && !notifier.hideStuff;
 
     return GestureDetector(
       onTap: () {
@@ -348,7 +356,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
         iconColor: Colors.white,
         isFinished: isFinished,
         isPlaying: controller.value.isPlaying,
-        show: !_dragging && !notifier.hideStuff,
+        show: showPlayButton,
         onPressed: _playPause,
       ),
     );
