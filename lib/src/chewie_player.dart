@@ -1,18 +1,18 @@
 import 'dart:async';
 
-import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/material/models/options_translation.dart';
-import 'package:chewie/src/notifiers/player_notifier.dart';
-import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
-import 'package:chewie/src/models/subtitle_model.dart';
 
-import 'material/models/option_item.dart';
+import '../src/chewie_progress_colors.dart';
+import '../src/material/models/options_translation.dart';
+import '../src/models/subtitle_model.dart';
+import '../src/notifiers/player_notifier.dart';
+import '../src/player_with_controls.dart';
+import './material/models/option_item.dart';
 
 typedef ChewieRoutePageBuilder = Widget Function(
   BuildContext context,
@@ -226,6 +226,7 @@ class ChewieController extends ChangeNotifier {
     this.aspectRatio,
     this.isFirstPlay = false,
     this.onCloseCallback,
+    this.onInitialPlayCompletedCallBack,
     this.autoInitialize = false,
     this.autoPlay = false,
     this.startAt,
@@ -306,6 +307,8 @@ class ChewieController extends ChangeNotifier {
       autoInitialize: autoInitialize ?? this.autoInitialize,
       autoPlay: autoPlay ?? this.autoPlay,
       onCloseCallback: onCloseCallback ?? this.onCloseCallback,
+      onInitialPlayCompletedCallBack:
+          onInitialPlayCompletedCallBack ?? this.onInitialPlayCompletedCallBack,
       startAt: startAt ?? this.startAt,
       looping: looping ?? this.looping,
       fullScreenByDefault: fullScreenByDefault ?? this.fullScreenByDefault,
@@ -357,6 +360,8 @@ class ChewieController extends ChangeNotifier {
   bool isFirstPlay;
 
   final VoidCallback? onCloseCallback;
+
+  final VoidCallback? onInitialPlayCompletedCallBack;
 
   /// Build your own options with default chewieOptions shiped through
   /// the builder method. Just add your own options to the Widget
@@ -495,6 +500,11 @@ class ChewieController extends ChangeNotifier {
     if (fullScreenByDefault) {
       videoPlayerController.addListener(_fullScreenListener);
     }
+    if (onInitialPlayCompletedCallBack != null) {
+      videoPlayerController.addListener(_onInitialPlayCompleted);
+    }
+
+    videoPlayerController.addListener(_playBackIncrement);
   }
 
   Future<void> _fullScreenListener() async {
@@ -503,6 +513,25 @@ class ChewieController extends ChangeNotifier {
       videoPlayerController.removeListener(_fullScreenListener);
     }
   }
+
+  void _playBackIncrement() {
+    if (isFinished) {
+      _noOfTimesPlayed++;
+      print(_noOfTimesPlayed);
+    }
+  }
+
+  int _noOfTimesPlayed = 0;
+
+  Future<void> _onInitialPlayCompleted() async {
+    if (onInitialPlayCompletedCallBack != null && _noOfTimesPlayed <= 1 && isFinished) {
+      onInitialPlayCompletedCallBack!();
+      videoPlayerController.removeListener(_onInitialPlayCompleted);
+    }
+  }
+
+  bool get isFinished =>
+      videoPlayerController.value.position >= videoPlayerController.value.duration;
 
   void enterFullScreen() {
     _isFullScreen = true;

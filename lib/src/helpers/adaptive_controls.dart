@@ -1,6 +1,6 @@
-import 'package:chewie/chewie.dart';
-import 'package:chewie/src/material/material_desktop_controls.dart';
 import 'package:flutter/material.dart';
+import '../../in_app_picture_in_picture.dart';
+import '../../src/material/material_desktop_controls.dart';
 
 class AdaptiveControls extends StatelessWidget {
   const AdaptiveControls({
