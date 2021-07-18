@@ -487,7 +487,7 @@ class ChewieController extends ChangeNotifier {
 
     if (autoPlay) {
       if (fullScreenByDefault) {
-        enterFullScreen();
+        // enterFullScreen();
       }
 
       await videoPlayerController.play();
@@ -517,7 +517,7 @@ class ChewieController extends ChangeNotifier {
   void _playBackIncrement() {
     if (isFinished) {
       _noOfTimesPlayed++;
-      print(_noOfTimesPlayed);
+      // print(_noOfTimesPlayed);
     }
   }
 
@@ -533,9 +533,9 @@ class ChewieController extends ChangeNotifier {
   bool get isFinished =>
       videoPlayerController.value.position >= videoPlayerController.value.duration;
 
-  void enterFullScreen() {
+  void enterFullScreen({bool notify = true}) {
     _isFullScreen = true;
-    notifyListeners();
+    if (notify) notifyListeners();
   }
 
   void exitFullScreen() {

@@ -53,7 +53,7 @@ class _MaterialControlsState extends State<MaterialControls>
   @override
   void initState() {
     super.initState();
-    print("Init stateeeeee");
+    // print("Init stateeeeee");
     notifier = Provider.of<PlayerNotifier>(context, listen: false);
   }
 
@@ -149,7 +149,7 @@ class _MaterialControlsState extends State<MaterialControls>
             (chewieController.fullScreenByDefault && !chewieController.isFirstPlay)) &&
         !isFinished;
     return Padding(
-      padding: const EdgeInsets.only(top: 4.0, left: 8, right: 8),
+      padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
       child: Row(
         children: [
           if (widget.onClose != null && !chewieController.isFirstPlay)
@@ -157,13 +157,23 @@ class _MaterialControlsState extends State<MaterialControls>
               onTap: closePlayer,
               showWhenFinshedPlayingVideo: true,
               icon: Icons.close,
-              padding: EdgeInsets.zero,
-              // iconSize: 18,
+              padding: const EdgeInsets.all(4),
+              constraints: BoxConstraints(
+                maxHeight: 36,
+                maxWidth: 36,
+              ),
+              iconSize: 24,
             ),
           if (showFullscreen) const Spacer(),
           if (showFullscreen)
             _buildIconbutton(
-              padding: EdgeInsets.zero,
+              padding: const EdgeInsets.all(4),
+              constraints: BoxConstraints(
+                maxHeight: 36,
+                maxWidth: 36,
+              ),
+              iconSize: 24,
+              // padding: EdgeInsets.zero,
               icon: chewieController.isFullScreen
                   ? Icons.fullscreen_exit_rounded
                   : Icons.fullscreen_rounded,
@@ -362,9 +372,10 @@ class _MaterialControlsState extends State<MaterialControls>
     required IconData? icon,
     bool showWhenFinshedPlayingVideo = false,
     double iconSize = 32.0,
-    EdgeInsetsGeometry padding = const EdgeInsets.all(12.0),
+    EdgeInsetsGeometry padding = const EdgeInsets.all(8.0),
     bool alwayShow = false,
     Widget? iconWidget,
+    BoxConstraints? constraints,
   }) {
     final isFinished = _latestValue.position >= _latestValue.duration;
     return GestureDetector(
@@ -392,6 +403,7 @@ class _MaterialControlsState extends State<MaterialControls>
                 // https://github.com/flutter/flutter/issues/52980
                 child: iconWidget ??
                     IconButton(
+                      constraints: constraints,
                       iconSize: iconSize,
                       padding: EdgeInsets.zero,
                       icon: Icon(
