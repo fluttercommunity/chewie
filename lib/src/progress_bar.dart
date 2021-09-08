@@ -68,7 +68,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   Widget build(BuildContext context) {
     final ChewieController chewieController = ChewieController.of(context);
 
-    return chewieController.dragableProgressBar
+    return chewieController.draggableProgressBar
         ? GestureDetector(
             onHorizontalDragStart: (DragStartDetails details) {
               if (!controller.value.isInitialized) {
