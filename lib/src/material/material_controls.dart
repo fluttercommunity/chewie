@@ -28,6 +28,7 @@ class _MaterialControlsState extends State<MaterialControls>
     with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
   late VideoPlayerValue _latestValue;
+  double? _latestVolume;
   Timer? _hideTimer;
   Timer? _initTimer;
   late var _subtitlesPosition = const Duration();
@@ -281,8 +282,10 @@ class _MaterialControlsState extends State<MaterialControls>
                       const Expanded(child: Text('LIVE'))
                     else
                       _buildPosition(iconColor),
+                    if (chewieController.allowMuting) _buildMuteButton(controller),
+                    const Spacer(),
                     if (chewieController.allowFullScreen) _buildExpandButton(),
-                  ],
+                    ],
                 ),
               ),
               SizedBox(
@@ -300,6 +303,39 @@ class _MaterialControlsState extends State<MaterialControls>
                   ),
                 ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+GestureDetector _buildMuteButton(
+    VideoPlayerController controller,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        _cancelAndRestartTimer();
+
+        if (_latestValue.volume == 0) {
+          controller.setVolume(_latestVolume ?? 0.5);
+        } else {
+          _latestVolume = controller.value.volume;
+          controller.setVolume(0.0);
+        }
+      },
+      child: AnimatedOpacity(
+        opacity: notifier.hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: ClipRect(
+          child: Container(
+            height: barHeight,
+            padding: const EdgeInsets.only(
+              left: 6.0,
+            ),
+            child: Icon(
+              _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
+              color: Colors.white,
+            ),
           ),
         ),
       ),
