@@ -5,17 +5,18 @@ class CenterPlayButton extends StatelessWidget {
   const CenterPlayButton({
     Key? key,
     required this.backgroundColor,
-    this.iconColor,
     required this.show,
     required this.isPlaying,
     required this.isFinished,
+    this.iconColor,
     this.onPressed,
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color? iconColor;
   final bool show;
-  final bool isPlaying, isFinished;
+  final bool isPlaying;
+  final bool isFinished;
   final VoidCallback? onPressed;
 
   @override

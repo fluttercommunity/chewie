@@ -4,8 +4,8 @@ version: 1.2.2
 homepage: https://github.com/brianegan/chewie
 
 environment:
-  sdk: '>=2.13.0 <3.0.0'
-  flutter: '>=1.22.0'
+  sdk: ">=2.13.0 <3.0.0"
+  flutter: ">=1.22.0"
 
 dependencies:
   cupertino_icons: ^1.0.3
@@ -18,7 +18,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  lint: ^1.5.1
+  lint: ^1.7.2
 
 flutter:
   uses-material-design: true

@@ -27,14 +27,17 @@ class PlayerWithControls extends StatelessWidget {
     ) {
       return chewieController.showControls
           ? chewieController.customControls ?? const AdaptiveControls()
-          : Container();
+          : const SizedBox.shrink();
     }
 
     Widget _buildPlayerWithControls(
-        ChewieController chewieController, BuildContext context) {
+      ChewieController chewieController,
+      BuildContext context,
+    ) {
       return Stack(
         children: <Widget>[
-          chewieController.placeholder ?? Container(),
+          if (chewieController.placeholder != null)
+            chewieController.placeholder!,
           Center(
             child: AspectRatio(
               aspectRatio: chewieController.aspectRatio ??
@@ -42,7 +45,7 @@ class PlayerWithControls extends StatelessWidget {
               child: VideoPlayer(chewieController.videoPlayerController),
             ),
           ),
-          chewieController.overlay ?? Container(),
+          if (chewieController.overlay != null) chewieController.overlay!,
           if (Theme.of(context).platform != TargetPlatform.iOS)
             Consumer<PlayerNotifier>(
               builder: (
@@ -57,7 +60,6 @@ class PlayerWithControls extends StatelessWidget {
                 ),
                 child: Container(
                   decoration: const BoxDecoration(color: Colors.black54),
-                  child: Container(),
                 ),
               ),
             ),
