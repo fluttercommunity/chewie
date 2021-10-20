@@ -5,7 +5,7 @@
 * ⬆️ Update 'wakelock' to 0.5.6
 * ⬆️ Update 'lint' to 1.7.2
 
-  ## 1.2.2
+## 1.2.2
 
 * 🛠️ Fix Incorrect use of ParentDataWidget.
   - Fixes: [#485](https://github.com/brianegan/chewie/issues/485)
