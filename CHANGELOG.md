@@ -1,6 +1,6 @@
 ## 1.2.4
 
-* 🛠️ Fix linting problems
+* 🛠️ Fix lint problems
 
 ## 1.2.3
 
