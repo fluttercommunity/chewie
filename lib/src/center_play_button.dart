@@ -15,7 +15,8 @@ class CenterPlayButton extends StatelessWidget {
   final Color backgroundColor;
   final Color? iconColor;
   final bool show;
-  final bool isPlaying, isFinished;
+  final bool isPlaying;
+  final bool isFinished;
   final VoidCallback? onPressed;
 
   @override

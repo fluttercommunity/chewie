@@ -186,7 +186,7 @@ class _ProgressBarPainter extends CustomPainter {
     );
 
     if (drawShadow) {
-      final shadowPath = Path()
+      final Path shadowPath = Path()
         ..addOval(
           Rect.fromCircle(
             center: Offset(playedPart, baseOffset + barHeight / 2),

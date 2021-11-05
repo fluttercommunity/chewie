@@ -1,3 +1,7 @@
+## 1.2.4
+
+* 🛠️ Fix linting problems
+
 ## 1.2.3
 
 * ⬆️ Update 'provider' to 6.0.1

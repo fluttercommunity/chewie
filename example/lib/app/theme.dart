@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static final light = ThemeData(
     brightness: Brightness.light,
-    accentColor: Colors.red,
+    colorScheme: const ColorScheme.dark(secondary: Colors.red),
     disabledColor: Colors.grey.shade400,
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );
 
   static final dark = ThemeData(
     brightness: Brightness.dark,
-    accentColor: Colors.red,
+    colorScheme: const ColorScheme.dark(secondary: Colors.red),
     disabledColor: Colors.grey.shade400,
     visualDensity: VisualDensity.adaptivePlatformDensity,
   );
