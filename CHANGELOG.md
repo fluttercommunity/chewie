@@ -1,3 +1,10 @@
+## 1.2.3
+
+* ⬆️ Update 'provider' to 6.0.1
+* ⬆️ Update 'video_player' to 2.2.5
+* ⬆️ Update 'wakelock' to 0.5.6
+* ⬆️ Update 'lint' to 1.7.2
+
 ## 1.2.2
 
 * 🛠️ Fix Incorrect use of ParentDataWidget.
