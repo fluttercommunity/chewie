@@ -2,15 +2,14 @@ import 'dart:async';
 
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/material/models/options_translation.dart';
+import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
-import 'package:chewie/src/models/subtitle_model.dart';
 
 import 'material/models/option_item.dart';
 
@@ -130,10 +129,18 @@ class ChewieState extends State<Chewie> {
 
     if (widget.controller.routePageBuilder == null) {
       return _defaultRoutePageBuilder(
-          context, animation, secondaryAnimation, controllerProvider);
+        context,
+        animation,
+        secondaryAnimation,
+        controllerProvider,
+      );
     }
     return widget.controller.routePageBuilder!(
-        context, animation, secondaryAnimation, controllerProvider);
+      context,
+      animation,
+      secondaryAnimation,
+      controllerProvider,
+    );
   }
 
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
@@ -155,10 +162,13 @@ class ChewieState extends State<Chewie> {
     // so we do not need to check Wakelock.isEnabled.
     Wakelock.disable();
 
-    SystemChrome.setEnabledSystemUIOverlays(
-        widget.controller.systemOverlaysAfterFullScreen);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: widget.controller.systemOverlaysAfterFullScreen,
+    );
     SystemChrome.setPreferredOrientations(
-        widget.controller.deviceOrientationsAfterFullScreen);
+      widget.controller.deviceOrientationsAfterFullScreen,
+    );
   }
 
   void onEnterFullScreen() {
@@ -168,17 +178,20 @@ class ChewieState extends State<Chewie> {
 
     if (widget.controller.systemOverlaysOnEnterFullScreen != null) {
       /// Optional user preferred settings
-      SystemChrome.setEnabledSystemUIOverlays(
-          widget.controller.systemOverlaysOnEnterFullScreen!);
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: widget.controller.systemOverlaysOnEnterFullScreen,
+      );
     } else {
       /// Default behavior
-      SystemChrome.setEnabledSystemUIOverlays([]);
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     }
 
     if (widget.controller.deviceOrientationsOnEnterFullScreen != null) {
       /// Optional user preferred settings
       SystemChrome.setPreferredOrientations(
-          widget.controller.deviceOrientationsOnEnterFullScreen!);
+        widget.controller.deviceOrientationsOnEnterFullScreen!,
+      );
     } else {
       final isLandscapeVideo = videoWidth > videoHeight;
       final isPortraitVideo = videoWidth < videoHeight;
@@ -252,8 +265,10 @@ class ChewieController extends ChangeNotifier {
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
     this.deviceOrientationsAfterFullScreen = DeviceOrientation.values,
     this.routePageBuilder,
-  }) : assert(playbackSpeeds.every((speed) => speed > 0),
-            'The playbackSpeeds values must all be greater than 0') {
+  }) : assert(
+          playbackSpeeds.every((speed) => speed > 0),
+          'The playbackSpeeds values must all be greater than 0',
+        ) {
     _initialize();
   }
 
@@ -289,8 +304,12 @@ class ChewieController extends ChangeNotifier {
     List<DeviceOrientation>? deviceOrientationsOnEnterFullScreen,
     List<SystemUiOverlay>? systemOverlaysAfterFullScreen,
     List<DeviceOrientation>? deviceOrientationsAfterFullScreen,
-    Widget Function(BuildContext, Animation<double>, Animation<double>,
-            _ChewieControllerProvider)?
+    Widget Function(
+      BuildContext,
+      Animation<double>,
+      Animation<double>,
+      _ChewieControllerProvider,
+    )?
         routePageBuilder,
   }) {
     return ChewieController(
@@ -358,7 +377,9 @@ class ChewieController extends ChangeNotifier {
   /// you'll build. If you want to hide the chewieOptions, just leave them
   /// out from your Widget.
   final Future<void> Function(
-      BuildContext context, List<OptionItem> chewieOptions)? optionsBuilder;
+    BuildContext context,
+    List<OptionItem> chewieOptions,
+  )? optionsBuilder;
 
   /// Add your own additional options on top of chewie options
   final List<OptionItem> Function(BuildContext context)? additionalOptions;

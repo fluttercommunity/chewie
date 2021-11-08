@@ -10,4 +10,3 @@ linter:
   rules:
     close_sinks: true
     sort_constructors_first: true
-    sort_pub_dependencies: false
