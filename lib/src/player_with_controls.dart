@@ -1,7 +1,6 @@
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/helpers/adaptive_controls.dart';
 import 'package:chewie/src/notifiers/index.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -31,7 +30,9 @@ class PlayerWithControls extends StatelessWidget {
     }
 
     Widget _buildPlayerWithControls(
-        ChewieController chewieController, BuildContext context) {
+      ChewieController chewieController,
+      BuildContext context,
+    ) {
       return Stack(
         children: <Widget>[
           chewieController.placeholder ?? Container(),

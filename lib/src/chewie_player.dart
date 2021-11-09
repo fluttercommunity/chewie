@@ -7,7 +7,6 @@ import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
@@ -129,9 +128,19 @@ class ChewieState extends State<Chewie> {
     );
 
     if (widget.controller.routePageBuilder == null) {
-      return _defaultRoutePageBuilder(context, animation, secondaryAnimation, controllerProvider);
+      return _defaultRoutePageBuilder(
+        context,
+        animation,
+        secondaryAnimation,
+        controllerProvider,
+      );
     }
-    return widget.controller.routePageBuilder!(context, animation, secondaryAnimation, controllerProvider);
+    return widget.controller.routePageBuilder!(
+      context,
+      animation,
+      secondaryAnimation,
+      controllerProvider,
+    );
   }
 
   Future<dynamic> _pushFullScreenWidget(BuildContext context) async {
@@ -153,8 +162,13 @@ class ChewieState extends State<Chewie> {
     // so we do not need to check Wakelock.isEnabled.
     Wakelock.disable();
 
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: widget.controller.systemOverlaysAfterFullScreen);
-    SystemChrome.setPreferredOrientations(widget.controller.deviceOrientationsAfterFullScreen);
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: widget.controller.systemOverlaysAfterFullScreen,
+    );
+    SystemChrome.setPreferredOrientations(
+      widget.controller.deviceOrientationsAfterFullScreen,
+    );
   }
 
   void onEnterFullScreen() {
@@ -250,7 +264,10 @@ class ChewieController extends ChangeNotifier {
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
     this.deviceOrientationsAfterFullScreen = DeviceOrientation.values,
     this.routePageBuilder,
-  }) : assert(playbackSpeeds.every((speed) => speed > 0), 'The playbackSpeeds values must all be greater than 0') {
+  }) : assert(
+          playbackSpeeds.every((speed) => speed > 0),
+          'The playbackSpeeds values must all be greater than 0',
+        ) {
     _initialize();
   }
 
@@ -286,7 +303,14 @@ class ChewieController extends ChangeNotifier {
     List<DeviceOrientation>? deviceOrientationsOnEnterFullScreen,
     List<SystemUiOverlay>? systemOverlaysAfterFullScreen,
     List<DeviceOrientation>? deviceOrientationsAfterFullScreen,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, _ChewieControllerProvider)? routePageBuilder,
+
+  Widget Function(
+      BuildContext,
+      Animation<double>,
+      Animation<double>,
+      _ChewieControllerProvider,
+    )?
+        routePageBuilder,
   }) {
     return ChewieController(
       videoPlayerController: videoPlayerController ?? this.videoPlayerController,
