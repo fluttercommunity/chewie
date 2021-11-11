@@ -3,6 +3,6 @@ import 'package:flutter/material.dart';
 
 void main() {
   runApp(
-    ChewieDemo(),
+    const ChewieDemo(),
   );
 }
