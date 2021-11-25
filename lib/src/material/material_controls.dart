@@ -16,7 +16,12 @@ import 'package:video_player/video_player.dart';
 import 'widgets/playback_speed_dialog.dart';
 
 class MaterialControls extends StatefulWidget {
-  const MaterialControls({Key? key}) : super(key: key);
+  const MaterialControls({
+    this.showPlayButton = true,
+    Key? key,
+  }) : super(key: key);
+
+  final bool showPlayButton;
 
   @override
   State<StatefulWidget> createState() {
@@ -27,6 +32,7 @@ class MaterialControls extends StatefulWidget {
 class _MaterialControlsState extends State<MaterialControls> with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
   late VideoPlayerValue _latestValue;
+  double? _latestVolume;
   Timer? _hideTimer;
   Timer? _initTimer;
   late var _subtitlesPosition = Duration.zero;
@@ -269,8 +275,12 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     if (chewieController.isLive) const Expanded(child: Text('LIVE')) else _buildPosition(iconColor),
+
+                    if (chewieController.allowMuting) _buildMuteButton(controller),
+                    const Spacer(),
+
                     if (chewieController.allowFullScreen) _buildExpandButton(),
-                  ],
+                    ],
                 ),
               ),
               SizedBox(
@@ -288,6 +298,39 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
                   ),
                 ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+GestureDetector _buildMuteButton(
+    VideoPlayerController controller,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        _cancelAndRestartTimer();
+
+        if (_latestValue.volume == 0) {
+          controller.setVolume(_latestVolume ?? 0.5);
+        } else {
+          _latestVolume = controller.value.volume;
+          controller.setVolume(0.0);
+        }
+      },
+      child: AnimatedOpacity(
+        opacity: notifier.hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: ClipRect(
+          child: Container(
+            height: barHeight,
+            padding: const EdgeInsets.only(
+              left: 6.0,
+            ),
+            child: Icon(
+              _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
+              color: Colors.white,
+            ),
           ),
         ),
       ),
@@ -320,6 +363,8 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
 
   Widget _buildHitArea() {
     final bool isFinished = _latestValue.position >= _latestValue.duration;
+    final bool showPlayButton =
+        widget.showPlayButton && !_dragging && !notifier.hideStuff;
 
     return GestureDetector(
       onTap: () {
@@ -344,7 +389,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
         iconColor: Colors.white,
         isFinished: isFinished,
         isPlaying: controller.value.isPlaying,
-        show: !_dragging && !notifier.hideStuff,
+        show: showPlayButton,
         onPressed: _playPause,
       ),
     );
