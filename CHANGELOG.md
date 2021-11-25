@@ -1,9 +1,11 @@
 ## 1.2.3
 
 * ⬆️ Update 'provider' to 6.0.1
-* ⬆️ Update 'video_player' to 2.2.5
+  - fixes [#568](https://github.com/brianegan/chewie/issues/568)
+* ⬆️ Update 'video_player' to 2.2.7
 * ⬆️ Update 'wakelock' to 0.5.6
 * ⬆️ Update 'lint' to 1.7.2
+* ⬆️ Update roadmap
 * 🛠️ Fix lint problems
 * 💡 Add very_good_analysis package
 * 💡 Add analysis_options.yaml for example app

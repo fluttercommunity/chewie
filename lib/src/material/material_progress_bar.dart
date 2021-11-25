@@ -26,9 +26,9 @@ class MaterialVideoProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return VideoProgressBar(
       controller,
-      barHeight: 2,
+      barHeight: 10,
       handleHeight: 6,
-      drawShadow: false,
+      drawShadow: true,
       colors: colors,
       onDragEnd: onDragEnd,
       onDragStart: onDragStart,
