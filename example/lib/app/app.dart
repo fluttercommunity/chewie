@@ -1,8 +1,7 @@
+import 'package:chewie/chewie.dart';
 import 'package:chewie_example/app/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:chewie/chewie.dart';
-import 'package:flutter/cupertino.dart';
-
+// ignore: depend_on_referenced_packages
 import 'package:video_player/video_player.dart';
 
 class ChewieDemo extends StatefulWidget {
@@ -78,31 +77,33 @@ class _ChewieDemoState extends State<ChewieDemo> {
         index: 0,
         start: Duration.zero,
         end: const Duration(seconds: 10),
-        text: const TextSpan(children: [
-          TextSpan(
-            text: 'Hello',
-            style: TextStyle(color: Colors.red, fontSize: 22),
-          ),
-          TextSpan(
-            text: ' from ',
-            style: TextStyle(color: Colors.green, fontSize: 20),
-          ),
-          TextSpan(
-            text: 'subtitles',
-            style: TextStyle(color: Colors.blue, fontSize: 18),
-          )
-        ]),
+        text: const TextSpan(
+          children: [
+            TextSpan(
+              text: 'Hello',
+              style: TextStyle(color: Colors.red, fontSize: 22),
+            ),
+            TextSpan(
+              text: ' from ',
+              style: TextStyle(color: Colors.green, fontSize: 20),
+            ),
+            TextSpan(
+              text: 'subtitles',
+              style: TextStyle(color: Colors.blue, fontSize: 18),
+            )
+          ],
+        ),
       ),
       Subtitle(
-          index: 0,
-          start: const Duration(seconds: 10),
-          end: const Duration(seconds: 20),
-          text: 'Whats up? :)'
-          // text: const TextSpan(
-          //   text: 'Whats up? :)',
-          //   style: TextStyle(color: Colors.amber, fontSize: 22, fontStyle: FontStyle.italic),
-          // ),
-          ),
+        index: 0,
+        start: const Duration(seconds: 10),
+        end: const Duration(seconds: 20),
+        text: 'Whats up? :)',
+        // text: const TextSpan(
+        //   text: 'Whats up? :)',
+        //   style: TextStyle(color: Colors.amber, fontSize: 22, fontStyle: FontStyle.italic),
+        // ),
+      ),
     ];
 
     _chewieController = ChewieController(
@@ -200,7 +201,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     onPressed: () {
                       setState(() {
                         _videoPlayerController1.pause();
-                        _videoPlayerController1.seekTo(const Duration());
+                        _videoPlayerController1.seekTo(Duration.zero);
                         _createChewieController();
                       });
                     },
@@ -215,7 +216,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     onPressed: () {
                       setState(() {
                         _videoPlayerController2.pause();
-                        _videoPlayerController2.seekTo(const Duration());
+                        _videoPlayerController2.seekTo(Duration.zero);
                         _chewieController = _chewieController!.copyWith(
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,

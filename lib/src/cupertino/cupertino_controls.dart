@@ -8,13 +8,12 @@ import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino/cupertino_progress_bar.dart';
 import 'package:chewie/src/helpers/utils.dart';
+import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
-import 'package:chewie/src/models/subtitle_model.dart';
 
 class CupertinoControls extends StatefulWidget {
   const CupertinoControls({
@@ -97,12 +96,18 @@ class _CupertinoControlsState extends State<CupertinoControls>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   _buildTopBar(
-                      backgroundColor, iconColor, barHeight, buttonPadding),
+                    backgroundColor,
+                    iconColor,
+                    barHeight,
+                    buttonPadding,
+                  ),
                   const Spacer(),
                   if (_subtitleOn)
                     Transform.translate(
                       offset: Offset(
-                          0.0, notifier.hideStuff ? barHeight * 0.8 : 0.0),
+                        0.0,
+                        notifier.hideStuff ? barHeight * 0.8 : 0.0,
+                      ),
                       child: _buildSubtitles(chewieController.subtitle!),
                     ),
                   _buildBottomBar(backgroundColor, iconColor, barHeight),
@@ -166,8 +171,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
       child: Container(
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
-            color: const Color(0x96000000),
-            borderRadius: BorderRadius.circular(10.0)),
+          color: const Color(0x96000000),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
         child: Text(
           currentSubtitle.first!.text.toString(),
           style: const TextStyle(
@@ -540,11 +546,20 @@ class _CupertinoControlsState extends State<CupertinoControls>
         children: <Widget>[
           if (chewieController.allowFullScreen)
             _buildExpandButton(
-                backgroundColor, iconColor, barHeight, buttonPadding),
+              backgroundColor,
+              iconColor,
+              barHeight,
+              buttonPadding,
+            ),
           const Spacer(),
           if (chewieController.allowMuting)
-            _buildMuteButton(controller, backgroundColor, iconColor, barHeight,
-                buttonPadding),
+            _buildMuteButton(
+              controller,
+              backgroundColor,
+              iconColor,
+              barHeight,
+              buttonPadding,
+            ),
         ],
       ),
     );
@@ -661,7 +676,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
           });
         } else {
           if (isFinished) {
-            controller.seekTo(const Duration());
+            controller.seekTo(Duration.zero);
           }
           controller.play();
         }
@@ -671,7 +686,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   void _skipBack() {
     _cancelAndRestartTimer();
-    final beginning = const Duration().inMilliseconds;
+    final beginning = Duration.zero.inMilliseconds;
     final skip =
         (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
