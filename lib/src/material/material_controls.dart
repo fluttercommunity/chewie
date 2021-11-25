@@ -16,7 +16,12 @@ import 'package:video_player/video_player.dart';
 import 'widgets/playback_speed_dialog.dart';
 
 class MaterialControls extends StatefulWidget {
-  const MaterialControls({Key? key}) : super(key: key);
+  const MaterialControls({
+    this.showPlayButton = true,
+    Key? key,
+  }) : super(key: key);
+
+  final bool showPlayButton;
 
   @override
   State<StatefulWidget> createState() {
@@ -42,6 +47,7 @@ class _MaterialControlsState extends State<MaterialControls>
 
   late VideoPlayerController controller;
   ChewieController? _chewieController;
+
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
 
@@ -372,6 +378,8 @@ GestureDetector _buildMuteButton(
 
   Widget _buildHitArea() {
     final bool isFinished = _latestValue.position >= _latestValue.duration;
+    final bool showPlayButton =
+        widget.showPlayButton && !_dragging && !notifier.hideStuff;
 
     return GestureDetector(
       onTap: () {
@@ -396,7 +404,7 @@ GestureDetector _buildMuteButton(
         iconColor: Colors.white,
         isFinished: isFinished,
         isPlaying: controller.value.isPlaying,
-        show: !_dragging && !notifier.hideStuff,
+        show: showPlayButton,
         onPressed: _playPause,
       ),
     );
