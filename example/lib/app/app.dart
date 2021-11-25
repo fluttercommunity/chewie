@@ -38,13 +38,16 @@ class _ChewieDemoState extends State<ChewieDemo> {
     super.dispose();
   }
 
+  List<String> srcs = [
+    "https://assets.mixkit.co/videos/preview/mixkit-daytime-city-traffic-aerial-view-56-large.mp4",
+    "https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4"
+  ];
+
   Future<void> initializePlayer() async {
-    _videoPlayerController1 = VideoPlayerController.network(
-      'https://assets.mixkit.co/videos/preview/mixkit-daytime-city-traffic-aerial-view-56-large.mp4',
-    );
-    _videoPlayerController2 = VideoPlayerController.network(
-      'https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4',
-    );
+    _videoPlayerController1 =
+        VideoPlayerController.network(srcs[currPlayIndex]);
+    _videoPlayerController2 =
+        VideoPlayerController.network(srcs[currPlayIndex]);
     await Future.wait([
       _videoPlayerController1.initialize(),
       _videoPlayerController2.initialize()
@@ -108,6 +111,15 @@ class _ChewieDemoState extends State<ChewieDemo> {
       autoPlay: true,
       looping: true,
 
+      additionalOptions: (context) {
+        return <OptionItem>[
+          OptionItem(
+            onTap: toggleVideo,
+            iconData: Icons.live_tv_sharp,
+            title: 'Toggle Video Src',
+          ),
+        ];
+      },
       subtitle: Subtitles(subtitles),
       subtitleBuilder: (context, dynamic subtitle) => Container(
         padding: const EdgeInsets.all(10.0),
@@ -135,6 +147,14 @@ class _ChewieDemoState extends State<ChewieDemo> {
       // ),
       // autoInitialize: true,
     );
+  }
+
+  int currPlayIndex = 0;
+
+  Future<void> toggleVideo() async {
+    await _videoPlayerController1.pause();
+    currPlayIndex = currPlayIndex == 0 ? 1 : 0;
+    await initializePlayer();
   }
 
   @override
