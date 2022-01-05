@@ -1,5 +1,9 @@
 # Chewie Audio Changelog
 
+## 1.3.0
+
+* Android 12 (API level 31) compatibility
+
 ## 1.2.0
 
 * Merged in chewie 1.0.0
