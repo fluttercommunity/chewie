@@ -1,6 +1,5 @@
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoProgressBar extends StatefulWidget {
@@ -14,7 +13,7 @@ class VideoProgressBar extends StatefulWidget {
     required this.barHeight,
     required this.handleHeight,
     required this.drawShadow,
-  })   : colors = colors ?? ChewieProgressColors(),
+  })  : colors = colors ?? ChewieProgressColors(),
         super(key: key);
 
   final VideoPlayerController controller;
@@ -56,7 +55,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   }
 
   void _seekToRelativePosition(Offset globalPosition) {
-    final box = context.findRenderObject() as RenderBox;
+    final box = context.findRenderObject()! as RenderBox;
     final Offset tapPos = box.globalToLocal(globalPosition);
     final double relative = tapPos.dx / box.size.width;
     final Duration position = controller.value.duration * relative;
@@ -186,7 +185,7 @@ class _ProgressBarPainter extends CustomPainter {
     );
 
     if (drawShadow) {
-      final shadowPath = Path()
+      final Path shadowPath = Path()
         ..addOval(
           Rect.fromCircle(
             center: Offset(playedPart, baseOffset + barHeight / 2),

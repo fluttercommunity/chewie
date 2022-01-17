@@ -1,3 +1,44 @@
+## 1.2.3
+
+* ⬆️ Update 'provider' to 6.0.1
+  - fixes [#568](https://github.com/brianegan/chewie/issues/568)
+* ⬆️ Update 'video_player' to 2.2.7
+* ⬆️ Update 'wakelock' to 0.5.6
+* ⬆️ Update 'lint' to 1.7.2
+* ⬆️ Update roadmap
+* 🛠️ Fix lint problems
+* 💡 Add very_good_analysis package
+* 💡 Add analysis_options.yaml for example app
+
+## 1.2.2
+
+* 🛠️ Fix Incorrect use of ParentDataWidget.
+  - Fixes: [#485](https://github.com/brianegan/chewie/issues/485)
+
+## 1.2.1
+
+* 💡 add `showOptions` flag to show/hide the options-menu
+  - Fixes: [#491](https://github.com/brianegan/chewie/issues/491)
+* ⬆️ update `video_player` to 2.1.5
+* 🛠️ fix MaterialUI duration text (RichText)
+
+## 1.2.0
+
+* 🖥 __Desktop-UI__: Added `AdaptiveControls` where `MaterialDesktopControls` is now the default for Desktop-Platforms (start [ChewieDemo](https://github.com/brianegan/chewie/blob/master/example/lib/app/app.dart) for a preview)
+  - Fixes: [#188](https://github.com/brianegan/chewie/issues/478)
+* Redesign `MaterialControls` (inspired by Youtube Mobile and Desktop)
+* Fix squeeze of `CenterPlayButton`
+* Add: `optionsTranslation`, `additionalOptions` and `optionsBuilder` to create and design your Video-Options like Playback speed, subtitles and other options you want to add (use here: `additionalOptions`!). Use `optionsTranslation` to provide your localized strings!
+
+> See [Options](https://github.com/brianegan/chewie#options) to customize your Chewie options
+
+## 1.1.0
+
+* Add subtitle functionality
+  - Thanks to kirill09: [#188](https://github.com/brianegan/chewie/pull/188) with which we've improved and optimized subtitles
+
+> See readme on how to create subtitles and provide your own subtitleBuilder: [Subtitles](https://github.com/brianegan/chewie#Subtitles)
+
 ## 1.0.0
 
 * Migrate to Null Safety

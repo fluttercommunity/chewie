@@ -1,10 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.chewieexample">
-
-    <uses-permission android:name="android.permission.INTERNET"/>
-
+    package="com.example.example">
    <application
-        android:label="chewie_example"
+        android:label="example"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

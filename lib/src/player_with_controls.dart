@@ -1,12 +1,9 @@
-import 'dart:ui';
-
 import 'package:chewie/src/chewie_player.dart';
-import 'package:chewie/src/cupertino_controls.dart';
-import 'package:chewie/src/material_controls.dart';
-import 'package:flutter/foundation.dart';
+import 'package:chewie/src/helpers/adaptive_controls.dart';
+import 'package:chewie/src/notifiers/index.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PlayerWithControls extends StatelessWidget {
   const PlayerWithControls({Key? key}) : super(key: key);
@@ -24,39 +21,52 @@ class PlayerWithControls extends StatelessWidget {
     }
 
     Widget _buildControls(
-        BuildContext context,
-        ChewieController chewieController,
-        ) {
-      final controls = Theme.of(context).platform == TargetPlatform.android
-          ? const MaterialControls()
-          : const CupertinoControls(
-        backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
-        iconColor: Color.fromARGB(255, 200, 200, 200),
-      );
+      BuildContext context,
+      ChewieController chewieController,
+    ) {
       return chewieController.showControls
-          ? chewieController.customControls ?? controls
+          ? chewieController.customControls ?? const AdaptiveControls()
           : Container();
     }
 
-    Stack _buildPlayerWithControls(
-        ChewieController chewieController, BuildContext context) {
+    Widget _buildPlayerWithControls(
+      ChewieController chewieController,
+      BuildContext context,
+    ) {
       return Stack(
         children: <Widget>[
-          chewieController.placeholder ?? Container(),
+          if(chewieController.placeholder!=null) chewieController.placeholder!,
           Center(
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(12.w),
-                child: AspectRatio(
-                  aspectRatio: chewieController.aspectRatio ??
-                      chewieController.videoPlayerController.value.aspectRatio,
-                  child: VideoPlayer(chewieController.videoPlayerController),
-                )),
+            child: AspectRatio(
+              aspectRatio: chewieController.aspectRatio ??
+                  chewieController.videoPlayerController.value.aspectRatio,
+              child: VideoPlayer(chewieController.videoPlayerController),
+            ),
           ),
-          chewieController.overlay ?? Container(),
+          if(chewieController.overlay!=null) chewieController.overlay!,
+          if (Theme.of(context).platform != TargetPlatform.iOS)
+            Consumer<PlayerNotifier>(
+              builder: (
+                BuildContext context,
+                PlayerNotifier notifier,
+                Widget? widget,
+              ) =>
+                  AnimatedOpacity(
+                opacity: notifier.hideStuff ? 0.0 : 0.8,
+                duration: const Duration(
+                  milliseconds: 250,
+                ),
+                child: Container(
+                  decoration: const BoxDecoration(color: Colors.black54),
+                  child: Container(),
+                ),
+              ),
+            ),
           if (!chewieController.isFullScreen)
             _buildControls(context, chewieController)
           else
             SafeArea(
+              bottom: false,
               child: _buildControls(context, chewieController),
             ),
         ],
