@@ -134,6 +134,14 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls> with 
     super.didChangeDependencies();
   }
 
+  Widget _buildSubtitleToggle({IconData? icon, bool isPadded = false}) {
+    return IconButton(
+      padding: isPadded ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
+      icon: Icon(icon, color: _subtitleOn ? Colors.white : Colors.grey[700]),
+      onPressed: _onSubtitleTap,
+    );
+  }
+
   Widget _buildOptionsButton({
     IconData? icon,
     bool isPadded = false,
@@ -148,19 +156,6 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls> with 
         title: chewieController.optionsTranslation?.playbackSpeedButtonText ?? 'Playback speed',
       )
     ];
-
-    if (chewieController.subtitle != null && chewieController.subtitle!.isNotEmpty) {
-      options.add(
-        OptionItem(
-          onTap: () {
-            _onSubtitleTap();
-            Navigator.pop(context);
-          },
-          iconData: _subtitleOn ? Icons.closed_caption : Icons.closed_caption_off_outlined,
-          title: chewieController.optionsTranslation?.subtitlesButtonText ?? 'Subtitles',
-        ),
-      );
-    }
 
     if (chewieController.additionalOptions != null && chewieController.additionalOptions!(context).isNotEmpty) {
       options.addAll(chewieController.additionalOptions!(context));
@@ -260,7 +255,11 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls> with 
                     _buildMuteButton(controller),
                     if (chewieController.isLive) const Expanded(child: Text('LIVE')) else _buildPosition(iconColor),
                     const Spacer(),
-                    if (chewieController.showOptions) _buildOptionsButton(icon: Icons.settings),
+                    if (chewieController.showControls &&
+                        chewieController.subtitle != null &&
+                        chewieController.subtitle!.isNotEmpty)
+                        _buildSubtitleToggle(icon: Icons.subtitles),
+                      if (chewieController.showOptions) _buildOptionsButton(icon: Icons.settings),
                     if (chewieController.allowFullScreen) _buildExpandButton(),
                   ],
                 ),
