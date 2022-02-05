@@ -165,19 +165,6 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
       )
     ];
 
-    if (chewieController.subtitle != null && chewieController.subtitle!.isNotEmpty) {
-      options.add(
-        OptionItem(
-          onTap: () {
-            _onSubtitleTap();
-            Navigator.pop(context);
-          },
-          iconData: _subtitleOn ? Icons.closed_caption : Icons.closed_caption_off_outlined,
-          title: chewieController.optionsTranslation?.subtitlesButtonText ?? 'Subtitles',
-        ),
-      );
-    }
-
     if (chewieController.additionalOptions != null && chewieController.additionalOptions!(context).isNotEmpty) {
       options.addAll(chewieController.additionalOptions!(context));
     }
