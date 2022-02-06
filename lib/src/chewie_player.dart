@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/material/models/options_translation.dart';
+import 'package:chewie/src/models/options_translation.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
 
-import 'material/models/option_item.dart';
+import 'models/option_item.dart';
 
 typedef ChewieRoutePageBuilder = Widget Function(
   BuildContext context,
@@ -387,7 +387,7 @@ class ChewieController extends ChangeNotifier {
   final List<OptionItem> Function(BuildContext context)? additionalOptions;
 
   /// Define here your own Widget on how your n'th subtitle will look like
-  final Widget Function(BuildContext context, dynamic subtitle)? subtitleBuilder;
+  Widget Function(BuildContext context, dynamic subtitle)? subtitleBuilder;
 
   /// Add a List of Subtitles here in `Subtitles.subtitle`
   Subtitles? subtitle;
