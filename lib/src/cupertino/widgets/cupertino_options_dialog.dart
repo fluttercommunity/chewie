@@ -12,6 +12,7 @@ class CupertinoOptionsDialog extends StatefulWidget {
   final String? cancelButtonText;
 
   @override
+  // ignore: library_private_types_in_public_api
   _CupertinoOptionsDialogState createState() => _CupertinoOptionsDialogState();
 }
 
