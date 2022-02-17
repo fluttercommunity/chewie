@@ -1,4 +1,4 @@
-import 'package:chewie/src/material/models/option_item.dart';
+import 'package:chewie/src/models/option_item.dart';
 import 'package:flutter/material.dart';
 
 class OptionsDialog extends StatefulWidget {
@@ -12,6 +12,7 @@ class OptionsDialog extends StatefulWidget {
   final String? cancelButtonText;
 
   @override
+  // ignore: library_private_types_in_public_api
   _OptionsDialogState createState() => _OptionsDialogState();
 }
 

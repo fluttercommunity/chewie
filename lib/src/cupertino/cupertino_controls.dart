@@ -7,7 +7,9 @@ import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino/cupertino_progress_bar.dart';
+import 'package:chewie/src/cupertino/widgets/cupertino_options_dialog.dart';
 import 'package:chewie/src/helpers/utils.dart';
+import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:flutter/cupertino.dart';
@@ -150,6 +152,53 @@ class _CupertinoControlsState extends State<CupertinoControls>
     super.didChangeDependencies();
   }
 
+  GestureDetector _buildOptionsButton(
+    Color iconColor,
+    double barHeight,
+  ) {
+    final options = <OptionItem>[];
+
+    if (chewieController.additionalOptions != null &&
+        chewieController.additionalOptions!(context).isNotEmpty) {
+      options.addAll(chewieController.additionalOptions!(context));
+    }
+
+    return GestureDetector(
+      onTap: () async {
+        _hideTimer?.cancel();
+
+        if (chewieController.optionsBuilder != null) {
+          await chewieController.optionsBuilder!(context, options);
+        } else {
+          await showCupertinoModalPopup<OptionItem>(
+            context: context,
+            semanticsDismissible: true,
+            useRootNavigator: chewieController.useRootNavigator,
+            builder: (context) => CupertinoOptionsDialog(
+              options: options,
+              cancelButtonText:
+                  chewieController.optionsTranslation?.cancelButtonText,
+            ),
+          );
+          if (_latestValue.isPlaying) {
+            _startHideTimer();
+          }
+        }
+      },
+      child: Container(
+        height: barHeight,
+        color: Colors.transparent,
+        padding: const EdgeInsets.only(left: 4.0, right: 8.0),
+        margin: const EdgeInsets.only(right: 6.0),
+        child: Icon(
+          Icons.more_vert,
+          color: iconColor,
+          size: 18,
+        ),
+      ),
+    );
+  }
+
   Widget _buildSubtitles(Subtitles subtitles) {
     if (!_subtitleOn) {
       return Container();
@@ -231,6 +280,10 @@ class _CupertinoControlsState extends State<CupertinoControls>
                           _buildSubtitleToggle(iconColor, barHeight),
                           if (chewieController.allowPlaybackSpeedChanging)
                             _buildSpeedButton(controller, iconColor, barHeight),
+                          if (chewieController.additionalOptions != null &&
+                              chewieController
+                                  .additionalOptions!(context).isNotEmpty)
+                            _buildOptionsButton(iconColor, barHeight),
                         ],
                       ),
               ),
