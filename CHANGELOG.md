@@ -1,3 +1,35 @@
+## 1.3.0
+
+* ⬆️ [#598](https://github.com/fluttercommunity/chewie/pull/598): Update `wakelock` to `^0.6.1+1`. Thanks [fehernyul](https://github.com/fehernyul).
+* ⬆️ [#599](https://github.com/fluttercommunity/chewie/pull/599): Uniform controls. Thanks [BuginRug](https://github.com/BuginRug).
+
+  **Slight Breaking Change**. Instead of:
+  
+  ```dart
+  typedef ChewieRoutePageBuilder = Widget Function(
+  	   BuildContext context,
+  	   Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      _ChewieControllerProvider controllerProvider,
+  );
+  ```
+  
+  It is now:
+  
+  ```dart
+  typedef ChewieRoutePageBuilder = Widget Function(
+  	   BuildContext context,
+  	   Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      ChewieControllerProvider controllerProvider,
+  );
+  ```
+  
+  TL;DR: We had to make `_ChewieControllerProvider` public.
+  
+* 🛠️ Fixed lint and formatting problems
+* Under New Management under the auspices of [Flutter Community](https://github.com/fluttercommunity), and new maintainers [diegotori](https://github.com/diegotori) and [maherjaafar](https://github.com/maherjaafar).
+
 ## 1.2.3
 
 * ⬆️ Update 'provider' to 6.0.1
@@ -216,3 +248,4 @@ Initial version of Chewie, the video player with a heart of gold.
   * Includes Material Player Controls
   * Includes Cupertino Player Controls
   * Spike version: Focus on good looking UI. Internal code is sloppy, needs a refactor and tests
+
