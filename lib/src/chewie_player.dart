@@ -495,11 +495,14 @@ class ChewieController extends ChangeNotifier {
   /// Defines a custom RoutePageBuilder for the fullscreen
   final ChewieRoutePageBuilder? routePageBuilder;
 
-  static ChewieController of(BuildContext context) {
+  static ChewieController of<ChewieControllerProvider>(BuildContext context) {
+    if (null is ChewieControllerProvider) {
+      return context.dependOnInheritedWidgetOfExactType<ChewieController>()!;
+    }
     final chewieControllerProvider =
         context.dependOnInheritedWidgetOfExactType<ChewieControllerProvider>()!;
 
-    return chewieControllerProvider.controller;
+    return chewieControllerProvider.controller; 
   }
 
   bool _isFullScreen = false;
