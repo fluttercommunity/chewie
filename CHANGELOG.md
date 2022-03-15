@@ -1,3 +1,6 @@
+## 1.3.1
+* ⬆️ [#617](https://github.com/fluttercommunity/chewie/pull/617): Allow video zooming with InteractiveViewer widget. Thanks [jmsanc](https://github.com/jmsanc).
+
 ## 1.3.0
 
 * ⬆️ [#598](https://github.com/fluttercommunity/chewie/pull/598): Update `wakelock` to `^0.6.1+1`. Thanks [fehernyul](https://github.com/fehernyul).
