@@ -5,13 +5,13 @@
 
 The video player for Flutter with a heart of gold. 
 
-The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
+The [`ext_video_player`](https://pub.dartlang.org/packages/ext_video_player) plugin provides low-level access to video playback. Chewie uses the `ext_video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
 
 ## Preview
 
-| MaterialControls | MaterialDesktopControls |
-| :--------------: | :---------------------: |
-|     ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialControls.png)     |    ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialDesktopControls.png)     |
+|                                MaterialControls                                 |                                MaterialDesktopControls                                 |
+| :-----------------------------------------------------------------------------: | :------------------------------------------------------------------------------------: |
+| ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialControls.png) | ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialDesktopControls.png) |
 
 ### CupertinoControls
 ![](https://github.com/brianegan/chewie/raw/master/assets/CupertinoControls.png)
@@ -23,7 +23,7 @@ In your `pubspec.yaml` file within your Flutter Project:
 ```yaml
 dependencies:
   chewie: <latest_version>
-  video_player: <latest_version>
+  ext_video_player: <latest_version>
 ```
 
 ## Use it
@@ -222,7 +222,7 @@ final playerWidget = Chewie(
 
 
 ## iOS warning 
-The video_player plugin used by chewie will only work in iOS simulators if you are on flutter 1.26.0 or above. You may need to switch to the beta channel `flutter channel beta`
+The ext_video_player plugin used by chewie will only work in iOS simulators if you are on flutter 1.26.0 or above. You may need to switch to the beta channel `flutter channel beta`
 Please refer to this [issue](https://github.com/flutter/flutter/issues/14647).
 
 

@@ -1,9 +1,9 @@
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/helpers/adaptive_controls.dart';
 import 'package:chewie/src/notifiers/index.dart';
+import 'package:ext_video_player/ext_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
 
 class PlayerWithControls extends StatelessWidget {
   const PlayerWithControls({Key? key}) : super(key: key);

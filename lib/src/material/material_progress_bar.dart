@@ -1,7 +1,7 @@
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/progress_bar.dart';
+import 'package:ext_video_player/ext_video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 class MaterialVideoProgressBar extends StatelessWidget {
   MaterialVideoProgressBar(

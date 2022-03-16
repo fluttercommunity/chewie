@@ -1,6 +1,6 @@
 import 'package:chewie/src/chewie_progress_colors.dart';
+import 'package:ext_video_player/ext_video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 class VideoProgressBar extends StatefulWidget {
   VideoProgressBar(
@@ -59,7 +59,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
     final box = context.findRenderObject()! as RenderBox;
     final Offset tapPos = box.globalToLocal(globalPosition);
     final double relative = tapPos.dx / box.size.width;
-    final Duration position = controller.value.duration * relative;
+    final Duration position = controller.value.duration! * relative;
     controller.seekTo(position);
   }
 
@@ -67,7 +67,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onHorizontalDragStart: (DragStartDetails details) {
-        if (!controller.value.isInitialized) {
+        if (!controller.value.initialized) {
           return;
         }
         _controllerWasPlaying = controller.value.isPlaying;
@@ -78,7 +78,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         widget.onDragStart?.call();
       },
       onHorizontalDragUpdate: (DragUpdateDetails details) {
-        if (!controller.value.isInitialized) {
+        if (!controller.value.initialized) {
           return;
         }
         _seekToRelativePosition(details.globalPosition);
@@ -93,7 +93,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         widget.onDragEnd?.call();
       },
       onTapDown: (TapDownDetails details) {
-        if (!controller.value.isInitialized) {
+        if (!controller.value.initialized) {
           return;
         }
         _seekToRelativePosition(details.globalPosition);
@@ -153,16 +153,16 @@ class _ProgressBarPainter extends CustomPainter {
       ),
       colors.backgroundPaint,
     );
-    if (!value.isInitialized) {
+    if (!value.initialized) {
       return;
     }
     final double playedPartPercent =
-        value.position.inMilliseconds / value.duration.inMilliseconds;
+        value.position.inMilliseconds / value.duration!.inMilliseconds;
     final double playedPart =
         playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
     for (final DurationRange range in value.buffered) {
-      final double start = range.startFraction(value.duration) * size.width;
-      final double end = range.endFraction(value.duration) * size.width;
+      final double start = range.startFraction(value.duration!) * size.width;
+      final double end = range.endFraction(value.duration!) * size.width;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromPoints(

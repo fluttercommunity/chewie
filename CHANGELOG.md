@@ -37,7 +37,7 @@
 
 * ⬆️ Update 'provider' to 6.0.1
   - fixes [#568](https://github.com/brianegan/chewie/issues/568)
-* ⬆️ Update 'video_player' to 2.2.7
+* ⬆️ Update 'ext_video_player' to 2.2.7
 * ⬆️ Update 'wakelock' to 0.5.6
 * ⬆️ Update 'lint' to 1.7.2
 * ⬆️ Update roadmap
@@ -54,7 +54,7 @@
 
 * 💡 add `showOptions` flag to show/hide the options-menu
   - Fixes: [#491](https://github.com/brianegan/chewie/issues/491)
-* ⬆️ update `video_player` to 2.1.5
+* ⬆️ update `ext_video_player` to 2.1.5
 * 🛠️ fix MaterialUI duration text (RichText)
 
 ## 1.2.0
@@ -135,7 +135,7 @@
 
 ## 0.10.1
 
-* Update `video_player` dependecy (stable release)
+* Update `ext_video_player` dependecy (stable release)
 
 ## 0.10.0
 
@@ -168,7 +168,7 @@
 
 ## 0.9.6
 
-  * Update to work with `video_player: ">=0.7.0 <0.11.0"`
+  * Update to work with `ext_video_player: ">=0.7.0 <0.11.0"`
 
 ## 0.9.5
 
@@ -177,7 +177,7 @@
 ## 0.9.4
 
   * Add overlay option to place a widget between the video and the controls
-  * Update to work with `video_player: ">=0.7.0 <0.10.0"`
+  * Update to work with `ext_video_player: ">=0.7.0 <0.10.0"`
 
 ## 0.9.3
 
@@ -199,7 +199,7 @@
 
 ## 0.8.0
 
-  * Update to work with `video_player: ">=0.7.0 <0.8.0` - Thanks @Sub6Resources
+  * Update to work with `ext_video_player: ">=0.7.0 <0.8.0` - Thanks @Sub6Resources
   * Preserves AspectRatio on FullScreen - Thanks @patrickb
   * Ability to start video in FullScreen - Thanks @miguelpruivo
 
@@ -217,7 +217,7 @@
 
 ## 0.6.0
 
-  * Update to work with `video_player: ">=0.6.0 <0.7.0`
+  * Update to work with `ext_video_player: ">=0.6.0 <0.7.0`
 
 ## 0.5.1
 
@@ -225,11 +225,11 @@
 
 ## 0.5.0
 
-  * Update to work with `video_player: ">=0.5.0 <0.6.0`
+  * Update to work with `ext_video_player: ">=0.5.0 <0.6.0`
 
 ## 0.3.0
 
-  * Update to work with `video_player: ">=0.2.0 <0.3.0`
+  * Update to work with `ext_video_player: ">=0.2.0 <0.3.0`
   * Add `showControls` option. You can use this to show / hide the controls
   * Move from `VideoProgressColors` to `ChewieProgressColors` for customization of the Chewie progress controls
   * Remove `progressColors` in favor of platform-specific customizations: `cupertinoProgressColors` and `materialProgressColors` to control

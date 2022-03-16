@@ -1,8 +1,7 @@
 import 'package:chewie/chewie.dart';
 import 'package:chewie_example/app/theme.dart';
+import 'package:ext_video_player/ext_video_player.dart';
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
-import 'package:video_player/video_player.dart';
 
 class ChewieDemo extends StatefulWidget {
   const ChewieDemo({
@@ -174,7 +173,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
               child: Center(
                 child: _chewieController != null &&
                         _chewieController!
-                            .videoPlayerController.value.isInitialized
+                            .videoPlayerController.value.initialized
                     ? Chewie(
                         controller: _chewieController!,
                       )
