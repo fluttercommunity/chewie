@@ -82,7 +82,7 @@ class _MaterialControlsState extends State<MaterialControls>
           absorbing: notifier.hideStuff,
           child: Stack(
             children: [
-              if (_latestValue.isBuffering)
+              if (displayLoading)
                 const Center(
                   child: CircularProgressIndicator(),
                 )
@@ -550,8 +550,27 @@ class _MaterialControlsState extends State<MaterialControls>
     });
   }
 
+  Timer? timerInstance;
+  bool displayLoading = false;
+
+  void handleTimeout() {
+    displayLoading = true;
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   void _updateState() {
     if (!mounted) return;
+
+    if (controller.value.isBuffering) {
+      timerInstance ??= Timer(const Duration(milliseconds: 200), handleTimeout);
+    } else {
+      timerInstance?.cancel();
+      timerInstance = null;
+      displayLoading = false;
+    }
+
     setState(() {
       _latestValue = controller.value;
       _subtitlesPosition = controller.value.position;
