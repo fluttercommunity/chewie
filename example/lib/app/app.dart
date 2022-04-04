@@ -39,6 +39,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   }
 
   List<String> srcs = [
+    "https://upload.wikimedia.org/wikipedia/commons/2/2c/Earth_rotation_during_Galileo_flyby_%28PIA00114%29_%28color-adjusted%29.webm",
     "https://assets.mixkit.co/videos/preview/mixkit-daytime-city-traffic-aerial-view-56-large.mp4",
     "https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4"
   ];
@@ -155,7 +156,10 @@ class _ChewieDemoState extends State<ChewieDemo> {
 
   Future<void> toggleVideo() async {
     await _videoPlayerController1.pause();
-    currPlayIndex = currPlayIndex == 0 ? 1 : 0;
+    currPlayIndex += 1;
+    if (currPlayIndex >= srcs.length) {
+      currPlayIndex = 0;
+    }
     await initializePlayer();
   }
 
