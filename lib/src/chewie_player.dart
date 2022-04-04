@@ -325,7 +325,7 @@ class ChewieController extends ChangeNotifier {
     List<DeviceOrientation>? deviceOrientationsOnEnterFullScreen,
     List<SystemUiOverlay>? systemOverlaysAfterFullScreen,
     List<DeviceOrientation>? deviceOrientationsAfterFullScreen,
-    int? bufferingProgressIndicatorDisplayDelayMS,
+    int? progressIndicatorDelayMS,
     Widget Function(
       BuildContext,
       Animation<double>,
@@ -379,8 +379,9 @@ class ChewieController extends ChangeNotifier {
           this.deviceOrientationsAfterFullScreen,
       routePageBuilder: routePageBuilder ?? this.routePageBuilder,
       hideControlsTimer: hideControlsTimer ?? this.hideControlsTimer,
-      progressIndicatorDelayMS: bufferingProgressIndicatorDisplayDelayMS ??
-            this.progressIndicatorDelayMS);
+      progressIndicatorDelayMS:
+          progressIndicatorDelayMS ?? this.progressIndicatorDelayMS,
+    );
   }
 
   static const defaultHideControlsTimer = Duration(seconds: 3);
