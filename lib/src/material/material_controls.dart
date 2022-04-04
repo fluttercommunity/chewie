@@ -563,12 +563,22 @@ class _MaterialControlsState extends State<MaterialControls>
   void _updateState() {
     if (!mounted) return;
 
-    if (controller.value.isBuffering) {
-      timerInstance ??= Timer(const Duration(milliseconds: 200), handleTimeout);
+    // display the progress bar indicator only after the buffering delay if it has been set
+    if (chewieController.progressIndicatorDelayMS != null) {
+      if (controller.value.isBuffering) {
+        timerInstance ??= Timer(
+          Duration(
+            milliseconds: chewieController.progressIndicatorDelayMS!,
+          ),
+          handleTimeout,
+        );
+      } else {
+        timerInstance?.cancel();
+        timerInstance = null;
+        displayLoading = false;
+      }
     } else {
-      timerInstance?.cancel();
-      timerInstance = null;
-      displayLoading = false;
+      displayLoading = controller.value.isBuffering;
     }
 
     setState(() {

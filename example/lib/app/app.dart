@@ -23,6 +23,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   late VideoPlayerController _videoPlayerController1;
   late VideoPlayerController _videoPlayerController2;
   ChewieController? _chewieController;
+  int? bufferDelay;
 
   @override
   void initState() {
@@ -111,6 +112,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
       looping: true,
+      progressIndicatorDelayMS: bufferDelay,
 
       additionalOptions: (context) {
         return <OptionItem>[
@@ -306,8 +308,85 @@ class _ChewieDemoState extends State<ChewieDemo> {
                 ),
               ],
             ),
+            ListTile(
+              title: const Text("Delay"),
+              subtitle: Column(
+                children: [
+                  DelaySlider(
+                    delay: _chewieController?.progressIndicatorDelayMS,
+                    onSave: (delay) async {
+                      if (delay != null) {
+                        if (delay == 0) {
+                          bufferDelay = null;
+                        } else {
+                          bufferDelay = delay;
+                        }
+
+                        await initializePlayer();
+                      }
+                    },
+                  ),
+                  Text(
+                    _chewieController?.progressIndicatorDelayMS != null
+                        ? "Progress indicator delay ${_chewieController!.progressIndicatorDelayMS.toString()} MS"
+                        : "Set me",
+                  ),
+                ],
+              ),
+            )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class DelaySlider extends StatefulWidget {
+  const DelaySlider({Key? key, required this.delay, required this.onSave})
+      : super(key: key);
+
+  final int? delay;
+  final void Function(int?) onSave;
+  @override
+  State<DelaySlider> createState() => _DelaySliderState();
+}
+
+class _DelaySliderState extends State<DelaySlider> {
+  int? delay;
+  bool saved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    delay = widget.delay;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const int max = 1000;
+    return ListTile(
+      title: Text(
+        "Progress indicator delay ${delay != null ? "${delay.toString()} MS" : ""}",
+      ),
+      subtitle: Slider(
+        value: delay != null ? (delay! / max) : 0,
+        onChanged: (value) async {
+          delay = (value * max).toInt();
+          setState(() {
+            saved = false;
+          });
+        },
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.save),
+        onPressed: saved
+            ? null
+            : () {
+                widget.onSave(delay);
+                setState(() {
+                  saved = true;
+                });
+              },
       ),
     );
   }
