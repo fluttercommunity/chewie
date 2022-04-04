@@ -310,28 +310,19 @@ class _ChewieDemoState extends State<ChewieDemo> {
             ),
             ListTile(
               title: const Text("Delay"),
-              subtitle: Column(
-                children: [
-                  DelaySlider(
-                    delay: _chewieController?.progressIndicatorDelayMS,
-                    onSave: (delay) async {
-                      if (delay != null) {
-                        if (delay == 0) {
-                          bufferDelay = null;
-                        } else {
-                          bufferDelay = delay;
-                        }
+              subtitle: DelaySlider(
+                delay: _chewieController?.progressIndicatorDelayMS,
+                onSave: (delay) async {
+                  if (delay != null) {
+                    if (delay == 0) {
+                      bufferDelay = null;
+                    } else {
+                      bufferDelay = delay;
+                    }
 
-                        await initializePlayer();
-                      }
-                    },
-                  ),
-                  Text(
-                    _chewieController?.progressIndicatorDelayMS != null
-                        ? "Progress indicator delay ${_chewieController!.progressIndicatorDelayMS.toString()} MS"
-                        : "Set me",
-                  ),
-                ],
+                    await initializePlayer();
+                  }
+                },
               ),
             )
           ],
