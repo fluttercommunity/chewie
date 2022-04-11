@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chewie/chewie.dart';
 import 'package:chewie_example/app/theme.dart';
 import 'package:flutter/material.dart';
@@ -308,23 +310,24 @@ class _ChewieDemoState extends State<ChewieDemo> {
                 ),
               ],
             ),
-            ListTile(
-              title: const Text("Delay"),
-              subtitle: DelaySlider(
-                delay: _chewieController?.progressIndicatorDelayMS,
-                onSave: (delay) async {
-                  if (delay != null) {
-                    if (delay == 0) {
-                      bufferDelay = null;
-                    } else {
-                      bufferDelay = delay;
-                    }
+            if (Platform.isAndroid)
+              ListTile(
+                title: const Text("Delay"),
+                subtitle: DelaySlider(
+                  delay: _chewieController?.progressIndicatorDelayMS,
+                  onSave: (delay) async {
+                    if (delay != null) {
+                      if (delay == 0) {
+                        bufferDelay = null;
+                      } else {
+                        bufferDelay = delay;
+                      }
 
-                    await initializePlayer();
-                  }
-                },
-              ),
-            )
+                      await initializePlayer();
+                    }
+                  },
+                ),
+              )
           ],
         ),
       ),

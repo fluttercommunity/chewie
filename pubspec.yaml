@@ -12,11 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.0.1
-  video_player:
-    git:
-      url: https://github.com/henri2h/plugins.git
-      ref: henri/enhance-seeking-mechanism-test
-      path: packages/video_player/video_player
+  video_player: ^2.2.7
   wakelock: ^0.6.1+1
 
 dev_dependencies:
