@@ -492,7 +492,7 @@ class ChewieController extends ChangeNotifier {
   /// Defines if push/pop navigations use the rootNavigator
   final bool useRootNavigator;
 
-  /// Define the time interval before the video controls are hidden
+  /// Defines the time interval before the video controls are hidden. By default, this is three seconds.
   final Duration hideControlsTimer;
 
   /// Defines the set of allowed playback speeds user can change
