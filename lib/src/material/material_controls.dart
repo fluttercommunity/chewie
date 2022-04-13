@@ -541,7 +541,7 @@ class _MaterialControlsState extends State<MaterialControls>
 
   void _startHideTimer() {
     final hideControlsTimer = chewieController.hideControlsTimer.isNegative
-        ? const Duration(seconds: 3)
+        ? ChewieController.defaultTimer
         : chewieController.hideControlsTimer;
     _hideTimer = Timer(hideControlsTimer, () {
       setState(() {

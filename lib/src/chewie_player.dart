@@ -280,7 +280,7 @@ class ChewieController extends ChangeNotifier {
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
     this.deviceOrientationsAfterFullScreen = DeviceOrientation.values,
     this.routePageBuilder,
-    this.hideControlsTimer = const Duration(seconds: 3),
+    this.hideControlsTimer = defaultTimer,
   }) : assert(
           playbackSpeeds.every((speed) => speed > 0),
           'The playbackSpeeds values must all be greater than 0',
@@ -379,6 +379,8 @@ class ChewieController extends ChangeNotifier {
       hideControlsTimer: hideControlsTimer ?? this.hideControlsTimer,
     );
   }
+
+  static const defaultTimer = Duration(seconds: 3);
 
   /// If false, the options button in MaterialUI and MaterialDesktopUI
   /// won't be shown.
