@@ -280,6 +280,7 @@ class ChewieController extends ChangeNotifier {
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
     this.deviceOrientationsAfterFullScreen = DeviceOrientation.values,
     this.routePageBuilder,
+    this.hideControlsTimer = const Duration(seconds: 3),
   }) : assert(
           playbackSpeeds.every((speed) => speed > 0),
           'The playbackSpeeds values must all be greater than 0',
@@ -317,6 +318,7 @@ class ChewieController extends ChangeNotifier {
     bool? allowMuting,
     bool? allowPlaybackSpeedChanging,
     bool? useRootNavigator,
+    Duration? hideControlsTimer,
     List<double>? playbackSpeeds,
     List<SystemUiOverlay>? systemOverlaysOnEnterFullScreen,
     List<DeviceOrientation>? deviceOrientationsOnEnterFullScreen,
@@ -374,6 +376,7 @@ class ChewieController extends ChangeNotifier {
       deviceOrientationsAfterFullScreen: deviceOrientationsAfterFullScreen ??
           this.deviceOrientationsAfterFullScreen,
       routePageBuilder: routePageBuilder ?? this.routePageBuilder,
+      hideControlsTimer: hideControlsTimer ?? this.hideControlsTimer,
     );
   }
 
@@ -486,6 +489,9 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines if push/pop navigations use the rootNavigator
   final bool useRootNavigator;
+
+  /// Define the time interval before the video controls are hidden
+  final Duration hideControlsTimer;
 
   /// Defines the set of allowed playback speeds user can change
   final List<double> playbackSpeeds;
