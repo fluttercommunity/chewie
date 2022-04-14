@@ -1,28 +1,28 @@
-import 'package:chewie/chewie.dart';
+import 'package:chewieLumen/chewieLumen.dart';
 import 'package:chewie_example/app/theme.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:video_player/video_player.dart';
 
-class ChewieDemo extends StatefulWidget {
-  const ChewieDemo({
+class ChewieLumenDemo extends StatefulWidget {
+  const ChewieLumenDemo({
     Key? key,
-    this.title = 'Chewie Demo',
+    this.title = 'ChewieLumen Demo',
   }) : super(key: key);
 
   final String title;
 
   @override
   State<StatefulWidget> createState() {
-    return _ChewieDemoState();
+    return _ChewieLumenDemoState();
   }
 }
 
-class _ChewieDemoState extends State<ChewieDemo> {
+class _ChewieLumenDemoState extends State<ChewieLumenDemo> {
   TargetPlatform? _platform;
   late VideoPlayerController _videoPlayerController1;
   late VideoPlayerController _videoPlayerController2;
-  ChewieController? _chewieController;
+  ChewieLumenController? _chewieLumenController;
 
   @override
   void initState() {
@@ -34,7 +34,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   void dispose() {
     _videoPlayerController1.dispose();
     _videoPlayerController2.dispose();
-    _chewieController?.dispose();
+    _chewieLumenController?.dispose();
     super.dispose();
   }
 
@@ -52,11 +52,11 @@ class _ChewieDemoState extends State<ChewieDemo> {
       _videoPlayerController1.initialize(),
       _videoPlayerController2.initialize()
     ]);
-    _createChewieController();
+    _createChewieLumenController();
     setState(() {});
   }
 
-  void _createChewieController() {
+  void _createChewieLumenController() {
     // final subtitles = [
     //     Subtitle(
     //       index: 0,
@@ -106,7 +106,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       ),
     ];
 
-    _chewieController = ChewieController(
+    _chewieLumenController = ChewieLumenController(
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
       looping: true,
@@ -136,7 +136,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       // Try playing around with some of these other options:
 
       // showControls: false,
-      // materialProgressColors: ChewieProgressColors(
+      // materialProgressColors: ChewieLumenProgressColors(
       //   playedColor: Colors.red,
       //   handleColor: Colors.blue,
       //   backgroundColor: Colors.grey,
@@ -172,11 +172,11 @@ class _ChewieDemoState extends State<ChewieDemo> {
           children: <Widget>[
             Expanded(
               child: Center(
-                child: _chewieController != null &&
-                        _chewieController!
+                child: _chewieLumenController != null &&
+                        _chewieLumenController!
                             .videoPlayerController.value.isInitialized
-                    ? Chewie(
-                        controller: _chewieController!,
+                    ? ChewieLumen(
+                        controller: _chewieLumenController!,
                       )
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -190,7 +190,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
             ),
             TextButton(
               onPressed: () {
-                _chewieController?.enterFullScreen();
+                _chewieLumenController?.enterFullScreen();
               },
               child: const Text('Fullscreen'),
             ),
@@ -202,7 +202,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       setState(() {
                         _videoPlayerController1.pause();
                         _videoPlayerController1.seekTo(Duration.zero);
-                        _createChewieController();
+                        _createChewieLumenController();
                       });
                     },
                     child: const Padding(
@@ -217,7 +217,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       setState(() {
                         _videoPlayerController2.pause();
                         _videoPlayerController2.seekTo(Duration.zero);
-                        _chewieController = _chewieController!.copyWith(
+                        _chewieLumenController = _chewieLumenController!.copyWith(
                           videoPlayerController: _videoPlayerController2,
                           autoPlay: true,
                           looping: true,

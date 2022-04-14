@@ -2,16 +2,16 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
-import 'package:chewie/src/animated_play_pause.dart';
-import 'package:chewie/src/center_play_button.dart';
-import 'package:chewie/src/chewie_player.dart';
-import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/cupertino/cupertino_progress_bar.dart';
-import 'package:chewie/src/cupertino/widgets/cupertino_options_dialog.dart';
-import 'package:chewie/src/helpers/utils.dart';
-import 'package:chewie/src/models/option_item.dart';
-import 'package:chewie/src/models/subtitle_model.dart';
-import 'package:chewie/src/notifiers/index.dart';
+import 'package:chewieLumen/src/animated_play_pause.dart';
+import 'package:chewieLumen/src/center_play_button.dart';
+import 'package:chewieLumen/src/chewie_player.dart';
+import 'package:chewieLumen/src/chewie_progress_colors.dart';
+import 'package:chewieLumen/src/cupertino/cupertino_progress_bar.dart';
+import 'package:chewieLumen/src/cupertino/widgets/cupertino_options_dialog.dart';
+import 'package:chewieLumen/src/helpers/utils.dart';
+import 'package:chewieLumen/src/models/option_item.dart';
+import 'package:chewieLumen/src/models/subtitle_model.dart';
+import 'package:chewieLumen/src/notifiers/index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,9 +50,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   late VideoPlayerController controller;
 
-  // We know that _chewieController is set in didChangeDependencies
-  ChewieController get chewieController => _chewieController!;
-  ChewieController? _chewieController;
+  // We know that _chewieLumenController is set in didChangeDependencies
+  ChewieLumenController get chewieLumenController => _chewieLumenController!;
+  ChewieLumenController? _chewieLumenController;
 
   @override
   void initState() {
@@ -63,10 +63,10 @@ class _CupertinoControlsState extends State<CupertinoControls>
   @override
   Widget build(BuildContext context) {
     if (_latestValue.hasError) {
-      return chewieController.errorBuilder != null
-          ? chewieController.errorBuilder!(
+      return chewieLumenController.errorBuilder != null
+          ? chewieLumenController.errorBuilder!(
               context,
-              chewieController.videoPlayerController.value.errorDescription!,
+              chewieLumenController.videoPlayerController.value.errorDescription!,
             )
           : const Center(
               child: Icon(
@@ -113,7 +113,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
                         0.0,
                         notifier.hideStuff ? barHeight * 0.8 : 0.0,
                       ),
-                      child: _buildSubtitles(chewieController.subtitle!),
+                      child: _buildSubtitles(chewieLumenController.subtitle!),
                     ),
                   _buildBottomBar(backgroundColor, iconColor, barHeight),
                 ],
@@ -140,11 +140,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   @override
   void didChangeDependencies() {
-    final _oldController = _chewieController;
-    _chewieController = ChewieController.of(context);
-    controller = chewieController.videoPlayerController;
+    final _oldController = _chewieLumenController;
+    _chewieLumenController = ChewieLumenController.of(context);
+    controller = chewieLumenController.videoPlayerController;
 
-    if (_oldController != chewieController) {
+    if (_oldController != chewieLumenController) {
       _dispose();
       _initialize();
     }
@@ -158,26 +158,26 @@ class _CupertinoControlsState extends State<CupertinoControls>
   ) {
     final options = <OptionItem>[];
 
-    if (chewieController.additionalOptions != null &&
-        chewieController.additionalOptions!(context).isNotEmpty) {
-      options.addAll(chewieController.additionalOptions!(context));
+    if (chewieLumenController.additionalOptions != null &&
+        chewieLumenController.additionalOptions!(context).isNotEmpty) {
+      options.addAll(chewieLumenController.additionalOptions!(context));
     }
 
     return GestureDetector(
       onTap: () async {
         _hideTimer?.cancel();
 
-        if (chewieController.optionsBuilder != null) {
-          await chewieController.optionsBuilder!(context, options);
+        if (chewieLumenController.optionsBuilder != null) {
+          await chewieLumenController.optionsBuilder!(context, options);
         } else {
           await showCupertinoModalPopup<OptionItem>(
             context: context,
             semanticsDismissible: true,
-            useRootNavigator: chewieController.useRootNavigator,
+            useRootNavigator: chewieLumenController.useRootNavigator,
             builder: (context) => CupertinoOptionsDialog(
               options: options,
               cancelButtonText:
-                  chewieController.optionsTranslation?.cancelButtonText,
+                  chewieLumenController.optionsTranslation?.cancelButtonText,
             ),
           );
           if (_latestValue.isPlaying) {
@@ -211,8 +211,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
       return Container();
     }
 
-    if (chewieController.subtitleBuilder != null) {
-      return chewieController.subtitleBuilder!(
+    if (chewieLumenController.subtitleBuilder != null) {
+      return chewieLumenController.subtitleBuilder!(
         context,
         currentSubtitle.first!.text,
       );
@@ -243,7 +243,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     double barHeight,
   ) {
     return SafeArea(
-      bottom: chewieController.isFullScreen,
+      bottom: chewieLumenController.isFullScreen,
       child: AnimatedOpacity(
         opacity: notifier.hideStuff ? 0.0 : 1.0,
         duration: const Duration(milliseconds: 300),
@@ -261,7 +261,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
               child: Container(
                 height: barHeight,
                 color: backgroundColor,
-                child: chewieController.isLive
+                child: chewieLumenController.isLive
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
@@ -278,10 +278,10 @@ class _CupertinoControlsState extends State<CupertinoControls>
                           _buildProgressBar(),
                           _buildRemaining(iconColor),
                           _buildSubtitleToggle(iconColor, barHeight),
-                          if (chewieController.allowPlaybackSpeedChanging)
+                          if (chewieLumenController.allowPlaybackSpeedChanging)
                             _buildSpeedButton(controller, iconColor, barHeight),
-                          if (chewieController.additionalOptions != null &&
-                              chewieController
+                          if (chewieLumenController.additionalOptions != null &&
+                              chewieLumenController
                                   .additionalOptions!(context).isNotEmpty)
                             _buildOptionsButton(iconColor, barHeight),
                         ],
@@ -328,7 +328,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
               color: backgroundColor,
               child: Center(
                 child: Icon(
-                  chewieController.isFullScreen
+                  chewieLumenController.isFullScreen
                       ? CupertinoIcons.arrow_down_right_arrow_up_left
                       : CupertinoIcons.arrow_up_left_arrow_down_right,
                   color: iconColor,
@@ -465,7 +465,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   Widget _buildSubtitleToggle(Color iconColor, double barHeight) {
     //if don't have subtitle hiden button
-    if (chewieController.subtitle?.isEmpty ?? true) {
+    if (chewieLumenController.subtitle?.isEmpty ?? true) {
       return Container();
     }
     return GestureDetector(
@@ -547,9 +547,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
         final chosenSpeed = await showCupertinoModalPopup<double>(
           context: context,
           semanticsDismissible: true,
-          useRootNavigator: chewieController.useRootNavigator,
+          useRootNavigator: chewieLumenController.useRootNavigator,
           builder: (context) => _PlaybackSpeedDialog(
-            speeds: chewieController.playbackSpeeds,
+            speeds: chewieLumenController.playbackSpeeds,
             selected: _latestValue.playbackSpeed,
           ),
         );
@@ -602,7 +602,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
       ),
       child: Row(
         children: <Widget>[
-          if (chewieController.allowFullScreen)
+          if (chewieLumenController.allowFullScreen)
             _buildExpandButton(
               backgroundColor,
               iconColor,
@@ -610,7 +610,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
               buttonPadding,
             ),
           const Spacer(),
-          if (chewieController.allowMuting)
+          if (chewieLumenController.allowMuting)
             _buildMuteButton(
               controller,
               backgroundColor,
@@ -634,16 +634,16 @@ class _CupertinoControlsState extends State<CupertinoControls>
   }
 
   Future<void> _initialize() async {
-    _subtitleOn = chewieController.subtitle?.isNotEmpty ?? false;
+    _subtitleOn = chewieLumenController.subtitle?.isNotEmpty ?? false;
     controller.addListener(_updateState);
 
     _updateState();
 
-    if (controller.value.isPlaying || chewieController.autoPlay) {
+    if (controller.value.isPlaying || chewieLumenController.autoPlay) {
       _startHideTimer();
     }
 
-    if (chewieController.showControlsOnInitialize) {
+    if (chewieLumenController.showControlsOnInitialize) {
       _initTimer = Timer(const Duration(milliseconds: 200), () {
         setState(() {
           notifier.hideStuff = false;
@@ -656,7 +656,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     setState(() {
       notifier.hideStuff = true;
 
-      chewieController.toggleFullScreen();
+      chewieLumenController.toggleFullScreen();
       _expandCollapseTimer = Timer(const Duration(milliseconds: 300), () {
         setState(() {
           _cancelAndRestartTimer();
@@ -685,8 +685,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
             _startHideTimer();
           },
-          colors: chewieController.cupertinoProgressColors ??
-              ChewieProgressColors(
+          colors: chewieLumenController.cupertinoProgressColors ??
+              ChewieLumenProgressColors(
                 playedColor: const Color.fromARGB(
                   120,
                   255,

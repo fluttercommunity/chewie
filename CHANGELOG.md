@@ -1,34 +1,34 @@
 ## 1.3.1
-* ⬆️ [#617](https://github.com/fluttercommunity/chewie/pull/617): Allow video zooming with InteractiveViewer widget. Thanks [jmsanc](https://github.com/jmsanc).
+* ⬆️ [#617](https://github.com/fluttercommunity/chewieLumen/pull/617): Allow video zooming with InteractiveViewer widget. Thanks [jmsanc](https://github.com/jmsanc).
 
 ## 1.3.0
 
-* ⬆️ [#598](https://github.com/fluttercommunity/chewie/pull/598): Update `wakelock` to `^0.6.1+1`. Thanks [fehernyul](https://github.com/fehernyul).
-* ⬆️ [#599](https://github.com/fluttercommunity/chewie/pull/599): Uniform controls. Thanks [BuginRug](https://github.com/BuginRug).
+* ⬆️ [#598](https://github.com/fluttercommunity/chewieLumen/pull/598): Update `wakelock` to `^0.6.1+1`. Thanks [fehernyul](https://github.com/fehernyul).
+* ⬆️ [#599](https://github.com/fluttercommunity/chewieLumen/pull/599): Uniform controls. Thanks [BuginRug](https://github.com/BuginRug).
 
   **Slight Breaking Change**. Instead of:
   
   ```dart
-  typedef ChewieRoutePageBuilder = Widget Function(
+  typedef ChewieLumenRoutePageBuilder = Widget Function(
   	   BuildContext context,
   	   Animation<double> animation,
       Animation<double> secondaryAnimation,
-      _ChewieControllerProvider controllerProvider,
+      _ChewieLumenControllerProvider controllerProvider,
   );
   ```
   
   It is now:
   
   ```dart
-  typedef ChewieRoutePageBuilder = Widget Function(
+  typedef ChewieLumenRoutePageBuilder = Widget Function(
   	   BuildContext context,
   	   Animation<double> animation,
       Animation<double> secondaryAnimation,
-      ChewieControllerProvider controllerProvider,
+      ChewieLumenControllerProvider controllerProvider,
   );
   ```
   
-  TL;DR: We had to make `_ChewieControllerProvider` public.
+  TL;DR: We had to make `_ChewieLumenControllerProvider` public.
   
 * 🛠️ Fixed lint and formatting problems
 * Under New Management under the auspices of [Flutter Community](https://github.com/fluttercommunity), and new maintainers [diegotori](https://github.com/diegotori) and [maherjaafar](https://github.com/maherjaafar).
@@ -36,7 +36,7 @@
 ## 1.2.3
 
 * ⬆️ Update 'provider' to 6.0.1
-  - fixes [#568](https://github.com/brianegan/chewie/issues/568)
+  - fixes [#568](https://github.com/brianegan/chewieLumen/issues/568)
 * ⬆️ Update 'video_player' to 2.2.7
 * ⬆️ Update 'wakelock' to 0.5.6
 * ⬆️ Update 'lint' to 1.7.2
@@ -48,36 +48,36 @@
 ## 1.2.2
 
 * 🛠️ Fix Incorrect use of ParentDataWidget.
-  - Fixes: [#485](https://github.com/brianegan/chewie/issues/485)
+  - Fixes: [#485](https://github.com/brianegan/chewieLumen/issues/485)
 
 ## 1.2.1
 
 * 💡 add `showOptions` flag to show/hide the options-menu
-  - Fixes: [#491](https://github.com/brianegan/chewie/issues/491)
+  - Fixes: [#491](https://github.com/brianegan/chewieLumen/issues/491)
 * ⬆️ update `video_player` to 2.1.5
 * 🛠️ fix MaterialUI duration text (RichText)
 
 ## 1.2.0
 
-* 🖥 __Desktop-UI__: Added `AdaptiveControls` where `MaterialDesktopControls` is now the default for Desktop-Platforms (start [ChewieDemo](https://github.com/brianegan/chewie/blob/master/example/lib/app/app.dart) for a preview)
-  - Fixes: [#188](https://github.com/brianegan/chewie/issues/478)
+* 🖥 __Desktop-UI__: Added `AdaptiveControls` where `MaterialDesktopControls` is now the default for Desktop-Platforms (start [ChewieLumenDemo](https://github.com/brianegan/chewieLumen/blob/master/example/lib/app/app.dart) for a preview)
+  - Fixes: [#188](https://github.com/brianegan/chewieLumen/issues/478)
 * Redesign `MaterialControls` (inspired by Youtube Mobile and Desktop)
 * Fix squeeze of `CenterPlayButton`
 * Add: `optionsTranslation`, `additionalOptions` and `optionsBuilder` to create and design your Video-Options like Playback speed, subtitles and other options you want to add (use here: `additionalOptions`!). Use `optionsTranslation` to provide your localized strings!
 
-> See [Options](https://github.com/brianegan/chewie#options) to customize your Chewie options
+> See [Options](https://github.com/brianegan/chewieLumen#options) to customize your ChewieLumen options
 
 ## 1.1.0
 
 * Add subtitle functionality
-  - Thanks to kirill09: [#188](https://github.com/brianegan/chewie/pull/188) with which we've improved and optimized subtitles
+  - Thanks to kirill09: [#188](https://github.com/brianegan/chewieLumen/pull/188) with which we've improved and optimized subtitles
 
-> See readme on how to create subtitles and provide your own subtitleBuilder: [Subtitles](https://github.com/brianegan/chewie#Subtitles)
+> See readme on how to create subtitles and provide your own subtitleBuilder: [Subtitles](https://github.com/brianegan/chewieLumen#Subtitles)
 
 ## 1.0.0
 
 * Migrate to Null Safety
-  - Thanks to miDeb: [#406](https://github.com/brianegan/chewie/pull/443)
+  - Thanks to miDeb: [#406](https://github.com/brianegan/chewieLumen/pull/443)
 
 ## 0.12.1+1
 
@@ -86,16 +86,16 @@
 ## 0.12.2
 
 * Fix: Deprecation of [`resizeToAvoidBottomPadding`](https://api.flutter.dev/flutter/material/Scaffold/resizeToAvoidBottomPadding.html). Replaced by `resizeToAvoidBottomInset`
-  - Thanks to: [#423](https://github.com/brianegan/chewie/pull/423)
+  - Thanks to: [#423](https://github.com/brianegan/chewieLumen/pull/423)
 
 ## 0.12.1
 
 * Fix: Duration called on null for cupertino controls
-  - Thanks to: [#406](https://github.com/brianegan/chewie/pull/406)
+  - Thanks to: [#406](https://github.com/brianegan/chewieLumen/pull/406)
 * Bump required Flutter version 1.20 -> 1.22
-  - Thanks to: [#401](https://github.com/brianegan/chewie/pull/401)
-* Export controls in chewie.dart.
-  - Thanks to: [#355](https://github.com/brianegan/chewie/pull/355)
+  - Thanks to: [#401](https://github.com/brianegan/chewieLumen/pull/401)
+* Export controls in chewieLumen.dart.
+  - Thanks to: [#355](https://github.com/brianegan/chewieLumen/pull/355)
 * Add `lint` linter
 * Add CI to analyze and check format
 
@@ -103,14 +103,14 @@
 
 * Add replay feature
 * Add Animated Play/Pause Button
-  - Thanks to: [#228](https://github.com/brianegan/chewie/pull/228)
+  - Thanks to: [#228](https://github.com/brianegan/chewieLumen/pull/228)
 
 ## 0.11.0
 
 * Add playback speed controls:
-  - Thanks to: [#390](https://github.com/brianegan/chewie/pull/390)
+  - Thanks to: [#390](https://github.com/brianegan/chewieLumen/pull/390)
 * Correct dependencies:
-  - Thanks to: [#395](https://github.com/brianegan/chewie/pull/395)
+  - Thanks to: [#395](https://github.com/brianegan/chewieLumen/pull/395)
 
 ## 0.10.4
 
@@ -126,12 +126,12 @@
 ## 0.10.3
 
 * Bugfix: only `setState` if widget is mounted (cupertino + material)
-  - Thanks to: [#309](https://github.com/brianegan/chewie/pull/309)
+  - Thanks to: [#309](https://github.com/brianegan/chewieLumen/pull/309)
 
 ## 0.10.2
 
 * Replace `open_iconic_flutter` with `cupertino_icons` to resolve Apple App-Store rejection (ITMS-90853)
-  - Fixes: [#381](https://github.com/brianegan/chewie/issues/381)
+  - Fixes: [#381](https://github.com/brianegan/chewieLumen/issues/381)
 
 ## 0.10.1
 
@@ -163,7 +163,7 @@
 
 ## 0.9.7
 
-  * Errors are properly handled. You can provide the Widget to display when an error occurs by providing an `errorBuilder` function to the `ChewieController` constructor.
+  * Errors are properly handled. You can provide the Widget to display when an error occurs by providing an `errorBuilder` function to the `ChewieLumenController` constructor.
   * Add ability to override the fullscreen page builder. Allows folks to customize that functionality!
 
 ## 0.9.6
@@ -194,7 +194,7 @@
 
 ## 0.9.0
 
-  * **Breaking changes**: Add a `ChewieController` to make customizations and control from outside of the player easier.
+  * **Breaking changes**: Add a `ChewieLumenController` to make customizations and control from outside of the player easier.
     Refer to the [README](README.md) for details on how to upgrade from previous versions.
 
 ## 0.8.0
@@ -231,7 +231,7 @@
 
   * Update to work with `video_player: ">=0.2.0 <0.3.0`
   * Add `showControls` option. You can use this to show / hide the controls
-  * Move from `VideoProgressColors` to `ChewieProgressColors` for customization of the Chewie progress controls
+  * Move from `VideoProgressColors` to `ChewieLumenProgressColors` for customization of the ChewieLumen progress controls
   * Remove `progressColors` in favor of platform-specific customizations: `cupertinoProgressColors` and `materialProgressColors` to control
   * Add analysis options
 
@@ -245,9 +245,9 @@
 
 ## 0.1.0
 
-Initial version of Chewie, the video player with a heart of gold.
+Initial version of ChewieLumen, the video player with a heart of gold.
 
-  * Hand a VideoPlayerController to Chewie, and let it do the rest.
+  * Hand a VideoPlayerController to ChewieLumen, and let it do the rest.
   * Includes Material Player Controls
   * Includes Cupertino Player Controls
   * Spike version: Focus on good looking UI. Internal code is sloppy, needs a refactor and tests

@@ -1,20 +1,20 @@
-# chewie
-[![Version](https://img.shields.io/pub/v/chewie.svg)](https://pub.dev/packages/chewie)
-![CI](https://github.com/brianegan/chewie/workflows/CI/badge.svg)
-[![Generic badge](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20-blue.svg)](https://pub.dev/packages/chewie)
+# chewieLumen
+[![Version](https://img.shields.io/pub/v/chewieLumen.svg)](https://pub.dev/packages/chewieLumen)
+![CI](https://github.com/brianegan/chewieLumen/workflows/CI/badge.svg)
+[![Generic badge](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20-blue.svg)](https://pub.dev/packages/chewieLumen)
 
 The video player for Flutter with a heart of gold. 
 
-The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
+The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. ChewieLumen uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
 
 ## Preview
 
 | MaterialControls | MaterialDesktopControls |
 | :--------------: | :---------------------: |
-|     ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialControls.png)     |    ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialDesktopControls.png)     |
+|     ![](https://github.com/brianegan/chewieLumen/raw/master/assets/MaterialControls.png)     |    ![](https://github.com/brianegan/chewieLumen/raw/master/assets/MaterialDesktopControls.png)     |
 
 ### CupertinoControls
-![](https://github.com/brianegan/chewie/raw/master/assets/CupertinoControls.png)
+![](https://github.com/brianegan/chewieLumen/raw/master/assets/CupertinoControls.png)
 
 ## Installation
 
@@ -22,27 +22,27 @@ In your `pubspec.yaml` file within your Flutter Project:
 
 ```yaml
 dependencies:
-  chewie: <latest_version>
+  chewieLumen: <latest_version>
   video_player: <latest_version>
 ```
 
 ## Use it
 
 ```dart
-import 'package:chewie/chewie.dart';
+import 'package:chewieLumen/chewieLumen.dart';
 final videoPlayerController = VideoPlayerController.network(
     'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4');
 
 await videoPlayerController.initialize();
 
-final chewieController = ChewieController(
+final chewieLumenController = ChewieLumenController(
   videoPlayerController: videoPlayerController,
   autoPlay: true,
   looping: true,
 );
 
-final playerWidget = Chewie(
-  controller: chewieController,
+final playerWidget = ChewieLumen(
+  controller: chewieLumenController,
 );
 ```
 
@@ -51,18 +51,18 @@ Please make sure to dispose both controller widgets after use. For example by ov
 @override
 void dispose() {
   videoPlayerController.dispose();
-  chewieController.dispose();
+  chewieLumenController.dispose();
   super.dispose();
 }
 ```
 
 ## Options
 
-![](https://github.com/brianegan/chewie/raw/master/assets/Options.png)
+![](https://github.com/brianegan/chewieLumen/raw/master/assets/Options.png)
 
-Chewie got some options which controls the video you provide. These options appear on default on a `showModalBottomSheet` (like you already know from YT maybe). Chewie is passing on default `Playback speed` and `Subtitles` options as an `OptionItem`.
+ChewieLumen got some options which controls the video you provide. These options appear on default on a `showModalBottomSheet` (like you already know from YT maybe). ChewieLumen is passing on default `Playback speed` and `Subtitles` options as an `OptionItem`.
 
-To add additional options just add these lines to your `ChewieController`:
+To add additional options just add these lines to your `ChewieLumenController`:
 
 ```dart
 additionalOptions: (context) {
@@ -118,14 +118,14 @@ optionsTranslation: OptionsTranslation(
 
 ## Subtitles
 
-> Since version 1.1.0 chewie supports subtitles. Here you can see how to use them
+> Since version 1.1.0 chewieLumen supports subtitles. Here you can see how to use them
 
 You can provide an `List<Subtitle>` and customize your subtitles with the `subtitleBuilder` function.
 
-Just add subtitles as following code is showing into your `ChewieController`:
+Just add subtitles as following code is showing into your `ChewieLumenController`:
 
 ```dart
-ChewieController(
+ChewieLumenController(
   videoPlayerController: _videoPlayerController,
   autoPlay: true,
   looping: true,
@@ -168,13 +168,13 @@ Subtitle(
 
 ## Example
 
-Please run the app in the [`example/`](https://github.com/brianegan/chewie/tree/master/example) folder to start playing!
+Please run the app in the [`example/`](https://github.com/brianegan/chewieLumen/tree/master/example) folder to start playing!
 
-## Migrating from Chewie < 0.9.0
-Instead of passing the `VideoPlayerController` and your options to the `Chewie` widget you now pass them to the `ChewieController` and pass that latter to the `Chewie` widget.
+## Migrating from ChewieLumen < 0.9.0
+Instead of passing the `VideoPlayerController` and your options to the `ChewieLumen` widget you now pass them to the `ChewieLumenController` and pass that latter to the `ChewieLumen` widget.
 
 ```dart
-final playerWidget = Chewie(
+final playerWidget = ChewieLumen(
   videoPlayerController,
   autoPlay: true,
   looping: true,
@@ -184,14 +184,14 @@ final playerWidget = Chewie(
 becomes
 
 ```dart
-final chewieController = ChewieController(
+final chewieLumenController = ChewieLumenController(
   videoPlayerController: videoPlayerController,
   autoPlay: true,
   looping: true,
 );
 
-final playerWidget = Chewie(
-  controller: chewieController,
+final playerWidget = ChewieLumen(
+  controller: chewieLumenController,
 );
 ```
 
@@ -222,7 +222,7 @@ final playerWidget = Chewie(
 
 
 ## iOS warning 
-The video_player plugin used by chewie will only work in iOS simulators if you are on flutter 1.26.0 or above. You may need to switch to the beta channel `flutter channel beta`
+The video_player plugin used by chewieLumen will only work in iOS simulators if you are on flutter 1.26.0 or above. You may need to switch to the beta channel `flutter channel beta`
 Please refer to this [issue](https://github.com/flutter/flutter/issues/14647).
 
 

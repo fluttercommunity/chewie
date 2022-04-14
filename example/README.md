@@ -1,6 +1,6 @@
-# Chewie Example
+# ChewieLumen Example
 
-An example of how to use the chewie for Flutter
+An example of how to use the chewieLumen for Flutter
 
 ## Getting Started
 

@@ -1,44 +1,44 @@
 import 'dart:async';
 
-import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/models/option_item.dart';
-import 'package:chewie/src/models/options_translation.dart';
-import 'package:chewie/src/models/subtitle_model.dart';
-import 'package:chewie/src/notifiers/player_notifier.dart';
-import 'package:chewie/src/player_with_controls.dart';
+import 'package:chewieLumen/src/chewie_progress_colors.dart';
+import 'package:chewieLumen/src/models/option_item.dart';
+import 'package:chewieLumen/src/models/options_translation.dart';
+import 'package:chewieLumen/src/models/subtitle_model.dart';
+import 'package:chewieLumen/src/notifiers/player_notifier.dart';
+import 'package:chewieLumen/src/player_with_controls.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock/wakelock.dart';
 
-typedef ChewieRoutePageBuilder = Widget Function(
+typedef ChewieLumenRoutePageBuilder = Widget Function(
   BuildContext context,
   Animation<double> animation,
   Animation<double> secondaryAnimation,
-  ChewieControllerProvider controllerProvider,
+  ChewieLumenControllerProvider controllerProvider,
 );
 
 /// A Video Player with Material and Cupertino skins.
 ///
-/// `video_player` is pretty low level. Chewie wraps it in a friendly skin to
+/// `video_player` is pretty low level. ChewieLumen wraps it in a friendly skin to
 /// make it easy to use!
-class Chewie extends StatefulWidget {
-  const Chewie({
+class ChewieLumen extends StatefulWidget {
+  const ChewieLumen({
     Key? key,
     required this.controller,
   }) : super(key: key);
 
-  /// The [ChewieController]
-  final ChewieController controller;
+  /// The [ChewieLumenController]
+  final ChewieLumenController controller;
 
   @override
-  ChewieState createState() {
-    return ChewieState();
+  ChewieLumenState createState() {
+    return ChewieLumenState();
   }
 }
 
-class ChewieState extends State<Chewie> {
+class ChewieLumenState extends State<ChewieLumen> {
   bool _isFullScreen = false;
 
   bool get isControllerFullScreen => widget.controller.isFullScreen;
@@ -58,7 +58,7 @@ class ChewieState extends State<Chewie> {
   }
 
   @override
-  void didUpdateWidget(Chewie oldWidget) {
+  void didUpdateWidget(ChewieLumen oldWidget) {
     if (oldWidget.controller != widget.controller) {
       widget.controller.addListener(listener);
     }
@@ -83,7 +83,7 @@ class ChewieState extends State<Chewie> {
 
   @override
   Widget build(BuildContext context) {
-    return ChewieControllerProvider(
+    return ChewieLumenControllerProvider(
       controller: widget.controller,
       child: ChangeNotifierProvider<PlayerNotifier>.value(
         value: notifier,
@@ -95,7 +95,7 @@ class ChewieState extends State<Chewie> {
   Widget _buildFullScreenVideo(
     BuildContext context,
     Animation<double> animation,
-    ChewieControllerProvider controllerProvider,
+    ChewieLumenControllerProvider controllerProvider,
   ) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -111,7 +111,7 @@ class ChewieState extends State<Chewie> {
     BuildContext context,
     Animation<double> animation,
     Animation<double> secondaryAnimation,
-    ChewieControllerProvider controllerProvider,
+    ChewieLumenControllerProvider controllerProvider,
   ) {
     return AnimatedBuilder(
       animation: animation,
@@ -126,7 +126,7 @@ class ChewieState extends State<Chewie> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    final controllerProvider = ChewieControllerProvider(
+    final controllerProvider = ChewieLumenControllerProvider(
       controller: widget.controller,
       child: ChangeNotifierProvider<PlayerNotifier>.value(
         value: notifier,
@@ -233,18 +233,18 @@ class ChewieState extends State<Chewie> {
   }
 }
 
-/// The ChewieController is used to configure and drive the Chewie Player
+/// The ChewieLumenController is used to configure and drive the ChewieLumen Player
 /// Widgets. It provides methods to control playback, such as [pause] and
 /// [play], as well as methods that control the visual appearance of the player,
 /// such as [enterFullScreen] or [exitFullScreen].
 ///
-/// In addition, you can listen to the ChewieController for presentational
+/// In addition, you can listen to the ChewieLumenController for presentational
 /// changes, such as entering and exiting full screen mode. To listen for
 /// changes to the playback, such as a change to the seek position of the
 /// player, please use the standard information provided by the
 /// `VideoPlayerController`.
-class ChewieController extends ChangeNotifier {
-  ChewieController({
+class ChewieLumenController extends ChangeNotifier {
+  ChewieLumenController({
     required this.videoPlayerController,
     this.optionsTranslation,
     this.aspectRatio,
@@ -287,7 +287,7 @@ class ChewieController extends ChangeNotifier {
     _initialize();
   }
 
-  ChewieController copyWith({
+  ChewieLumenController copyWith({
     VideoPlayerController? videoPlayerController,
     OptionsTranslation? optionsTranslation,
     double? aspectRatio,
@@ -296,8 +296,8 @@ class ChewieController extends ChangeNotifier {
     Duration? startAt,
     bool? looping,
     bool? fullScreenByDefault,
-    ChewieProgressColors? cupertinoProgressColors,
-    ChewieProgressColors? materialProgressColors,
+    ChewieLumenProgressColors? cupertinoProgressColors,
+    ChewieLumenProgressColors? materialProgressColors,
     Widget? placeholder,
     Widget? overlay,
     bool? showControlsOnInitialize,
@@ -326,11 +326,11 @@ class ChewieController extends ChangeNotifier {
       BuildContext,
       Animation<double>,
       Animation<double>,
-      ChewieControllerProvider,
+      ChewieLumenControllerProvider,
     )?
         routePageBuilder,
   }) {
-    return ChewieController(
+    return ChewieLumenController(
       videoPlayerController:
           videoPlayerController ?? this.videoPlayerController,
       optionsTranslation: optionsTranslation ?? this.optionsTranslation,
@@ -391,16 +391,16 @@ class ChewieController extends ChangeNotifier {
   /// These are required for the default `OptionItem`'s
   final OptionsTranslation? optionsTranslation;
 
-  /// Build your own options with default chewieOptions shiped through
+  /// Build your own options with default chewieLumenOptions shiped through
   /// the builder method. Just add your own options to the Widget
-  /// you'll build. If you want to hide the chewieOptions, just leave them
+  /// you'll build. If you want to hide the chewieLumenOptions, just leave them
   /// out from your Widget.
   final Future<void> Function(
     BuildContext context,
-    List<OptionItem> chewieOptions,
+    List<OptionItem> chewieLumenOptions,
   )? optionsBuilder;
 
-  /// Add your own additional options on top of chewie options
+  /// Add your own additional options on top of chewieLumen options
   final List<OptionItem> Function(BuildContext context)? additionalOptions;
 
   /// Define here your own Widget on how your n'th subtitle will look like
@@ -453,11 +453,11 @@ class ChewieController extends ChangeNotifier {
 
   /// The colors to use for controls on iOS. By default, the iOS player uses
   /// colors sampled from the original iOS 11 designs.
-  final ChewieProgressColors? cupertinoProgressColors;
+  final ChewieLumenProgressColors? cupertinoProgressColors;
 
   /// The colors to use for the Material Progress Bar. By default, the Material
   /// player uses the colors from your Theme.
-  final ChewieProgressColors? materialProgressColors;
+  final ChewieLumenProgressColors? materialProgressColors;
 
   /// The placeholder is displayed underneath the Video before it is initialized
   /// or played.
@@ -503,13 +503,13 @@ class ChewieController extends ChangeNotifier {
   final List<DeviceOrientation> deviceOrientationsAfterFullScreen;
 
   /// Defines a custom RoutePageBuilder for the fullscreen
-  final ChewieRoutePageBuilder? routePageBuilder;
+  final ChewieLumenRoutePageBuilder? routePageBuilder;
 
-  static ChewieController of(BuildContext context) {
-    final chewieControllerProvider =
-        context.dependOnInheritedWidgetOfExactType<ChewieControllerProvider>()!;
+  static ChewieLumenController of(BuildContext context) {
+    final chewieLumenControllerProvider =
+        context.dependOnInheritedWidgetOfExactType<ChewieLumenControllerProvider>()!;
 
-    return chewieControllerProvider.controller;
+    return chewieLumenControllerProvider.controller;
   }
 
   bool _isFullScreen = false;
@@ -595,16 +595,16 @@ class ChewieController extends ChangeNotifier {
   }
 }
 
-class ChewieControllerProvider extends InheritedWidget {
-  const ChewieControllerProvider({
+class ChewieLumenControllerProvider extends InheritedWidget {
+  const ChewieLumenControllerProvider({
     Key? key,
     required this.controller,
     required Widget child,
   }) : super(key: key, child: child);
 
-  final ChewieController controller;
+  final ChewieLumenController controller;
 
   @override
-  bool updateShouldNotify(ChewieControllerProvider old) =>
+  bool updateShouldNotify(ChewieLumenControllerProvider old) =>
       controller != old.controller;
 }

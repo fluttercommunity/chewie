@@ -1,5 +1,5 @@
-name: chewie_example
-description: An example of how to use the chewie for Flutter
+name: chewieLumen_example
+description: An example of how to use the chewieLumen for Flutter
 version: 1.0.0
 publish_to: none
 
@@ -7,7 +7,7 @@ environment:
   sdk: '>=2.12.0-0 <3.0.0'
 
 dependencies:
-  chewie:
+  chewieLumen:
     path: ../
   flutter:
     sdk: flutter
