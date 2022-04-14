@@ -1,5 +1,5 @@
-import 'package:chewieLumen/chewieLumen.dart';
-import 'package:chewie_example/app/theme.dart';
+import 'package:chewieLumen/chewie.dart';
+import 'package:chewieLumen_example/app/theme.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:video_player/video_player.dart';
@@ -44,14 +44,9 @@ class _ChewieLumenDemoState extends State<ChewieLumenDemo> {
   ];
 
   Future<void> initializePlayer() async {
-    _videoPlayerController1 =
-        VideoPlayerController.network(srcs[currPlayIndex]);
-    _videoPlayerController2 =
-        VideoPlayerController.network(srcs[currPlayIndex]);
-    await Future.wait([
-      _videoPlayerController1.initialize(),
-      _videoPlayerController2.initialize()
-    ]);
+    _videoPlayerController1 = VideoPlayerController.network(srcs[currPlayIndex]);
+    _videoPlayerController2 = VideoPlayerController.network(srcs[currPlayIndex]);
+    await Future.wait([_videoPlayerController1.initialize(), _videoPlayerController2.initialize()]);
     _createChewieLumenController();
     setState(() {});
   }
@@ -172,20 +167,19 @@ class _ChewieLumenDemoState extends State<ChewieLumenDemo> {
           children: <Widget>[
             Expanded(
               child: Center(
-                child: _chewieLumenController != null &&
-                        _chewieLumenController!
-                            .videoPlayerController.value.isInitialized
-                    ? ChewieLumen(
-                        controller: _chewieLumenController!,
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 20),
-                          Text('Loading'),
-                        ],
-                      ),
+                child:
+                    _chewieLumenController != null && _chewieLumenController!.videoPlayerController.value.isInitialized
+                        ? ChewieLumen(
+                            controller: _chewieLumenController!,
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 20),
+                              Text('Loading'),
+                            ],
+                          ),
               ),
             ),
             TextButton(
