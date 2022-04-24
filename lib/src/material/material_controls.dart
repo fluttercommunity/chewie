@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:chewieLumen/src/center_play_button.dart';
+import 'package:chewieLumen/src/center_buttons.dart';
 import 'package:chewieLumen/src/chewie_player.dart';
 import 'package:chewieLumen/src/chewie_progress_colors.dart';
 import 'package:chewieLumen/src/helpers/utils.dart';
@@ -17,10 +17,32 @@ import 'package:video_player/video_player.dart';
 class MaterialControls extends StatefulWidget {
   const MaterialControls({
     this.showPlayButton = true,
+    this.showPrevNextButtons = false,
+    this.showVideoInfo = false,
+    this.videoTitle,
+    this.videoSubtitle,
+    this.playIconColor = Colors.black,
+    this.backgroundPlayIconColor = Colors.white,
+    this.prevNextIconsColor = Colors.white,
+    this.isPrevButtonDisabled = true,
+    this.isNextButtonDisabled = true,
+    this.onPrevClicked,
+    this.onNextClicked,
     Key? key,
   }) : super(key: key);
 
   final bool showPlayButton;
+  final bool showPrevNextButtons;
+  final bool showVideoInfo;
+  final Widget? videoTitle;
+  final Widget? videoSubtitle;
+  final Color backgroundPlayIconColor;
+  final Color prevNextIconsColor;
+  final Color playIconColor;
+  final bool isPrevButtonDisabled;
+  final bool isNextButtonDisabled;
+  final void Function()? onPrevClicked;
+  final void Function()? onNextClicked;
 
   @override
   State<StatefulWidget> createState() {
@@ -88,6 +110,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
               else
                 _buildHitArea(),
               _buildActionBar(),
+              if (widget.showVideoInfo) _buildVideoInfo(),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -148,6 +171,36 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
             children: [
               _buildSubtitleToggle(),
               if (chewieLumenController.showOptions) _buildOptionsButton(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVideoInfo() {
+    return Positioned(
+      top: 40,
+      left: 20,
+      child: SafeArea(
+        child: AnimatedOpacity(
+          opacity: notifier.hideStuff ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 250),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget.videoTitle != null)
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  child: widget.videoTitle,
+                ),
+              if (widget.videoSubtitle != null) ...[
+                const SizedBox(height: 5.0),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.75,
+                  child: widget.videoSubtitle,
+                )
+              ],
             ],
           ),
         ),
@@ -374,13 +427,19 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           });
         }
       },
-      child: CenterPlayButton(
-        backgroundColor: Colors.black54,
-        iconColor: Colors.white,
+      child: CenterButtons(
+        backgroundPlayIconColor: widget.backgroundPlayIconColor,
+        playIconColor: widget.playIconColor,
+        prevNextIconsColor: widget.prevNextIconsColor,
         isFinished: isFinished,
         isPlaying: controller.value.isPlaying,
         show: showPlayButton,
-        onPressed: _playPause,
+        withMaterialPrevAndNextButtons: widget.showPrevNextButtons,
+        isPrevButtonDisabled: widget.isPrevButtonDisabled,
+        isNextButtonDisabled: widget.isNextButtonDisabled,
+        onPlayPressed: _playPause,
+        onPrevClicked: widget.onPrevClicked,
+        onNextClicked: widget.onNextClicked,
       ),
     );
   }

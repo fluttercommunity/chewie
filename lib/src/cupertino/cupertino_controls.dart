@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:chewieLumen/src/animated_play_pause.dart';
-import 'package:chewieLumen/src/center_play_button.dart';
+import 'package:chewieLumen/src/center_buttons.dart';
 import 'package:chewieLumen/src/chewie_player.dart';
 import 'package:chewieLumen/src/chewie_progress_colors.dart';
 import 'package:chewieLumen/src/cupertino/cupertino_progress_bar.dart';
@@ -35,8 +35,7 @@ class CupertinoControls extends StatefulWidget {
   }
 }
 
-class _CupertinoControlsState extends State<CupertinoControls>
-    with SingleTickerProviderStateMixin {
+class _CupertinoControlsState extends State<CupertinoControls> with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
   late VideoPlayerValue _latestValue;
   double? _latestVolume;
@@ -176,8 +175,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
             useRootNavigator: chewieLumenController.useRootNavigator,
             builder: (context) => CupertinoOptionsDialog(
               options: options,
-              cancelButtonText:
-                  chewieLumenController.optionsTranslation?.cancelButtonText,
+              cancelButtonText: chewieLumenController.optionsTranslation?.cancelButtonText,
             ),
           );
           if (_latestValue.isPlaying) {
@@ -281,8 +279,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
                           if (chewieLumenController.allowPlaybackSpeedChanging)
                             _buildSpeedButton(controller, iconColor, barHeight),
                           if (chewieLumenController.additionalOptions != null &&
-                              chewieLumenController
-                                  .additionalOptions!(context).isNotEmpty)
+                              chewieLumenController.additionalOptions!(context).isNotEmpty)
                             _buildOptionsButton(iconColor, barHeight),
                         ],
                       ),
@@ -344,8 +341,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   Widget _buildHitArea() {
     final bool isFinished = _latestValue.position >= _latestValue.duration;
-    final bool showPlayButton =
-        widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
+    final bool showPlayButton = widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
 
     return GestureDetector(
       onTap: _latestValue.isPlaying
@@ -357,13 +353,13 @@ class _CupertinoControlsState extends State<CupertinoControls>
                 notifier.hideStuff = false;
               });
             },
-      child: CenterPlayButton(
-        backgroundColor: widget.backgroundColor,
-        iconColor: widget.iconColor,
+      child: CenterButtons(
+        backgroundPlayIconColor: Colors.black54,
+        playIconColor: Colors.white,
         isFinished: isFinished,
         isPlaying: controller.value.isPlaying,
         show: showPlayButton,
-        onPressed: _playPause,
+        onPlayPressed: _playPause,
       ),
     );
   }
@@ -745,16 +741,14 @@ class _CupertinoControlsState extends State<CupertinoControls>
   void _skipBack() {
     _cancelAndRestartTimer();
     final beginning = Duration.zero.inMilliseconds;
-    final skip =
-        (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
+    final skip = (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
   }
 
   void _skipForward() {
     _cancelAndRestartTimer();
     final end = _latestValue.duration.inMilliseconds;
-    final skip =
-        (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
+    final skip = (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.min(skip, end)));
   }
 
@@ -801,8 +795,7 @@ class _PlaybackSpeedDialog extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (e == _selected)
-                    Icon(Icons.check, size: 20.0, color: selectedColor),
+                  if (e == _selected) Icon(Icons.check, size: 20.0, color: selectedColor),
                   Text(e.toString()),
                 ],
               ),
