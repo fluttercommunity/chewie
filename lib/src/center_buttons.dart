@@ -42,13 +42,14 @@ class CenterButtons extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (withMaterialPrevAndNextButtons)
+              if (withMaterialPrevAndNextButtons) ...[
                 _NextPrevButton(
                   icon: Icons.skip_previous_sharp,
                   iconColor: isPrevButtonDisabled ? Colors.grey : prevNextIconsColor,
                   onPressed: isPrevButtonDisabled ? null : onPrevClicked,
                 ),
-              if (withMaterialPrevAndNextButtons) const SizedBox(width: 10.0),
+                const SizedBox(width: 10.0)
+              ],
               _PlayButton(
                 backgroundColor: backgroundPlayIconColor,
                 isFinished: isFinished,
@@ -56,13 +57,14 @@ class CenterButtons extends StatelessWidget {
                 onPlayPressed: onPlayPressed,
                 iconColor: playIconColor,
               ),
-              if (withMaterialPrevAndNextButtons) const SizedBox(width: 10.0),
-              if (withMaterialPrevAndNextButtons)
+              if (withMaterialPrevAndNextButtons) ...[
+                const SizedBox(width: 10.0),
                 _NextPrevButton(
                   icon: Icons.skip_next_sharp,
                   iconColor: isNextButtonDisabled ? Colors.grey : prevNextIconsColor,
                   onPressed: isNextButtonDisabled ? null : onNextClicked,
-                ),
+                )
+              ],
             ],
           ),
         ),
