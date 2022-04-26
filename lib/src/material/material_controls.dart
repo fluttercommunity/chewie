@@ -26,6 +26,8 @@ class MaterialControls extends StatefulWidget {
     this.prevNextIconsColor = Colors.white,
     this.isPrevButtonDisabled = true,
     this.isNextButtonDisabled = true,
+    this.positionTextSize = 14.0,
+    this.muteButtonSize = 14.0,
     this.onPrevClicked,
     this.onNextClicked,
     Key? key,
@@ -41,6 +43,8 @@ class MaterialControls extends StatefulWidget {
   final Color playIconColor;
   final bool isPrevButtonDisabled;
   final bool isNextButtonDisabled;
+  final double positionTextSize;
+  final double muteButtonSize;
   final void Function()? onPrevClicked;
   final void Function()? onNextClicked;
 
@@ -191,7 +195,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
             children: [
               if (widget.videoTitle != null)
                 SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.4,
+                  width: MediaQuery.of(context).size.width * 0.6,
                   child: widget.videoTitle,
                 ),
               if (widget.videoSubtitle != null) ...[
@@ -296,8 +300,6 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
   AnimatedOpacity _buildBottomBar(
     BuildContext context,
   ) {
-    final iconColor = Theme.of(context).textTheme.button!.color;
-
     return AnimatedOpacity(
       opacity: notifier.hideStuff ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 300),
@@ -320,8 +322,8 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
                     if (chewieLumenController.isLive)
                       const Expanded(child: Text('LIVE'))
                     else
-                      _buildPosition(iconColor),
-                    if (chewieLumenController.allowMuting) _buildMuteButton(controller),
+                      _buildPosition(widget.positionTextSize),
+                    if (chewieLumenController.allowMuting) _buildMuteButton(controller, widget.muteButtonSize),
                     const Spacer(),
                     if (chewieLumenController.allowFullScreen) _buildExpandButton(),
                   ],
@@ -348,9 +350,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     );
   }
 
-  GestureDetector _buildMuteButton(
-    VideoPlayerController controller,
-  ) {
+  GestureDetector _buildMuteButton(VideoPlayerController controller, double muteButtonSize) {
     return GestureDetector(
       onTap: () {
         _cancelAndRestartTimer();
@@ -374,6 +374,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
             child: Icon(
               _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
               color: Colors.white,
+              size: muteButtonSize,
             ),
           ),
         ),
@@ -466,7 +467,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     }
   }
 
-  Widget _buildPosition(Color? iconColor) {
+  Widget _buildPosition(double positionTextSize) {
     final position = _latestValue.position;
     final duration = _latestValue.duration;
 
@@ -477,14 +478,14 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           TextSpan(
             text: '/ ${formatDuration(duration)}',
             style: TextStyle(
-              fontSize: 14.0,
+              fontSize: positionTextSize,
               color: Colors.white.withOpacity(.75),
               fontWeight: FontWeight.normal,
             ),
           )
         ],
-        style: const TextStyle(
-          fontSize: 14.0,
+        style: TextStyle(
+          fontSize: positionTextSize,
           color: Colors.white,
           fontWeight: FontWeight.bold,
         ),
