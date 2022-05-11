@@ -19,6 +19,7 @@ typedef ChewieRoutePageBuilder = Widget Function(
   ChewieControllerProvider controllerProvider,
 );
 
+typedef ClickResult = Function();
 /// A Video Player with Material and Cupertino skins.
 ///
 /// `video_player` is pretty low level. Chewie wraps it in a friendly skin to
@@ -182,6 +183,7 @@ class ChewieState extends State<Chewie> {
   }
 
   void onEnterFullScreen() {
+    widget.controller.result();
     final videoWidth = widget.controller.videoPlayerController.value.size.width;
     final videoHeight =
         widget.controller.videoPlayerController.value.size.height;
@@ -281,6 +283,7 @@ class ChewieController extends ChangeNotifier {
     this.deviceOrientationsAfterFullScreen = DeviceOrientation.values,
     this.routePageBuilder,
     this.hideControlsTimer = defaultHideControlsTimer,
+    required this.result
   }) : assert(
           playbackSpeeds.every((speed) => speed > 0),
           'The playbackSpeeds values must all be greater than 0',
@@ -386,6 +389,7 @@ class ChewieController extends ChangeNotifier {
   /// won't be shown.
   final bool showOptions;
 
+  final ClickResult result;
   /// Pass your translations for the options like:
   /// - PlaybackSpeed
   /// - Subtitles
@@ -566,6 +570,7 @@ class ChewieController extends ChangeNotifier {
   void exitFullScreen() {
     _isFullScreen = false;
     notifyListeners();
+    result();
   }
 
   void toggleFullScreen() {
