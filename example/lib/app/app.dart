@@ -317,12 +317,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                   delay: _chewieController?.progressIndicatorDelayMs,
                   onSave: (delay) async {
                     if (delay != null) {
-                      if (delay == 0) {
-                        bufferDelay = null;
-                      } else {
-                        bufferDelay = delay;
-                      }
-
+                      bufferDelay = delay == 0 ? null : delay;
                       await initializePlayer();
                     }
                   },
