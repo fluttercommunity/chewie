@@ -280,6 +280,7 @@ class ChewieController extends ChangeNotifier {
     this.systemOverlaysAfterFullScreen = SystemUiOverlay.values,
     this.deviceOrientationsAfterFullScreen = DeviceOrientation.values,
     this.routePageBuilder,
+    this.progressIndicatorDelay,
     this.hideControlsTimer = defaultHideControlsTimer,
     this.progressIndicatorDelayMs,
   }) : assert(
@@ -325,7 +326,7 @@ class ChewieController extends ChangeNotifier {
     List<DeviceOrientation>? deviceOrientationsOnEnterFullScreen,
     List<SystemUiOverlay>? systemOverlaysAfterFullScreen,
     List<DeviceOrientation>? deviceOrientationsAfterFullScreen,
-    int? progressIndicatorDelayMs,
+    Duration? progressIndicatorDelay,
     Widget Function(
       BuildContext,
       Animation<double>,
@@ -379,8 +380,9 @@ class ChewieController extends ChangeNotifier {
           this.deviceOrientationsAfterFullScreen,
       routePageBuilder: routePageBuilder ?? this.routePageBuilder,
       hideControlsTimer: hideControlsTimer ?? this.hideControlsTimer,
-      progressIndicatorDelayMs:
-          progressIndicatorDelayMs ?? this.progressIndicatorDelayMs,
+      progressIndicatorDelay:
+          progressIndicatorDelay ?? this.progressIndicatorDelay,
+      hideControlsTimer: hideControlsTimer ?? this.hideControlsTimer,
     );
   }
 
@@ -518,7 +520,7 @@ class ChewieController extends ChangeNotifier {
   final ChewieRoutePageBuilder? routePageBuilder;
 
   /// [Android] Defines a delay in milliseconds between entering buffering state and displaying the loading spinner. Set null (default) to disable it.
-  final int? progressIndicatorDelayMs;
+  final Duration? progressIndicatorDelay;
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider =

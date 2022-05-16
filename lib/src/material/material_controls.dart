@@ -564,12 +564,10 @@ class _MaterialControlsState extends State<MaterialControls>
     if (!mounted) return;
 
     // display the progress bar indicator only after the buffering delay if it has been set
-    if (chewieController.progressIndicatorDelayMs != null) {
+    if (chewieController.progressIndicatorDelay != null) {
       if (controller.value.isBuffering) {
         timerInstance ??= Timer(
-          Duration(
-            milliseconds: chewieController.progressIndicatorDelayMs!,
-          ),
+          chewieController.progressIndicatorDelay!,
           handleTimeout,
         );
       } else {
