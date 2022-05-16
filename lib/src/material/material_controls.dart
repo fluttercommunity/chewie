@@ -40,6 +40,8 @@ class _MaterialControlsState extends State<MaterialControls>
   Timer? _showAfterExpandCollapseTimer;
   bool _dragging = false;
   bool _displayTapped = false;
+  Timer? _bufferingDisplayTimer;
+  bool _displayBufferingIndicator = false;
 
   final barHeight = 48.0 * 1.5;
   final marginSize = 5.0;
@@ -82,7 +84,7 @@ class _MaterialControlsState extends State<MaterialControls>
           absorbing: notifier.hideStuff,
           child: Stack(
             children: [
-              if (displayLoading)
+              if (_displayBufferingIndicator)
                 const Center(
                   child: CircularProgressIndicator(),
                 )
@@ -550,11 +552,8 @@ class _MaterialControlsState extends State<MaterialControls>
     });
   }
 
-  Timer? timerInstance;
-  bool displayLoading = false;
-
-  void handleTimeout() {
-    displayLoading = true;
+  void _bufferingTimerTimeout() {
+    _displayBufferingIndicator = true;
     if (mounted) {
       setState(() {});
     }
@@ -566,17 +565,17 @@ class _MaterialControlsState extends State<MaterialControls>
     // display the progress bar indicator only after the buffering delay if it has been set
     if (chewieController.progressIndicatorDelay != null) {
       if (controller.value.isBuffering) {
-        timerInstance ??= Timer(
+        _bufferingDisplayTimer ??= Timer(
           chewieController.progressIndicatorDelay!,
-          handleTimeout,
+          _bufferingTimerTimeout,
         );
       } else {
-        timerInstance?.cancel();
-        timerInstance = null;
-        displayLoading = false;
+        _bufferingDisplayTimer?.cancel();
+        _bufferingDisplayTimer = null;
+        _displayBufferingIndicator = false;
       }
     } else {
-      displayLoading = controller.value.isBuffering;
+      _displayBufferingIndicator = controller.value.isBuffering;
     }
 
     setState(() {

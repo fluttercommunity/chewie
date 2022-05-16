@@ -519,7 +519,7 @@ class ChewieController extends ChangeNotifier {
   /// Defines a custom RoutePageBuilder for the fullscreen
   final ChewieRoutePageBuilder? routePageBuilder;
 
-  /// [Android] Defines a delay in milliseconds between entering buffering state and displaying the loading spinner. Set null (default) to disable it.
+  /// Defines a delay in milliseconds between entering buffering state and displaying the loading spinner. Set null (default) to disable it.
   final Duration? progressIndicatorDelay;
 
   static ChewieController of(BuildContext context) {
