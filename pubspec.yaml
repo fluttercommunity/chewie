@@ -19,6 +19,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   lint: ^1.7.2
+  very_good_analysis: ^2.4.0
 
 flutter:
   uses-material-design: true
