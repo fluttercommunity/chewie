@@ -83,13 +83,13 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         if (!controller.value.isInitialized) {
           return;
         }
-        if (Platform.isAndroid) {
-          // on android, we need to let the player buffer when scrolling
-          // in order to let the player buffer. https://github.com/flutter/flutter/issues/101409
-          if (!controller.value.isBuffering) {
-            _seekToRelativePosition(details.globalPosition);
-          }
-        } else {
+        // Should only seek if it's not running on Android, or if it is,
+        // then the VideoPlayerController cannot be buffering.
+        // On Android, we need to let the player buffer when scrolling
+        // in order to let the player buffer. https://github.com/flutter/flutter/issues/101409
+        final shouldSeekToRelativePosition =
+            !Platform.isAndroid || !controller.value.isBuffering;
+        if (shouldSeekToRelativePosition) {
           _seekToRelativePosition(details.globalPosition);
         }
 
