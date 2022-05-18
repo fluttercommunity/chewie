@@ -14,12 +14,12 @@ dependencies:
   provider: ^6.0.1
   video_player: ^2.2.7
   wakelock: ^0.6.1+1
-  very_good_analysis: ^2.4.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   lint: ^1.7.2
+  very_good_analysis: ^2.4.0
 
 flutter:
   uses-material-design: true
