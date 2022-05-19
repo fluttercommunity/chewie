@@ -1,3 +1,6 @@
+## 1.3.3
+* ⬆️ [#634](https://github.com/fluttercommunity/chewie/pull/634): chore: Move very_good_analysis to dev_dependencies. Thanks [JCQuintas](https://github.com/JCQuintas).
+
 ## 1.3.2
 * ⬆️ [#626](https://github.com/fluttercommunity/chewie/pull/626): Added customizable timer to hide controls. Thanks [BuginRug](https://github.com/BuginRug).
 
