@@ -1,3 +1,4 @@
+import 'package:chewie/chewie.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -65,56 +66,75 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragStart: (DragStartDetails details) {
-        if (!controller.value.isInitialized) {
-          return;
-        }
-        _controllerWasPlaying = controller.value.isPlaying;
-        if (_controllerWasPlaying) {
-          controller.pause();
-        }
+    final ChewieController chewieController = ChewieController.of(context);
 
-        widget.onDragStart?.call();
-      },
-      onHorizontalDragUpdate: (DragUpdateDetails details) {
-        if (!controller.value.isInitialized) {
-          return;
-        }
-        _seekToRelativePosition(details.globalPosition);
+    return chewieController.draggableProgressBar
+        ? GestureDetector(
+            onHorizontalDragStart: (DragStartDetails details) {
+              if (!controller.value.isInitialized) {
+                return;
+              }
+              _controllerWasPlaying = controller.value.isPlaying;
+              if (_controllerWasPlaying) {
+                controller.pause();
+              }
 
-        widget.onDragUpdate?.call();
-      },
-      onHorizontalDragEnd: (DragEndDetails details) {
-        if (_controllerWasPlaying) {
-          controller.play();
-        }
+              widget.onDragStart?.call();
+            },
+            onHorizontalDragUpdate: (DragUpdateDetails details) {
+              if (!controller.value.isInitialized) {
+                return;
+              }
+              _seekToRelativePosition(details.globalPosition);
 
-        widget.onDragEnd?.call();
-      },
-      onTapDown: (TapDownDetails details) {
-        if (!controller.value.isInitialized) {
-          return;
-        }
-        _seekToRelativePosition(details.globalPosition);
-      },
-      child: Center(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.transparent,
-          child: CustomPaint(
-            painter: _ProgressBarPainter(
-              value: controller.value,
-              colors: widget.colors,
-              barHeight: widget.barHeight,
-              handleHeight: widget.handleHeight,
-              drawShadow: widget.drawShadow,
+              widget.onDragUpdate?.call();
+            },
+            onHorizontalDragEnd: (DragEndDetails details) {
+              if (_controllerWasPlaying) {
+                controller.play();
+              }
+
+              widget.onDragEnd?.call();
+            },
+            onTapDown: (TapDownDetails details) {
+              if (!controller.value.isInitialized) {
+                return;
+              }
+              _seekToRelativePosition(details.globalPosition);
+            },
+            child: Center(
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                color: Colors.transparent,
+                child: CustomPaint(
+                  painter: _ProgressBarPainter(
+                    value: controller.value,
+                    colors: widget.colors,
+                    barHeight: widget.barHeight,
+                    handleHeight: widget.handleHeight,
+                    drawShadow: widget.drawShadow,
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          )
+        : Center(
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.transparent,
+              child: CustomPaint(
+                painter: _ProgressBarPainter(
+                  value: controller.value,
+                  colors: widget.colors,
+                  barHeight: widget.barHeight,
+                  handleHeight: widget.handleHeight,
+                  drawShadow: widget.drawShadow,
+                ),
+              ),
+            ),
+          );
   }
 }
 
