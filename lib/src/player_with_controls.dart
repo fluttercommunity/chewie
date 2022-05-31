@@ -75,7 +75,7 @@ class PlayerWithControls extends StatelessWidget {
   Widget? _buildPlaceholder(
       ChewieController chewieController, BuildContext context) {
     if (chewieController.placeholder == null) return null;
-    const aspectRatio = 16 / 9;
+    const aspectRatio = chewieController.videoPlayerController.value.aspectRatio;
     final size = MediaQuery.of(context).size;
     double width;
     if (size.width < size.height) {
