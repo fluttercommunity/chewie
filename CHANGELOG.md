@@ -1,3 +1,85 @@
+## 1.3.3
+* ⬆️ [#634](https://github.com/fluttercommunity/chewie/pull/634): chore: Move very_good_analysis to dev_dependencies. Thanks [JCQuintas](https://github.com/JCQuintas).
+
+## 1.3.2
+* ⬆️ [#626](https://github.com/fluttercommunity/chewie/pull/626): Added customizable timer to hide controls. Thanks [BuginRug](https://github.com/BuginRug).
+
+## 1.3.1
+* ⬆️ [#617](https://github.com/fluttercommunity/chewie/pull/617): Allow video zooming with InteractiveViewer widget. Thanks [jmsanc](https://github.com/jmsanc).
+
+## 1.3.0
+
+* ⬆️ [#598](https://github.com/fluttercommunity/chewie/pull/598): Update `wakelock` to `^0.6.1+1`. Thanks [fehernyul](https://github.com/fehernyul).
+* ⬆️ [#599](https://github.com/fluttercommunity/chewie/pull/599): Uniform controls. Thanks [BuginRug](https://github.com/BuginRug).
+
+  **Slight Breaking Change**. Instead of:
+  
+  ```dart
+  typedef ChewieRoutePageBuilder = Widget Function(
+  	  BuildContext context,
+  	  Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      _ChewieControllerProvider controllerProvider,
+  );
+  ```
+  
+  It is now:
+  
+  ```dart
+  typedef ChewieRoutePageBuilder = Widget Function(
+  	  BuildContext context,
+  	  Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      ChewieControllerProvider controllerProvider,
+  );
+  ```
+  
+  TL;DR: We had to make `_ChewieControllerProvider` public.
+  
+* 🛠️ Fixed lint and formatting problems
+* Under New Management under the auspices of [Flutter Community](https://github.com/fluttercommunity), and new maintainers [diegotori](https://github.com/diegotori) and [maherjaafar](https://github.com/maherjaafar).
+
+## 1.2.3
+
+* ⬆️ Update 'provider' to 6.0.1
+  - fixes [#568](https://github.com/brianegan/chewie/issues/568)
+* ⬆️ Update 'video_player' to 2.2.7
+* ⬆️ Update 'wakelock' to 0.5.6
+* ⬆️ Update 'lint' to 1.7.2
+* ⬆️ Update roadmap
+* 🛠️ Fix lint problems
+* 💡 Add very_good_analysis package
+* 💡 Add analysis_options.yaml for example app
+
+## 1.2.2
+
+* 🛠️ Fix Incorrect use of ParentDataWidget.
+  - Fixes: [#485](https://github.com/brianegan/chewie/issues/485)
+
+## 1.2.1
+
+* 💡 add `showOptions` flag to show/hide the options-menu
+  - Fixes: [#491](https://github.com/brianegan/chewie/issues/491)
+* ⬆️ update `video_player` to 2.1.5
+* 🛠️ fix MaterialUI duration text (RichText)
+
+## 1.2.0
+
+* 🖥 __Desktop-UI__: Added `AdaptiveControls` where `MaterialDesktopControls` is now the default for Desktop-Platforms (start [ChewieDemo](https://github.com/brianegan/chewie/blob/master/example/lib/app/app.dart) for a preview)
+  - Fixes: [#188](https://github.com/brianegan/chewie/issues/478)
+* Redesign `MaterialControls` (inspired by Youtube Mobile and Desktop)
+* Fix squeeze of `CenterPlayButton`
+* Add: `optionsTranslation`, `additionalOptions` and `optionsBuilder` to create and design your Video-Options like Playback speed, subtitles and other options you want to add (use here: `additionalOptions`!). Use `optionsTranslation` to provide your localized strings!
+
+> See [Options](https://github.com/brianegan/chewie#options) to customize your Chewie options
+
+## 1.1.0
+
+* Add subtitle functionality
+  - Thanks to kirill09: [#188](https://github.com/brianegan/chewie/pull/188) with which we've improved and optimized subtitles
+
+> See readme on how to create subtitles and provide your own subtitleBuilder: [Subtitles](https://github.com/brianegan/chewie#Subtitles)
+
 ## 1.0.0
 
 * Migrate to Null Safety
@@ -175,3 +257,4 @@ Initial version of Chewie, the video player with a heart of gold.
   * Includes Material Player Controls
   * Includes Cupertino Player Controls
   * Spike version: Focus on good looking UI. Internal code is sloppy, needs a refactor and tests
+

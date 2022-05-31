@@ -1,0 +1,12 @@
+include: package:lint/analysis_options_package.yaml
+
+analyzer:
+  strong-mode:
+    implicit-dynamic: false
+  exclude:
+    - lib/generated_plugin_registrant.dart
+
+linter:
+  rules:
+    close_sinks: true
+    sort_constructors_first: true
