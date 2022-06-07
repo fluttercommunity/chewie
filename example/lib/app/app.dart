@@ -42,7 +42,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   }
 
   List<String> srcs = [
-    "https://upload.wikimedia.org/wikipedia/commons/2/2c/Earth_rotation_during_Galileo_flyby_%28PIA00114%29_%28color-adjusted%29.webm",
+    "https://assets.mixkit.co/videos/preview/mixkit-spinning-around-the-earth-29351-large.mp4",
     "https://assets.mixkit.co/videos/preview/mixkit-daytime-city-traffic-aerial-view-56-large.mp4",
     "https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4"
   ];
