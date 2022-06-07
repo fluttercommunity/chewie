@@ -30,8 +30,10 @@ class MaterialControls extends StatefulWidget {
     this.muteButtonSize = 14.0,
     this.onPrevClicked,
     this.onNextClicked,
+    Key? progressBarKey,
     Key? key,
-  }) : super(key: key);
+  })  : _progressBarKey = progressBarKey,
+        super(key: key);
 
   final bool showPlayButton;
   final bool showPrevNextButtons;
@@ -45,6 +47,7 @@ class MaterialControls extends StatefulWidget {
   final bool isNextButtonDisabled;
   final double positionTextSize;
   final double muteButtonSize;
+  final Key? _progressBarKey;
   final void Function()? onPrevClicked;
   final void Function()? onNextClicked;
 
@@ -126,7 +129,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
                       ),
                       child: _buildSubtitles(context, chewieLumenController.subtitle!),
                     ),
-                  _buildBottomBar(context),
+                  _buildBottomBar(context, widget._progressBarKey),
                 ],
               ),
             ],
@@ -299,6 +302,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
 
   AnimatedOpacity _buildBottomBar(
     BuildContext context,
+    Key? key,
   ) {
     return AnimatedOpacity(
       opacity: notifier.hideStuff ? 0.0 : 1.0,
@@ -338,7 +342,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
                     padding: const EdgeInsets.only(right: 20),
                     child: Row(
                       children: [
-                        _buildProgressBar(),
+                        _buildProgressBar(key),
                       ],
                     ),
                   ),
@@ -606,10 +610,13 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     });
   }
 
-  Widget _buildProgressBar() {
+  Widget _buildProgressBar(
+    Key? key,
+  ) {
     return Expanded(
       child: MaterialVideoProgressBar(
         controller,
+        key: key,
         onDragStart: () {
           setState(() {
             _dragging = true;
