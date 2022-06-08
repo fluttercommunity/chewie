@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chewie/chewie.dart';
 import 'package:chewie_example/app/theme.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +25,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   late VideoPlayerController _videoPlayerController1;
   late VideoPlayerController _videoPlayerController2;
   ChewieController? _chewieController;
+  int? bufferDelay;
 
   @override
   void initState() {
@@ -39,6 +42,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   }
 
   List<String> srcs = [
+    "https://assets.mixkit.co/videos/preview/mixkit-spinning-around-the-earth-29351-large.mp4",
     "https://assets.mixkit.co/videos/preview/mixkit-daytime-city-traffic-aerial-view-56-large.mp4",
     "https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4"
   ];
@@ -110,6 +114,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
       looping: true,
+      progressIndicatorDelay:
+          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
 
       additionalOptions: (context) {
         return <OptionItem>[
@@ -155,7 +161,10 @@ class _ChewieDemoState extends State<ChewieDemo> {
 
   Future<void> toggleVideo() async {
     await _videoPlayerController1.pause();
-    currPlayIndex = currPlayIndex == 0 ? 1 : 0;
+    currPlayIndex += 1;
+    if (currPlayIndex >= srcs.length) {
+      currPlayIndex = 0;
+    }
     await initializePlayer();
   }
 
@@ -302,8 +311,73 @@ class _ChewieDemoState extends State<ChewieDemo> {
                 ),
               ],
             ),
+            if (Platform.isAndroid)
+              ListTile(
+                title: const Text("Delay"),
+                subtitle: DelaySlider(
+                  delay:
+                      _chewieController?.progressIndicatorDelay?.inMilliseconds,
+                  onSave: (delay) async {
+                    if (delay != null) {
+                      bufferDelay = delay == 0 ? null : delay;
+                      await initializePlayer();
+                    }
+                  },
+                ),
+              )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class DelaySlider extends StatefulWidget {
+  const DelaySlider({Key? key, required this.delay, required this.onSave})
+      : super(key: key);
+
+  final int? delay;
+  final void Function(int?) onSave;
+  @override
+  State<DelaySlider> createState() => _DelaySliderState();
+}
+
+class _DelaySliderState extends State<DelaySlider> {
+  int? delay;
+  bool saved = false;
+
+  @override
+  void initState() {
+    super.initState();
+    delay = widget.delay;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const int max = 1000;
+    return ListTile(
+      title: Text(
+        "Progress indicator delay ${delay != null ? "${delay.toString()} MS" : ""}",
+      ),
+      subtitle: Slider(
+        value: delay != null ? (delay! / max) : 0,
+        onChanged: (value) async {
+          delay = (value * max).toInt();
+          setState(() {
+            saved = false;
+          });
+        },
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.save),
+        onPressed: saved
+            ? null
+            : () {
+                widget.onSave(delay);
+                setState(() {
+                  saved = true;
+                });
+              },
       ),
     );
   }

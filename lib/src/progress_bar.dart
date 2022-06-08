@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -81,7 +83,15 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         if (!controller.value.isInitialized) {
           return;
         }
-        _seekToRelativePosition(details.globalPosition);
+        // Should only seek if it's not running on Android, or if it is,
+        // then the VideoPlayerController cannot be buffering.
+        // On Android, we need to let the player buffer when scrolling
+        // in order to let the player buffer. https://github.com/flutter/flutter/issues/101409
+        final shouldSeekToRelativePosition =
+            !Platform.isAndroid || !controller.value.isBuffering;
+        if (shouldSeekToRelativePosition) {
+          _seekToRelativePosition(details.globalPosition);
+        }
 
         widget.onDragUpdate?.call();
       },

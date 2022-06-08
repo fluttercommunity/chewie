@@ -47,6 +47,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
   bool _dragging = false;
   Duration? _subtitlesPosition;
   bool _subtitleOn = false;
+  Timer? _bufferingDisplayTimer;
+  bool _displayBufferingIndicator = false;
 
   late VideoPlayerController controller;
 
@@ -91,7 +93,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
           absorbing: notifier.hideStuff,
           child: Stack(
             children: [
-              if (_latestValue.isBuffering)
+              if (_displayBufferingIndicator)
                 const Center(
                   child: CircularProgressIndicator(),
                 )
@@ -769,8 +771,32 @@ class _CupertinoControlsState extends State<CupertinoControls>
     });
   }
 
+  void _bufferingTimerTimeout() {
+    _displayBufferingIndicator = true;
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   void _updateState() {
     if (!mounted) return;
+
+    // display the progress bar indicator only after the buffering delay if it has been set
+    if (chewieController.progressIndicatorDelay != null) {
+      if (controller.value.isBuffering) {
+        _bufferingDisplayTimer ??= Timer(
+          chewieController.progressIndicatorDelay!,
+          _bufferingTimerTimeout,
+        );
+      } else {
+        _bufferingDisplayTimer?.cancel();
+        _bufferingDisplayTimer = null;
+        _displayBufferingIndicator = false;
+      }
+    } else {
+      _displayBufferingIndicator = controller.value.isBuffering;
+    }
+
     setState(() {
       _latestValue = controller.value;
       _subtitlesPosition = controller.value.position;
