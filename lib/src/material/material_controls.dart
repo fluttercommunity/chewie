@@ -28,6 +28,7 @@ class MaterialControls extends StatefulWidget {
     this.isNextButtonDisabled = true,
     this.positionTextSize = 14.0,
     this.muteButtonSize = 14.0,
+    this.videoHeightOverflowValue,
     this.onPrevClicked,
     this.onNextClicked,
     Key? progressBarKey,
@@ -47,6 +48,7 @@ class MaterialControls extends StatefulWidget {
   final bool isNextButtonDisabled;
   final double positionTextSize;
   final double muteButtonSize;
+  final double? videoHeightOverflowValue;
   final Key? _progressBarKey;
   final void Function()? onPrevClicked;
   final void Function()? onNextClicked;
@@ -117,7 +119,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
               else
                 _buildHitArea(),
               _buildActionBar(),
-              if (widget.showVideoInfo) _buildVideoInfo(),
+              if (widget.showVideoInfo) _buildVideoInfo(widget.videoHeightOverflowValue),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -129,7 +131,7 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
                       ),
                       child: _buildSubtitles(context, chewieLumenController.subtitle!),
                     ),
-                  _buildBottomBar(context, widget._progressBarKey),
+                  _buildBottomBar(context, widget._progressBarKey, widget.videoHeightOverflowValue),
                 ],
               ),
             ],
@@ -185,9 +187,10 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
     );
   }
 
-  Widget _buildVideoInfo() {
+  Widget _buildVideoInfo([double? videoHeightOverflowValue]) {
+    const topPosition = 30.0;
     return Positioned(
-      top: 40,
+      top: videoHeightOverflowValue != null ? videoHeightOverflowValue + topPosition : topPosition,
       left: 20,
       child: SafeArea(
         child: AnimatedOpacity(
@@ -303,15 +306,17 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
   AnimatedOpacity _buildBottomBar(
     BuildContext context,
     Key? key,
+    double? videoHeightOverflowValue,
   ) {
+    final bottomPadding = videoHeightOverflowValue ?? 0;
     return AnimatedOpacity(
       opacity: notifier.hideStuff ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 300),
       child: Container(
-        height: barHeight + (chewieLumenController.isFullScreen ? 10.0 : 0),
+        height: barHeight + (chewieLumenController.isFullScreen ? 10.0 + bottomPadding : 0 + bottomPadding),
         padding: EdgeInsets.only(
           left: 20,
-          bottom: !chewieLumenController.isFullScreen ? 10.0 : 0,
+          bottom: !chewieLumenController.isFullScreen ? 10.0 + bottomPadding : 0 + bottomPadding,
         ),
         child: SafeArea(
           bottom: chewieLumenController.isFullScreen,
