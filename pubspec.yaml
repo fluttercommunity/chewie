@@ -8,18 +8,18 @@ environment:
   flutter: '>=1.22.0'
 
 dependencies:
-  cupertino_icons: ^1.0.3
+  cupertino_icons: ^1.0.5
   flutter:
     sdk: flutter
-  provider: ^6.0.1
-  video_player: ^2.2.7
-  wakelock: ^0.6.1+1
+  provider: ^6.0.3
+  video_player: ^2.4.4
+  wakelock: ^0.6.1+2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  lint: ^1.7.2
-  very_good_analysis: ^2.4.0
+  lint: ^1.8.2
+  very_good_analysis: ^3.0.0
 
 flutter:
   uses-material-design: true
