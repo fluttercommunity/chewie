@@ -1,3 +1,7 @@
+## 1.3.4
+* ⬆️ [#646](https://github.com/fluttercommunity/chewie/pull/646): Fix to videos recorded with an orientation of 180° ( landscapeRight) being reversed on Android. Thanks [williamviktorsson](https://github.com/williamviktorsson).
+* ⬆️ [#623](https://github.com/fluttercommunity/chewie/pull/646): [Android] Add a delay before displaying progress indicator. Thanks [henri2h](https://github.com/henri2h).
+
 ## 1.3.3
 * ⬆️ [#634](https://github.com/fluttercommunity/chewie/pull/634): chore: Move very_good_analysis to dev_dependencies. Thanks [JCQuintas](https://github.com/JCQuintas).
 
