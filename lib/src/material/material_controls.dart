@@ -633,9 +633,9 @@ class _MaterialControlsState extends State<MaterialControls> with SingleTickerPr
           setState(() {
             _dragging = false;
           });
-
           _startHideTimer();
         },
+        onProgressChanged: chewieLumenController.onProgressChanged?.call,
         colors: chewieLumenController.materialProgressColors ??
             ChewieLumenProgressColors(
               playedColor: Theme.of(context).colorScheme.secondary,

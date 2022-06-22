@@ -9,6 +9,7 @@ class VideoProgressBar extends StatefulWidget {
     this.onDragEnd,
     this.onDragStart,
     this.onDragUpdate,
+    this.onProgressChanged,
     Key? key,
     required this.barHeight,
     required this.handleHeight,
@@ -21,6 +22,7 @@ class VideoProgressBar extends StatefulWidget {
   final Function()? onDragStart;
   final Function()? onDragEnd;
   final Function()? onDragUpdate;
+  final Function()? onProgressChanged;
 
   final double barHeight;
   final double handleHeight;
@@ -40,7 +42,6 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   }
 
   bool _controllerWasPlaying = false;
-
   VideoPlayerController get controller => widget.controller;
 
   @override
@@ -74,7 +75,6 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         if (_controllerWasPlaying) {
           controller.pause();
         }
-
         widget.onDragStart?.call();
       },
       onHorizontalDragUpdate: (DragUpdateDetails details) {
@@ -89,14 +89,15 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         if (_controllerWasPlaying) {
           controller.play();
         }
-
         widget.onDragEnd?.call();
+        widget.onProgressChanged?.call();
       },
       onTapDown: (TapDownDetails details) {
         if (!controller.value.isInitialized) {
           return;
         }
         _seekToRelativePosition(details.globalPosition);
+        widget.onProgressChanged?.call();
       },
       child: Center(
         child: Container(
@@ -156,10 +157,8 @@ class _ProgressBarPainter extends CustomPainter {
     if (!value.isInitialized) {
       return;
     }
-    final double playedPartPercent =
-        value.position.inMilliseconds / value.duration.inMilliseconds;
-    final double playedPart =
-        playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
+    final double playedPartPercent = value.position.inMilliseconds / value.duration.inMilliseconds;
+    final double playedPart = playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
     for (final DurationRange range in value.buffered) {
       final double start = range.startFraction(value.duration) * size.width;
       final double end = range.endFraction(value.duration) * size.width;

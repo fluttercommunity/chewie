@@ -256,6 +256,7 @@ class ChewieLumenController extends ChangeNotifier {
     this.materialProgressColors,
     this.placeholder,
     this.onPlayPaused,
+    this.onProgressChanged,
     this.overlay,
     this.showControlsOnInitialize = true,
     this.showOptions = true,
@@ -456,6 +457,8 @@ class ChewieLumenController extends ChangeNotifier {
   final Widget? placeholder;
 
   final void Function(bool)? onPlayPaused;
+
+  final void Function()? onProgressChanged;
 
   /// A widget which is placed between the video and the controls
   final Widget? overlay;
