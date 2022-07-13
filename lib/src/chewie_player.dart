@@ -433,7 +433,7 @@ class ChewieController extends ChangeNotifier {
   /// Whether or not the video should loop
   final bool looping;
 
-  /// Weather or not to show the controls when initializing the widget.
+  /// Wether or not to show the controls when initializing the widget.
   final bool showControlsOnInitialize;
 
   /// Whether or not to show the controls at all
@@ -481,7 +481,7 @@ class ChewieController extends ChangeNotifier {
   /// Defines if the player will sleep in fullscreen or not
   final bool allowedScreenSleep;
 
-  /// Defines if the controls should be for live stream video
+  /// Defines if the controls should be shown for live stream video
   final bool isLive;
 
   /// Defines if the fullscreen control should be shown
