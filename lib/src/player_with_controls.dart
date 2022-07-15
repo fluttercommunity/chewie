@@ -38,6 +38,7 @@ class PlayerWithControls extends StatelessWidget {
           if (chewieController.placeholder != null)
             chewieController.placeholder!,
           InteractiveViewer(
+            transformationController: chewieController.transformationController,
             maxScale: chewieController.maxScale,
             panEnabled: chewieController.zoomAndPan,
             scaleEnabled: chewieController.zoomAndPan,
