@@ -150,16 +150,18 @@ class CroppedVideoState extends State<CroppedVideo> {
   Widget build(BuildContext context) {
     if (initialized) {
       return Center(
-        child: AspectRatio(
-          aspectRatio: cropAspectRatio ?? controller.value.aspectRatio,
-          child: FittedBox(
-            fit: BoxFit.cover,
-            child: SizedBox(
-              width: controller.value.size?.width ?? 0,
-              height: controller.value.size?.height ?? 0,
-              child: AspectRatio(
-                aspectRatio: controller.value.aspectRatio,
-                child: VideoPlayer(controller),
+        child: Center(
+          child: ClipRect(
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: controller.value.size.width,
+                  height: controller.value.size.height,
+                  child: VideoPlayer(controller),
+                ),
               ),
             ),
           ),
