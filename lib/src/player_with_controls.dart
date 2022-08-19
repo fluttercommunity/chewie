@@ -43,13 +43,10 @@ class PlayerWithControls extends StatelessWidget {
             panEnabled: chewieController.zoomAndPan,
             scaleEnabled: chewieController.zoomAndPan,
             child: Center(
-              child: AspectRatio(
-                aspectRatio: chewieController.aspectRatio ??
-                    chewieController.videoPlayerController.value.aspectRatio,
-                child: CroppedVideo(
-                  controller: chewieController.videoPlayerController,
-                  cropAspectRatio: chewieController.aspectRatio!,
-                ),
+              child: CroppedVideo(
+                controller: chewieController.videoPlayerController,
+                cropAspectRatio: chewieController.aspectRatio!,
+                fit: chewieController.fit ?? BoxFit.contain,
               ),
             ),
           ),
@@ -100,10 +97,15 @@ class PlayerWithControls extends StatelessWidget {
 }
 
 class CroppedVideo extends StatefulWidget {
-  CroppedVideo({required this.controller, required this.cropAspectRatio});
+  const CroppedVideo({
+    required this.controller,
+    required this.cropAspectRatio,
+    required this.fit,
+  });
 
   final VideoPlayerController controller;
   final double cropAspectRatio;
+  final BoxFit fit;
 
   @override
   CroppedVideoState createState() => CroppedVideoState();
@@ -150,18 +152,16 @@ class CroppedVideoState extends State<CroppedVideo> {
   Widget build(BuildContext context) {
     if (initialized) {
       return Center(
-        child: Center(
-          child: ClipRect(
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              child: FittedBox(
-                fit: BoxFit.cover,
-                child: SizedBox(
-                  width: controller.value.size.width,
-                  height: controller.value.size.height,
-                  child: VideoPlayer(controller),
-                ),
+        child: ClipRect(
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            child: FittedBox(
+              fit: widget.fit,
+              child: SizedBox(
+                width: controller.value.size.width,
+                height: controller.value.size.height,
+                child: VideoPlayer(controller),
               ),
             ),
           ),

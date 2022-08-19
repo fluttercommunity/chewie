@@ -248,6 +248,7 @@ class ChewieController extends ChangeNotifier {
     required this.videoPlayerController,
     this.optionsTranslation,
     this.aspectRatio,
+    this.fit,
     this.autoInitialize = false,
     this.autoPlay = false,
     this.startAt,
@@ -294,6 +295,7 @@ class ChewieController extends ChangeNotifier {
     VideoPlayerController? videoPlayerController,
     OptionsTranslation? optionsTranslation,
     double? aspectRatio,
+    BoxFit? fit,
     bool? autoInitialize,
     bool? autoPlay,
     Duration? startAt,
@@ -341,6 +343,7 @@ class ChewieController extends ChangeNotifier {
           videoPlayerController ?? this.videoPlayerController,
       optionsTranslation: optionsTranslation ?? this.optionsTranslation,
       aspectRatio: aspectRatio ?? this.aspectRatio,
+      fit: fit ?? this.fit,
       autoInitialize: autoInitialize ?? this.autoInitialize,
       autoPlay: autoPlay ?? this.autoPlay,
       startAt: startAt ?? this.startAt,
@@ -464,6 +467,8 @@ class ChewieController extends ChangeNotifier {
   ///
   /// Will fallback to fitting within the space allowed.
   final double? aspectRatio;
+
+  final BoxFit? fit;
 
   /// The colors to use for controls on iOS. By default, the iOS player uses
   /// colors sampled from the original iOS 11 designs.
