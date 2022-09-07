@@ -26,7 +26,7 @@ class PlayerWithControls extends StatelessWidget {
     ) {
       return chewieController.showControls
           ? chewieController.customControls ?? const AdaptiveControls()
-          : Container();
+          : const SizedBox();
     }
 
     Widget _buildPlayerWithControls(
@@ -65,9 +65,9 @@ class PlayerWithControls extends StatelessWidget {
                   duration: const Duration(
                     milliseconds: 250,
                   ),
-                  child: Container(
-                    decoration: const BoxDecoration(color: Colors.black54),
-                    child: Container(),
+                  child: const DecoratedBox(
+                    decoration: BoxDecoration(color: Colors.black54),
+                    child: SizedBox(),
                   ),
                 ),
               ),
