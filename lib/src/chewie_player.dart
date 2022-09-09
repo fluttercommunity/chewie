@@ -625,6 +625,6 @@ class ChewieControllerProvider extends InheritedWidget {
   final ChewieController controller;
 
   @override
-  bool updateShouldNotify(ChewieControllerProvider old) =>
-      controller != old.controller;
+  bool updateShouldNotify(ChewieControllerProvider oldWidget) =>
+      controller != oldWidget.controller;
 }
