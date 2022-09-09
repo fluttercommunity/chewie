@@ -128,11 +128,11 @@ class _MaterialControlsState extends State<MaterialControls>
 
   @override
   void didChangeDependencies() {
-    final _oldController = _chewieController;
+    final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
-    if (_oldController != chewieController) {
+    if (oldController != chewieController) {
       _dispose();
       _initialize();
     }
@@ -213,11 +213,11 @@ class _MaterialControlsState extends State<MaterialControls>
 
   Widget _buildSubtitles(BuildContext context, Subtitles subtitles) {
     if (!_subtitleOn) {
-      return Container();
+      return const SizedBox();
     }
     final currentSubtitle = subtitles.getByPosition(_subtitlesPosition);
     if (currentSubtitle.isEmpty) {
-      return Container();
+      return const SizedBox();
     }
 
     if (chewieController.subtitleBuilder != null) {
@@ -446,7 +446,7 @@ class _MaterialControlsState extends State<MaterialControls>
   Widget _buildSubtitleToggle() {
     //if don't have subtitle hiden button
     if (chewieController.subtitle?.isEmpty ?? true) {
-      return Container();
+      return const SizedBox();
     }
     return GestureDetector(
       onTap: _onSubtitleTap,

@@ -128,11 +128,11 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
   @override
   void didChangeDependencies() {
-    final _oldController = _chewieController;
+    final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
-    if (_oldController != chewieController) {
+    if (oldController != chewieController) {
       _dispose();
       _initialize();
     }
@@ -206,11 +206,11 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
   Widget _buildSubtitles(BuildContext context, Subtitles subtitles) {
     if (!_subtitleOn) {
-      return Container();
+      return const SizedBox();
     }
     final currentSubtitle = subtitles.getByPosition(_subtitlesPosition);
     if (currentSubtitle.isEmpty) {
-      return Container();
+      return const SizedBox();
     }
 
     if (chewieController.subtitleBuilder != null) {

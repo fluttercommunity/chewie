@@ -142,11 +142,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   @override
   void didChangeDependencies() {
-    final _oldController = _chewieController;
+    final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
-    if (_oldController != chewieController) {
+    if (oldController != chewieController) {
       _dispose();
       _initialize();
     }
@@ -203,14 +203,14 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   Widget _buildSubtitles(Subtitles subtitles) {
     if (!_subtitleOn) {
-      return Container();
+      return const SizedBox();
     }
     if (_subtitlesPosition == null) {
-      return Container();
+      return const SizedBox();
     }
     final currentSubtitle = subtitles.getByPosition(_subtitlesPosition!);
     if (currentSubtitle.isEmpty) {
-      return Container();
+      return const SizedBox();
     }
 
     if (chewieController.subtitleBuilder != null) {
@@ -395,7 +395,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
           borderRadius: BorderRadius.circular(10.0),
           child: BackdropFilter(
             filter: ui.ImageFilter.blur(sigmaX: 10.0),
-            child: Container(
+            child: ColoredBox(
               color: backgroundColor,
               child: Container(
                 height: barHeight,
@@ -468,7 +468,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
   Widget _buildSubtitleToggle(Color iconColor, double barHeight) {
     //if don't have subtitle hiden button
     if (chewieController.subtitle?.isEmpty ?? true) {
-      return Container();
+      return const SizedBox();
     }
     return GestureDetector(
       onTap: _subtitleToggle,
