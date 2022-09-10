@@ -21,13 +21,13 @@ class CenterPlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return ColoredBox(
       color: Colors.transparent,
       child: Center(
         child: AnimatedOpacity(
           opacity: show ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 300),
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               color: backgroundColor,
               shape: BoxShape.circle,
