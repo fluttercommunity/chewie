@@ -255,6 +255,7 @@ class _MaterialControlsState extends State<MaterialControls>
       opacity: notifier.hideStuff ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 300),
       child: Container(
+        color: Colors.black.withOpacity(0.45),
         height: barHeight + (chewieController.isFullScreen ? 10.0 : 0),
         padding: EdgeInsets.only(
           left: 20,
@@ -276,8 +277,8 @@ class _MaterialControlsState extends State<MaterialControls>
                       _buildPosition(iconColor),
                     if (chewieController.allowMuting)
                       _buildMuteButton(controller),
-                    _buildBackwardButton(),
-                    _buildForwardButton(),
+                    if (!chewieController.isLive) _buildBackwardButton(),
+                    if (!chewieController.isLive) _buildForwardButton(),
                     const Spacer(),
                     if (chewieController.allowFullScreen) _buildExpandButton(),
                   ],
@@ -353,7 +354,7 @@ class _MaterialControlsState extends State<MaterialControls>
             left: 8.0,
             right: 8.0,
           ),
-          child: Center(
+          child: const Center(
             child: Icon(
               Icons.forward_10_rounded,
               color: Colors.white,
@@ -380,7 +381,7 @@ class _MaterialControlsState extends State<MaterialControls>
             left: 8.0,
             right: 8.0,
           ),
-          child: Center(
+          child: const Center(
             child: Icon(
               Icons.replay_10_rounded,
               color: Colors.white,
