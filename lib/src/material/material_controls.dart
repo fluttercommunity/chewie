@@ -276,6 +276,8 @@ class _MaterialControlsState extends State<MaterialControls>
                       _buildPosition(iconColor),
                     if (chewieController.allowMuting)
                       _buildMuteButton(controller),
+                    _buildBackwardButton(),
+                    _buildForwardButton(),
                     const Spacer(),
                     if (chewieController.allowFullScreen) _buildExpandButton(),
                   ],
@@ -327,6 +329,60 @@ class _MaterialControlsState extends State<MaterialControls>
             ),
             child: Icon(
               _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  GestureDetector _buildForwardButton() {
+    return GestureDetector(
+      onTap: () {
+        controller.seekTo(
+            Duration(seconds: controller.value.position.inSeconds + 10));
+      },
+      child: AnimatedOpacity(
+        opacity: notifier.hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: Container(
+          height: barHeight + (chewieController.isFullScreen ? 15.0 : 0),
+          margin: const EdgeInsets.only(right: 12.0),
+          padding: const EdgeInsets.only(
+            left: 8.0,
+            right: 8.0,
+          ),
+          child: Center(
+            child: Icon(
+              Icons.forward_10_rounded,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  GestureDetector _buildBackwardButton() {
+    return GestureDetector(
+      onTap: () {
+        controller.seekTo(
+            Duration(seconds: controller.value.position.inSeconds - 10));
+      },
+      child: AnimatedOpacity(
+        opacity: notifier.hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: Container(
+          height: barHeight + (chewieController.isFullScreen ? 15.0 : 0),
+          margin: const EdgeInsets.only(right: 12.0),
+          padding: const EdgeInsets.only(
+            left: 8.0,
+            right: 8.0,
+          ),
+          child: Center(
+            child: Icon(
+              Icons.replay_10_rounded,
               color: Colors.white,
             ),
           ),

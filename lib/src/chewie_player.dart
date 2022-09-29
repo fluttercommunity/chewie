@@ -537,6 +537,8 @@ class ChewieController extends ChangeNotifier {
   bool get isFullScreen => _isFullScreen;
 
   bool get isPlaying => videoPlayerController.value.isPlaying;
+  ///--------------
+
 
   Future _initialize() async {
     await videoPlayerController.setLooping(looping);
@@ -605,6 +607,9 @@ class ChewieController extends ChangeNotifier {
   Future<void> seekTo(Duration moment) async {
     await videoPlayerController.seekTo(moment);
   }
+
+  ///-------------
+
 
   Future<void> setVolume(double volume) async {
     await videoPlayerController.setVolume(volume);
