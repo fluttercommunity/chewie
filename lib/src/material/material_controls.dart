@@ -262,6 +262,7 @@ class _MaterialControlsState extends State<MaterialControls>
         ),
         child: SafeArea(
           bottom: chewieController.isFullScreen,
+          minimum: chewieController.controlsSafeAreaMinimum,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
