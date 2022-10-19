@@ -527,7 +527,8 @@ class ChewieController extends ChangeNotifier {
   /// Defines a delay in milliseconds between entering buffering state and displaying the loading spinner. Set null (default) to disable it.
   final Duration? progressIndicatorDelay;
 
-  /// allows extra padding to position controls as desired
+  /// Adds additional padding to the controls' [SafeArea] as desired.
+  /// Defaults to [EdgeInsets.zero].
   final EdgeInsets controlsSafeAreaMinimum;
 
   static ChewieController of(BuildContext context) {
