@@ -50,14 +50,14 @@ class Subtitle {
   }
 
   @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) return true;
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
 
-    return o is Subtitle &&
-        o.index == index &&
-        o.start == start &&
-        o.end == end &&
-        o.text == text;
+    return other is Subtitle &&
+        other.index == index &&
+        other.start == start &&
+        other.end == end &&
+        other.text == text;
   }
 
   @override
