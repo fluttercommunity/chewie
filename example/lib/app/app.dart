@@ -192,7 +192,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
-                          CircularProgressIndicator(),
+                          CircularProgressIndicator.adaptive(),
                           SizedBox(height: 20),
                           Text('Loading'),
                         ],
