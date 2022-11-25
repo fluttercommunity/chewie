@@ -283,7 +283,7 @@ class ChewieController extends ChangeNotifier {
     this.routePageBuilder,
     this.progressIndicatorDelay,
     this.hideControlsTimer = defaultHideControlsTimer,
-    this.controlsSafeAreaMinimum = const EdgeInsets.zero,
+    this.controlsSafeAreaMinimum = EdgeInsets.zero,
   }) : assert(
           playbackSpeeds.every((speed) => speed > 0),
           'The playbackSpeeds values must all be greater than 0',
