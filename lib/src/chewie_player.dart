@@ -283,6 +283,7 @@ class ChewieController extends ChangeNotifier {
     this.routePageBuilder,
     this.progressIndicatorDelay,
     this.hideControlsTimer = defaultHideControlsTimer,
+    this.controlsSafeAreaMinimum = EdgeInsets.zero,
   }) : assert(
           playbackSpeeds.every((speed) => speed > 0),
           'The playbackSpeeds values must all be greater than 0',
@@ -322,6 +323,7 @@ class ChewieController extends ChangeNotifier {
     bool? allowPlaybackSpeedChanging,
     bool? useRootNavigator,
     Duration? hideControlsTimer,
+    EdgeInsets? controlsSafeAreaMinimum,
     List<double>? playbackSpeeds,
     List<SystemUiOverlay>? systemOverlaysOnEnterFullScreen,
     List<DeviceOrientation>? deviceOrientationsOnEnterFullScreen,
@@ -524,6 +526,10 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines a delay in milliseconds between entering buffering state and displaying the loading spinner. Set null (default) to disable it.
   final Duration? progressIndicatorDelay;
+
+  /// Adds additional padding to the controls' [SafeArea] as desired.
+  /// Defaults to [EdgeInsets.zero].
+  final EdgeInsets controlsSafeAreaMinimum;
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider =
