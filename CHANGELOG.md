@@ -1,3 +1,8 @@
+## 1.3.6
+* 🛠️ [#681](https://github.com/fluttercommunity/chewie/pull/681): Flutter `3.3` lint fixes. Thanks [diegotori](https://github.com/diegotori).
+
+* ⬆️ [#676](https://github.com/fluttercommunity/chewie/pull/676): Allow Chewie controls to be positioned to allow for a larger safe area. Thanks [jweidner-mbible](https://github.com/jweidner-mbible).
+
 ## 1.3.5
 
 * ⬆️ [#669](https://github.com/fluttercommunity/chewie/pull/669): Fix for CenterPlayButton UI bug when using Material 3. Thanks [luis901101](https://github.com/luis901101).
