@@ -115,7 +115,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
                         0.0,
                         notifier.hideStuff ? barHeight * 0.8 : 0.0,
                       ),
-                      child: _buildSubtitles(chewieController.subtitle!),
+                      child: chewieController.showSubtitle
+                          ? _buildSubtitles(chewieController.subtitle!)
+                          : const SizedBox(),
                     ),
                   _buildBottomBar(backgroundColor, iconColor, barHeight),
                 ],
