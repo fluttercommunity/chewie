@@ -1,3 +1,6 @@
+## 1.4.0
+* 🛠️ [#701](https://github.com/fluttercommunity/chewie/pull/701): Added Dart Analysis fixes due to Flutter 3.7. Thanks [diegotori](https://github.com/diegotori).
+
 ## 1.3.6
 * 🛠️ [#681](https://github.com/fluttercommunity/chewie/pull/681): Flutter `3.3` lint fixes. Thanks [diegotori](https://github.com/diegotori).
 
