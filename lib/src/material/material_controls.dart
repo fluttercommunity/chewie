@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chewie/src/center_play_button.dart';
+import 'package:chewie/src/center_seek_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/helpers/utils.dart';
@@ -385,13 +386,44 @@ class _MaterialControlsState extends State<MaterialControls>
           });
         }
       },
-      child: CenterPlayButton(
-        backgroundColor: Colors.black54,
-        iconColor: Colors.white,
-        isFinished: isFinished,
-        isPlaying: controller.value.isPlaying,
-        show: showPlayButton,
-        onPressed: _playPause,
+      child: Container(
+        alignment: Alignment.center,
+        color: Colors
+            .transparent, // The Gesture Detector doesn't expand to the full size of the container without this; Not sure why!
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (!isFinished && !chewieController.isLive)
+              CenterSeekButton(
+                iconData: Icons.replay_10,
+                backgroundColor: Colors.black54,
+                iconColor: Colors.white,
+                show: showPlayButton,
+                onPressed: _seekBackward,
+              ),
+            Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: marginSize,
+              ),
+              child: CenterPlayButton(
+                backgroundColor: Colors.black54,
+                iconColor: Colors.white,
+                isFinished: isFinished,
+                isPlaying: controller.value.isPlaying,
+                show: showPlayButton,
+                onPressed: _playPause,
+              ),
+            ),
+            if (!isFinished && !chewieController.isLive)
+              CenterSeekButton(
+                iconData: Icons.forward_10,
+                backgroundColor: Colors.black54,
+                iconColor: Colors.white,
+                show: showPlayButton,
+                onPressed: _seekForward,
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -540,6 +572,36 @@ class _MaterialControlsState extends State<MaterialControls>
         }
       }
     });
+  }
+
+  void _seekRelative(Duration relativeSeek) {
+    _cancelAndRestartTimer();
+    final position = _latestValue.position + relativeSeek;
+    final duration = _latestValue.duration;
+
+    if (position < Duration.zero) {
+      controller.seekTo(Duration.zero);
+    } else if (position > duration) {
+      controller.seekTo(duration);
+    } else {
+      controller.seekTo(position);
+    }
+  }
+
+  void _seekBackward() {
+    _seekRelative(
+      const Duration(
+        seconds: -10,
+      ),
+    );
+  }
+
+  void _seekForward() {
+    _seekRelative(
+      const Duration(
+        seconds: 10,
+      ),
+    );
   }
 
   void _startHideTimer() {
