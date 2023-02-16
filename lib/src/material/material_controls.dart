@@ -399,6 +399,8 @@ class _MaterialControlsState extends State<MaterialControls>
                 backgroundColor: Colors.black54,
                 iconColor: Colors.white,
                 show: showPlayButton,
+                fadeDuration: chewieController.materialSeekButtonFadeDuration,
+                iconSize: chewieController.materialSeekButtonSize,
                 onPressed: _seekBackward,
               ),
             Container(
@@ -420,6 +422,8 @@ class _MaterialControlsState extends State<MaterialControls>
                 backgroundColor: Colors.black54,
                 iconColor: Colors.white,
                 show: showPlayButton,
+                fadeDuration: chewieController.materialSeekButtonFadeDuration,
+                iconSize: chewieController.materialSeekButtonSize,
                 onPressed: _seekForward,
               ),
           ],

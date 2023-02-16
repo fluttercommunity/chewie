@@ -7,6 +7,8 @@ class CenterSeekButton extends StatelessWidget {
     required this.backgroundColor,
     this.iconColor,
     required this.show,
+    this.fadeDuration = const Duration(milliseconds: 300),
+    this.iconSize = 26,
     this.onPressed,
   }) : super(key: key);
 
@@ -15,6 +17,8 @@ class CenterSeekButton extends StatelessWidget {
   final Color? iconColor;
   final bool show;
   final VoidCallback? onPressed;
+  final Duration fadeDuration;
+  final double iconSize;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +28,7 @@ class CenterSeekButton extends StatelessWidget {
         child: UnconstrainedBox(
           child: AnimatedOpacity(
             opacity: show ? 1.0 : 0.0,
-            duration: const Duration(milliseconds: 300),
+            duration: fadeDuration,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color: backgroundColor,
@@ -33,7 +37,7 @@ class CenterSeekButton extends StatelessWidget {
               // Always set the iconSize on the IconButton, not on the Icon itself:
               // https://github.com/flutter/flutter/issues/52980
               child: IconButton(
-                iconSize: 26,
+                iconSize: iconSize,
                 padding: const EdgeInsets.all(8.0),
                 icon: Icon(iconData, color: iconColor),
                 onPressed: onPressed,
