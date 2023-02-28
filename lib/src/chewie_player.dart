@@ -433,7 +433,7 @@ class ChewieController extends ChangeNotifier {
 
   /// Play the video as soon as it's displayed
   final bool autoPlay;
-  
+
   /// Non-Draggable Progress Bar
   final bool draggableProgressBar;
 

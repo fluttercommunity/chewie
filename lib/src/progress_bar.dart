@@ -57,7 +57,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
     super.deactivate();
   }
 
-  Duration _calcRelativePosition(Offset globalPosition) {
+  Duration _calcRelativePosition(BuildContext context, Offset globalPosition) {
     final box = context.findRenderObject()! as RenderBox;
     final Offset tapPos = box.globalToLocal(globalPosition);
     final double relative = tapPos.dx / box.size.width;
@@ -67,12 +67,31 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   }
 
   void _seekToRelativePosition(Offset globalPosition) {
-    controller.seekTo(_calcRelativePosition(globalPosition));
+    controller.seekTo(_calcRelativePosition(context, globalPosition));
   }
 
   @override
   Widget build(BuildContext context) {
     final ChewieController chewieController = ChewieController.of(context);
+    final child = Center(
+      child: Container(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        color: Colors.transparent,
+        child: CustomPaint(
+          painter: _ProgressBarPainter(
+            value: controller.value,
+            draggableValue: _latestDraggableOffset != null
+                ? _calcRelativePosition(context, _latestDraggableOffset!)
+                : Duration.zero,
+            colors: widget.colors,
+            barHeight: widget.barHeight,
+            handleHeight: widget.handleHeight,
+            drawShadow: widget.drawShadow,
+          ),
+        ),
+      ),
+    );
 
     return chewieController.draggableProgressBar
         ? GestureDetector(
@@ -114,30 +133,10 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
               }
               _seekToRelativePosition(details.globalPosition);
             },
-            child: progressBar,
+            child: child,
           )
-        : progressBar;
+        : child;
   }
-
-  Widget get progressBar => Center(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          color: Colors.transparent,
-          child: CustomPaint(
-            painter: _ProgressBarPainter(
-              value: controller.value,
-              draggableValue: _latestDraggableOffset != null
-                  ? _calcRelativePosition(_latestDraggableOffset!)
-                  : Duration.zero,
-              colors: widget.colors,
-              barHeight: widget.barHeight,
-              handleHeight: widget.handleHeight,
-              drawShadow: widget.drawShadow,
-            ),
-          ),
-        ),
-      );
 }
 
 class _ProgressBarPainter extends CustomPainter {
