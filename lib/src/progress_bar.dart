@@ -57,39 +57,23 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
     super.deactivate();
   }
 
-  Duration _calcRelativePosition(BuildContext context, Offset globalPosition) {
-    final box = context.findRenderObject()! as RenderBox;
-    final Offset tapPos = box.globalToLocal(globalPosition);
-    final double relative = tapPos.dx / box.size.width;
-    final Duration position = controller.value.duration * relative;
-
-    return position;
-  }
-
   void _seekToRelativePosition(Offset globalPosition) {
-    controller.seekTo(_calcRelativePosition(context, globalPosition));
+    controller.seekTo(context.calcRelativePosition(
+      controller.value.duration,
+      globalPosition,
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     final ChewieController chewieController = ChewieController.of(context);
     final child = Center(
-      child: Container(
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        color: Colors.transparent,
-        child: CustomPaint(
-          painter: _ProgressBarPainter(
-            value: controller.value,
-            draggableValue: _latestDraggableOffset != null
-                ? _calcRelativePosition(context, _latestDraggableOffset!)
-                : Duration.zero,
-            colors: widget.colors,
-            barHeight: widget.barHeight,
-            handleHeight: widget.handleHeight,
-            drawShadow: widget.drawShadow,
-          ),
-        ),
+      child: StaticProgressBar(
+        value: controller.value,
+        colors: widget.colors,
+        barHeight: widget.barHeight,
+        handleHeight: widget.handleHeight,
+        drawShadow: widget.drawShadow,
       ),
     );
 
@@ -136,6 +120,48 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
             child: child,
           )
         : child;
+  }
+}
+
+class StaticProgressBar extends StatelessWidget {
+  const StaticProgressBar({
+    Key? key,
+    required this.value,
+    required this.colors,
+    required this.barHeight,
+    required this.handleHeight,
+    required this.drawShadow,
+    this.latestDraggableOffset,
+  }) : super(key: key);
+
+  final Offset? latestDraggableOffset;
+  final VideoPlayerValue value;
+  final ChewieProgressColors colors;
+
+  final double barHeight;
+  final double handleHeight;
+  final bool drawShadow;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height,
+      width: MediaQuery.of(context).size.width,
+      color: Colors.transparent,
+      child: CustomPaint(
+        painter: _ProgressBarPainter(
+          value: value,
+          draggableValue: context.calcRelativePosition(
+            value.duration,
+            latestDraggableOffset,
+          ),
+          colors: colors,
+          barHeight: barHeight,
+          handleHeight: handleHeight,
+          drawShadow: drawShadow,
+        ),
+      ),
+    );
   }
 }
 
@@ -227,5 +253,19 @@ class _ProgressBarPainter extends CustomPainter {
       handleHeight,
       colors.handlePaint,
     );
+  }
+}
+
+extension RelativePositionExtensions on BuildContext {
+  Duration calcRelativePosition(
+    Duration videoDuration,
+    Offset? globalPosition,
+  ) {
+    if (globalPosition == null) return Duration.zero;
+    final box = findRenderObject()! as RenderBox;
+    final Offset tapPos = box.globalToLocal(globalPosition);
+    final double relative = tapPos.dx / box.size.width;
+    final Duration position = videoDuration * relative;
+    return position;
   }
 }
