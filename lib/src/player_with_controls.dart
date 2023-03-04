@@ -20,6 +20,16 @@ class PlayerWithControls extends StatelessWidget {
       return width > height ? width / height : height / width;
     }
 
+    Widget buildOverlay(BuildContext context) {
+      if(chewieController.overlayBuilder != null) {
+        return chewieController.overlayBuilder!(context);
+      }
+      if (chewieController.overlay != null) {
+        return chewieController.overlay!;
+      }
+      return const SizedBox.shrink();
+    }
+
     Widget buildControls(
       BuildContext context,
       ChewieController chewieController,
@@ -50,7 +60,7 @@ class PlayerWithControls extends StatelessWidget {
               ),
             ),
           ),
-          if (chewieController.overlay != null) chewieController.overlay!,
+          buildOverlay(context),
           if (Theme.of(context).platform != TargetPlatform.iOS)
             Consumer<PlayerNotifier>(
               builder: (
