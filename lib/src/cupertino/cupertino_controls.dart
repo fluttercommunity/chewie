@@ -12,6 +12,7 @@ import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
+import 'package:chewie/src/seek_rewind_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,12 +23,14 @@ class CupertinoControls extends StatefulWidget {
     required this.backgroundColor,
     required this.iconColor,
     this.showPlayButton = true,
+    this.showSeekButton = true,
     Key? key,
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color iconColor;
   final bool showPlayButton;
+  final bool showSeekButton;
 
   @override
   State<StatefulWidget> createState() {
@@ -349,25 +352,48 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final bool isFinished = _latestValue.position >= _latestValue.duration;
     final bool showPlayButton =
         widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
+    final bool showSeekButton =
+        widget.showSeekButton && !_latestValue.isPlaying && !_dragging;
 
-    return GestureDetector(
-      onTap: _latestValue.isPlaying
-          ? _cancelAndRestartTimer
-          : () {
-              _hideTimer?.cancel();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SeekRewindButton(
+          backgroundColor: Colors.black54,
+          iconColor: Colors.white,
+          show: showSeekButton,
+          onPressed: _seekRewind,
+          onDoublePressed: _seekRewind,
+          icon: Icons.fast_rewind,
+        ),
+        GestureDetector(
+          onTap: _latestValue.isPlaying
+              ? _cancelAndRestartTimer
+              : () {
+                  _hideTimer?.cancel();
 
-              setState(() {
-                notifier.hideStuff = false;
-              });
-            },
-      child: CenterPlayButton(
-        backgroundColor: widget.backgroundColor,
-        iconColor: widget.iconColor,
-        isFinished: isFinished,
-        isPlaying: controller.value.isPlaying,
-        show: showPlayButton,
-        onPressed: _playPause,
-      ),
+                  setState(() {
+                    notifier.hideStuff = false;
+                  });
+                },
+          child: CenterPlayButton(
+            backgroundColor: widget.backgroundColor,
+            iconColor: widget.iconColor,
+            isFinished: isFinished,
+            isPlaying: controller.value.isPlaying,
+            show: showSeekButton,
+            onPressed: _playPause,
+          ),
+        ),
+        SeekRewindButton(
+          backgroundColor: Colors.black54,
+          iconColor: Colors.white,
+          show: showPlayButton,
+          onPressed: _seekForward,
+          onDoublePressed: _seekForward,
+          icon: Icons.fast_forward,
+        ),
+      ],
     );
   }
 
@@ -801,6 +827,26 @@ class _CupertinoControlsState extends State<CupertinoControls>
     setState(() {
       _latestValue = controller.value;
       _subtitlesPosition = controller.value.position;
+    });
+  }
+
+  void _seekForward() {
+    setState(() {
+      controller.seekTo(
+        Duration(
+          seconds: _latestValue.position.inSeconds + 10,
+        ),
+      );
+    });
+  }
+
+  void _seekRewind() {
+    setState(() {
+      controller.seekTo(
+        Duration(
+          seconds: _latestValue.position.inSeconds - 10,
+        ),
+      );
     });
   }
 }

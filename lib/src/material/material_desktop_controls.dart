@@ -11,6 +11,7 @@ import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
+import 'package:chewie/src/seek_rewind_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -18,10 +19,12 @@ import 'package:video_player/video_player.dart';
 class MaterialDesktopControls extends StatefulWidget {
   const MaterialDesktopControls({
     this.showPlayButton = true,
+    this.showSeekButton = true,
     Key? key,
   }) : super(key: key);
 
   final bool showPlayButton;
+  final bool showSeekButton;
 
   @override
   State<StatefulWidget> createState() {
@@ -330,33 +333,56 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     final bool isFinished = _latestValue.position >= _latestValue.duration;
     final bool showPlayButton =
         widget.showPlayButton && !_dragging && !notifier.hideStuff;
+    final bool showSeekButton =
+        widget.showSeekButton && !_dragging && !notifier.hideStuff;
 
-    return GestureDetector(
-      onTap: () {
-        if (_latestValue.isPlaying) {
-          if (_displayTapped) {
-            setState(() {
-              notifier.hideStuff = true;
-            });
-          } else {
-            _cancelAndRestartTimer();
-          }
-        } else {
-          _playPause();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SeekRewindButton(
+          backgroundColor: Colors.black54,
+          iconColor: Colors.white,
+          show: showSeekButton,
+          onPressed: _seekRewind,
+          onDoublePressed: _seekRewind,
+          icon: Icons.fast_rewind,
+        ),
+        GestureDetector(
+          onTap: () {
+            if (_latestValue.isPlaying) {
+              if (_displayTapped) {
+                setState(() {
+                  notifier.hideStuff = true;
+                });
+              } else {
+                _cancelAndRestartTimer();
+              }
+            } else {
+              _playPause();
 
-          setState(() {
-            notifier.hideStuff = true;
-          });
-        }
-      },
-      child: CenterPlayButton(
-        backgroundColor: Colors.black54,
-        iconColor: Colors.white,
-        isFinished: isFinished,
-        isPlaying: controller.value.isPlaying,
-        show: showPlayButton,
-        onPressed: _playPause,
-      ),
+              setState(() {
+                notifier.hideStuff = true;
+              });
+            }
+          },
+          child: CenterPlayButton(
+            backgroundColor: Colors.black54,
+            iconColor: Colors.white,
+            isFinished: isFinished,
+            isPlaying: controller.value.isPlaying,
+            show: showPlayButton,
+            onPressed: _playPause,
+          ),
+        ),
+        SeekRewindButton(
+          backgroundColor: Colors.black54,
+          iconColor: Colors.white,
+          show: showSeekButton,
+          onPressed: _seekForward,
+          onDoublePressed: _seekForward,
+          icon: Icons.fast_forward,
+        ),
+      ],
     );
   }
 
@@ -592,5 +618,25 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
             ),
       ),
     );
+  }
+
+  void _seekForward() {
+    setState(() {
+      controller.seekTo(
+        Duration(
+          seconds: _latestValue.position.inSeconds + 10,
+        ),
+      );
+    });
+  }
+
+  void _seekRewind() {
+    setState(() {
+      controller.seekTo(
+        Duration(
+          seconds: _latestValue.position.inSeconds - 10,
+        ),
+      );
+    });
   }
 }
