@@ -22,18 +22,11 @@ class SeekRewindButton extends StatefulWidget {
   State<SeekRewindButton> createState() => _SeekRewindButtonState();
 }
 
-class _SeekRewindButtonState extends State<SeekRewindButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController animationController;
+class _SeekRewindButtonState extends State<SeekRewindButton> {
 
   @override
   void initState() {
     super.initState();
-    animationController = AnimationController(
-      vsync: this,
-      value: 0,
-      duration: const Duration(milliseconds: 400),
-    );
   }
 
   @override
