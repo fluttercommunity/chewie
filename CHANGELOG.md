@@ -1,5 +1,21 @@
-=======
 # Chewie Audio Changelog
+
+## 1.4.0
+
+* Flutter 3.10 compatibility
+
+## 1.2.0
+
+* Merged in chewie 1.0.0
+   * Nullsafety support
+   * Fixed iOS "Duration called on null"
+   * Add animated play/pause
+   * Add playback speed control
+   * Other changes
+
+## 1.0.1
+
+Merged in chewie 0.12.0 with, among others, dependency updates and iconic fotn removal.
 
 ## 1.0.0
 
@@ -10,7 +26,7 @@ Forked from https://github.com/brianegan/chewie
 * Removed video components from Chewie to make an audio-only player.
 
 
-# [Chewie](https://github.com/brianegan/chewie) Changelog
+# [Chewie](https://github.com/fluttercommunity/chewie) Changelog
 
 ## 1.5.0
 * 🛠️ [#712](https://github.com/fluttercommunity/chewie/pull/712): Progress Bars can now be disabled by setting `ChewieController.draggableProgressBar` to `false`. Thanks [shiyiya](https://github.com/shiyiya).
