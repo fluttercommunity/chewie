@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:video_player/video_player.dart';
 
+// TODO: Remove after upgrading Flutter to 3.10
+// ignore_for_file: prefer_const_constructors
 class ChewieDemo extends StatefulWidget {
   const ChewieDemo({
     Key? key,
