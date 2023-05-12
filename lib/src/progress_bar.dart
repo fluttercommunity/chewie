@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:chewie/src/chewie_progress_colors.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -88,7 +87,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         // On Android, we need to let the player buffer when scrolling
         // in order to let the player buffer. https://github.com/flutter/flutter/issues/101409
         final shouldSeekToRelativePosition =
-            !Platform.isAndroid || !controller.value.isBuffering;
+            !(defaultTargetPlatform == TargetPlatform.android) || !controller.value.isBuffering;
         if (shouldSeekToRelativePosition) {
           _seekToRelativePosition(details.globalPosition);
         }
