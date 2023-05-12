@@ -86,7 +86,7 @@ class _MaterialControlsState extends State<MaterialControls>
             children: [
               if (_displayBufferingIndicator)
                 const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator.adaptive(),
                 )
               else
                 _buildHitArea(),
