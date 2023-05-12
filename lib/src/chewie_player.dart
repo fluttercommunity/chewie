@@ -335,8 +335,7 @@ class ChewieController extends ChangeNotifier {
       Animation<double>,
       Animation<double>,
       ChewieControllerProvider,
-    )?
-        routePageBuilder,
+    )? routePageBuilder,
   }) {
     return ChewieController(
       videoPlayerController:
@@ -544,7 +543,7 @@ class ChewieController extends ChangeNotifier {
 
   bool get isPlaying => videoPlayerController.value.isPlaying;
 
-  Future _initialize() async {
+  Future<dynamic> _initialize() async {
     await videoPlayerController.setLooping(looping);
 
     if ((autoInitialize || autoPlay) &&
