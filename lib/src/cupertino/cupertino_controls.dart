@@ -22,11 +22,15 @@ class CupertinoControls extends StatefulWidget {
     required this.backgroundColor,
     required this.iconColor,
     this.showPlayButton = true,
+    this.iconSelectedColor, // Opcional, Color do ícone selecionado
+    this.textStyle, // Opcional, TextStyle para o texto
     Key? key,
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color iconColor;
+  final Color? iconSelectedColor; // Adicionado campo para cor do ícone selecionado
+  final TextStyle? textStyle; // Adicionado campo para estilo do texto
   final bool showPlayButton;
 
   @override
@@ -35,8 +39,7 @@ class CupertinoControls extends StatefulWidget {
   }
 }
 
-class _CupertinoControlsState extends State<CupertinoControls>
-    with SingleTickerProviderStateMixin {
+class _CupertinoControlsState extends State<CupertinoControls> with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
   late VideoPlayerValue _latestValue;
   double? _latestVolume;
@@ -182,8 +185,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
             useRootNavigator: chewieController.useRootNavigator,
             builder: (context) => CupertinoOptionsDialog(
               options: options,
-              cancelButtonText:
-                  chewieController.optionsTranslation?.cancelButtonText,
+              cancelButtonText: chewieController.optionsTranslation?.cancelButtonText,
             ),
           );
           if (_latestValue.isPlaying) {
@@ -287,10 +289,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
                           _buildRemaining(iconColor),
                           _buildSubtitleToggle(iconColor, barHeight),
                           if (chewieController.allowPlaybackSpeedChanging)
-                            _buildSpeedButton(controller, iconColor, barHeight, textStyle ?? const TextStyle(fontSize: 12.0)),
+                            _buildSpeedButton(controller, iconColor, barHeight),
                           if (chewieController.additionalOptions != null &&
-                              chewieController
-                                  .additionalOptions!(context).isNotEmpty)
+                              chewieController.additionalOptions!(context).isNotEmpty)
                             _buildOptionsButton(iconColor, barHeight),
                         ],
                       ),
@@ -352,8 +353,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   Widget _buildHitArea() {
     final bool isFinished = _latestValue.position >= _latestValue.duration;
-    final bool showPlayButton =
-        widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
+    final bool showPlayButton = widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
 
     return GestureDetector(
       onTap: _latestValue.isPlaying
@@ -547,7 +547,6 @@ class _CupertinoControlsState extends State<CupertinoControls>
     VideoPlayerController controller,
     Color iconColor,
     double barHeight,
-    TextStyle textStyle,
   ) {
     return GestureDetector(
       onTap: () async {
@@ -560,8 +559,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
           builder: (context) => _PlaybackSpeedDialog(
             speeds: chewieController.playbackSpeeds,
             selected: _latestValue.playbackSpeed,
-            iconColor: iconColor,
-            textStyle: textStyle,
+            iconColor: widget.iconSelectedColor ?? Colors.white, // cor padrão se for null
+            textStyle: widget.textStyle ??
+                const TextStyle(color: Colors.black, fontSize: 16.0), // estilo padrão se for null
           ),
         );
 
@@ -759,16 +759,14 @@ class _CupertinoControlsState extends State<CupertinoControls>
   void _skipBack() {
     _cancelAndRestartTimer();
     final beginning = Duration.zero.inMilliseconds;
-    final skip =
-        (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
+    final skip = (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
   }
 
   void _skipForward() {
     _cancelAndRestartTimer();
     final end = _latestValue.duration.inMilliseconds;
-    final skip =
-        (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
+    final skip = (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.min(skip, end)));
   }
 
@@ -821,7 +819,7 @@ class _PlaybackSpeedDialog extends StatelessWidget {
     Key? key,
     required List<double> speeds,
     required double selected,
-    required this.iconColor, 
+    required this.iconColor,
     required this.textStyle, // adicionado parâmetro para estilo de texto
   })  : _speeds = speeds,
         _selected = selected,
@@ -829,12 +827,11 @@ class _PlaybackSpeedDialog extends StatelessWidget {
 
   final List<double> _speeds;
   final double _selected;
-  final Color iconColor; 
+  final Color iconColor;
   final TextStyle textStyle; // adicionado campo para estilo de texto
 
   @override
   Widget build(BuildContext context) {
-    final selectedColor = CupertinoTheme.of(context).primaryColor;
 
     return CupertinoActionSheet(
       actions: _speeds
@@ -846,8 +843,7 @@ class _PlaybackSpeedDialog extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (e == _selected)
-                    Icon(Icons.check, size: 20.0, color: iconColor),
+                  if (e == _selected) Icon(Icons.check, size: 20.0, color: iconColor),
                   Text(e.toString(), style: textStyle), // usando o estilo de texto passado
                 ],
               ),
