@@ -22,16 +22,20 @@ class CupertinoControls extends StatefulWidget {
     required this.backgroundColor,
     required this.iconColor,
     this.showPlayButton = true,
-    this.iconSelectedColor, // Opcional, Color do ícone selecionado
-    this.textStyle, // Opcional, TextStyle para o texto
+    this.iconSelectedColor,
+    this.textStyle,
+    this.mainAxisAlignment, // adicionado parâmetro de MainAxisAlignment
+    this.paddingIcon = const EdgeInsets.all(0.0),
     Key? key,
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color iconColor;
-  final Color? iconSelectedColor; // Adicionado campo para cor do ícone selecionado
-  final TextStyle? textStyle; // Adicionado campo para estilo do texto
+  final Color? iconSelectedColor;
+  final TextStyle? textStyle;
+  final MainAxisAlignment? mainAxisAlignment; // adicionado campo de MainAxisAlignment
   final bool showPlayButton;
+  final EdgeInsets paddingIcon;
 
   @override
   State<StatefulWidget> createState() {
@@ -562,6 +566,9 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
             iconColor: widget.iconSelectedColor ?? Colors.white, // cor padrão se for null
             textStyle: widget.textStyle ??
                 const TextStyle(color: Colors.black, fontSize: 16.0), // estilo padrão se for null
+            mainAxisAlignment: widget.mainAxisAlignment ??
+                MainAxisAlignment.center, // alinhamento padrão se for null
+                paddingIcon: widget.paddingIcon,
           ),
         );
 
@@ -821,6 +828,8 @@ class _PlaybackSpeedDialog extends StatelessWidget {
     required double selected,
     required this.iconColor,
     required this.textStyle, // adicionado parâmetro para estilo de texto
+    required this.mainAxisAlignment,
+    required this.paddingIcon,
   })  : _speeds = speeds,
         _selected = selected,
         super(key: key);
@@ -829,10 +838,11 @@ class _PlaybackSpeedDialog extends StatelessWidget {
   final double _selected;
   final Color iconColor;
   final TextStyle textStyle; // adicionado campo para estilo de texto
+  final MainAxisAlignment mainAxisAlignment;
+  final EdgeInsets paddingIcon;
 
   @override
   Widget build(BuildContext context) {
-
     return CupertinoActionSheet(
       actions: _speeds
           .map(
@@ -841,9 +851,15 @@ class _PlaybackSpeedDialog extends StatelessWidget {
                 Navigator.of(context).pop(e);
               },
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: mainAxisAlignment,
                 children: [
-                  if (e == _selected) Icon(Icons.check, size: 20.0, color: iconColor),
+                  if (e == _selected)
+                    Padding(
+                      padding: paddingIcon,
+                      child: Icon(Icons.check, size: 20.0, color: iconColor),
+                    )
+                  else if (MainAxisAlignment.start == mainAxisAlignment)
+                    SizedBox(width: 20.0),
                   Text(e.toString(), style: textStyle), // usando o estilo de texto passado
                 ],
               ),
