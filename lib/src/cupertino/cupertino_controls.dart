@@ -24,8 +24,8 @@ class CupertinoControls extends StatefulWidget {
     this.showPlayButton = true,
     this.iconSelectedColor,
     this.textStyle,
-    this.mainAxisAlignment, // adicionado parâmetro de MainAxisAlignment
-    this.paddingIcon = const EdgeInsets.all(0.0),
+    this.mainAxisAlignment,
+    this.paddingItem = const EdgeInsets.all(0.0),
     Key? key,
   }) : super(key: key);
 
@@ -33,9 +33,9 @@ class CupertinoControls extends StatefulWidget {
   final Color iconColor;
   final Color? iconSelectedColor;
   final TextStyle? textStyle;
-  final MainAxisAlignment? mainAxisAlignment; // adicionado campo de MainAxisAlignment
+  final MainAxisAlignment? mainAxisAlignment;
   final bool showPlayButton;
-  final EdgeInsets paddingIcon;
+  final EdgeInsets paddingItem;
 
   @override
   State<StatefulWidget> createState() {
@@ -563,12 +563,12 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
           builder: (context) => _PlaybackSpeedDialog(
             speeds: chewieController.playbackSpeeds,
             selected: _latestValue.playbackSpeed,
-            iconColor: widget.iconSelectedColor ?? Colors.white, // cor padrão se for null
+            iconColor: widget.iconSelectedColor ?? Colors.white,
             textStyle: widget.textStyle ??
-                const TextStyle(color: Colors.black, fontSize: 16.0), // estilo padrão se for null
+                const TextStyle(color: Colors.black, fontSize: 16.0), 
             mainAxisAlignment: widget.mainAxisAlignment ??
-                MainAxisAlignment.center, // alinhamento padrão se for null
-                paddingIcon: widget.paddingIcon,
+                MainAxisAlignment.center,
+                paddingItem: widget.paddingItem,
           ),
         );
 
@@ -827,9 +827,9 @@ class _PlaybackSpeedDialog extends StatelessWidget {
     required List<double> speeds,
     required double selected,
     required this.iconColor,
-    required this.textStyle, // adicionado parâmetro para estilo de texto
+    required this.textStyle,
     required this.mainAxisAlignment,
-    required this.paddingIcon,
+    required this.paddingItem,
   })  : _speeds = speeds,
         _selected = selected,
         super(key: key);
@@ -837,9 +837,9 @@ class _PlaybackSpeedDialog extends StatelessWidget {
   final List<double> _speeds;
   final double _selected;
   final Color iconColor;
-  final TextStyle textStyle; // adicionado campo para estilo de texto
+  final TextStyle textStyle;
   final MainAxisAlignment mainAxisAlignment;
-  final EdgeInsets paddingIcon;
+  final EdgeInsets paddingItem;
 
   @override
   Widget build(BuildContext context) {
@@ -854,13 +854,13 @@ class _PlaybackSpeedDialog extends StatelessWidget {
                 mainAxisAlignment: mainAxisAlignment,
                 children: [
                   if (e == _selected)
-                    Padding(
-                      padding: paddingIcon,
-                      child: Icon(Icons.check, size: 20.0, color: iconColor),
-                    )
+                    Icon(Icons.check, size: 20.0, color: iconColor)
                   else if (MainAxisAlignment.start == mainAxisAlignment)
                     SizedBox(width: 20.0),
-                  Text(e.toString(), style: textStyle), // usando o estilo de texto passado
+                  Padding(
+                    padding: paddingItem,
+                    child: Text(e.toString(), style: textStyle),
+                  ),
                 ],
               ),
             ),
