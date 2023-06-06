@@ -84,6 +84,10 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final orientation = MediaQuery.of(context).orientation;
     final barHeight = orientation == Orientation.portrait ? 30.0 : 47.0;
     final buttonPadding = orientation == Orientation.portrait ? 16.0 : 24.0;
+    final style = TextStyle(
+      color: iconColor,
+      fontSize: orientation == Orientation.portrait ? 12.0 : 16.0,
+    );
 
     return MouseRegion(
       onHover: (_) => _cancelAndRestartTimer(),
@@ -117,7 +121,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
                       ),
                       child: _buildSubtitles(chewieController.subtitle!),
                     ),
-                  _buildBottomBar(backgroundColor, iconColor, barHeight),
+                  _buildBottomBar(backgroundColor, iconColor, barHeight, style),
                 ],
               ),
             ],
@@ -243,6 +247,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     Color backgroundColor,
     Color iconColor,
     double barHeight,
+    TextStyle? textStyle,
   ) {
     return SafeArea(
       bottom: chewieController.isFullScreen,
@@ -282,7 +287,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
                           _buildRemaining(iconColor),
                           _buildSubtitleToggle(iconColor, barHeight),
                           if (chewieController.allowPlaybackSpeedChanging)
-                            _buildSpeedButton(controller, iconColor, barHeight),
+                            _buildSpeedButton(controller, iconColor, barHeight, textStyle ?? const TextStyle(fontSize: 12.0)),
                           if (chewieController.additionalOptions != null &&
                               chewieController
                                   .additionalOptions!(context).isNotEmpty)
@@ -542,6 +547,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     VideoPlayerController controller,
     Color iconColor,
     double barHeight,
+    TextStyle textStyle,
   ) {
     return GestureDetector(
       onTap: () async {
@@ -554,6 +560,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
           builder: (context) => _PlaybackSpeedDialog(
             speeds: chewieController.playbackSpeeds,
             selected: _latestValue.playbackSpeed,
+            iconColor: iconColor,
+            textStyle: textStyle,
           ),
         );
 
@@ -813,12 +821,16 @@ class _PlaybackSpeedDialog extends StatelessWidget {
     Key? key,
     required List<double> speeds,
     required double selected,
+    required this.iconColor, 
+    required this.textStyle, // adicionado parâmetro para estilo de texto
   })  : _speeds = speeds,
         _selected = selected,
         super(key: key);
 
   final List<double> _speeds;
   final double _selected;
+  final Color iconColor; 
+  final TextStyle textStyle; // adicionado campo para estilo de texto
 
   @override
   Widget build(BuildContext context) {
@@ -835,8 +847,8 @@ class _PlaybackSpeedDialog extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (e == _selected)
-                    Icon(Icons.check, size: 20.0, color: selectedColor),
-                  Text(e.toString(), style: TextStyle(color: Colors.white)),
+                    Icon(Icons.check, size: 20.0, color: iconColor),
+                  Text(e.toString(), style: textStyle), // usando o estilo de texto passado
                 ],
               ),
             ),
