@@ -836,7 +836,7 @@ class _PlaybackSpeedDialog extends StatelessWidget {
                 children: [
                   if (e == _selected)
                     Icon(Icons.check, size: 20.0, color: selectedColor),
-                  Text(e.toString()),
+                  Text(e.toString(), style: TextStyle(color: Colors.white)),
                 ],
               ),
             ),
