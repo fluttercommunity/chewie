@@ -7,6 +7,7 @@ import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
+import 'package:chewie/src/models/additional_button.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
@@ -18,9 +19,11 @@ class MaterialControls extends StatefulWidget {
   const MaterialControls({
     this.showPlayButton = true,
     Key? key,
+    this.additionalButtons,
   }) : super(key: key);
 
   final bool showPlayButton;
+  final List<AdditionalButton>? additionalButtons;
 
   @override
   State<StatefulWidget> createState() {
@@ -91,6 +94,9 @@ class _MaterialControlsState extends State<MaterialControls>
               else
                 _buildHitArea(),
               _buildActionBar(),
+              if (widget.additionalButtons != null &&
+                  widget.additionalButtons!.isNotEmpty)
+                _buildAdditionalButtons(),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -153,6 +159,32 @@ class _MaterialControlsState extends State<MaterialControls>
               _buildSubtitleToggle(),
               if (chewieController.showOptions) _buildOptionsButton(),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAdditionalButtons() {
+    return Positioned(
+      top: 0,
+      left: 0,
+      child: SafeArea(
+        child: AnimatedOpacity(
+          opacity: notifier.hideStuff ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 250),
+          child: Row(
+            children: widget.additionalButtons!
+                .map((element) => Padding(
+                      padding:
+                          element.margin ?? const EdgeInsets.only(right: 5),
+                      child: GestureDetector(
+                          child: Padding(
+                        padding: element.padding ?? EdgeInsets.zero,
+                        child: element.icon,
+                      )),
+                    ))
+                .toList(),
           ),
         ),
       ),

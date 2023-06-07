@@ -189,9 +189,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     ? Chewie(
                         controller: _chewieController!,
                       )
-                    : const Column(
+                    : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: const [
                           CircularProgressIndicator(),
                           SizedBox(height: 20),
                           Text('Loading'),

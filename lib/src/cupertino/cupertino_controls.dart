@@ -9,6 +9,7 @@ import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino/cupertino_progress_bar.dart';
 import 'package:chewie/src/cupertino/widgets/cupertino_options_dialog.dart';
 import 'package:chewie/src/helpers/utils.dart';
+import 'package:chewie/src/models/additional_button.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
@@ -23,11 +24,13 @@ class CupertinoControls extends StatefulWidget {
     required this.iconColor,
     this.showPlayButton = true,
     Key? key,
+    this.additionalButtons = const [],
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color iconColor;
   final bool showPlayButton;
+  final List<AdditionalButton>? additionalButtons;
 
   @override
   State<StatefulWidget> createState() {
@@ -612,6 +615,17 @@ class _CupertinoControlsState extends State<CupertinoControls>
               barHeight,
               buttonPadding,
             ),
+          if (widget.additionalButtons != null)
+            ...widget.additionalButtons!.map((element) => CustomControlButton(
+                  notifier: notifier,
+                  backgroundColor: backgroundColor,
+                  height: barHeight,
+                  padding: element.padding ??
+                      EdgeInsets.symmetric(horizontal: buttonPadding),
+                  margin: element.margin,
+                  icon: element.icon,
+                  onTap: element.onTap,
+                )),
           const Spacer(),
           if (chewieController.allowMuting)
             _buildMuteButton(
@@ -842,6 +856,53 @@ class _PlaybackSpeedDialog extends StatelessWidget {
             ),
           )
           .toList(),
+    );
+  }
+}
+
+class CustomControlButton extends StatelessWidget {
+  const CustomControlButton(
+      {Key? key,
+      this.onTap,
+      required this.notifier,
+      required this.height,
+      this.margin,
+      required this.padding,
+      required this.backgroundColor,
+      required this.icon})
+      : super(key: key);
+
+  final Function()? onTap;
+  final PlayerNotifier notifier;
+  final double height;
+  final EdgeInsets? margin;
+  final EdgeInsets padding;
+  final Color backgroundColor;
+  final Widget icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: margin ?? const EdgeInsets.only(left: 5),
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedOpacity(
+          opacity: notifier.hideStuff ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 300),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10.0),
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 10.0),
+              child: Container(
+                height: height,
+                color: backgroundColor,
+                padding: padding,
+                child: Center(child: icon),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
