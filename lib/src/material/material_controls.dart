@@ -17,11 +17,14 @@ import 'package:video_player/video_player.dart';
 class MaterialControls extends StatefulWidget {
   const MaterialControls({
     this.showPlayButton = true,
+    required this.backgroundColor,
+    required this.buttonColor,
     Key? key,
   }) : super(key: key);
 
   final bool showPlayButton;
-
+  final Color? backgroundColor;
+  final Color? buttonColor;
   @override
   State<StatefulWidget> createState() {
     return _MaterialControlsState();
@@ -65,10 +68,10 @@ class _MaterialControlsState extends State<MaterialControls>
             context,
             chewieController.videoPlayerController.value.errorDescription!,
           ) ??
-          const Center(
+          Center(
             child: Icon(
               Icons.error,
-              color: Colors.white,
+              color: widget.buttonColor ?? Colors.white,
               size: 42,
             ),
           );
@@ -203,9 +206,9 @@ class _MaterialControlsState extends State<MaterialControls>
             _startHideTimer();
           }
         },
-        icon: const Icon(
+        icon: Icon(
           Icons.more_vert,
-          color: Colors.white,
+          color: widget.buttonColor ?? Colors.white,
         ),
       ),
     );
@@ -249,12 +252,11 @@ class _MaterialControlsState extends State<MaterialControls>
   AnimatedOpacity _buildBottomBar(
     BuildContext context,
   ) {
-    final iconColor = Theme.of(context).textTheme.labelLarge!.color;
-
     return AnimatedOpacity(
       opacity: notifier.hideStuff ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 300),
       child: Container(
+        color: widget.backgroundColor,
         height: barHeight + (chewieController.isFullScreen ? 10.0 : 0),
         padding: EdgeInsets.only(
           left: 20,
@@ -274,7 +276,7 @@ class _MaterialControlsState extends State<MaterialControls>
                     if (chewieController.isLive)
                       const Expanded(child: Text('LIVE'))
                     else
-                      _buildPosition(iconColor),
+                      _buildPosition(widget.buttonColor),
                     if (chewieController.allowMuting)
                       _buildMuteButton(controller),
                     const Spacer(),
@@ -328,7 +330,7 @@ class _MaterialControlsState extends State<MaterialControls>
             ),
             child: Icon(
               _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
-              color: Colors.white,
+              color: widget.buttonColor ?? Colors.white,
             ),
           ),
         ),
@@ -354,7 +356,7 @@ class _MaterialControlsState extends State<MaterialControls>
               chewieController.isFullScreen
                   ? Icons.fullscreen_exit
                   : Icons.fullscreen,
-              color: Colors.white,
+              color: widget.buttonColor ?? Colors.white,
             ),
           ),
         ),
@@ -430,14 +432,15 @@ class _MaterialControlsState extends State<MaterialControls>
             text: '/ ${formatDuration(duration)}',
             style: TextStyle(
               fontSize: 14.0,
-              color: Colors.white.withOpacity(.75),
+              color: widget.buttonColor?.withOpacity(.75) ??
+                  Colors.white.withOpacity(.75),
               fontWeight: FontWeight.normal,
             ),
           )
         ],
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14.0,
-          color: Colors.white,
+          color: widget.buttonColor ?? Colors.white,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -462,7 +465,9 @@ class _MaterialControlsState extends State<MaterialControls>
           _subtitleOn
               ? Icons.closed_caption
               : Icons.closed_caption_off_outlined,
-          color: _subtitleOn ? Colors.white : Colors.grey[700],
+          color: _subtitleOn
+              ? (widget.buttonColor ?? Colors.white)
+              : (widget.buttonColor?.withOpacity(0.7) ?? Colors.grey[700]),
         ),
       ),
     );
