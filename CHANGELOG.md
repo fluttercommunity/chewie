@@ -1,3 +1,6 @@
+## 1.6.0+1
+* Added Flutter Community Banner to `README.md`. Thanks [diegotori](https://github.com/diegotori).
+
 ## 1.6.0
 * [#747](https://github.com/fluttercommunity/chewie/pull/747): Migrated from `wakelock` to `wakelock_plus`. Thanks [diegotori](https://github.com/diegotori).
 * Also upgrades `video_player` from `2.4.7` to `2.7.0`.

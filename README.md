@@ -1,4 +1,7 @@
 # chewie
+
+[![Flutter Community: chewie](https://fluttercommunity.dev/_github/header/chewie)](https://github.com/fluttercommunity/community)
+
 [![Version](https://img.shields.io/pub/v/chewie.svg)](https://pub.dev/packages/chewie)
 ![CI](https://github.com/brianegan/chewie/workflows/CI/badge.svg)
 [![Generic badge](https://img.shields.io/badge/platform-android%20|%20ios%20|%20web%20-blue.svg)](https://pub.dev/packages/chewie)
