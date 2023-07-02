@@ -1,3 +1,7 @@
+## 1.6.0
+* [#747](https://github.com/fluttercommunity/chewie/pull/747): Migrated from `wakelock` to `wakelock_plus`. Thanks [diegotori](https://github.com/diegotori).
+* Also upgrades `video_player` from `2.4.7` to `2.7.0`.
+
 ## 1.5.0
 * 🛠️ [#712](https://github.com/fluttercommunity/chewie/pull/712): Progress Bars can now be disabled by setting `ChewieController.draggableProgressBar` to `false`. Thanks [shiyiya](https://github.com/shiyiya).
 * ⬆️ Increased Dart SDK constraint to cover Dart `3.0.0` and higher.
