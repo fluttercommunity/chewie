@@ -683,6 +683,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
             _hideTimer?.cancel();
           },
+          onDragUpdate: () {
+            _hideTimer?.cancel();
+          },
           onDragEnd: () {
             setState(() {
               _dragging = false;
