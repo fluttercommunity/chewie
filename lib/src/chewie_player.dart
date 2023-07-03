@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 typedef ChewieRoutePageBuilder = Widget Function(
   BuildContext context,
@@ -158,7 +158,7 @@ class ChewieState extends State<Chewie> {
     onEnterFullScreen();
 
     if (!widget.controller.allowedScreenSleep) {
-      Wakelock.enable();
+      WakelockPlus.enable();
     }
 
     await Navigator.of(
@@ -169,8 +169,8 @@ class ChewieState extends State<Chewie> {
     widget.controller.exitFullScreen();
 
     // The wakelock plugins checks whether it needs to perform an action internally,
-    // so we do not need to check Wakelock.isEnabled.
-    Wakelock.disable();
+    // so we do not need to check WakelockPlus.isEnabled.
+    WakelockPlus.disable();
 
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
@@ -250,6 +250,7 @@ class ChewieController extends ChangeNotifier {
     this.aspectRatio,
     this.autoInitialize = false,
     this.autoPlay = false,
+    this.draggableProgressBar = true,
     this.startAt,
     this.looping = false,
     this.fullScreenByDefault = false,
@@ -297,6 +298,7 @@ class ChewieController extends ChangeNotifier {
     double? aspectRatio,
     bool? autoInitialize,
     bool? autoPlay,
+    bool? draggableProgressBar,
     Duration? startAt,
     bool? looping,
     bool? fullScreenByDefault,
@@ -335,10 +337,10 @@ class ChewieController extends ChangeNotifier {
       Animation<double>,
       Animation<double>,
       ChewieControllerProvider,
-    )?
-        routePageBuilder,
+    )? routePageBuilder,
   }) {
     return ChewieController(
+      draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
       videoPlayerController:
           videoPlayerController ?? this.videoPlayerController,
       optionsTranslation: optionsTranslation ?? this.optionsTranslation,
@@ -430,6 +432,9 @@ class ChewieController extends ChangeNotifier {
 
   /// Play the video as soon as it's displayed
   final bool autoPlay;
+
+  /// Non-Draggable Progress Bar
+  final bool draggableProgressBar;
 
   /// Start video at a certain position
   final Duration? startAt;
@@ -544,7 +549,7 @@ class ChewieController extends ChangeNotifier {
 
   bool get isPlaying => videoPlayerController.value.isPlaying;
 
-  Future _initialize() async {
+  Future<dynamic> _initialize() async {
     await videoPlayerController.setLooping(looping);
 
     if ((autoInitialize || autoPlay) &&

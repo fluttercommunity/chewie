@@ -1,3 +1,18 @@
+## 1.6.0+1
+* Added Flutter Community Banner to `README.md`. Thanks [diegotori](https://github.com/diegotori).
+
+## 1.6.0
+* [#747](https://github.com/fluttercommunity/chewie/pull/747): Migrated from `wakelock` to `wakelock_plus`. Thanks [diegotori](https://github.com/diegotori).
+* Also upgrades `video_player` from `2.4.7` to `2.7.0`.
+* **IMPORTANT**: Library now requires `Flutter`, version `2.11.0` or higher.
+
+## 1.5.0
+* 🛠️ [#712](https://github.com/fluttercommunity/chewie/pull/712): Progress Bars can now be disabled by setting `ChewieController.draggableProgressBar` to `false`. Thanks [shiyiya](https://github.com/shiyiya).
+* ⬆️ Increased Dart SDK constraint to cover Dart `3.0.0` and higher.
+
+## 1.4.1
+* 🛠️ [#719](https://github.com/fluttercommunity/chewie/pull/719): Fix overlay not visible. Thanks [jaripekkala](https://github.com/jaripekkala).
+
 ## 1.4.0
 * 🛠️ [#701](https://github.com/fluttercommunity/chewie/pull/701): Added Dart Analysis fixes due to Flutter 3.7. Thanks [diegotori](https://github.com/diegotori).
 

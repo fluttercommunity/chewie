@@ -601,6 +601,9 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
           _hideTimer?.cancel();
         },
+        onDragUpdate: () {
+          _hideTimer?.cancel();
+        },
         onDragEnd: () {
           setState(() {
             _dragging = false;
