@@ -427,8 +427,12 @@ class ChewieController extends ChangeNotifier {
   /// Add a List of Subtitles here in `Subtitles.subtitle`
   Subtitles? subtitle;
 
-  /// Option to disable subtitle by default
-  bool showSubtitle;
+  ///
+  /// Whether to display subtitles.
+  ///
+  /// By default, this is set to `false`, which hides them.
+  ///
+  final bool showSubtitle;
 
   /// The controller for the video you want to play
   final VideoPlayerController videoPlayerController;
