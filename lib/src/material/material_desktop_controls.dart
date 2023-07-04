@@ -5,6 +5,7 @@ import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/helpers/utils.dart';
+import 'package:chewie/src/hit_area_controls.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
@@ -336,53 +337,33 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     final bool showSeekButton =
         widget.showSeekButton && !_dragging && !notifier.hideStuff;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SeekRewindButton(
-          backgroundColor: Colors.black54,
-          iconColor: Colors.white,
-          show: showSeekButton,
-          onPressed: _seekRewind,
-          onDoublePressed: _seekRewind,
-          icon: Icons.fast_rewind,
-        ),
-        GestureDetector(
-          onTap: () {
-            if (_latestValue.isPlaying) {
-              if (_displayTapped) {
-                setState(() {
-                  notifier.hideStuff = true;
-                });
-              } else {
-                _cancelAndRestartTimer();
-              }
-            } else {
-              _playPause();
+    return HitAreaControls(
+      onTapPlay: () {
+        if (_latestValue.isPlaying) {
+          if (_displayTapped) {
+            setState(() {
+              notifier.hideStuff = true;
+            });
+          } else {
+            _cancelAndRestartTimer();
+          }
+        } else {
+          _playPause();
 
-              setState(() {
-                notifier.hideStuff = true;
-              });
-            }
-          },
-          child: CenterPlayButton(
-            backgroundColor: Colors.black54,
-            iconColor: Colors.white,
-            isFinished: isFinished,
-            isPlaying: controller.value.isPlaying,
-            show: showPlayButton,
-            onPressed: _playPause,
-          ),
-        ),
-        SeekRewindButton(
-          backgroundColor: Colors.black54,
-          iconColor: Colors.white,
-          show: showSeekButton,
-          onPressed: _seekForward,
-          onDoublePressed: _seekForward,
-          icon: Icons.fast_forward,
-        ),
-      ],
+          setState(() {
+            notifier.hideStuff = true;
+          });
+        }
+      },
+      backgroundColor: Colors.black54,
+      iconColor: Colors.white,
+      isFinished: isFinished,
+      isPlaying: controller.value.isPlaying,
+      showPlayButton: showPlayButton,
+      showSeekButton: showSeekButton,
+      onPressedPlay: _playPause,
+      seekRewind: _seekRewind,
+      seekForward: _seekForward,
     );
   }
 
@@ -623,23 +604,17 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     );
   }
 
-  void _seekForward() {
+  void _seekTo({int seconds = 10}) {
     setState(() {
       controller.seekTo(
         Duration(
-          seconds: _latestValue.position.inSeconds + 10,
+          seconds: _latestValue.position.inSeconds + seconds,
         ),
       );
     });
   }
 
-  void _seekRewind() {
-    setState(() {
-      controller.seekTo(
-        Duration(
-          seconds: _latestValue.position.inSeconds - 10,
-        ),
-      );
-    });
-  }
+  void _seekForward() => _seekTo();
+
+  void _seekRewind() => _seekTo(seconds: -10);
 }
