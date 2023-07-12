@@ -86,6 +86,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final buttonPadding = orientation == Orientation.portrait ? 16.0 : 24.0;
 
     return MouseRegion(
+      opaque: false,
       onHover: (_) => _cancelAndRestartTimer(),
       child: GestureDetector(
         onTap: () => _cancelAndRestartTimer(),
@@ -355,20 +356,20 @@ class _CupertinoControlsState extends State<CupertinoControls>
           ? _cancelAndRestartTimer
           : () {
               _hideTimer?.cancel();
+              notifier.hideStuff = !notifier.hideStuff;
 
               setState(() {
-                notifier.hideStuff = false;
                 _startHideTimer();
               });
             },
-      child: CenterPlayButton(
+      child: !notifier.hideStuff ? CenterPlayButton(
         backgroundColor: widget.backgroundColor,
         iconColor: widget.iconColor,
         isFinished: isFinished,
         isPlaying: controller.value.isPlaying,
         show: showPlayButton,
         onPressed: _playPause,
-      ),
+      ) : Container(),
     );
   }
 
