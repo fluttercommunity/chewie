@@ -49,9 +49,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
 
   Future<void> initializePlayer() async {
     _videoPlayerController1 =
-        VideoPlayerController.networkUrl(Uri.parse(srcs[currPlayIndex]));
+        VideoPlayerController.network(srcs[currPlayIndex]);
     _videoPlayerController2 =
-        VideoPlayerController.networkUrl(Uri.parse(srcs[currPlayIndex]));
+        VideoPlayerController.network(srcs[currPlayIndex]);
     await Future.wait([
       _videoPlayerController1.initialize(),
       _videoPlayerController2.initialize()
@@ -189,7 +189,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     ? Chewie(
                         controller: _chewieController!,
                       )
-                    : Column(
+                    : const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CircularProgressIndicator(),
