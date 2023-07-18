@@ -26,7 +26,7 @@ class CenterPlayButton extends StatelessWidget {
       child: Center(
         child: UnconstrainedBox(
           child: AnimatedOpacity(
-            opacity: show ? 1.0 : 0.0,
+            opacity: 1.0,
             duration: const Duration(milliseconds: 300),
             child: DecoratedBox(
               decoration: BoxDecoration(

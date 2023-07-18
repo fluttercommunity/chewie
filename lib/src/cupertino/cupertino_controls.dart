@@ -87,7 +87,6 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
     return MouseRegion(
       opaque: false,
-      onHover: (_) => _cancelAndRestartTimer(),
       child: GestureDetector(
         onTap: () => _cancelAndRestartTimer(),
         child: AbsorbPointer(
@@ -362,14 +361,16 @@ class _CupertinoControlsState extends State<CupertinoControls>
                 _startHideTimer();
               });
             },
-      child: !notifier.hideStuff ?CenterPlayButton(
-        backgroundColor: widget.backgroundColor,
-        iconColor: widget.iconColor,
-        isFinished: isFinished,
-        isPlaying: controller.value.isPlaying,
-        show: showPlayButton,
-        onPressed: _playPause,
-      ) : Container(),
+      child: !notifier.hideStuff
+          ? CenterPlayButton(
+              backgroundColor: widget.backgroundColor,
+              iconColor: widget.iconColor,
+              isFinished: isFinished,
+              isPlaying: controller.value.isPlaying,
+              show: showPlayButton,
+              onPressed: _playPause,
+            )
+          : Container(),
     );
   }
 
@@ -630,10 +631,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   void _cancelAndRestartTimer() {
     _hideTimer?.cancel();
+    notifier.hideStuff = !notifier.hideStuff;
 
     setState(() {
-      notifier.hideStuff = false;
-
       _startHideTimer();
     });
   }
