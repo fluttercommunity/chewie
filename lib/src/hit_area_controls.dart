@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'center_play_button.dart';
-import 'seek_rewind_button.dart';
+import 'seek_control_button.dart';
 
 class HitAreaControls extends StatelessWidget {
   const HitAreaControls({
     Key? key,
-    this.onTapPlay,
-    this.onPressedPlay,
-    this.seekRewind,
-    this.seekForward,
+    required this.onTapPlay,
+    required this.onPressedPlay,
+    required this.seekRewind,
+    required this.seekForward,
     required this.backgroundColor,
     required this.iconColor,
     required this.isFinished,
@@ -18,10 +18,10 @@ class HitAreaControls extends StatelessWidget {
     required this.showSeekButton,
   }) : super(key: key);
 
-  final Function()? onTapPlay;
-  final Function()? onPressedPlay;
-  final Function()? seekRewind;
-  final Function()? seekForward;
+  final VoidCallback onTapPlay;
+  final VoidCallback onPressedPlay;
+  final VoidCallback seekRewind;
+  final VoidCallback seekForward;
   final Color backgroundColor;
   final Color iconColor;
   final bool isFinished;
@@ -34,7 +34,14 @@ class HitAreaControls extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildSeekRewindButton(isSeekForward: false),
+        SeekControlButton(
+          backgroundColor: backgroundColor,
+          iconColor: iconColor,
+          show: showSeekButton,
+          onPressed: seekRewind,
+          onDoublePressed: seekRewind,
+          icon: Icons.fast_rewind,
+        ),
         GestureDetector(
           onTap: onTapPlay,
           child: CenterPlayButton(
@@ -46,19 +53,15 @@ class HitAreaControls extends StatelessWidget {
             onPressed: onPressedPlay,
           ),
         ),
-        _buildSeekRewindButton(isSeekForward: true),
+        SeekControlButton(
+          backgroundColor: backgroundColor,
+          iconColor: iconColor,
+          show: showSeekButton,
+          onPressed: seekForward,
+          onDoublePressed: seekForward,
+          icon: Icons.fast_forward,
+        ),
       ],
-    );
-  }
-
-  SeekRewindButton _buildSeekRewindButton({bool isSeekForward = true}) {
-    return SeekRewindButton(
-      backgroundColor: backgroundColor,
-      iconColor: iconColor,
-      show: showSeekButton,
-      onPressed: isSeekForward ? seekForward : seekRewind,
-      onDoublePressed: isSeekForward ? seekForward : seekRewind,
-      icon: isSeekForward ? Icons.fast_forward : Icons.fast_rewind,
     );
   }
 }

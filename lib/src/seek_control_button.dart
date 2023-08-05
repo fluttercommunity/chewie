@@ -1,29 +1,28 @@
 import 'package:flutter/material.dart';
 
-class SeekRewindButton extends StatefulWidget {
-  const SeekRewindButton({
+class SeekControlButton extends StatefulWidget {
+  const SeekControlButton({
     Key? key,
     required this.backgroundColor,
-    this.iconColor,
+    required this.iconColor,
     required this.show,
     required this.icon,
-    this.onPressed,
-    this.onDoublePressed,
+    required this.onPressed,
+    required this.onDoublePressed,
   }) : super(key: key);
 
   final Color backgroundColor;
-  final Color? iconColor;
+  final Color iconColor;
   final bool show;
-  final VoidCallback? onPressed;
-  final VoidCallback? onDoublePressed;
-  final IconData? icon;
+  final VoidCallback onPressed;
+  final VoidCallback onDoublePressed;
+  final IconData icon;
 
   @override
-  State<SeekRewindButton> createState() => _SeekRewindButtonState();
+  State<SeekControlButton> createState() => _SeekControlButtonState();
 }
 
-class _SeekRewindButtonState extends State<SeekRewindButton> {
-
+class _SeekControlButtonState extends State<SeekControlButton> {
   @override
   void initState() {
     super.initState();
