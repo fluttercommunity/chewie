@@ -1,3 +1,7 @@
+## 1.7.0
+* 🛠️ [#754](https://github.com/fluttercommunity/chewie/pull/754): Upgraded `wakelock_plus` to version `1.1.0`. Thanks [diegotori](https://github.com/diegotori).
+* **BREAKING CHANGE**: Library now requires at least Dart and Flutter versions `2.18` and `3.3.0` respectively.
+
 ## 1.6.0+1
 * Added Flutter Community Banner to `README.md`. Thanks [diegotori](https://github.com/diegotori).
 
