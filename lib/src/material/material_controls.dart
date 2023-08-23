@@ -83,7 +83,11 @@ class _MaterialControlsState extends State<MaterialControls>
         child: AbsorbPointer(
           absorbing: notifier.hideStuff,
           child: Stack(
+            alignment: AlignmentDirectional.topCenter,
             children: [
+              if (chewieController.watermark != null) ...[
+                chewieController.watermark!,
+              ],
               if (_displayBufferingIndicator)
                 const Center(
                   child: CircularProgressIndicator(),
