@@ -8,20 +8,20 @@ class HitAreaControls extends StatelessWidget {
     Key? key,
     required this.onTapPlay,
     required this.onPressedPlay,
-    required this.seekRewind,
-    required this.seekForward,
     required this.backgroundColor,
     required this.iconColor,
     required this.isFinished,
     required this.isPlaying,
     required this.showPlayButton,
     required this.showSeekButton,
+    this.seekRewind,
+    this.seekForward,
   }) : super(key: key);
 
   final VoidCallback onTapPlay;
   final VoidCallback onPressedPlay;
-  final VoidCallback seekRewind;
-  final VoidCallback seekForward;
+  final VoidCallback? seekRewind;
+  final VoidCallback? seekForward;
   final Color backgroundColor;
   final Color iconColor;
   final bool isFinished;
@@ -34,14 +34,15 @@ class HitAreaControls extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        SeekControlButton(
-          backgroundColor: backgroundColor,
-          iconColor: iconColor,
-          show: showSeekButton,
-          onPressed: seekRewind,
-          onDoublePressed: seekRewind,
-          icon: Icons.fast_rewind,
-        ),
+        showSeekButton
+            ? SeekControlButton(
+                backgroundColor: backgroundColor,
+                iconColor: iconColor,
+                onPressed: seekRewind,
+                onDoublePressed: seekRewind,
+                icon: Icons.fast_rewind,
+              )
+            : const SizedBox.shrink(),
         GestureDetector(
           onTap: onTapPlay,
           child: CenterPlayButton(
@@ -53,14 +54,15 @@ class HitAreaControls extends StatelessWidget {
             onPressed: onPressedPlay,
           ),
         ),
-        SeekControlButton(
-          backgroundColor: backgroundColor,
-          iconColor: iconColor,
-          show: showSeekButton,
-          onPressed: seekForward,
-          onDoublePressed: seekForward,
-          icon: Icons.fast_forward,
-        ),
+        showSeekButton
+            ? SeekControlButton(
+                backgroundColor: backgroundColor,
+                iconColor: iconColor,
+                onPressed: seekForward,
+                onDoublePressed: seekForward,
+                icon: Icons.fast_forward,
+              )
+            : const SizedBox.shrink(),
       ],
     );
   }

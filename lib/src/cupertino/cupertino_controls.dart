@@ -351,8 +351,6 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final bool isFinished = _latestValue.position >= _latestValue.duration;
     final bool showPlayButton =
         widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
-    final bool showSeekButton =
-        widget.showSeekButton && !_latestValue.isPlaying && !_dragging;
 
     return HitAreaControls(
       onTapPlay: _latestValue.isPlaying
@@ -369,10 +367,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
       isFinished: isFinished,
       isPlaying: controller.value.isPlaying,
       showPlayButton: showPlayButton,
-      showSeekButton: showSeekButton,
+      showSeekButton: false,
       onPressedPlay: _playPause,
-      seekRewind: _seekRewind,
-      seekForward: _seekForward,
     );
   }
 
@@ -811,20 +807,6 @@ class _CupertinoControlsState extends State<CupertinoControls>
       _subtitlesPosition = controller.value.position;
     });
   }
-
-  void _seekTo({int seconds = 10}) {
-    setState(() {
-      controller.seekTo(
-        Duration(
-          seconds: _latestValue.position.inSeconds + seconds,
-        ),
-      );
-    });
-  }
-
-  void _seekForward() => _seekTo();
-
-  void _seekRewind() => _seekTo(seconds: -10);
 }
 
 class _PlaybackSpeedDialog extends StatelessWidget {
