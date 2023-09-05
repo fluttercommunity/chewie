@@ -49,7 +49,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
   bool _subtitleOn = false;
   Timer? _bufferingDisplayTimer;
   bool _displayBufferingIndicator = false;
-
+  double selectedSpeed = 1.0;
   late VideoPlayerController controller;
 
   // We know that _chewieController is set in didChangeDependencies
@@ -559,6 +559,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
         if (chosenSpeed != null) {
           controller.setPlaybackSpeed(chosenSpeed);
+
+          selectedSpeed = chosenSpeed;
         }
 
         if (_latestValue.isPlaying) {
@@ -754,6 +756,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final skip =
         (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
+    Future.delayed(const Duration(milliseconds: 100), () {
+      controller.setPlaybackSpeed(selectedSpeed);
+    });
   }
 
   void _skipForward() {
@@ -762,6 +767,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final skip =
         (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.min(skip, end)));
+    Future.delayed(Duration(milliseconds: 100), () {
+      controller.setPlaybackSpeed(selectedSpeed);
+    });
   }
 
   void _startHideTimer() {
