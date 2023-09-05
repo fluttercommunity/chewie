@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -756,7 +757,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final skip =
         (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
-    Future.delayed(const Duration(milliseconds: 100), () {
+    log("Reversing the video", name: "Video Player");
+    Future.delayed(const Duration(milliseconds: 200), () {
       controller.setPlaybackSpeed(selectedSpeed);
     });
   }
@@ -767,7 +769,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final skip =
         (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.min(skip, end)));
-    Future.delayed(Duration(milliseconds: 100), () {
+
+    log("Forwaring the video", name: "Video Player");
+    Future.delayed(const Duration(milliseconds: 200), () {
       controller.setPlaybackSpeed(selectedSpeed);
     });
   }
