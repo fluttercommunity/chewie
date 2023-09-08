@@ -93,6 +93,10 @@ class _CupertinoControlsState extends State<CupertinoControls>
           absorbing: notifier.hideStuff,
           child: Stack(
             children: [
+              if (chewieController.watermark != null) ...[
+                chewieController.watermark!,
+              ],
+
               if (_displayBufferingIndicator)
                 const Center(
                   child: CircularProgressIndicator(),

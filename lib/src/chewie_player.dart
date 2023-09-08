@@ -246,6 +246,7 @@ class ChewieState extends State<Chewie> {
 class ChewieController extends ChangeNotifier {
   ChewieController({
     required this.videoPlayerController,
+    this.watermark,
     this.optionsTranslation,
     this.aspectRatio,
     this.autoInitialize = false,
@@ -332,6 +333,7 @@ class ChewieController extends ChangeNotifier {
     List<SystemUiOverlay>? systemOverlaysAfterFullScreen,
     List<DeviceOrientation>? deviceOrientationsAfterFullScreen,
     Duration? progressIndicatorDelay,
+    Widget? watermark,
     Widget Function(
       BuildContext,
       Animation<double>,
@@ -340,6 +342,7 @@ class ChewieController extends ChangeNotifier {
     )? routePageBuilder,
   }) {
     return ChewieController(
+      watermark: watermark?? this.watermark,
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
       videoPlayerController:
           videoPlayerController ?? this.videoPlayerController,
@@ -535,6 +538,9 @@ class ChewieController extends ChangeNotifier {
   /// Adds additional padding to the controls' [SafeArea] as desired.
   /// Defaults to [EdgeInsets.zero].
   final EdgeInsets controlsSafeAreaMinimum;
+
+  ///  adds a watermark as a widget to the video
+   Widget? watermark;
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider =
