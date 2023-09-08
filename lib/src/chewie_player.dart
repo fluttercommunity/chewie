@@ -168,9 +168,9 @@ class ChewieState extends State<Chewie> {
     _isFullScreen = false;
     widget.controller.exitFullScreen();
 
-    // The wakelock plugins checks whether it needs to perform an action internally,
-    // so we do not need to check WakelockPlus.isEnabled.
-    WakelockPlus.disable();
+    if (!widget.controller.allowedScreenSleep) {
+      WakelockPlus.disable();
+    }
 
     SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
