@@ -756,7 +756,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final skip =
         (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
-    Future.delayed(const Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 1000), () {
       controller.setPlaybackSpeed(selectedSpeed);
     });
   }
@@ -767,7 +767,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final skip =
         (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.min(skip, end)));
-    Future.delayed(Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 1000), () {
       controller.setPlaybackSpeed(selectedSpeed);
     });
   }
