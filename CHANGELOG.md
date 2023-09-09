@@ -1,3 +1,7 @@
+## 1.7.1
+* 🛠️ [#772](https://github.com/fluttercommunity/chewie/pull/772): Stop force disabling wakelock. Thanks [jan-milovanovic](https://github.com/jan-milovanovic).
+* ⬆️ [#775](https://github.com/fluttercommunity/chewie/pull/775): Flutter `3.13` iOS example app upgrade. Thanks [diegotori](https://github.com/diegotori).
+
 ## 1.7.0
 * 🛠️ [#754](https://github.com/fluttercommunity/chewie/pull/754): Upgraded `wakelock_plus` to version `1.1.0`. Thanks [diegotori](https://github.com/diegotori).
 * **BREAKING CHANGE**: Library now requires at least Dart and Flutter versions `2.18` and `3.3.0` respectively.
