@@ -750,23 +750,27 @@ class _CupertinoControlsState extends State<CupertinoControls>
     });
   }
 
-  void _skipBack() {
+  Future<void> _skipBack() async {
     _cancelAndRestartTimer();
     final beginning = Duration.zero.inMilliseconds;
     final skip =
         (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
-    controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
+    await controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
+    // Restoring the video speed to selected speed
+    // A delay of 1 second is added to ensure a smooth transition of speed after reversing the video as reversing is an asynchronous function
     Future.delayed(const Duration(milliseconds: 1000), () {
       controller.setPlaybackSpeed(selectedSpeed);
     });
   }
 
-  void _skipForward() {
+  Future<void> _skipForward() async {
     _cancelAndRestartTimer();
     final end = _latestValue.duration.inMilliseconds;
     final skip =
         (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
-    controller.seekTo(Duration(milliseconds: math.min(skip, end)));
+    await controller.seekTo(Duration(milliseconds: math.min(skip, end)));
+    // Restoring the video speed to selected speed
+    // A delay of 1 second is added to ensure a smooth transition of speed after forwarding the video as forwaring is an asynchronous function
     Future.delayed(const Duration(milliseconds: 1000), () {
       controller.setPlaybackSpeed(selectedSpeed);
     });
