@@ -22,12 +22,20 @@ class CupertinoControls extends StatefulWidget {
     required this.backgroundColor,
     required this.iconColor,
     this.showPlayButton = true,
+    this.iconSelectedColor,
+    this.textStyle,
+    this.mainAxisAlignment,
+    this.paddingItem = const EdgeInsets.all(0.0),
     Key? key,
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color iconColor;
+  final Color? iconSelectedColor;
+  final TextStyle? textStyle;
+  final MainAxisAlignment? mainAxisAlignment;
   final bool showPlayButton;
+  final EdgeInsets paddingItem;
 
   @override
   State<StatefulWidget> createState() {
@@ -35,8 +43,7 @@ class CupertinoControls extends StatefulWidget {
   }
 }
 
-class _CupertinoControlsState extends State<CupertinoControls>
-    with SingleTickerProviderStateMixin {
+class _CupertinoControlsState extends State<CupertinoControls> with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
   late VideoPlayerValue _latestValue;
   double? _latestVolume;
@@ -84,6 +91,10 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final orientation = MediaQuery.of(context).orientation;
     final barHeight = orientation == Orientation.portrait ? 30.0 : 47.0;
     final buttonPadding = orientation == Orientation.portrait ? 16.0 : 24.0;
+    final style = TextStyle(
+      color: iconColor,
+      fontSize: orientation == Orientation.portrait ? 12.0 : 16.0,
+    );
 
     return MouseRegion(
       onHover: (_) => _cancelAndRestartTimer(),
@@ -117,7 +128,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
                       ),
                       child: _buildSubtitles(chewieController.subtitle!),
                     ),
-                  _buildBottomBar(backgroundColor, iconColor, barHeight),
+                  _buildBottomBar(backgroundColor, iconColor, barHeight, style),
                 ],
               ),
             ],
@@ -178,8 +189,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
             useRootNavigator: chewieController.useRootNavigator,
             builder: (context) => CupertinoOptionsDialog(
               options: options,
-              cancelButtonText:
-                  chewieController.optionsTranslation?.cancelButtonText,
+              cancelButtonText: chewieController.optionsTranslation?.cancelButtonText,
             ),
           );
           if (_latestValue.isPlaying) {
@@ -243,6 +253,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     Color backgroundColor,
     Color iconColor,
     double barHeight,
+    TextStyle? textStyle,
   ) {
     return SafeArea(
       bottom: chewieController.isFullScreen,
@@ -284,8 +295,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
                           if (chewieController.allowPlaybackSpeedChanging)
                             _buildSpeedButton(controller, iconColor, barHeight),
                           if (chewieController.additionalOptions != null &&
-                              chewieController
-                                  .additionalOptions!(context).isNotEmpty)
+                              chewieController.additionalOptions!(context).isNotEmpty)
                             _buildOptionsButton(iconColor, barHeight),
                         ],
                       ),
@@ -347,8 +357,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   Widget _buildHitArea() {
     final bool isFinished = _latestValue.position >= _latestValue.duration;
-    final bool showPlayButton =
-        widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
+    final bool showPlayButton = widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
 
     return GestureDetector(
       onTap: _latestValue.isPlaying
@@ -554,6 +563,12 @@ class _CupertinoControlsState extends State<CupertinoControls>
           builder: (context) => _PlaybackSpeedDialog(
             speeds: chewieController.playbackSpeeds,
             selected: _latestValue.playbackSpeed,
+            iconColor: widget.iconSelectedColor ?? Colors.white,
+            textStyle: widget.textStyle ??
+                const TextStyle(color: Colors.black, fontSize: 16.0), 
+            mainAxisAlignment: widget.mainAxisAlignment ??
+                MainAxisAlignment.center,
+                paddingItem: widget.paddingItem,
           ),
         );
 
@@ -751,16 +766,14 @@ class _CupertinoControlsState extends State<CupertinoControls>
   void _skipBack() {
     _cancelAndRestartTimer();
     final beginning = Duration.zero.inMilliseconds;
-    final skip =
-        (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
+    final skip = (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
   }
 
   void _skipForward() {
     _cancelAndRestartTimer();
     final end = _latestValue.duration.inMilliseconds;
-    final skip =
-        (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
+    final skip = (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
     controller.seekTo(Duration(milliseconds: math.min(skip, end)));
   }
 
@@ -813,17 +826,23 @@ class _PlaybackSpeedDialog extends StatelessWidget {
     Key? key,
     required List<double> speeds,
     required double selected,
+    required this.iconColor,
+    required this.textStyle,
+    required this.mainAxisAlignment,
+    required this.paddingItem,
   })  : _speeds = speeds,
         _selected = selected,
         super(key: key);
 
   final List<double> _speeds;
   final double _selected;
+  final Color iconColor;
+  final TextStyle textStyle;
+  final MainAxisAlignment mainAxisAlignment;
+  final EdgeInsets paddingItem;
 
   @override
   Widget build(BuildContext context) {
-    final selectedColor = CupertinoTheme.of(context).primaryColor;
-
     return CupertinoActionSheet(
       actions: _speeds
           .map(
@@ -832,11 +851,16 @@ class _PlaybackSpeedDialog extends StatelessWidget {
                 Navigator.of(context).pop(e);
               },
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: mainAxisAlignment,
                 children: [
                   if (e == _selected)
-                    Icon(Icons.check, size: 20.0, color: selectedColor),
-                  Text(e.toString()),
+                    Icon(Icons.check, size: 20.0, color: iconColor)
+                  else if (MainAxisAlignment.start == mainAxisAlignment)
+                    SizedBox(width: 20.0),
+                  Padding(
+                    padding: paddingItem,
+                    child: Text(e.toString(), style: textStyle),
+                  ),
                 ],
               ),
             ),
