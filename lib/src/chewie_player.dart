@@ -57,8 +57,8 @@ class ChewieState extends State<Chewie> {
     required this.isRotated,
   });
 
-  final int rotation =0 ;
-  final bool isRotated=false;
+  final int rotation;
+  final bool isRotated;
 
   @override
   void initState() {
