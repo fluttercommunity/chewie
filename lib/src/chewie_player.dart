@@ -27,8 +27,8 @@ class Chewie extends StatefulWidget {
   const Chewie({
     Key? key,
     required this.controller,
-     this.rotation,
-     this.isRotated,
+     this.rotation = 0,
+     this.isRotated = false,
   }) : super(key: key);
 
   /// The [ChewieController]
