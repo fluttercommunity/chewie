@@ -58,10 +58,11 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   }
 
   void _seekToRelativePosition(Offset globalPosition) {
-    controller.seekTo(context.calcRelativePosition(
+    final relativePosition = context.calcRelativePosition(
       controller.value.duration,
       globalPosition,
-    ));
+    );
+    controller.seekTo(relativePosition ?? Duration.zero);
   }
 
   @override
@@ -74,6 +75,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         barHeight: widget.barHeight,
         handleHeight: widget.handleHeight,
         drawShadow: widget.drawShadow,
+        latestDraggableOffset: _latestDraggableOffset,
       ),
     );
 
@@ -181,7 +183,7 @@ class _ProgressBarPainter extends CustomPainter {
   final double barHeight;
   final double handleHeight;
   final bool drawShadow;
-  final Duration draggableValue;
+  final Duration? draggableValue;
 
   @override
   bool shouldRepaint(CustomPainter painter) {
@@ -205,8 +207,8 @@ class _ProgressBarPainter extends CustomPainter {
     if (!value.isInitialized) {
       return;
     }
-    final double playedPartPercent = (draggableValue != Duration.zero
-            ? draggableValue.inMilliseconds
+    final double playedPartPercent = (draggableValue != null
+            ? draggableValue!.inMilliseconds
             : value.position.inMilliseconds) /
         value.duration.inMilliseconds;
     final double playedPart =
@@ -257,11 +259,11 @@ class _ProgressBarPainter extends CustomPainter {
 }
 
 extension RelativePositionExtensions on BuildContext {
-  Duration calcRelativePosition(
+  Duration? calcRelativePosition(
     Duration videoDuration,
     Offset? globalPosition,
   ) {
-    if (globalPosition == null) return Duration.zero;
+    if (globalPosition == null) return null;
     final box = findRenderObject()! as RenderBox;
     final Offset tapPos = box.globalToLocal(globalPosition);
     final double relative = tapPos.dx / box.size.width;
