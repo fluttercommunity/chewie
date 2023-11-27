@@ -266,7 +266,7 @@ extension RelativePositionExtensions on BuildContext {
     if (globalPosition == null) return null;
     final box = findRenderObject()! as RenderBox;
     final Offset tapPos = box.globalToLocal(globalPosition);
-    final double relative = tapPos.dx / box.size.width;
+    final double relative = (tapPos.dx / box.size.width).clamp(0, 1);
     final Duration position = videoDuration * relative;
     return position;
   }
