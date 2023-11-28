@@ -1,3 +1,6 @@
+## 1.7.2
+* 🛠️ [#798](https://github.com/fluttercommunity/chewie/pull/798): Fix: Progress bar does not follow drag #789. Thanks [koutaro-masaki](https://github.com/koutaro-masaki).
+
 ## 1.7.1
 * 🛠️ [#772](https://github.com/fluttercommunity/chewie/pull/772): Stop force disabling wakelock. Thanks [jan-milovanovic](https://github.com/jan-milovanovic).
 * ⬆️ [#775](https://github.com/fluttercommunity/chewie/pull/775): Flutter `3.13` iOS example app upgrade. Thanks [diegotori](https://github.com/diegotori).
