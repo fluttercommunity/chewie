@@ -1,3 +1,6 @@
+## 1.7.4
+* 🛠️ [#774](https://github.com/fluttercommunity/chewie/pull/774): Fixed : Playback speed reset on forwarding video. Thanks [Kronos-2701](https://github.com/Kronos-2701).
+
 ## 1.7.3
 * 🛠️ [#777](https://github.com/fluttercommunity/chewie/pull/777): fix display size while Chewie wrapped by some rotate widget. Thanks [bailyzheng](https://github.com/bailyzheng).
 
