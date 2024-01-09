@@ -54,6 +54,7 @@ class ChewieState extends State<Chewie> {
   @override
   void dispose() {
     widget.controller.removeListener(listener);
+    notifier.dispose();
     super.dispose();
   }
 
