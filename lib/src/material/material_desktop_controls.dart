@@ -485,40 +485,37 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   void _onExpandCollapse() {
     setState(() {
       notifier.hideStuff = true;
+    });
 
-      chewieController.toggleFullScreen();
-      _showAfterExpandCollapseTimer =
-          Timer(const Duration(milliseconds: 300), () {
-        setState(() {
-          _cancelAndRestartTimer();
-        });
+    chewieController.toggleFullScreen();
+
+    _showAfterExpandCollapseTimer =
+        Timer(const Duration(milliseconds: 300), () {
+      setState(() {
+        _cancelAndRestartTimer();
       });
     });
   }
 
   void _playPause() {
-    final isFinished = _latestValue.position >= _latestValue.duration;
-
-    setState(() {
-      if (controller.value.isPlaying) {
+    if (controller.value.isPlaying) {
+      setState(() {
         notifier.hideStuff = false;
-        _hideTimer?.cancel();
-        controller.pause();
-      } else {
-        _cancelAndRestartTimer();
+      });
 
-        if (!controller.value.isInitialized) {
-          controller.initialize().then((_) {
-            controller.play();
-          });
-        } else {
-          if (isFinished) {
-            controller.seekTo(Duration.zero);
-          }
+      _hideTimer?.cancel();
+      controller.pause();
+    } else {
+      _cancelAndRestartTimer();
+
+      if (!controller.value.isInitialized) {
+        controller.initialize().then((_) {
           controller.play();
-        }
+        });
+      } else {
+        controller.play();
       }
-    });
+    }
   }
 
   void _startHideTimer() {
