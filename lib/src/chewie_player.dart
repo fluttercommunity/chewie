@@ -169,14 +169,7 @@ class ChewieState extends State<Chewie> {
     ).push(route);
 
     if (kIsWeb) {
-      final prevPosition =
-          widget.controller.videoPlayerController.value.position;
-      widget.controller.videoPlayerController.initialize().then((_) async {
-        widget.controller._initialize();
-        widget.controller.videoPlayerController.seekTo(prevPosition);
-        await widget.controller.videoPlayerController.play();
-        widget.controller.videoPlayerController.pause();
-      });
+      _reInitializeControllers();
     }
 
     _isFullScreen = false;
@@ -244,6 +237,18 @@ class ChewieState extends State<Chewie> {
         SystemChrome.setPreferredOrientations(DeviceOrientation.values);
       }
     }
+  }
+
+  ///When viewing full screen on web, returning from full screen causes original video to lose the picture.
+  ///We re initialise controllers for web only when returning from full screen
+  void _reInitializeControllers() {
+    final prevPosition = widget.controller.videoPlayerController.value.position;
+    widget.controller.videoPlayerController.initialize().then((_) async {
+      widget.controller._initialize();
+      widget.controller.videoPlayerController.seekTo(prevPosition);
+      await widget.controller.videoPlayerController.play();
+      widget.controller.videoPlayerController.pause();
+    });
   }
 }
 
