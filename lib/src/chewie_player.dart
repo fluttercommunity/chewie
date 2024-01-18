@@ -6,6 +6,7 @@ import 'package:chewie/src/models/options_translation.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -166,6 +167,18 @@ class ChewieState extends State<Chewie> {
       context,
       rootNavigator: widget.controller.useRootNavigator,
     ).push(route);
+
+    if (kIsWeb) {
+      final prevPosition =
+          widget.controller.videoPlayerController.value.position;
+      widget.controller.videoPlayerController.initialize().then((_) async {
+        widget.controller._initialize();
+        widget.controller.videoPlayerController.seekTo(prevPosition);
+        await widget.controller.videoPlayerController.play();
+        widget.controller.videoPlayerController.pause();
+      });
+    }
+
     _isFullScreen = false;
     widget.controller.exitFullScreen();
 
