@@ -1,3 +1,6 @@
+## 1.7.5
+* 🛠️ [#810](https://github.com/fluttercommunity/chewie/pull/810): Fixed : Web full screen issue (#790 #688). Thanks [ToddZeil](https://github.com/ToddZeil).
+
 ## 1.7.4
 * 🛠️ [#774](https://github.com/fluttercommunity/chewie/pull/774): Fixed : Playback speed reset on forwarding video. Thanks [Kronos-2701](https://github.com/Kronos-2701).
 
