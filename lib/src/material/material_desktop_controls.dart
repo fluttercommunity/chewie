@@ -510,9 +510,11 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
       if (!controller.value.isInitialized) {
         controller.initialize().then((_) {
+          //[VideoPlayerController.play] If the video is at the end, this method starts playing from the beginning
           controller.play();
         });
       } else {
+        //[VideoPlayerController.play] If the video is at the end, this method starts playing from the beginning
         controller.play();
       }
     }
