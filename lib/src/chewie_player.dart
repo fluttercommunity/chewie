@@ -40,46 +40,39 @@ class Chewie extends StatefulWidget {
 
 class ChewieState extends State<Chewie> {
   bool _isFullScreen = false;
-
-  bool get isControllerFullScreen => widget.controller.isFullScreen;
-  late PlayerNotifier notifier;
+  late PlayerNotifier notifier; // Define the notifier here
 
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(listener);
-    notifier = PlayerNotifier.init();
+    notifier = PlayerNotifier.init(); // Initialize the notifier here
   }
 
   @override
   void dispose() {
     widget.controller.removeListener(listener);
-    notifier.dispose();
     super.dispose();
   }
 
-  @override
-  void didUpdateWidget(Chewie oldWidget) {
-    if (oldWidget.controller != widget.controller) {
-      widget.controller.addListener(listener);
-    }
-    super.didUpdateWidget(oldWidget);
-    if (_isFullScreen != isControllerFullScreen) {
-      widget.controller._isFullScreen = _isFullScreen;
-    }
-  }
-
   Future<void> listener() async {
-    if (isControllerFullScreen && !_isFullScreen) {
-      _isFullScreen = isControllerFullScreen;
+    if (widget.controller.isFullScreen && !_isFullScreen) {
+      _isFullScreen = true;
       await _pushFullScreenWidget(context);
-    } else if (_isFullScreen) {
+    } else if (!widget.controller.isFullScreen && _isFullScreen) {
+      _isFullScreen = false;
       Navigator.of(
         context,
         rootNavigator: widget.controller.useRootNavigator,
       ).pop();
-      _isFullScreen = false;
     }
+  }
+
+  // Method to update _isFullScreen when toggling full screen mode
+  void toggleFullScreen() {
+    setState(() {
+      _isFullScreen = !_isFullScreen;
+    });
   }
 
   @override
@@ -172,14 +165,6 @@ class ChewieState extends State<Chewie> {
     if (!widget.controller.allowedScreenSleep) {
       WakelockPlus.disable();
     }
-
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: widget.controller.systemOverlaysAfterFullScreen,
-    );
-    SystemChrome.setPreferredOrientations(
-      widget.controller.deviceOrientationsAfterFullScreen,
-    );
   }
 
   void onEnterFullScreen() {
@@ -187,21 +172,7 @@ class ChewieState extends State<Chewie> {
     final videoHeight =
         widget.controller.videoPlayerController.value.size.height;
 
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-
-    // if (widget.controller.systemOverlaysOnEnterFullScreen != null) {
-    //   /// Optional user preferred settings
-    //   SystemChrome.setEnabledSystemUIMode(
-    //     SystemUiMode.manual,
-    //     overlays: widget.controller.systemOverlaysOnEnterFullScreen,
-    //   );
-    // } else {
-    //   /// Default behavior
-    //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
-    // }
-
     if (widget.controller.deviceOrientationsOnEnterFullScreen != null) {
-      /// Optional user preferred settings
       SystemChrome.setPreferredOrientations(
         widget.controller.deviceOrientationsOnEnterFullScreen!,
       );
@@ -209,25 +180,17 @@ class ChewieState extends State<Chewie> {
       final isLandscapeVideo = videoWidth > videoHeight;
       final isPortraitVideo = videoWidth < videoHeight;
 
-      /// Default behavior
-      /// Video w > h means we force landscape
       if (isLandscapeVideo) {
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.landscapeLeft,
           DeviceOrientation.landscapeRight,
         ]);
-      }
-
-      /// Video h > w means we force portrait
-      else if (isPortraitVideo) {
+      } else if (isPortraitVideo) {
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
           DeviceOrientation.portraitDown,
         ]);
-      }
-
-      /// Otherwise if h == w (square video)
-      else {
+      } else {
         SystemChrome.setPreferredOrientations(DeviceOrientation.values);
       }
     }
@@ -590,6 +553,12 @@ class ChewieController extends ChangeNotifier {
   void exitFullScreen() {
     _isFullScreen = false;
     notifyListeners();
+
+    // Reset preferred orientations to portrait mode
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
   }
 
   void toggleFullScreen() {
