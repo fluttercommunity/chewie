@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+jobs:
+  check-format:
+      name: Check format using dart format.
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v2
+        - name: Flutter Action
+          uses: subosito/flutter-action@v2
+        - name: Check format
+          run: dart format . --set-exit-if-changed
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Flutter Action
+        uses: subosito/flutter-action@v2
+      - name: Install Package Dependencies
+        run: flutter packages get
+      - name: Get dependencies for example
+        run: flutter pub get
+        working-directory: example
+      - name: Lint using flutter analyze
+        run: flutter analyze .
+
+  # test:
+  #   name: Test2
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+  #     - uses: subosito/flutter-action@v1
+  #       with:
+  #         channel: beta
+  #     - name: Test
+  #       run: flutter test
