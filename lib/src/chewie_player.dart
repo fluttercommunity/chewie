@@ -28,14 +28,22 @@ class Chewie extends StatefulWidget {
   const Chewie({
     Key? key,
     required this.controller,
+     this.rotation = 0,
+     this.isRotated = false,
   }) : super(key: key);
 
   /// The [ChewieController]
   final ChewieController controller;
 
+  final int rotation;
+  final bool isRotated;
+
   @override
   ChewieState createState() {
-    return ChewieState();
+    return ChewieState(
+      rotation: rotation,
+      isRotated: isRotated,
+    );
   }
 }
 
@@ -44,6 +52,14 @@ class ChewieState extends State<Chewie> {
 
   bool get isControllerFullScreen => widget.controller.isFullScreen;
   late PlayerNotifier notifier;
+
+  ChewieState({
+    required this.rotation,
+    required this.isRotated,
+  });
+
+  final int rotation;
+  final bool isRotated;
 
   @override
   void initState() {
@@ -89,7 +105,10 @@ class ChewieState extends State<Chewie> {
       controller: widget.controller,
       child: ChangeNotifierProvider<PlayerNotifier>.value(
         value: notifier,
-        builder: (context, w) => const PlayerWithControls(),
+        builder: (context, w) => PlayerWithControls(
+          rotation: rotation,
+          isRotated: isRotated,
+        ),
       ),
     );
   }
@@ -132,7 +151,10 @@ class ChewieState extends State<Chewie> {
       controller: widget.controller,
       child: ChangeNotifierProvider<PlayerNotifier>.value(
         value: notifier,
-        builder: (context, w) => const PlayerWithControls(),
+        builder: (context, w) => PlayerWithControls(
+          rotation: rotation,
+          isRotated: isRotated,
+        ),
       ),
     );
 
