@@ -28,10 +28,12 @@ class Chewie extends StatefulWidget {
   const Chewie({
     Key? key,
     required this.controller,
+    required this.user
   }) : super(key: key);
 
   /// The [ChewieController]
   final ChewieController controller;
+  final UserProfileModel user;
 
   @override
   ChewieState createState() {
@@ -44,6 +46,11 @@ class ChewieState extends State<Chewie> {
 
   bool get isControllerFullScreen => widget.controller.isFullScreen;
   late PlayerNotifier notifier;
+
+
+  bool waterMark = false;
+  late Timer _timer;
+  int _start = 0;
 
   @override
   void initState() {
@@ -101,10 +108,44 @@ class ChewieState extends State<Chewie> {
   ) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Container(
-        alignment: Alignment.center,
-        color: Colors.black,
-        child: controllerProvider,
+      body: Stack(
+        children:[
+          Container(
+            alignment: Alignment.center,
+            color: Colors.black,
+            child: controllerProvider,
+          ),
+          StatefulBuilder(builder: (innerContext,update){
+            _timer = Timer.periodic(
+              Duration(seconds: 30),
+                  (Timer timer) {
+                if (_start == 0) {
+                  //timer.cancel();
+                  waterMark = !waterMark;
+                  _start = 60;
+                } else {
+                  _start--;
+                  //if(_start == 15) waterMark = !waterMark;
+                }
+              },
+            );
+            return Positioned(
+                child: Center(
+                  child: Container(
+                    alignment: waterMark ?  Alignment.topRight:Alignment.bottomLeft,
+                    margin: EdgeInsets.symmetric(vertical: 50,horizontal: 10),
+                    child: Text(
+                      "${user.email}",
+                      style: TextStyle(
+                          color: Colors.black
+                              .withOpacity(0.1),
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                )) ;
+          }),
+        ],
       ),
     );
   }
