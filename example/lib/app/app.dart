@@ -188,10 +188,12 @@ class _ChewieDemoState extends State<ChewieDemo> {
                             .videoPlayerController.value.isInitialized
                     ? Chewie(
                         controller: _chewieController!,
+                        controlBarBackgroundColor: Colors.yellow,
+                        controlBarButtonsColor: Colors.blue,
                       )
-                    : const Column(
+                    : Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: const [
                           CircularProgressIndicator(),
                           SizedBox(height: 20),
                           Text('Loading'),

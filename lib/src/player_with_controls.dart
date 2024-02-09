@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/helpers/adaptive_controls.dart';
 import 'package:chewie/src/notifiers/index.dart';
@@ -6,8 +7,13 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 class PlayerWithControls extends StatelessWidget {
-  const PlayerWithControls({Key? key}) : super(key: key);
-
+  const PlayerWithControls({
+    Key? key,
+    this.controlBarBackgroundColor,
+    this.controlBarButtonsColor,
+  }) : super(key: key);
+  final Color? controlBarBackgroundColor;
+  final Color? controlBarButtonsColor;
   @override
   Widget build(BuildContext context) {
     final ChewieController chewieController = ChewieController.of(context);
@@ -25,7 +31,11 @@ class PlayerWithControls extends StatelessWidget {
       ChewieController chewieController,
     ) {
       return chewieController.showControls
-          ? chewieController.customControls ?? const AdaptiveControls()
+          ? chewieController.customControls ??
+              AdaptiveControls(
+                controlBarBackgroundColor: controlBarBackgroundColor,
+                controlBarButtonsColor: controlBarButtonsColor,
+              )
           : const SizedBox();
     }
 
