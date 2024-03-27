@@ -1,6 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
+import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 
 class VideoProgressBar extends StatefulWidget {
   VideoProgressBar(
@@ -16,7 +16,7 @@ class VideoProgressBar extends StatefulWidget {
   })  : colors = colors ?? ChewieProgressColors(),
         super(key: key);
 
-  final VideoPlayerController controller;
+  final VlcPlayerController controller;
   final ChewieProgressColors colors;
   final Function()? onDragStart;
   final Function()? onDragEnd;
@@ -43,7 +43,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
   Offset? _latestDraggableOffset;
 
-  VideoPlayerController get controller => widget.controller;
+  VlcPlayerController get controller => widget.controller;
 
   @override
   void initState() {
@@ -136,7 +136,7 @@ class StaticProgressBar extends StatelessWidget {
   }) : super(key: key);
 
   final Offset? latestDraggableOffset;
-  final VideoPlayerValue value;
+  final VlcPlayerValue value;
   final ChewieProgressColors colors;
 
   final double barHeight;
@@ -178,7 +178,7 @@ class _ProgressBarPainter extends CustomPainter {
     required this.draggableValue,
   });
 
-  VideoPlayerValue value;
+  VlcPlayerValue value;
   ChewieProgressColors colors;
 
   final double barHeight;
@@ -217,19 +217,8 @@ class _ProgressBarPainter extends CustomPainter {
         value.duration.inMilliseconds;
     final double playedPart =
         playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
-    for (final DurationRange range in value.buffered) {
-      final double start = range.startFraction(value.duration) * size.width;
-      final double end = range.endFraction(value.duration) * size.width;
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromPoints(
-            Offset(start, baseOffset),
-            Offset(end, baseOffset + barHeight),
-          ),
-          const Radius.circular(4.0),
-        ),
-        colors.bufferedPaint,
-      );
+    if (playedPart.isNaN) {
+      return;
     }
     canvas.drawRRect(
       RRect.fromRectAndRadius(
