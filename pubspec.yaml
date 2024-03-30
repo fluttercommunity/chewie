@@ -11,13 +11,9 @@ dependencies:
   cupertino_icons: ^1.0.5
   flutter:
     sdk: flutter
-  provider: ^6.0.5
-  video_player: ^2.7.0
-  wakelock_plus:
-    git:
-      url: https://github.com/ycv005/wakelock_plus
-      ref: main
-      path: wakelock_plus
+  provider: ^6.1.2
+  video_player: ^2.8.3
+  wakelock_plus: wakelock_plus: ^1.2.1
 
 dev_dependencies:
   flutter_test:
