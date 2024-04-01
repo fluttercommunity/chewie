@@ -6,3 +6,4 @@ export 'src/cupertino/cupertino_controls.dart';
 export 'src/material/material_controls.dart';
 export 'src/material/material_desktop_controls.dart';
 export 'src/models/index.dart';
+export 'src/helpers/adaptive_controls.dart';
