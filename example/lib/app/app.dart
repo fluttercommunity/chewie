@@ -3,14 +3,13 @@ import 'dart:io';
 import 'package:chewie/chewie.dart';
 import 'package:chewie_example/app/theme.dart';
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
 import 'package:video_player/video_player.dart';
 
 class ChewieDemo extends StatefulWidget {
   const ChewieDemo({
-    Key? key,
+    super.key,
     this.title = 'Chewie Demo',
-  }) : super(key: key);
+  });
 
   final String title;
 
@@ -333,8 +332,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
 }
 
 class DelaySlider extends StatefulWidget {
-  const DelaySlider({Key? key, required this.delay, required this.onSave})
-      : super(key: key);
+  const DelaySlider({super.key, required this.delay, required this.onSave});
 
   final int? delay;
   final void Function(int?) onSave;
