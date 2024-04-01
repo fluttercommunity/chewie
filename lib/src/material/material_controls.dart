@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/helpers/utils.dart';
+import 'package:chewie/src/hit_area_controls.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
@@ -17,10 +17,12 @@ import 'package:video_player/video_player.dart';
 class MaterialControls extends StatefulWidget {
   const MaterialControls({
     this.showPlayButton = true,
+    this.showSeekButton = true,
     Key? key,
   }) : super(key: key);
 
   final bool showPlayButton;
+  final bool showSeekButton;
 
   @override
   State<StatefulWidget> createState() {
@@ -367,9 +369,11 @@ class _MaterialControlsState extends State<MaterialControls>
     final bool isFinished = _latestValue.position >= _latestValue.duration;
     final bool showPlayButton =
         widget.showPlayButton && !_dragging && !notifier.hideStuff;
+    final bool showSeekButton =
+        widget.showSeekButton && !_dragging && !notifier.hideStuff;
 
-    return GestureDetector(
-      onTap: () {
+    return HitAreaControls(
+      onTapPlay: () {
         if (_latestValue.isPlaying) {
           if (_displayTapped) {
             setState(() {
@@ -386,14 +390,15 @@ class _MaterialControlsState extends State<MaterialControls>
           });
         }
       },
-      child: CenterPlayButton(
-        backgroundColor: Colors.black54,
-        iconColor: Colors.white,
-        isFinished: isFinished,
-        isPlaying: controller.value.isPlaying,
-        show: showPlayButton,
-        onPressed: _playPause,
-      ),
+      backgroundColor: Colors.black54,
+      iconColor: Colors.white,
+      isFinished: isFinished,
+      isPlaying: controller.value.isPlaying,
+      showPlayButton: showPlayButton,
+      showSeekButton: showSeekButton,
+      onPressedPlay: _playPause,
+      seekRewind: _seekRewind,
+      seekForward: _seekForward,
     );
   }
 
@@ -542,6 +547,20 @@ class _MaterialControlsState extends State<MaterialControls>
       }
     });
   }
+
+  void _seekTo({int seconds = 10}) {
+    setState(() {
+      controller.seekTo(
+        Duration(
+          seconds: _latestValue.position.inSeconds + seconds,
+        ),
+      );
+    });
+  }
+
+  void _seekForward() => _seekTo();
+
+  void _seekRewind() => _seekTo(seconds: -10);
 
   void _startHideTimer() {
     final hideControlsTimer = chewieController.hideControlsTimer.isNegative

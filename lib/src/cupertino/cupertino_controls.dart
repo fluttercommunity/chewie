@@ -3,12 +3,12 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:chewie/src/animated_play_pause.dart';
-import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino/cupertino_progress_bar.dart';
 import 'package:chewie/src/cupertino/widgets/cupertino_options_dialog.dart';
 import 'package:chewie/src/helpers/utils.dart';
+import 'package:chewie/src/hit_area_controls.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
@@ -22,12 +22,14 @@ class CupertinoControls extends StatefulWidget {
     required this.backgroundColor,
     required this.iconColor,
     this.showPlayButton = true,
+    this.showSeekButton = true,
     Key? key,
   }) : super(key: key);
 
   final Color backgroundColor;
   final Color iconColor;
   final bool showPlayButton;
+  final bool showSeekButton;
 
   @override
   State<StatefulWidget> createState() {
@@ -350,8 +352,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final bool showPlayButton =
         widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
 
-    return GestureDetector(
-      onTap: _latestValue.isPlaying
+    return HitAreaControls(
+      onTapPlay: _latestValue.isPlaying
           ? _cancelAndRestartTimer
           : () {
               _hideTimer?.cancel();
@@ -360,14 +362,13 @@ class _CupertinoControlsState extends State<CupertinoControls>
                 notifier.hideStuff = false;
               });
             },
-      child: CenterPlayButton(
-        backgroundColor: widget.backgroundColor,
-        iconColor: widget.iconColor,
-        isFinished: isFinished,
-        isPlaying: controller.value.isPlaying,
-        show: showPlayButton,
-        onPressed: _playPause,
-      ),
+      backgroundColor: widget.backgroundColor,
+      iconColor: widget.iconColor,
+      isFinished: isFinished,
+      isPlaying: controller.value.isPlaying,
+      showPlayButton: showPlayButton,
+      showSeekButton: false,
+      onPressedPlay: _playPause,
     );
   }
 
