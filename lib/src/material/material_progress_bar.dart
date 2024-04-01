@@ -12,7 +12,7 @@ class MaterialVideoProgressBar extends StatelessWidget {
     this.onDragStart,
     this.onDragUpdate,
     super.key,
-  })  : colors = colors ?? ChewieProgressColors();
+  }) : colors = colors ?? ChewieProgressColors();
 
   final double height;
   final VideoPlayerController controller;
