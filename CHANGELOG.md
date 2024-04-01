@@ -1,3 +1,11 @@
+## 1.8.0
+* 🛠️ [#814](https://github.com/fluttercommunity/chewie/pull/814): Refactor VideoPlayerController initialization to adhere to video_player ^2.8.2 guidelines. Thanks [ishworpanta10](https://github.com/ishworpanta10).
+* 🛠️ [#815](https://github.com/fluttercommunity/chewie/pull/815): Fix the Safe area conflict for material controls in Android. Thanks [MadGeorge](https://github.com/MadGeorge).
+* 🛠️ [#821](https://github.com/fluttercommunity/chewie/pull/821): Upgrade chewie's dependency package. Thanks [ycv005](https://github.com/ycv005).
+* 🛠️ [#824](https://github.com/fluttercommunity/chewie/pull/824): Flutter 3.19 enforcement. Thanks [diegotori](https://github.com/diegotori).
+* **BREAKING CHANGE**: Library now requires at least Flutter and Dart versions `3.19.0` and `3.3` respectively.
+
+
 ## 1.7.5
 * 🛠️ [#810](https://github.com/fluttercommunity/chewie/pull/810): Fixed : Web full screen issue (#790 #688). Thanks [ToddZeil](https://github.com/ToddZeil).
 * 🛠️ [#802](https://github.com/fluttercommunity/chewie/pull/802): Update chewie_player.dart. Thanks [B0yma](https://github.com/B0yma).
