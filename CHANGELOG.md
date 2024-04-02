@@ -1,3 +1,6 @@
+## 1.8.1
+* ⬆️ [#825](https://github.com/fluttercommunity/chewie/pull/825): Upgraded `wakelock_plus` to version `1.2.2`. Thanks [diegotori](https://github.com/diegotori).
+
 ## 1.8.0
 * 🛠️ [#814](https://github.com/fluttercommunity/chewie/pull/814): Refactor VideoPlayerController initialization to adhere to video_player ^2.8.2 guidelines. Thanks [ishworpanta10](https://github.com/ishworpanta10).
 * 🛠️ [#815](https://github.com/fluttercommunity/chewie/pull/815): Fix the Safe area conflict for material controls in Android. Thanks [MadGeorge](https://github.com/MadGeorge).
