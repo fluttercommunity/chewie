@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:in_app_picture_in_picture/src/chewie_progress_colors.dart';
+import 'package:in_app_picture_in_picture/src/progress_bar.dart';
 import 'package:video_player/video_player.dart';
-
-import '../../src/chewie_progress_colors.dart';
-import '../../src/progress_bar.dart';
 
 class CupertinoVideoProgressBar extends StatelessWidget {
   CupertinoVideoProgressBar(

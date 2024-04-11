@@ -8,17 +8,17 @@ environment:
    flutter: ">=1.22.0"
 
 dependencies:
-   cupertino_icons: ^1.0.4
+   cupertino_icons: ^1.0.6
    flutter:
       sdk: flutter
-   provider: ^6.0.1
-   video_player: ^2.2.7
-   wakelock: ^0.6.1+2
+   provider: ^6.1.2
+   video_player: ^2.8.5
+   wakelock: ^0.6.2
 
 dev_dependencies:
    flutter_test:
       sdk: flutter
-   lint: ^1.8.1
+   lint: ^2.3.0
 
 flutter:
    uses-material-design: true

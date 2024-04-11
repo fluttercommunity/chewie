@@ -1,5 +1,5 @@
-import '../src/animated_play_pause.dart';
 import 'package:flutter/material.dart';
+import 'package:in_app_picture_in_picture/src/animated_play_pause.dart';
 
 class CenterPlayButton extends StatelessWidget {
   const CenterPlayButton({
@@ -15,18 +15,19 @@ class CenterPlayButton extends StatelessWidget {
   final Color backgroundColor;
   final Color? iconColor;
   final bool show;
-  final bool isPlaying, isFinished;
+  final bool isPlaying;
+  final bool isFinished;
   final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return ColoredBox(
       color: Colors.transparent,
       child: Center(
         child: AnimatedOpacity(
           opacity: show ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 300),
-          child: Container(
+          child: DecoratedBox(
             decoration: BoxDecoration(
               color: backgroundColor,
               shape: BoxShape.circle,

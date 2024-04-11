@@ -1,21 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:in_app_picture_in_picture/src/animated_play_pause.dart';
+import 'package:in_app_picture_in_picture/src/center_play_button.dart';
+import 'package:in_app_picture_in_picture/src/chewie_player.dart';
+import 'package:in_app_picture_in_picture/src/chewie_progress_colors.dart';
+import 'package:in_app_picture_in_picture/src/helpers/utils.dart';
+import 'package:in_app_picture_in_picture/src/material/material_progress_bar.dart';
+import 'package:in_app_picture_in_picture/src/material/models/option_item.dart';
+import 'package:in_app_picture_in_picture/src/material/widgets/options_dialog.dart';
+import 'package:in_app_picture_in_picture/src/material/widgets/playback_speed_dialog.dart';
+import 'package:in_app_picture_in_picture/src/models/subtitle_model.dart';
+import 'package:in_app_picture_in_picture/src/notifiers/index.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
-
-import '../../src/animated_play_pause.dart';
-import '../../src/center_play_button.dart';
-import '../../src/chewie_player.dart';
-import '../../src/chewie_progress_colors.dart';
-import '../../src/helpers/utils.dart';
-import '../../src/material/material_progress_bar.dart';
-import '../../src/material/models/option_item.dart';
-import '../../src/material/widgets/options_dialog.dart';
-import '../../src/models/subtitle_model.dart';
-import '../../src/notifiers/index.dart';
-
-import 'widgets/playback_speed_dialog.dart';
 
 class MaterialDesktopControls extends StatefulWidget {
   const MaterialDesktopControls({Key? key}) : super(key: key);
@@ -33,7 +31,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   double? _latestVolume;
   Timer? _hideTimer;
   Timer? _initTimer;
-  late var _subtitlesPosition = const Duration();
+  late var _subtitlesPosition = Duration.zero;
   bool _subtitleOn = false;
   Timer? _showAfterExpandCollapseTimer;
   bool _dragging = false;
@@ -118,11 +116,11 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
   @override
   void didChangeDependencies() {
-    final _oldController = _chewieController;
+    final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
-    if (_oldController != chewieController) {
+    if (oldController != chewieController) {
       _dispose();
       _initialize();
     }
@@ -142,7 +140,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
         },
         iconData: Icons.speed,
         title: chewieController.optionsTranslation?.playbackSpeedButtonText ?? 'Playback speed',
-      )
+      ),
     ];
 
     if (chewieController.subtitle != null && chewieController.subtitle!.isNotEmpty) {
@@ -235,7 +233,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   AnimatedOpacity _buildBottomBar(
     BuildContext context,
   ) {
-    final iconColor = Theme.of(context).textTheme.button!.color;
+    final iconColor = Theme.of(context).textTheme.labelLarge!.color;
 
     return AnimatedOpacity(
       opacity: notifier.hideStuff ? 0.0 : 1.0,
@@ -495,7 +493,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
           });
         } else {
           if (isFinished) {
-            controller.seekTo(const Duration());
+            controller.seekTo(Duration.zero);
           }
           controller.play();
         }

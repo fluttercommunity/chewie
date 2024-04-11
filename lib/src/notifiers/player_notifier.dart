@@ -19,6 +19,7 @@ class PlayerNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ignore: avoid_positional_boolean_parameters, use_setters_to_change_properties
   void hideStuffNoState(bool value) {
     _hideStuff = value;
   }
