@@ -32,7 +32,7 @@ class Chewie extends StatefulWidget {
   /// The [ChewieController]
   final ChewieController controller;
 
-  final void Function({required bool newState}) onToggleFullscreen;
+  final void Function(bool newState) onToggleFullscreen;
 
   @override
   ChewieState createState() {
@@ -73,7 +73,7 @@ class ChewieState extends State<Chewie> {
       // Navigator.of(context, rootNavigator: true).pop();
       _isFullScreen = false;
     }
-    widget.onToggleFullscreen(newState: _isFullScreen);
+    widget.onToggleFullscreen(_isFullScreen);
   }
 
   @override
