@@ -16,9 +16,9 @@ import 'package:video_player/video_player.dart';
 
 class MaterialControls extends StatefulWidget {
   const MaterialControls({
-    Key? key,
+    super.key,
     this.onClose,
-  }) : super(key: key);
+  });
 
   final VoidCallback? onClose;
 

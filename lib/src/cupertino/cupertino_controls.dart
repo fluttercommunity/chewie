@@ -18,8 +18,8 @@ class CupertinoControls extends StatefulWidget {
     required this.backgroundColor,
     required this.iconColor,
     required this.onClose,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Color backgroundColor;
   final Color iconColor;
@@ -762,12 +762,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
 class PlaybackSpeedDialog extends StatelessWidget {
   const PlaybackSpeedDialog({
-    Key? key,
+    super.key,
     required List<double> speeds,
     required double selected,
   })  : _speeds = speeds,
-        _selected = selected,
-        super(key: key);
+        _selected = selected;
 
   final List<double> _speeds;
   final double _selected;

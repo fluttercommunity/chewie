@@ -5,8 +5,8 @@ import 'package:in_app_picture_in_picture/src/material/material_desktop_controls
 class AdaptiveControls extends StatelessWidget {
   const AdaptiveControls({
     required this.onClose,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final VoidCallback? onClose;
 

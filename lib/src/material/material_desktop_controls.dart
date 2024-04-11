@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 class MaterialDesktopControls extends StatefulWidget {
-  const MaterialDesktopControls({Key? key}) : super(key: key);
+  const MaterialDesktopControls({super.key});
 
   @override
   State<StatefulWidget> createState() {
