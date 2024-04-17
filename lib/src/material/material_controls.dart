@@ -92,7 +92,7 @@ class _MaterialControlsState extends State<MaterialControls>
                 )
               else
                 _buildHitArea(),
-              if (hideControlsWithoutPlayButton == false) ...[
+              if (widget.hideControlsWithoutPlayButton == false) ...[
                 _buildActionBar(),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.end,
