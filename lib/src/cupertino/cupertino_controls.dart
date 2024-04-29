@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
-
+import 'dart:io' show Platform;
 import 'package:chewie/src/animated_play_pause.dart';
 import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
@@ -22,12 +22,14 @@ class CupertinoControls extends StatefulWidget {
     required this.backgroundColor,
     required this.iconColor,
     this.showPlayButton = true,
+    this.airPlayButton = null,
     super.key,
   });
 
   final Color backgroundColor;
   final Color iconColor;
   final bool showPlayButton;
+  final dynamic airPlayButton;
 
   @override
   State<StatefulWidget> createState() {
@@ -82,6 +84,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final backgroundColor = widget.backgroundColor;
     final iconColor = widget.iconColor;
     final orientation = MediaQuery.of(context).orientation;
+    final airPlayButton = Platform.isAndroid ? null : widget.airPlayButton;
     final barHeight = orientation == Orientation.portrait ? 30.0 : 47.0;
     final buttonPadding = orientation == Orientation.portrait ? 16.0 : 24.0;
 
@@ -102,12 +105,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  _buildTopBar(
-                    backgroundColor,
-                    iconColor,
-                    barHeight,
-                    buttonPadding,
-                  ),
+                  _buildTopBar(backgroundColor, iconColor, barHeight,
+                      buttonPadding, airPlayButton),
                   const Spacer(),
                   if (_subtitleOn)
                     Transform.translate(
@@ -338,6 +337,31 @@ class _CupertinoControlsState extends State<CupertinoControls>
                   size: 16,
                 ),
               ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  GestureDetector _buildAirplayButton(Color backgroundColor, Color iconColor,
+      double barHeight, double buttonPadding, dynamic airPlayButton) {
+    return GestureDetector(
+      child: AnimatedOpacity(
+        opacity: notifier.hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10.0),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 10.0),
+            child: Container(
+              height: barHeight,
+              padding: EdgeInsets.only(
+                left: buttonPadding,
+                right: buttonPadding,
+              ),
+              color: backgroundColor,
+              child: Center(child: airPlayButton),
             ),
           ),
         ),
@@ -592,12 +616,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
     );
   }
 
-  Widget _buildTopBar(
-    Color backgroundColor,
-    Color iconColor,
-    double barHeight,
-    double buttonPadding,
-  ) {
+  Widget _buildTopBar(Color backgroundColor, Color iconColor, double barHeight,
+      double buttonPadding, dynamic airPlayButton) {
     return Container(
       height: barHeight,
       margin: EdgeInsets.only(
@@ -614,6 +634,13 @@ class _CupertinoControlsState extends State<CupertinoControls>
               barHeight,
               buttonPadding,
             ),
+          if (airPlayButton != null)
+            const SizedBox(
+              width: 12,
+            ),
+          if (chewieController.allowFullScreen && airPlayButton != null)
+            _buildAirplayButton(backgroundColor, iconColor, barHeight,
+                buttonPadding, airPlayButton),
           const Spacer(),
           if (chewieController.allowMuting)
             _buildMuteButton(
