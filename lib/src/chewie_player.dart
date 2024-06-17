@@ -264,7 +264,7 @@ class ChewieController extends ChangeNotifier {
     double? aspectRatio,
     bool? autoInitialize,
     bool? autoPlay,
-    bool? draggableProgressBar,
+    bool draggableProgressBar,
     Duration? startAt,
     bool? looping,
     bool? fullScreenByDefault,
