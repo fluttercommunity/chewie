@@ -30,26 +30,28 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdk = 34
+    namespace "com.example.example"
+    compileSdk 34
+
+     compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
-     lintOptions {
-        disable 'InvalidPackage'
-        checkReleaseBuilds false
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
 
     defaultConfig {
-        applicationId = "com.example.example"
-        minSdk = 24
-        targetSdk = 33
-        versionCode = flutterVersionCode.toInteger()
-        versionName = flutterVersionName
+        applicationId  "com.example.example"
+        minSdk 24
+        targetSdk 34
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
     }
 
     buildTypes {
@@ -59,10 +61,6 @@ android {
             signingConfig signingConfigs.debug
         }
     }
-
-    buildFeatures {
-        viewBinding true
-    }
 }
 
 flutter {
@@ -70,7 +68,4 @@ flutter {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.5.0'
 }
-
