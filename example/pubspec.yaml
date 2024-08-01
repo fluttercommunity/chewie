@@ -13,11 +13,11 @@ dependencies:
   flutter:
     sdk: flutter
 
-  video_player: any
+  video_player: ^2.9.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.2
+  flutter_lints: ^4.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

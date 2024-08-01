@@ -1,3 +1,6 @@
+## 1.8.2
+* ⬆️ [#842](https://github.com/fluttercommunity/chewie/pull/842): package upgrades. Thanks [vaishnavi-2301](https://github.com/vaishnavi-2301).
+
 ## 1.8.1
 * ⬆️ [#825](https://github.com/fluttercommunity/chewie/pull/825): Upgraded `wakelock_plus` to version `1.2.2`. Thanks [diegotori](https://github.com/diegotori).
 
