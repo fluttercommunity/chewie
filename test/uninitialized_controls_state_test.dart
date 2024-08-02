@@ -79,7 +79,8 @@ main() {
     expect(playButtonWidget.isFinished, false);
   });
 
-  testWidgets("MaterialDesktopControls state test", (WidgetTester tester) async {
+  testWidgets("MaterialDesktopControls state test",
+      (WidgetTester tester) async {
     // Build our app and trigger a frame.
     var videoPlayerController = VideoPlayerController.networkUrl(
       Uri.parse(srcs[0]),
