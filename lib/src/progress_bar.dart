@@ -56,11 +56,17 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
     super.deactivate();
   }
 
-  void _seekToRelativePosition(Offset globalPosition) {
-    controller.seekTo(context.calcRelativePosition(
+  void _seekToRelativePosition(Offset globalPosition) async {
+    double currentPlaybackSpeed = controller.value.playbackSpeed;
+    await controller.seekTo(context.calcRelativePosition(
       controller.value.duration,
       globalPosition,
     ));
+    // For some reason playback speed gets reset when
+    // seeking, so it needs to be restored
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      controller.setPlaybackSpeed(currentPlaybackSpeed);
+    });
   }
 
   @override
