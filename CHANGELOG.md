@@ -1,3 +1,6 @@
+## [1.8.3]
+* 🛠️ [#828](https://github.com/fluttercommunity/chewie/pull/828): Fix the logic of the Center Play Button icon selection. Thanks [EmreDET](https://github.com/EmreDET).
+
 ## 1.8.2
 * ⬆️ [#842](https://github.com/fluttercommunity/chewie/pull/842): package upgrades. Thanks [vaishnavi-2301](https://github.com/vaishnavi-2301).
 
