@@ -277,6 +277,7 @@ class ChewieController extends ChangeNotifier {
     this.materialProgressColors,
     this.placeholder,
     this.overlay,
+    this.overlayBuilder,
     this.showControlsOnInitialize = true,
     this.showOptions = true,
     this.optionsBuilder,
@@ -325,6 +326,7 @@ class ChewieController extends ChangeNotifier {
     ChewieProgressColors? materialProgressColors,
     Widget? placeholder,
     Widget? overlay,
+    Widget Function(BuildContext)? overlayBuilder,
     bool? showControlsOnInitialize,
     bool? showOptions,
     Future<void> Function(BuildContext, List<OptionItem>)? optionsBuilder,
@@ -375,6 +377,7 @@ class ChewieController extends ChangeNotifier {
           materialProgressColors ?? this.materialProgressColors,
       placeholder: placeholder ?? this.placeholder,
       overlay: overlay ?? this.overlay,
+      overlayBuilder: overlayBuilder ?? this.overlayBuilder,
       showControlsOnInitialize:
           showControlsOnInitialize ?? this.showControlsOnInitialize,
       showOptions: showOptions ?? this.showOptions,
@@ -410,6 +413,9 @@ class ChewieController extends ChangeNotifier {
   }
 
   static const defaultHideControlsTimer = Duration(seconds: 3);
+
+  /// Define here your own Widget on how your overlay will look
+  Widget Function(BuildContext context)? overlayBuilder;
 
   /// If false, the options button in MaterialUI and MaterialDesktopUI
   /// won't be shown.
