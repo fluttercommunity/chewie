@@ -289,6 +289,7 @@ class ChewieController extends ChangeNotifier {
     this.subtitleBuilder,
     this.customControls,
     this.errorBuilder,
+    this.bufferingBuilder,
     this.allowedScreenSleep = true,
     this.isLive = false,
     this.allowFullScreen = true,
@@ -336,6 +337,7 @@ class ChewieController extends ChangeNotifier {
     Subtitles? subtitle,
     Widget Function(BuildContext, dynamic)? subtitleBuilder,
     Widget? customControls,
+    WidgetBuilder? bufferingBuilder,
     Widget Function(BuildContext, String)? errorBuilder,
     bool? allowedScreenSleep,
     bool? isLive,
@@ -385,6 +387,7 @@ class ChewieController extends ChangeNotifier {
       subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
       customControls: customControls ?? this.customControls,
       errorBuilder: errorBuilder ?? this.errorBuilder,
+      bufferingBuilder: bufferingBuilder ?? this.bufferingBuilder,
       allowedScreenSleep: allowedScreenSleep ?? this.allowedScreenSleep,
       isLive: isLive ?? this.isLive,
       allowFullScreen: allowFullScreen ?? this.allowFullScreen,
@@ -484,6 +487,9 @@ class ChewieController extends ChangeNotifier {
   /// error message.
   final Widget Function(BuildContext context, String errorMessage)?
       errorBuilder;
+
+  /// When the video is buffering, you can build a custom widget.
+  final WidgetBuilder? bufferingBuilder;
 
   /// The Aspect Ratio of the Video. Important to get the correct size of the
   /// video!
