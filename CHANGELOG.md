@@ -1,3 +1,6 @@
+## [1.8.4]
+* 🛠️ [#838](https://github.com/fluttercommunity/chewie/pull/838): Add bufferingBuilder. Thanks [daniellampl](https://github.com/daniellampl).
+
 ## [1.8.3]
 * 🛠️ [#828](https://github.com/fluttercommunity/chewie/pull/828): Fix the logic of the Center Play Button icon selection. Thanks [EmreDET](https://github.com/EmreDET).
 
