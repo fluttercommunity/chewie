@@ -14,6 +14,7 @@ class MaterialVideoProgressBar extends StatelessWidget {
     this.onDragStart,
     this.onDragUpdate,
     super.key,
+    this.draggableProgressBar = true,
   }) : colors = colors ?? ChewieProgressColors();
 
   final double height;
@@ -24,6 +25,7 @@ class MaterialVideoProgressBar extends StatelessWidget {
   final Function()? onDragStart;
   final Function()? onDragEnd;
   final Function()? onDragUpdate;
+  final bool draggableProgressBar;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class MaterialVideoProgressBar extends StatelessWidget {
       onDragEnd: onDragEnd,
       onDragStart: onDragStart,
       onDragUpdate: onDragUpdate,
+      draggableProgressBar: draggableProgressBar,
     );
   }
 }

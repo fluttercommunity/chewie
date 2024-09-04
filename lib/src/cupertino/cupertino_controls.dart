@@ -720,6 +720,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
                   255,
                 ),
               ),
+          draggableProgressBar: chewieController.draggableProgressBar,
         ),
       ),
     );
