@@ -594,6 +594,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
                   Theme.of(context).colorScheme.surface.withOpacity(0.5),
               backgroundColor: Theme.of(context).disabledColor.withOpacity(.5),
             ),
+        draggableProgressBar: chewieController.draggableProgressBar,
       ),
     );
   }

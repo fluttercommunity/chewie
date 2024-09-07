@@ -9,6 +9,7 @@ class VideoProgressBar extends StatefulWidget {
     this.onDragEnd,
     this.onDragStart,
     this.onDragUpdate,
+    this.draggableProgressBar = true,
     super.key,
     required this.barHeight,
     required this.handleHeight,
@@ -24,6 +25,7 @@ class VideoProgressBar extends StatefulWidget {
   final double barHeight;
   final double handleHeight;
   final bool drawShadow;
+  final bool draggableProgressBar;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -65,7 +67,6 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
   @override
   Widget build(BuildContext context) {
-    final ChewieController chewieController = ChewieController.of(context);
     final child = Center(
       child: StaticProgressBar(
         value: controller.value,
@@ -77,7 +78,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
       ),
     );
 
-    return chewieController.draggableProgressBar
+    return widget.draggableProgressBar
         ? GestureDetector(
             onHorizontalDragStart: (DragStartDetails details) {
               if (!controller.value.isInitialized) {
