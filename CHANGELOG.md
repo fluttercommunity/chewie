@@ -1,3 +1,7 @@
+## [1.8.5]
+* ⬆️ [#703](https://github.com/fluttercommunity/chewie/pull/703): Adding Seek buttons for Android. Thanks [GyanendroKh](https://github.com/GyanendroKh).
+* Upgraded `wakelock_plus` to version `1.2.8`, which uses `web` version `1.0.0`. Thanks [diegotori](https://github.com/diegotori).
+
 ## [1.8.4]
 * 🛠️ [#838](https://github.com/fluttercommunity/chewie/pull/838): Add bufferingBuilder. Thanks [daniellampl](https://github.com/daniellampl).
 
