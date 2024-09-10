@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CenterSeekButton extends StatelessWidget {
   const CenterSeekButton({
-    Key? key,
+    super.key,
     required this.iconData,
     required this.backgroundColor,
     this.iconColor,
@@ -10,7 +10,7 @@ class CenterSeekButton extends StatelessWidget {
     this.fadeDuration = const Duration(milliseconds: 300),
     this.iconSize = 26,
     this.onPressed,
-  }) : super(key: key);
+  });
 
   final IconData iconData;
   final Color backgroundColor;
