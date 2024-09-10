@@ -275,6 +275,8 @@ class ChewieController extends ChangeNotifier {
     this.fullScreenByDefault = false,
     this.cupertinoProgressColors,
     this.materialProgressColors,
+    this.materialSeekButtonFadeDuration = const Duration(milliseconds: 300),
+    this.materialSeekButtonSize = 26,
     this.placeholder,
     this.overlay,
     this.showControlsOnInitialize = true,
@@ -324,6 +326,8 @@ class ChewieController extends ChangeNotifier {
     bool? fullScreenByDefault,
     ChewieProgressColors? cupertinoProgressColors,
     ChewieProgressColors? materialProgressColors,
+    Duration? materialSeekButtonFadeDuration,
+    double? materialSeekButtonSize,
     Widget? placeholder,
     Widget? overlay,
     bool? showControlsOnInitialize,
@@ -375,6 +379,10 @@ class ChewieController extends ChangeNotifier {
           cupertinoProgressColors ?? this.cupertinoProgressColors,
       materialProgressColors:
           materialProgressColors ?? this.materialProgressColors,
+      materialSeekButtonFadeDuration:
+          materialSeekButtonFadeDuration ?? this.materialSeekButtonFadeDuration,
+      materialSeekButtonSize:
+          materialSeekButtonSize ?? this.materialSeekButtonSize,
       placeholder: placeholder ?? this.placeholder,
       overlay: overlay ?? this.overlay,
       showControlsOnInitialize:
@@ -504,6 +512,12 @@ class ChewieController extends ChangeNotifier {
   /// The colors to use for the Material Progress Bar. By default, the Material
   /// player uses the colors from your Theme.
   final ChewieProgressColors? materialProgressColors;
+
+  // The duration of the fade animation for the seek button (Material Player only)
+  final Duration materialSeekButtonFadeDuration;
+
+  // The size of the seek button for the Material Player only
+  final double materialSeekButtonSize;
 
   /// The placeholder is displayed underneath the Video before it is initialized
   /// or played.
