@@ -102,8 +102,9 @@ class _MaterialControlsState extends State<MaterialControls>
                         0.0,
                         notifier.hideStuff ? barHeight * 0.8 : 0.0,
                       ),
-                      child:
-                          _buildSubtitles(context, chewieController.subtitle!),
+                      child: chewieController.showSubtitle
+                          ? _buildSubtitles(context, chewieController.subtitle!)
+                          : const SizedBox(),
                     ),
                   _buildBottomBar(context),
                 ],
