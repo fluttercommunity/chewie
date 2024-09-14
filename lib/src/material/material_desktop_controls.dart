@@ -491,8 +491,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
     chewieController.toggleFullScreen();
 
-    _showAfterExpandCollapseTimer =
-        Timer(const Duration(milliseconds: 300), () {
+    _showAfterExpandCollapseTimer = Timer(const Duration(seconds: 4), () {
       setState(() {
         _cancelAndRestartTimer();
       });
