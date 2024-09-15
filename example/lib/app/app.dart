@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:chewie/chewie.dart';
@@ -136,12 +137,36 @@ class _ChewieDemoState extends State<ChewieDemo> {
     streamFile.writeAsString(updatedPlaylist);
   }
 
+  String filterHLSPlaylist(String playlistContent, String resolution) {
+    List<String> lines = playlistContent.split('\n');
+
+    List<String> filteredLines = [];
+
+    bool hasRes = false;
+
+    for (String line in lines) {
+      if (line.contains('#EXT-X-STREAM-INF') &&
+          line.contains('NAME="$resolution"')) {
+        hasRes = true;
+      } else if (line.contains('#EXT-X-STREAM-INF')) {
+        hasRes = false;
+      }
+
+      // If this is the 240p stream or any non-stream metadata, keep the lines
+      if (hasRes || line.startsWith('#')) {
+        filteredLines.add(line);
+      }
+    }
+
+    // Join the filtered lines back into a single string and return the result
+    return filteredLines.join('\n');
+  }
+
   Future<void> initializePlayer() async {
     // final directory = await getTemporaryDirectory();
     await _startServer();
     _videoPlayerController1 = VideoPlayerController.networkUrl(
       Uri.parse('http://localhost:8080/master.m3u8'),
-      videoPlayerOptions: VideoPlayerOptions(mixWithOthers: true),
     );
     await _videoPlayerController1.initialize();
     _createChewieController();
@@ -166,6 +191,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                 style: const TextStyle(color: Colors.black),
               ),
       ),
+      placeholder: const Center(child: FlutterLogo()),
       hideControlsTimer: const Duration(seconds: 3),
     );
   }
@@ -212,6 +238,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
     final baseDir = await getTemporaryDirectory();
 
     final path = '${baseDir.path}/master.m3u8';
+    final path240p = '${baseDir.path}/master240.m3u8';
+    final path720p = '${baseDir.path}/master720.m3u8';
 
     await dio.download(
       'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
@@ -220,11 +248,14 @@ class _ChewieDemoState extends State<ChewieDemo> {
 
     masterFile = File(path);
 
-    masterFile = await masterFile?.writeAsString(
-      await parseM3U8(
-        await masterFile!.readAsString(),
-      ),
+    final parsed = await parseM3U8(
+      await masterFile!.readAsString(),
     );
+
+    masterFile = await masterFile?.writeAsString(parsed);
+
+    File(path240p).writeAsString(filterHLSPlaylist(parsed, '240'));
+    File(path720p).writeAsString(filterHLSPlaylist(parsed, '720'));
 
     setState(() {});
 
@@ -271,6 +302,68 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       _chewieController?.enterFullScreen();
                     },
                     child: const Text('Fullscreen'),
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () async {
+                            log('start');
+                            final startAt =
+                                (await _videoPlayerController1.position) ??
+                                    Duration.zero;
+                            await _chewieController?.pause();
+                            _videoPlayerController1.dispose();
+                            _videoPlayerController1 =
+                                VideoPlayerController.networkUrl(
+                              Uri.parse('http://localhost:8080/master240.m3u8'),
+                            );
+                            await _videoPlayerController1.initialize();
+                            _videoPlayerController1.seekTo(startAt);
+                            _chewieController = _chewieController!.copyWith(
+                              videoPlayerController: _videoPlayerController1,
+                              autoPlay: true,
+                              looping: true,
+                            );
+                            log('changed');
+                            setState(() {});
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: Text("set 240p"),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () async {
+                            log('start');
+                            final startAt =
+                                (await _videoPlayerController1.position) ??
+                                    Duration.zero;
+                            await _chewieController?.pause();
+                            _videoPlayerController1.dispose();
+                            _videoPlayerController1 =
+                                VideoPlayerController.networkUrl(
+                              Uri.parse('http://localhost:8080/master720.m3u8'),
+                            );
+                            await _videoPlayerController1.initialize();
+                            _videoPlayerController1.seekTo(startAt);
+                            _chewieController = _chewieController!.copyWith(
+                              videoPlayerController: _videoPlayerController1,
+                              autoPlay: true,
+                              looping: true,
+                            );
+                            log('changed');
+                            setState(() {});
+                          },
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16.0),
+                            child: Text("set 720p"),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
                   Row(
                     children: <Widget>[
