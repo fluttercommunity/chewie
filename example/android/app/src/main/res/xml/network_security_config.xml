@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+  <base-config cleartextTrafficPermitted="true">
+    <trust-anchors>
+      <certificates src="system" />
+      <certificates src="user" />
+    </trust-anchors>
+  </base-config>
+  <domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="true">localhost</domain>
+    <trust-anchors>
+      <certificates src="@raw/my_ca" />
+    </trust-anchors>
+  </domain-config>
+  <debug-overrides cleartextTrafficPermitted="true">
+    <trust-anchors>
+      <certificates src="@raw/my_ca" />
+    </trust-anchors>
+  </debug-overrides>
+</network-security-config>

@@ -15,6 +15,10 @@ dependencies:
 
   video_player: ^2.9.1
   flutter_vlc_player:
+  path_provider: ^2.1.4
+  dio: ^5.7.0
+  system_files_viewer: ^1.0.5
+  shelf: ^1.4.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -31,9 +35,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #  - images/a_dot_burr.jpeg
-  #  - images/a_dot_ham.jpeg
+  assets:
+    - assets/cer/cert.pem
+    - assets/cer/key.pem
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
