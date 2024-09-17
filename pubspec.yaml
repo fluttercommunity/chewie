@@ -4,13 +4,16 @@ version: 1.8.5
 homepage: https://github.com/fluttercommunity/chewie
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
+  sdk: ">=3.3.0 <4.0.0"
   flutter: ">=3.19.0"
 
 dependencies:
   cupertino_icons: ^1.0.5
   flutter:
     sdk: flutter
+  flutter_animate: ^4.5.0
+  flutter_svg: ^2.0.10+1
+  gap: ^3.0.1
   provider: ^6.1.2
   video_player: ^2.9.1
   wakelock_plus: ^1.2.8
@@ -22,3 +25,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/icons/
+    - assets/locales/

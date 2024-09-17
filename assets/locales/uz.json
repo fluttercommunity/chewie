@@ -1,0 +1,28 @@
+{
+  "player": {
+    "no_select": "Tanlanmagan",
+    "watched": "Ko'rilgan",
+    "settings": {
+      "quality": "Sifat",
+      "lang": "Til",
+      "speed": "Tezlik",
+      "subtitle": "Subtitrlar",
+      "no_subtitle": "Subtitr yo'q",
+      "auto": "Avtomatik"
+    },
+    "season": {
+      "all_episodes": "Barcha qismlar ro'yxati",
+      "episode": "Qism",
+      "and_episode": "Mavsum: {}, qism: {}"
+    },
+    "time": {
+      "min": "daqiqa",
+      "hour": "soat",
+      "second": "sekund"
+    },
+    "ending": {
+      "next_episode": "Keyingi qism {} sekund dan keyin boshlanadi",
+      "like": "Film yoqdimi?"
+    }
+  }
+}

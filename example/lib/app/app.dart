@@ -77,7 +77,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
     super.dispose();
   }
 
-  String src = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8";
+  String src =
+      "https://api.splay.uz/en/api/v3/content/hls-simple/cuser-agent-for-generating-picture-in-the-middle-of-video/120240/playlist.m3u8";
 
   Future<String> parseM3U8(String master) async {
     final resolutionPattern = RegExp(r'RESOLUTION=(\d+x\d+)');
@@ -107,7 +108,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       // print(
       //     'Resolution: $resolution, Bandwidth: $bandwidth, Codecs: $codec, URL: $streamUrl');
 
-      preparePlaylist(streamUrl!);
+      // preparePlaylist(streamUrl!);
     }
 
     return master;
@@ -165,9 +166,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
   Future<void> initializePlayer() async {
     // final directory = await getTemporaryDirectory();
     await _startServer();
-    _videoPlayerController1 = VideoPlayerController.networkUrl(
-      Uri.parse('http://localhost:8080/master.m3u8'),
-    );
+    _videoPlayerController1 = VideoPlayerController.networkUrl(Uri.parse(
+        'https://vod02.splay.uz/hls8/Saboq%2055-qism%20%28Serial%20Rizanova%29/_tmp_/master.m3u8'));
     await _videoPlayerController1.initialize();
     _createChewieController();
     setState(() {});
@@ -238,24 +238,22 @@ class _ChewieDemoState extends State<ChewieDemo> {
     final baseDir = await getTemporaryDirectory();
 
     final path = '${baseDir.path}/master.m3u8';
-    final path240p = '${baseDir.path}/master240.m3u8';
-    final path720p = '${baseDir.path}/master720.m3u8';
+    // final path240p = '${baseDir.path}/master240.m3u8';
+    // final path720p = '${baseDir.path}/master720.m3u8';
 
     await dio.download(
-      'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+      'https://vod02.splay.uz/hls8/Saboq%2055-qism%20%28Serial%20Rizanova%29/_tmp_/master.m3u8',
       path,
     );
 
     masterFile = File(path);
 
-    final parsed = await parseM3U8(
-      await masterFile!.readAsString(),
-    );
+    final parsed = await masterFile!.readAsString();
 
     masterFile = await masterFile?.writeAsString(parsed);
 
-    File(path240p).writeAsString(filterHLSPlaylist(parsed, '240'));
-    File(path720p).writeAsString(filterHLSPlaylist(parsed, '720'));
+    // File(path240p).writeAsString(filterHLSPlaylist(parsed, '240'));
+    // File(path720p).writeAsString(filterHLSPlaylist(parsed, '720'));
 
     setState(() {});
 
@@ -277,228 +275,234 @@ class _ChewieDemoState extends State<ChewieDemo> {
               appBar: AppBar(
                 title: Text(widget.title),
               ),
-              body: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: Center(
-                      child: _chewieController != null &&
-                              _chewieController!
-                                  .videoPlayerController.value.isInitialized
-                          ? Chewie(
-                              controller: _chewieController!,
-                            )
-                          : const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CircularProgressIndicator(),
-                                SizedBox(height: 20),
-                                Text('Loading'),
-                              ],
-                            ),
+              body: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: Center(
+                        child: _chewieController != null &&
+                                _chewieController!
+                                    .videoPlayerController.value.isInitialized
+                            ? Chewie(
+                                controller: _chewieController!,
+                              )
+                            : const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(),
+                                  SizedBox(height: 20),
+                                  Text('Loading'),
+                                ],
+                              ),
+                      ),
                     ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      _chewieController?.enterFullScreen();
-                    },
-                    child: const Text('Fullscreen'),
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () async {
-                            log('start');
-                            final startAt =
-                                (await _videoPlayerController1.position) ??
-                                    Duration.zero;
-                            await _chewieController?.pause();
-                            _videoPlayerController1.dispose();
-                            _videoPlayerController1 =
-                                VideoPlayerController.networkUrl(
-                              Uri.parse('http://localhost:8080/master240.m3u8'),
-                            );
-                            await _videoPlayerController1.initialize();
-                            _videoPlayerController1.seekTo(startAt);
-                            _chewieController = _chewieController!.copyWith(
-                              videoPlayerController: _videoPlayerController1,
-                              autoPlay: true,
-                              looping: true,
-                            );
-                            log('changed');
-                            setState(() {});
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: Text("set 240p"),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () async {
-                            log('start');
-                            final startAt =
-                                (await _videoPlayerController1.position) ??
-                                    Duration.zero;
-                            await _chewieController?.pause();
-                            _videoPlayerController1.dispose();
-                            _videoPlayerController1 =
-                                VideoPlayerController.networkUrl(
-                              Uri.parse('http://localhost:8080/master720.m3u8'),
-                            );
-                            await _videoPlayerController1.initialize();
-                            _videoPlayerController1.seekTo(startAt);
-                            _chewieController = _chewieController!.copyWith(
-                              videoPlayerController: _videoPlayerController1,
-                              autoPlay: true,
-                              looping: true,
-                            );
-                            log('changed');
-                            setState(() {});
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: Text("set 720p"),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _videoPlayerController1.pause();
-                              _videoPlayerController1.seekTo(Duration.zero);
-                              _createChewieController();
-                            });
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: Text("Landscape Video"),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
+                    TextButton(
+                      onPressed: () {
+                        _chewieController?.enterFullScreen();
+                      },
+                      child: const Text('Fullscreen'),
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () async {
+                              log('start');
+                              final startAt =
+                                  (await _videoPlayerController1.position) ??
+                                      Duration.zero;
+                              await _chewieController?.pause();
+                              _videoPlayerController1.dispose();
+                              _videoPlayerController1 =
+                                  VideoPlayerController.networkUrl(
+                                Uri.parse(
+                                    'http://localhost:8080/master240.m3u8'),
+                              );
+                              await _videoPlayerController1.initialize();
+                              _videoPlayerController1.seekTo(startAt);
                               _chewieController = _chewieController!.copyWith(
                                 videoPlayerController: _videoPlayerController1,
                                 autoPlay: true,
                                 looping: true,
-                                /* subtitle: Subtitles([
-                            Subtitle(
-                              index: 0,
-                              start: Duration.zero,
-                              end: const Duration(seconds: 10),
-                              text: 'Hello from subtitles',
-                            ),
-                            Subtitle(
-                              index: 0,
-                              start: const Duration(seconds: 10),
-                              end: const Duration(seconds: 20),
-                              text: 'Whats up? :)',
-                            ),
-                          ]),
-                          subtitleBuilder: (context, subtitle) => Container(
-                            padding: const EdgeInsets.all(10.0),
-                            child: Text(
-                              subtitle,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ), */
                               );
-                            });
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: Text("Portrait Video"),
+                              log('changed');
+                              setState(() {});
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Text("set 240p"),
+                            ),
                           ),
+                        ),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () async {
+                              log('start');
+                              final startAt =
+                                  (await _videoPlayerController1.position) ??
+                                      Duration.zero;
+                              await _chewieController?.pause();
+                              _videoPlayerController1.dispose();
+                              _videoPlayerController1 =
+                                  VideoPlayerController.networkUrl(
+                                Uri.parse(
+                                    'http://localhost:8080/master720.m3u8'),
+                              );
+                              await _videoPlayerController1.initialize();
+                              _videoPlayerController1.seekTo(startAt);
+                              _chewieController = _chewieController!.copyWith(
+                                videoPlayerController: _videoPlayerController1,
+                                autoPlay: true,
+                                looping: true,
+                              );
+                              log('changed');
+                              setState(() {});
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Text("set 720p"),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _videoPlayerController1.pause();
+                                _videoPlayerController1.seekTo(Duration.zero);
+                                _createChewieController();
+                              });
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Text("Landscape Video"),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _chewieController = _chewieController!.copyWith(
+                                  videoPlayerController:
+                                      _videoPlayerController1,
+                                  autoPlay: true,
+                                  looping: true,
+                                  /* subtitle: Subtitles([
+                              Subtitle(
+                                index: 0,
+                                start: Duration.zero,
+                                end: const Duration(seconds: 10),
+                                text: 'Hello from subtitles',
+                              ),
+                              Subtitle(
+                                index: 0,
+                                start: const Duration(seconds: 10),
+                                end: const Duration(seconds: 20),
+                                text: 'Whats up? :)',
+                              ),
+                            ]),
+                            subtitleBuilder: (context, subtitle) => Container(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Text(
+                                subtitle,
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ), */
+                                );
+                              });
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Text("Portrait Video"),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              _openFilesPage();
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Text("Open files"),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _platform = TargetPlatform.android;
+                              });
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Text("Android controls"),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _platform = TargetPlatform.iOS;
+                              });
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Text("iOS controls"),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _platform = TargetPlatform.windows;
+                              });
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Text("Desktop controls"),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (Platform.isAndroid)
+                      ListTile(
+                        title: const Text("Delay"),
+                        subtitle: DelaySlider(
+                          delay: _chewieController
+                              ?.progressIndicatorDelay?.inMilliseconds,
+                          onSave: (delay) async {
+                            if (delay != null) {
+                              bufferDelay = delay == 0 ? null : delay;
+                              await initializePlayer();
+                            }
+                          },
                         ),
                       )
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            _openFilesPage();
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: Text("Open files"),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _platform = TargetPlatform.android;
-                            });
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: Text("Android controls"),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _platform = TargetPlatform.iOS;
-                            });
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: Text("iOS controls"),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _platform = TargetPlatform.windows;
-                            });
-                          },
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: Text("Desktop controls"),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (Platform.isAndroid)
-                    ListTile(
-                      title: const Text("Delay"),
-                      subtitle: DelaySlider(
-                        delay: _chewieController
-                            ?.progressIndicatorDelay?.inMilliseconds,
-                        onSave: (delay) async {
-                          if (delay != null) {
-                            bufferDelay = delay == 0 ? null : delay;
-                            await initializePlayer();
-                          }
-                        },
-                      ),
-                    )
-                ],
+                  ],
+                ),
               ),
             ),
           );
