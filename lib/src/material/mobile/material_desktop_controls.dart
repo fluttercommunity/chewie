@@ -5,7 +5,7 @@ import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/helpers/utils.dart';
-import 'package:chewie/src/material/material_progress_bar.dart';
+import 'package:chewie/src/material/mobile/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
 import 'package:chewie/src/models/option_item.dart';

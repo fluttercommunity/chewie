@@ -1,5 +1,6 @@
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+
+import '../../chewie.dart';
 
 class AdaptiveControls extends StatelessWidget {
   const AdaptiveControls({
@@ -17,7 +18,6 @@ class AdaptiveControls extends StatelessWidget {
       case TargetPlatform.windows:
       case TargetPlatform.linux:
         return const MaterialDesktopControls();
-
       default:
         return const MaterialControls();
     }

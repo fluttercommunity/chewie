@@ -178,6 +178,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
       looping: true,
+      allowFullScreen: true,
+      allowedScreenSleep: false,
       progressIndicatorDelay:
           bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
       subtitleBuilder: (context, dynamic subtitle) => Container(
@@ -192,7 +194,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
               ),
       ),
       placeholder: const Center(child: FlutterLogo()),
-      hideControlsTimer: const Duration(seconds: 3),
+      hideControlsTimer: const Duration(minutes: 3),
     );
   }
 
@@ -279,7 +281,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                 child: Column(
                   children: <Widget>[
                     AspectRatio(
-                      aspectRatio: 16 / 9,
+                      aspectRatio: 16 / 10,
                       child: Center(
                         child: _chewieController != null &&
                                 _chewieController!

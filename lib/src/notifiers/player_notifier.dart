@@ -8,14 +8,24 @@ import 'package:flutter/material.dart';
 class PlayerNotifier extends ChangeNotifier {
   PlayerNotifier._(
     bool hideStuff,
-  ) : _hideStuff = hideStuff;
+    bool lockStuff,
+  )   : _hideStuff = hideStuff,
+        _lockStuff = lockStuff;
 
   bool _hideStuff;
+  bool _lockStuff;
 
   bool get hideStuff => _hideStuff;
 
+  bool get lockStuff => _lockStuff;
+
   set hideStuff(bool value) {
     _hideStuff = value;
+    notifyListeners();
+  }
+
+  set lockStuff(bool value) {
+    _lockStuff = value;
     notifyListeners();
   }
 
@@ -23,6 +33,7 @@ class PlayerNotifier extends ChangeNotifier {
   static PlayerNotifier init() {
     return PlayerNotifier._(
       true,
+      false,
     );
   }
 }

@@ -1,17 +1,15 @@
 import 'dart:async';
 
-import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/models/option_item.dart';
-import 'package:chewie/src/models/options_translation.dart';
-import 'package:chewie/src/models/subtitle_model.dart';
-import 'package:chewie/src/notifiers/player_notifier.dart';
-import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+
+import '../chewie.dart';
+import 'notifiers/player_notifier.dart';
+import 'player_with_controls.dart';
 
 typedef ChewieRoutePageBuilder = Widget Function(
   BuildContext context,
@@ -26,8 +24,8 @@ typedef ChewieRoutePageBuilder = Widget Function(
 /// make it easy to use!
 class Chewie extends StatefulWidget {
   const Chewie({
-    super.key,
     required this.controller,
+    super.key,
   });
 
   /// The [ChewieController]
@@ -179,11 +177,11 @@ class ChewieState extends State<Chewie> {
       WakelockPlus.disable();
     }
 
-    SystemChrome.setEnabledSystemUIMode(
+    await SystemChrome.setEnabledSystemUIMode(
       SystemUiMode.manual,
       overlays: widget.controller.systemOverlaysAfterFullScreen,
     );
-    SystemChrome.setPreferredOrientations(
+    await SystemChrome.setPreferredOrientations(
       widget.controller.deviceOrientationsAfterFullScreen,
     );
   }
@@ -244,10 +242,10 @@ class ChewieState extends State<Chewie> {
   void _reInitializeControllers() {
     final prevPosition = widget.controller.videoPlayerController.value.position;
     widget.controller.videoPlayerController.initialize().then((_) async {
-      widget.controller._initialize();
-      widget.controller.videoPlayerController.seekTo(prevPosition);
+      await widget.controller._initialize();
+      await widget.controller.videoPlayerController.seekTo(prevPosition);
       await widget.controller.videoPlayerController.play();
-      widget.controller.videoPlayerController.pause();
+      await widget.controller.videoPlayerController.pause();
     });
   }
 }
@@ -265,8 +263,9 @@ class ChewieState extends State<Chewie> {
 class ChewieController extends ChangeNotifier {
   ChewieController({
     required this.videoPlayerController,
+    double? aspectRatio,
+    BoxFit? fit,
     this.optionsTranslation,
-    this.aspectRatio,
     this.autoInitialize = false,
     this.autoPlay = false,
     this.draggableProgressBar = true,
@@ -311,6 +310,8 @@ class ChewieController extends ChangeNotifier {
           playbackSpeeds.every((speed) => speed > 0),
           'The playbackSpeeds values must all be greater than 0',
         ) {
+    _aspectRatio = aspectRatio;
+    _fit.value = fit ?? _fit.value;
     _initialize();
   }
 
@@ -318,6 +319,7 @@ class ChewieController extends ChangeNotifier {
     VideoPlayerController? videoPlayerController,
     OptionsTranslation? optionsTranslation,
     double? aspectRatio,
+    BoxFit? fit,
     bool? autoInitialize,
     bool? autoPlay,
     bool? draggableProgressBar,
@@ -370,6 +372,7 @@ class ChewieController extends ChangeNotifier {
           videoPlayerController ?? this.videoPlayerController,
       optionsTranslation: optionsTranslation ?? this.optionsTranslation,
       aspectRatio: aspectRatio ?? this.aspectRatio,
+      fit: fit ?? this.fit.value,
       autoInitialize: autoInitialize ?? this.autoInitialize,
       autoPlay: autoPlay ?? this.autoPlay,
       startAt: startAt ?? this.startAt,
@@ -499,12 +502,6 @@ class ChewieController extends ChangeNotifier {
   /// When the video is buffering, you can build a custom widget.
   final WidgetBuilder? bufferingBuilder;
 
-  /// The Aspect Ratio of the Video. Important to get the correct size of the
-  /// video!
-  ///
-  /// Will fallback to fitting within the space allowed.
-  final double? aspectRatio;
-
   /// The colors to use for controls on iOS. By default, the iOS player uses
   /// colors sampled from the original iOS 11 designs.
   final ChewieProgressColors? cupertinoProgressColors;
@@ -582,7 +579,19 @@ class ChewieController extends ChangeNotifier {
     return chewieControllerProvider.controller;
   }
 
+  double? _aspectRatio;
+
   bool _isFullScreen = false;
+
+  int _fitIndex = 0;
+
+  final List<BoxFit> _fitOptions = BoxFit.values;
+
+  final _fit = ValueNotifier(BoxFit.contain);
+
+  double? get aspectRatio => _aspectRatio;
+
+  ValueNotifier<BoxFit> get fit => _fit;
 
   bool get isFullScreen => _isFullScreen;
 
@@ -639,6 +648,11 @@ class ChewieController extends ChangeNotifier {
     isPlaying ? pause() : play();
   }
 
+  void setAspectRatio(double value) {
+    _aspectRatio = value;
+    notifyListeners();
+  }
+
   Future<void> play() async {
     await videoPlayerController.play();
   }
@@ -660,6 +674,11 @@ class ChewieController extends ChangeNotifier {
     await videoPlayerController.setVolume(volume);
   }
 
+  void switchFit() {
+    _fitIndex = (_fitIndex + 1) % _fitOptions.length;
+    _fit.value = _fitOptions[_fitIndex];
+  }
+
   void setSubtitle(List<Subtitle> newSubtitle) {
     subtitle = Subtitles(newSubtitle);
   }
@@ -667,9 +686,9 @@ class ChewieController extends ChangeNotifier {
 
 class ChewieControllerProvider extends InheritedWidget {
   const ChewieControllerProvider({
-    super.key,
     required this.controller,
     required super.child,
+    super.key,
   });
 
   final ChewieController controller;

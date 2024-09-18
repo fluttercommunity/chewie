@@ -1,19 +1,27 @@
 import 'dart:async';
 
-import 'package:chewie/src/center_play_button.dart';
-import 'package:chewie/src/center_seek_button.dart';
-import 'package:chewie/src/chewie_player.dart';
-import 'package:chewie/src/chewie_progress_colors.dart';
-import 'package:chewie/src/helpers/utils.dart';
-import 'package:chewie/src/material/mobile/material_progress_bar.dart';
-import 'package:chewie/src/material/widgets/options_dialog.dart';
-import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
-import 'package:chewie/src/models/option_item.dart';
-import 'package:chewie/src/models/subtitle_model.dart';
-import 'package:chewie/src/notifiers/index.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+
+import '../../center_play_button.dart';
+import '../../chewie_player.dart';
+import '../../config/colors.dart';
+import '../../config/icons.dart';
+import '../../helpers/extensions.dart';
+import '../../helpers/utils.dart';
+import '../../models/option_item.dart';
+import '../../models/subtitle_model.dart';
+import '../../notifiers/index.dart';
+import '../../widgets/animations/player_animated_size.dart';
+import '../widgets/buttons/player_icon_button.dart';
+import '../widgets/options_dialog.dart';
+import '../widgets/playback_speed_dialog.dart';
+import 'material_gesture.dart';
+import 'material_progress_bar.dart';
 
 class MaterialControls extends StatefulWidget {
   const MaterialControls({
@@ -31,26 +39,25 @@ class MaterialControls extends StatefulWidget {
 
 class _MaterialControlsState extends State<MaterialControls>
     with SingleTickerProviderStateMixin {
-  late PlayerNotifier notifier;
+  late var _subtitlesPosition = Duration.zero;
+  late VideoPlayerController controller;
   late VideoPlayerValue _latestValue;
-  double? _latestVolume;
+  late PlayerNotifier notifier;
+
+  Timer? _showAfterExpandCollapseTimer;
+  Timer? _bufferingDisplayTimer;
   Timer? _hideTimer;
   Timer? _initTimer;
-  late var _subtitlesPosition = Duration.zero;
-  bool _subtitleOn = false;
-  Timer? _showAfterExpandCollapseTimer;
-  bool _dragging = false;
-  bool _displayTapped = false;
-  Timer? _bufferingDisplayTimer;
+
   bool _displayBufferingIndicator = false;
+  bool _displayTapped = false;
+  bool _subtitleOn = false;
+  bool _dragging = false;
 
   final barHeight = 48.0 * 1.5;
   final marginSize = 5.0;
 
-  late VideoPlayerController controller;
   ChewieController? _chewieController;
-
-  // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
 
   @override
@@ -80,18 +87,22 @@ class _MaterialControlsState extends State<MaterialControls>
         _cancelAndRestartTimer();
       },
       child: GestureDetector(
-        onTap: () => _cancelAndRestartTimer(),
+        onTap: _cancelAndRestartTimer,
         child: AbsorbPointer(
           absorbing: notifier.hideStuff,
           child: Stack(
             children: [
-              if (_displayBufferingIndicator)
-                _chewieController?.bufferingBuilder?.call(context) ??
-                    const Center(
-                      child: CircularProgressIndicator(),
-                    )
-              else
-                _buildHitArea(),
+              _buildHitArea(),
+              Positioned.fill(
+                child: IgnorePointer(
+                  ignoring: notifier.lockStuff,
+                  child: MaterialGesture(
+                    controller: chewieController,
+                    onTap: _showOrHide,
+                  ),
+                ),
+              ),
+              _buildPlayPause(),
               _buildActionBar(),
               Column(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -99,7 +110,7 @@ class _MaterialControlsState extends State<MaterialControls>
                   if (_subtitleOn)
                     Transform.translate(
                       offset: Offset(
-                        0.0,
+                        0,
                         notifier.hideStuff ? barHeight * 0.8 : 0.0,
                       ),
                       child:
@@ -144,18 +155,63 @@ class _MaterialControlsState extends State<MaterialControls>
 
   Widget _buildActionBar() {
     return Positioned(
-      top: 0,
-      right: 0,
+      top: 8,
+      left: 8,
+      right: 8,
       child: SafeArea(
-        child: AnimatedOpacity(
-          opacity: notifier.hideStuff ? 0.0 : 1.0,
-          duration: const Duration(milliseconds: 250),
-          child: Row(
-            children: [
-              _buildSubtitleToggle(),
-              if (chewieController.showOptions) _buildOptionsButton(),
-            ],
-          ),
+        child: Row(
+          children: [
+            Expanded(
+              child: IgnorePointer(
+                ignoring: notifier.lockStuff,
+                child: Center(
+                  child: AnimatedOpacity(
+                    opacity:
+                        notifier.lockStuff || notifier.hideStuff ? 0.0 : 1.0,
+                    duration: 250.ms,
+                    child: Row(
+                      children: [
+                        PlayerIconButton(
+                          onPressed: () {
+                            if (chewieController.isFullScreen) {
+                              chewieController.toggleFullScreen();
+                            }
+                            if (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            }
+                          },
+                          icon: PlayerIcons.close,
+                        ),
+                        const Spacer(),
+                        PlayerIconButton(
+                          onPressed: () {},
+                          icon: PlayerIcons.pictureInPicture,
+                        ),
+                        PlayerIconButton(
+                          onPressed: () {
+                            chewieController.switchFit();
+                          },
+                          icon: PlayerIcons.fullScreen,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            AnimatedOpacity(
+              opacity: notifier.hideStuff ? 0.0 : 1.0,
+              duration: 250.ms,
+              child: PlayerIconButton(
+                onPressed: () {
+                  notifier.lockStuff = !notifier.lockStuff;
+                },
+                icon: notifier.lockStuff
+                    ? PlayerIcons.lockClose
+                    : PlayerIcons.lockOpen,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -166,12 +222,12 @@ class _MaterialControlsState extends State<MaterialControls>
       OptionItem(
         onTap: () async {
           Navigator.pop(context);
-          _onSpeedButtonTap();
+          await _onSpeedButtonTap();
         },
         iconData: Icons.speed,
         title: chewieController.optionsTranslation?.playbackSpeedButtonText ??
             'Playback speed',
-      )
+      ),
     ];
 
     if (chewieController.additionalOptions != null &&
@@ -180,7 +236,7 @@ class _MaterialControlsState extends State<MaterialControls>
     }
 
     return AnimatedOpacity(
-      opacity: notifier.hideStuff ? 0.0 : 1.0,
+      opacity: notifier.lockStuff || notifier.hideStuff ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 250),
       child: IconButton(
         onPressed: () async {
@@ -235,7 +291,7 @@ class _MaterialControlsState extends State<MaterialControls>
         padding: const EdgeInsets.all(5),
         decoration: BoxDecoration(
           color: const Color(0x96000000),
-          borderRadius: BorderRadius.circular(10.0),
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Text(
           currentSubtitle.first!.text.toString(),
@@ -248,189 +304,173 @@ class _MaterialControlsState extends State<MaterialControls>
     );
   }
 
-  AnimatedOpacity _buildBottomBar(
+  Widget _buildBottomBar(
     BuildContext context,
   ) {
     final iconColor = Theme.of(context).textTheme.labelLarge!.color;
 
-    return AnimatedOpacity(
-      opacity: notifier.hideStuff ? 0.0 : 1.0,
-      duration: const Duration(milliseconds: 300),
-      child: Container(
-        height: barHeight + (chewieController.isFullScreen ? 10.0 : 0),
-        padding: EdgeInsets.only(
-          left: 20,
-          bottom: !chewieController.isFullScreen ? 10.0 : 0,
-        ),
-        child: SafeArea(
-          top: false,
-          bottom: chewieController.isFullScreen,
-          minimum: chewieController.controlsSafeAreaMinimum,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Flexible(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    if (chewieController.isLive)
-                      const Expanded(child: Text('LIVE'))
-                    else
-                      _buildPosition(iconColor),
-                    if (chewieController.allowMuting)
-                      _buildMuteButton(controller),
-                    const Spacer(),
-                    if (chewieController.allowFullScreen) _buildExpandButton(),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: chewieController.isFullScreen ? 15.0 : 0,
-              ),
-              if (!chewieController.isLive)
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.only(right: 20),
-                    child: Row(
-                      children: [
-                        _buildProgressBar(),
-                      ],
+    return IgnorePointer(
+      ignoring: notifier.lockStuff,
+      child: AnimatedOpacity(
+        opacity: notifier.lockStuff || notifier.hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: SizedBox(
+          height: barHeight + (chewieController.isFullScreen ? 20.0 : 4),
+          child: SafeArea(
+            top: false,
+            bottom: chewieController.isFullScreen,
+            minimum: chewieController.controlsSafeAreaMinimum,
+            child: Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (!chewieController.isLive)
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                        ),
+                        child: Row(
+                          children: [
+                            _buildProgressBar(),
+                            const Gap(8),
+                            if (chewieController.isLive)
+                              const Text('LIVE')
+                            else
+                              _buildPosition(iconColor),
+                          ],
+                        ),
+                      ),
                     ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      PlayerIconButton(
+                        onPressed: () {},
+                        icon: PlayerIcons.stack,
+                      ),
+                      const Gap(4),
+                      PlayerIconButton(
+                        onPressed: () {},
+                        icon: PlayerIcons.settings,
+                      ),
+                      const Spacer(),
+                      PlayerIconButton(
+                        onPressed: () {},
+                        icon: PlayerIcons.skipLeft,
+                      ),
+                      const Gap(4),
+                      PlayerIconButton(
+                        onPressed: () {},
+                        icon: PlayerIcons.skipRight,
+                      ),
+                      const Gap(4),
+                      if (chewieController.allowFullScreen)
+                        _buildExpandButton(),
+                    ],
                   ),
-                ),
-            ],
+                ],
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
-  GestureDetector _buildMuteButton(
-    VideoPlayerController controller,
-  ) {
-    return GestureDetector(
-      onTap: () {
+  Widget _buildExpandButton() {
+    return PlayerIconButton(
+      onPressed: _onExpandCollapse,
+      icon: chewieController.isFullScreen
+          ? PlayerIcons.disableFullScreen
+          : PlayerIcons.enableFullScreen,
+    );
+  }
+
+  void _showOrHide() {
+    if (_latestValue.isPlaying) {
+      if (_displayTapped) {
+        setState(() {
+          notifier.hideStuff = true;
+        });
+      } else {
         _cancelAndRestartTimer();
+      }
+    } else {
+      _playPause();
 
-        if (_latestValue.volume == 0) {
-          controller.setVolume(_latestVolume ?? 0.5);
-        } else {
-          _latestVolume = controller.value.volume;
-          controller.setVolume(0.0);
-        }
-      },
-      child: AnimatedOpacity(
-        opacity: notifier.hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
-        child: ClipRect(
-          child: Container(
-            height: barHeight,
-            padding: const EdgeInsets.only(
-              left: 6.0,
-            ),
-            child: Icon(
-              _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  GestureDetector _buildExpandButton() {
-    return GestureDetector(
-      onTap: _onExpandCollapse,
-      child: AnimatedOpacity(
-        opacity: notifier.hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
-        child: Container(
-          height: barHeight + (chewieController.isFullScreen ? 15.0 : 0),
-          margin: const EdgeInsets.only(right: 12.0),
-          padding: const EdgeInsets.only(
-            left: 8.0,
-            right: 8.0,
-          ),
-          child: Center(
-            child: Icon(
-              chewieController.isFullScreen
-                  ? Icons.fullscreen_exit
-                  : Icons.fullscreen,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-    );
+      setState(() {
+        notifier.hideStuff = true;
+      });
+    }
   }
 
   Widget _buildHitArea() {
-    final bool isFinished = (_latestValue.position >= _latestValue.duration) &&
-        _latestValue.duration.inSeconds > 0;
-    final bool showPlayButton =
-        widget.showPlayButton && !_dragging && !notifier.hideStuff;
-
     return GestureDetector(
-      onTap: () {
-        if (_latestValue.isPlaying) {
-          if (_displayTapped) {
-            setState(() {
-              notifier.hideStuff = true;
-            });
-          } else {
-            _cancelAndRestartTimer();
-          }
-        } else {
-          _playPause();
-
-          setState(() {
-            notifier.hideStuff = true;
-          });
-        }
-      },
+      onTap: _showOrHide,
       child: Container(
         alignment: Alignment.center,
-        color: Colors
-            .transparent, // The Gesture Detector doesn't expand to the full size of the container without this; Not sure why!
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (!isFinished && !chewieController.isLive)
-              CenterSeekButton(
-                iconData: Icons.replay_10,
-                backgroundColor: Colors.black54,
-                iconColor: Colors.white,
-                show: showPlayButton,
-                fadeDuration: chewieController.materialSeekButtonFadeDuration,
-                iconSize: chewieController.materialSeekButtonSize,
+        color: Colors.transparent,
+      ),
+    );
+  }
+
+  Widget _buildPlayPause() {
+    final isFinished = (_latestValue.position >= _latestValue.duration) &&
+        _latestValue.duration.inSeconds > 0;
+    final showPlayButton =
+        widget.showPlayButton && !_dragging && !notifier.hideStuff;
+
+    return IgnorePointer(
+      ignoring: notifier.lockStuff,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (!isFinished && !chewieController.isLive)
+            PlayerAnimatedSize(
+              value: !notifier.lockStuff && showPlayButton,
+              child: PlayerIconButton(
+                size: 48,
                 onPressed: _seekBackward,
-              ),
-            Container(
-              margin: EdgeInsets.symmetric(
-                horizontal: marginSize,
-              ),
-              child: CenterPlayButton(
-                backgroundColor: Colors.black54,
-                iconColor: Colors.white,
-                isFinished: isFinished,
-                isPlaying: controller.value.isPlaying,
-                show: showPlayButton,
-                onPressed: _playPause,
+                icon: PlayerIcons.backward10,
               ),
             ),
-            if (!isFinished && !chewieController.isLive)
-              CenterSeekButton(
-                iconData: Icons.forward_10,
-                backgroundColor: Colors.black54,
-                iconColor: Colors.white,
-                show: showPlayButton,
-                fadeDuration: chewieController.materialSeekButtonFadeDuration,
-                iconSize: chewieController.materialSeekButtonSize,
+          SizedBox(
+            width: 70,
+            child: _displayBufferingIndicator
+                ? _chewieController?.bufferingBuilder?.call(context) ??
+                    const Center(
+                      child: CupertinoActivityIndicator(
+                        color: PlayerColors.white,
+                        radius: 20,
+                      ),
+                    )
+                : Container(
+                    margin: EdgeInsets.symmetric(
+                      horizontal: marginSize,
+                    ),
+                    child: CenterPlayButton(
+                      backgroundColor: Colors.transparent,
+                      iconColor: Colors.white,
+                      isFinished: isFinished,
+                      isPlaying: controller.value.isPlaying,
+                      show: !notifier.lockStuff && showPlayButton,
+                      onPressed: _playPause,
+                    ),
+                  ),
+          ),
+          if (!isFinished && !chewieController.isLive)
+            PlayerAnimatedSize(
+              value: !notifier.lockStuff && showPlayButton,
+              child: PlayerIconButton(
+                size: 48,
                 onPressed: _seekForward,
+                icon: PlayerIcons.forward10,
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
@@ -449,7 +489,7 @@ class _MaterialControlsState extends State<MaterialControls>
     );
 
     if (chosenSpeed != null) {
-      controller.setPlaybackSpeed(chosenSpeed);
+      await controller.setPlaybackSpeed(chosenSpeed);
     }
 
     if (_latestValue.isPlaying) {
@@ -461,30 +501,16 @@ class _MaterialControlsState extends State<MaterialControls>
     final position = _latestValue.position;
     final duration = _latestValue.duration;
 
-    return RichText(
-      text: TextSpan(
-        text: '${formatDuration(position)} ',
-        children: <InlineSpan>[
-          TextSpan(
-            text: '/ ${formatDuration(duration)}',
-            style: TextStyle(
-              fontSize: 14.0,
-              color: Colors.white.withOpacity(.75),
-              fontWeight: FontWeight.normal,
-            ),
-          )
-        ],
-        style: const TextStyle(
-          fontSize: 14.0,
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-        ),
+    return Text(
+      formatDuration(duration - position),
+      style: context.s14.copyWith(
+        color: PlayerColors.greyB8,
       ),
     );
   }
 
   Widget _buildSubtitleToggle() {
-    //if don't have subtitle hiden button
+    //if don't have subtitle hidden button
     if (chewieController.subtitle?.isEmpty ?? true) {
       return const SizedBox();
     }
@@ -494,8 +520,8 @@ class _MaterialControlsState extends State<MaterialControls>
         height: barHeight,
         color: Colors.transparent,
         padding: const EdgeInsets.only(
-          left: 12.0,
-          right: 12.0,
+          left: 12,
+          right: 12,
         ),
         child: Icon(
           _subtitleOn
@@ -549,15 +575,13 @@ class _MaterialControlsState extends State<MaterialControls>
       chewieController.toggleFullScreen();
       _showAfterExpandCollapseTimer =
           Timer(const Duration(milliseconds: 300), () {
-        setState(() {
-          _cancelAndRestartTimer();
-        });
+        setState(_cancelAndRestartTimer);
       });
     });
   }
 
   void _playPause() {
-    final bool isFinished = (_latestValue.position >= _latestValue.duration) &&
+    final isFinished = (_latestValue.position >= _latestValue.duration) &&
         _latestValue.duration.inSeconds > 0;
 
     setState(() {
@@ -633,7 +657,8 @@ class _MaterialControlsState extends State<MaterialControls>
   void _updateState() {
     if (!mounted) return;
 
-    // display the progress bar indicator only after the buffering delay if it has been set
+    // display the progress bar indicator only after the buffering delay if it
+    // has been set
     if (chewieController.progressIndicatorDelay != null) {
       if (controller.value.isBuffering) {
         _bufferingDisplayTimer ??= Timer(
@@ -676,14 +701,6 @@ class _MaterialControlsState extends State<MaterialControls>
 
           _startHideTimer();
         },
-        colors: chewieController.materialProgressColors ??
-            ChewieProgressColors(
-              playedColor: Theme.of(context).colorScheme.secondary,
-              handleColor: Theme.of(context).colorScheme.secondary,
-              bufferedColor:
-                  Theme.of(context).colorScheme.surface.withOpacity(0.5),
-              backgroundColor: Theme.of(context).disabledColor.withOpacity(.5),
-            ),
         draggableProgressBar: chewieController.draggableProgressBar,
       ),
     );

@@ -1,5 +1,6 @@
-import 'package:chewie/src/widgets/svg/svg_asset.dart';
 import 'package:flutter/material.dart';
+
+import '../../../widgets/svg/svg_asset.dart';
 
 class PlayerIconButton extends StatelessWidget {
   const PlayerIconButton({
@@ -15,12 +16,16 @@ class PlayerIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: onPressed,
-      icon: SvgAsset(
-        icon,
-        width: size,
-        height: size,
+    return SizedBox(
+      width: size + 6,
+      height: size + 6,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: SvgAsset(
+          icon,
+          width: size,
+          height: size,
+        ),
       ),
     );
   }

@@ -1,26 +1,27 @@
-import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+
+import '../chewie.dart';
 
 class VideoProgressBar extends StatefulWidget {
   VideoProgressBar(
     this.controller, {
+    required this.barHeight,
+    required this.handleHeight,
+    required this.drawShadow,
     ChewieProgressColors? colors,
     this.onDragEnd,
     this.onDragStart,
     this.onDragUpdate,
     this.draggableProgressBar = true,
     super.key,
-    required this.barHeight,
-    required this.handleHeight,
-    required this.drawShadow,
   }) : colors = colors ?? ChewieProgressColors();
 
   final VideoPlayerController controller;
   final ChewieProgressColors colors;
-  final Function()? onDragStart;
-  final Function()? onDragEnd;
-  final Function()? onDragUpdate;
+  final VoidCallback? onDragStart;
+  final VoidCallback? onDragEnd;
+  final VoidCallback? onDragUpdate;
 
   final double barHeight;
   final double handleHeight;
@@ -59,10 +60,12 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   }
 
   void _seekToRelativePosition(Offset globalPosition) {
-    controller.seekTo(context.calcRelativePosition(
-      controller.value.duration,
-      globalPosition,
-    ));
+    controller.seekTo(
+      context.calcRelativePosition(
+        controller.value.duration,
+        globalPosition,
+      ),
+    );
   }
 
   @override
@@ -126,12 +129,12 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
 class StaticProgressBar extends StatelessWidget {
   const StaticProgressBar({
-    super.key,
     required this.value,
     required this.colors,
     required this.barHeight,
     required this.handleHeight,
     required this.drawShadow,
+    super.key,
     this.latestDraggableOffset,
   });
 
@@ -201,32 +204,32 @@ class _ProgressBarPainter extends CustomPainter {
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromPoints(
-          Offset(0.0, baseOffset),
+          Offset(0, baseOffset),
           Offset(size.width, baseOffset + barHeight),
         ),
-        const Radius.circular(4.0),
+        const Radius.circular(4),
       ),
       colors.backgroundPaint,
     );
     if (!value.isInitialized) {
       return;
     }
-    final double playedPartPercent = (draggableValue != null
+    final playedPartPercent = (draggableValue != null
             ? draggableValue!.inMilliseconds
             : value.position.inMilliseconds) /
         value.duration.inMilliseconds;
-    final double playedPart =
+    final playedPart =
         playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
-    for (final DurationRange range in value.buffered) {
-      final double start = range.startFraction(value.duration) * size.width;
-      final double end = range.endFraction(value.duration) * size.width;
+    for (final range in value.buffered) {
+      final start = range.startFraction(value.duration) * size.width;
+      final end = range.endFraction(value.duration) * size.width;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromPoints(
             Offset(start, baseOffset),
             Offset(end, baseOffset + barHeight),
           ),
-          const Radius.circular(4.0),
+          const Radius.circular(4),
         ),
         colors.bufferedPaint,
       );
@@ -234,16 +237,16 @@ class _ProgressBarPainter extends CustomPainter {
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromPoints(
-          Offset(0.0, baseOffset),
+          Offset(0, baseOffset),
           Offset(playedPart, baseOffset + barHeight),
         ),
-        const Radius.circular(4.0),
+        const Radius.circular(4),
       ),
       colors.playedPaint,
     );
 
     if (drawShadow) {
-      final Path shadowPath = Path()
+      final shadowPath = Path()
         ..addOval(
           Rect.fromCircle(
             center: Offset(playedPart, baseOffset + barHeight / 2),
@@ -268,9 +271,9 @@ extension RelativePositionExtensions on BuildContext {
     Offset globalPosition,
   ) {
     final box = findRenderObject()! as RenderBox;
-    final Offset tapPos = box.globalToLocal(globalPosition);
-    final double relative = (tapPos.dx / box.size.width).clamp(0, 1);
-    final Duration position = videoDuration * relative;
+    final tapPos = box.globalToLocal(globalPosition);
+    final relative = (tapPos.dx / box.size.width).clamp(0, 1);
+    final position = videoDuration * relative;
     return position;
   }
 }

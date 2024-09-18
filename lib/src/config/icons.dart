@@ -50,4 +50,8 @@ class PlayerIcons {
   static const check = '$assetsIcons/check.svg';
 
   static const reload = '$assetsIcons/reload.svg';
+
+  static const enableFullScreen = '$assetsIcons/enable_full_screen.svg';
+
+  static const disableFullScreen = '$assetsIcons/disable_full_screen.svg';
 }

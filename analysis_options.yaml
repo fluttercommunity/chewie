@@ -1,17 +1,17 @@
-include: package:flutter_lints/flutter.yaml
-
-analyzer:
-  language:
-    strict-raw-types: true
-  exclude:
-    - lib/generated_plugin_registrant.dart
-  errors:
-    # allow self-reference to deprecated members (we do this because otherwise we have
-    # to annotate every member in every test, assert, etc, when we deprecate something)
-    deprecated_member_use_from_same_package: ignore
+include: package:very_good_analysis/analysis_options.yaml
 
 linter:
   rules:
-    close_sinks: true
-    sort_constructors_first: true
-    sort_pub_dependencies: false
+    public_member_api_docs: false
+    prefer_relative_imports: true
+    always_use_package_imports: false
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+
+  errors:
+    invalid_annotation_target: ignore
+    use_build_context_synchronously: ignore
+    use_setters_to_change_properties: ignore

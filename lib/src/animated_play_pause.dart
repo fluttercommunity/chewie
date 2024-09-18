@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 /// A widget that animates implicitly between a play and a pause icon.
 class AnimatedPlayPause extends StatefulWidget {
   const AnimatedPlayPause({
-    super.key,
     required this.playing,
+    super.key,
     this.size,
     this.color,
   });
@@ -22,7 +22,7 @@ class AnimatedPlayPauseState extends State<AnimatedPlayPause>
   late final animationController = AnimationController(
     vsync: this,
     value: widget.playing ? 1 : 0,
-    duration: const Duration(milliseconds: 400),
+    duration: const Duration(milliseconds: 300),
   );
 
   @override
