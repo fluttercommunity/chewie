@@ -19,6 +19,7 @@ dependencies:
   dio: ^5.7.0
   system_files_viewer: ^1.0.5
   shelf: ^1.4.1
+  easy_localization: ^3.0.7
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -38,6 +39,7 @@ flutter:
   assets:
     - assets/cer/cert.pem
     - assets/cer/key.pem
+    - assets/locales/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

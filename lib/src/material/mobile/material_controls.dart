@@ -22,6 +22,7 @@ import '../widgets/options_dialog.dart';
 import '../widgets/playback_speed_dialog.dart';
 import 'material_gesture.dart';
 import 'material_progress_bar.dart';
+import 'material_settings/material_settings_main.dart';
 
 class MaterialControls extends StatefulWidget {
   const MaterialControls({
@@ -353,7 +354,12 @@ class _MaterialControlsState extends State<MaterialControls>
                       ),
                       const Gap(4),
                       PlayerIconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          showPlayerSettings(
+                            context,
+                            controller: chewieController,
+                          );
+                        },
                         icon: PlayerIcons.settings,
                       ),
                       const Spacer(),

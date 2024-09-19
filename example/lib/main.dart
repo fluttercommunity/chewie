@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:chewie/chewie.dart';
 import 'package:chewie_example/app/app.dart';
+import 'package:chewie_example/src/gen/codegen_loader.g.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
 class MyHttpOverrides extends HttpOverrides {
@@ -22,12 +25,38 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
 
   runApp(
-    MaterialApp(
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('ru'),
+        Locale('uz'),
+      ],
+      startLocale: const Locale('ru'),
+      path: 'assets/locales',
+      assetLoader: const CodegenLoader(),
+      extraAssetLoaders: const [
+        TranslationsLoader(
+          packageName: 'chewie',
+        ),
+      ],
+      child: const MyWidget(),
+    ),
+  );
+}
+
+class MyWidget extends StatelessWidget {
+  const MyWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+      locale: context.locale,
       routes: {
         '/': (context) => const ChewieDemo(),
       },
-    ),
-  );
+    );
+  }
 }

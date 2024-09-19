@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:developer';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +10,9 @@ import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../chewie.dart';
+import 'helpers/hls/hls_parser.dart';
+import 'helpers/models/audio_track.dart';
+import 'helpers/models/video_track.dart';
 import 'notifiers/player_notifier.dart';
 import 'player_with_controls.dart';
 
@@ -589,6 +594,14 @@ class ChewieController extends ChangeNotifier {
 
   final _fit = ValueNotifier(BoxFit.contain);
 
+  List<VideoTrack> _videoTracks = [];
+
+  List<AudioTrack> _audioTracks = [];
+
+  List<VideoTrack> get videoTracks => _videoTracks;
+
+  List<AudioTrack> get audioTracks => _audioTracks;
+
   double? get aspectRatio => _aspectRatio;
 
   ValueNotifier<BoxFit> get fit => _fit;
@@ -619,6 +632,51 @@ class ChewieController extends ChangeNotifier {
 
     if (fullScreenByDefault) {
       videoPlayerController.addListener(_fullScreenListener);
+    }
+
+    await _initializeHlsData();
+  }
+
+  Future<void> _initializeHlsData() async {
+    final dataSourceType = videoPlayerController.dataSourceType;
+
+    if (videoPlayerController.dataSource.contains('.m3u8')) {
+      switch (dataSourceType) {
+        case DataSourceType.network:
+        case DataSourceType.contentUri:
+          await _initializeHlsDataFromNetwork(
+            videoPlayerController.dataSource,
+            headers: videoPlayerController.httpHeaders,
+          );
+        case DataSourceType.asset:
+        case DataSourceType.file:
+      }
+    }
+  }
+
+  Future<void> _initializeHlsDataFromNetwork(
+    String url, {
+    Map<String, dynamic>? headers,
+  }) async {
+    try {
+      final res = await Dio(BaseOptions()).get<String>(url);
+
+      if (res.data != null) {
+        final parser = HlsParser(playlistContent: res.data!);
+
+        _videoTracks = parser.parseVideoTracks();
+
+        _audioTracks = parser.parseAudioTracks();
+
+        notifyListeners();
+      }
+
+      log(_videoTracks.toString());
+      log(_audioTracks.toString());
+    } on DioException catch (err) {
+      log(err.error.toString());
+      log(err.stackTrace.toString());
+      log(err.message.toString());
     }
   }
 

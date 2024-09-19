@@ -78,7 +78,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   }
 
   String src =
-      "https://api.splay.uz/en/api/v3/content/hls-simple/cuser-agent-for-generating-picture-in-the-middle-of-video/120240/playlist.m3u8";
+      "https://vod02.splay.uz/hls8/Saboq%2055-qism%20%28Serial%20Rizanova%29/_tmp_/master.m3u8";
 
   Future<String> parseM3U8(String master) async {
     final resolutionPattern = RegExp(r'RESOLUTION=(\d+x\d+)');
@@ -166,8 +166,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   Future<void> initializePlayer() async {
     // final directory = await getTemporaryDirectory();
     await _startServer();
-    _videoPlayerController1 = VideoPlayerController.networkUrl(Uri.parse(
-        'https://vod02.splay.uz/hls8/Saboq%2055-qism%20%28Serial%20Rizanova%29/_tmp_/master.m3u8'));
+    _videoPlayerController1 = VideoPlayerController.networkUrl(Uri.parse(src));
     await _videoPlayerController1.initialize();
     _createChewieController();
     setState(() {});
@@ -180,20 +179,6 @@ class _ChewieDemoState extends State<ChewieDemo> {
       looping: true,
       allowFullScreen: true,
       allowedScreenSleep: false,
-      progressIndicatorDelay:
-          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
-      subtitleBuilder: (context, dynamic subtitle) => Container(
-        padding: const EdgeInsets.all(10.0),
-        child: subtitle is InlineSpan
-            ? RichText(
-                text: subtitle,
-              )
-            : Text(
-                subtitle.toString(),
-                style: const TextStyle(color: Colors.black),
-              ),
-      ),
-      placeholder: const Center(child: FlutterLogo()),
       hideControlsTimer: const Duration(minutes: 3),
     );
   }
