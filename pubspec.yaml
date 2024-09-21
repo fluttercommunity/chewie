@@ -18,8 +18,10 @@ dependencies:
   flutter_svg: ^2.0.10+1
   gap: ^3.0.1
   modal_bottom_sheet: ^3.0.0
+  path_provider: ^2.1.4
   provider: ^6.1.2
   screen_brightness: ^1.0.1
+  shelf: ^1.4.1
   video_player: ^2.9.1
   volume_controller: ^2.0.8
   wakelock_plus: ^1.2.8

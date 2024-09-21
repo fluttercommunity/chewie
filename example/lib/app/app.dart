@@ -67,12 +67,21 @@ class _ChewieDemoState extends State<ChewieDemo> {
     super.initState();
     // initializePlayer();
 
-    _prepareHlsFile();
+    // _prepareHlsFile();
+
+    Future.sync(() async {
+      try {
+        _chewieController = await ChewieController.fromHlsUrl(
+          url: src,
+          autoPlay: true,
+        );
+      } catch (err) {}
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
-    _videoPlayerController1.dispose();
     _chewieController?.dispose();
     super.dispose();
   }
@@ -249,7 +258,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
 
   @override
   Widget build(BuildContext context) {
-    return masterFile == null
+    return _chewieController == null
         ? const Center(
             child: CircularProgressIndicator(),
           )
@@ -268,21 +277,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     AspectRatio(
                       aspectRatio: 16 / 10,
                       child: Center(
-                        child: _chewieController != null &&
-                                _chewieController!
-                                    .videoPlayerController.value.isInitialized
-                            ? Chewie(
-                                controller: _chewieController!,
-                              )
-                            : const Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CircularProgressIndicator(),
-                                  SizedBox(height: 20),
-                                  Text('Loading'),
-                                ],
-                              ),
-                      ),
+                          child: Chewie(
+                        controller: _chewieController!,
+                      )),
                     ),
                     TextButton(
                       onPressed: () {

@@ -142,7 +142,7 @@ class _MaterialGestureState extends State<MaterialGesture> {
                     (await widget.controller.videoPlayerController.position) ??
                         Duration.zero;
                 await widget.controller.seekTo(
-                  position + (-10).seconds,
+                  position + 10.seconds,
                 );
               },
               onVerticalDragUpdate: (details) {

@@ -7,6 +7,8 @@ import 'package:video_player/video_player.dart';
 import '../../../../chewie.dart';
 import '../../../config/icons.dart';
 import '../../../gen/locale_keys.g.dart';
+import '../../../helpers/models/audio_track.dart';
+import '../../../helpers/models/video_track.dart';
 import '../../../widgets/sheet/player_bottom_sheet.dart';
 import '../../widgets/buttons/player_tile_button.dart';
 import 'generic_simple_choose_sheet.dart';
@@ -62,18 +64,20 @@ class _SettingsViewState extends State<SettingsView> {
         },
       ),
       [
-        GenericSimpleChooseSheet<dynamic>(
+        GenericSimpleChooseSheet<VideoTrack>(
           onPressBack: () => _animateTo(0),
           title: LocaleKeys.player_settings_quality.tr(),
+          items: widget.controller.videoTracks,
           buildItemLabel: (item) {
-            return '';
+            return item.name ?? item.resolution?.split('x').last ?? 'Unknown';
           },
         ),
-        GenericSimpleChooseSheet<dynamic>(
+        GenericSimpleChooseSheet<AudioTrack>(
           onPressBack: () => _animateTo(0),
           title: LocaleKeys.player_settings_lang.tr(),
+          items: widget.controller.audioTracks,
           buildItemLabel: (item) {
-            return '';
+            return item.name ?? 'Unknown';
           },
         ),
         GenericSimpleChooseSheet<double>(

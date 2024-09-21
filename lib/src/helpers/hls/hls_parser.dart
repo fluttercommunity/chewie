@@ -27,7 +27,7 @@ class HlsParser {
   }
 
   List<VideoTrack> parseVideoTracks() {
-    final videoTrackPattern = RegExp(r'#EXT-X-STREAM-INF:(.*?)\n(.*?)\n');
+    final videoTrackPattern = RegExp(r'#EXT-X-STREAM-INF:(.*)\s*\n\s*(\S+)');
     final matches = videoTrackPattern.allMatches(playlistContent);
 
     return matches.map((match) {
@@ -41,7 +41,10 @@ class HlsParser {
         audioGroupId: attributes['AUDIO'],
         uri: match.group(2),
       );
-    }).toList();
+    }).toList()
+      ..removeWhere(
+        (item) => item.resolution == null,
+      );
   }
 
   Map<String, String> _parseAttributes(String attributeString) {
@@ -56,5 +59,37 @@ class HlsParser {
     }
 
     return attributes;
+  }
+
+  String changeResolution(VideoTrack targetResolution) {
+    final videoTracks = parseVideoTracks();
+    final audioTracks = parseAudioTracks();
+
+    final matchingTrack = videoTracks.firstWhere(
+      (track) => track.resolution == targetResolution.resolution,
+      orElse: () => throw Exception(
+        'Resolution ${targetResolution.resolution} not found',
+      ),
+    );
+
+    final matchingAudioTrack = audioTracks.firstWhere(
+      (audioTrack) => audioTrack.groupId == matchingTrack.audioGroupId,
+      orElse: () => throw Exception(
+        'Audio group ${matchingTrack.audioGroupId} not found',
+      ),
+    );
+
+    return (
+      StringBuffer()
+        ..writeln('#EXTM3U')
+        ..writeln('#EXT-X-VERSION:6')
+        ..writeln(
+          '#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${matchingAudioTrack.groupId}",NAME="${matchingAudioTrack.name}",DEFAULT=${matchingAudioTrack.isDefault ?? true ? "YES" : "NO"},LANGUAGE="${matchingAudioTrack.language}",CHANNELS="${matchingAudioTrack.channels}",URI="${matchingAudioTrack.uri}"',
+        )
+        ..writeln(
+          '#EXT-X-STREAM-INF:BANDWIDTH=${matchingTrack.bandwidth},RESOLUTION=${matchingTrack.resolution},CODECS="${matchingTrack.codecs}",AUDIO="${matchingTrack.audioGroupId}"',
+        )
+        ..writeln(matchingTrack.uri),
+    ).toString();
   }
 }

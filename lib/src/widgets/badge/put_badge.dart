@@ -1,6 +1,7 @@
-import 'package:chewie/src/helpers/enums/badge_type_enum.dart';
-import 'package:chewie/src/widgets/badge/badge.dart';
 import 'package:flutter/material.dart';
+
+import '../../helpers/enums/badge_type_enum.dart';
+import 'badge.dart';
 
 class PutBadge extends StatelessWidget {
   const PutBadge({

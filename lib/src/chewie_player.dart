@@ -1,15 +1,20 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shelf/shelf.dart' as shelf;
+import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../chewie.dart';
+import 'helpers/hls/hls_download_manager.dart';
 import 'helpers/hls/hls_parser.dart';
 import 'helpers/models/audio_track.dart';
 import 'helpers/models/video_track.dart';
@@ -45,8 +50,9 @@ class Chewie extends StatefulWidget {
 class ChewieState extends State<Chewie> {
   bool _isFullScreen = false;
 
-  bool get isControllerFullScreen => widget.controller.isFullScreen;
   late PlayerNotifier notifier;
+
+  bool get isControllerFullScreen => widget.controller.isFullScreen;
 
   @override
   void initState() {
@@ -296,7 +302,7 @@ class ChewieController extends ChangeNotifier {
     this.customControls,
     this.errorBuilder,
     this.bufferingBuilder,
-    this.allowedScreenSleep = true,
+    this.allowedScreenSleep = false,
     this.isLive = false,
     this.allowFullScreen = true,
     this.allowMuting = true,
@@ -311,6 +317,7 @@ class ChewieController extends ChangeNotifier {
     this.progressIndicatorDelay,
     this.hideControlsTimer = defaultHideControlsTimer,
     this.controlsSafeAreaMinimum = EdgeInsets.zero,
+    this.server,
   }) : assert(
           playbackSpeeds.every((speed) => speed > 0),
           'The playbackSpeeds values must all be greater than 0',
@@ -318,6 +325,145 @@ class ChewieController extends ChangeNotifier {
     _aspectRatio = aspectRatio;
     _fit.value = fit ?? _fit.value;
     _initialize();
+  }
+
+  static Future<ChewieController> fromHlsUrl({
+    required String url,
+    Map<String, dynamic>? headers,
+    Directory? directory,
+    OptionsTranslation? optionsTranslation,
+    double? aspectRatio,
+    BoxFit? fit,
+    bool autoInitialize = false,
+    bool autoPlay = false,
+    bool draggableProgressBar = true,
+    Duration? startAt,
+    bool looping = false,
+    bool fullScreenByDefault = false,
+    ChewieProgressColors? cupertinoProgressColors,
+    ChewieProgressColors? materialProgressColors,
+    Duration materialSeekButtonFadeDuration = const Duration(
+      milliseconds: 300,
+    ),
+    double materialSeekButtonSize = 26,
+    Widget? placeholder,
+    Widget? overlay,
+    bool showControlsOnInitialize = false,
+    bool showOptions = true,
+    Future<void> Function(BuildContext, List<OptionItem>)? optionsBuilder,
+    List<OptionItem> Function(BuildContext)? additionalOptions,
+    bool showControls = true,
+    TransformationController? transformationController,
+    bool zoomAndPan = false,
+    double maxScale = 2.5,
+    Subtitles? subtitle,
+    Widget Function(BuildContext, dynamic)? subtitleBuilder,
+    Widget? customControls,
+    WidgetBuilder? bufferingBuilder,
+    Widget Function(BuildContext, String)? errorBuilder,
+    bool allowedScreenSleep = false,
+    bool isLive = false,
+    bool allowFullScreen = true,
+    bool allowMuting = true,
+    bool allowPlaybackSpeedChanging = true,
+    bool useRootNavigator = true,
+    Duration hideControlsTimer = defaultHideControlsTimer,
+    EdgeInsets controlsSafeAreaMinimum = EdgeInsets.zero,
+    List<double> playbackSpeeds = const [
+      0.25,
+      0.5,
+      0.75,
+      1,
+      1.25,
+      1.5,
+      1.75,
+      2,
+    ],
+    List<SystemUiOverlay>? systemOverlaysOnEnterFullScreen,
+    List<DeviceOrientation>? deviceOrientationsOnEnterFullScreen,
+    List<SystemUiOverlay> systemOverlaysAfterFullScreen =
+        SystemUiOverlay.values,
+    List<DeviceOrientation> deviceOrientationsAfterFullScreen =
+        DeviceOrientation.values,
+    Duration? progressIndicatorDelay,
+    Widget Function(
+      BuildContext,
+      Animation<double>,
+      Animation<double>,
+      ChewieControllerProvider,
+    )? routePageBuilder,
+  }) async {
+    final initialDirectory = directory ?? await getTemporaryDirectory();
+
+    final downloadManager = HlsDownloadManager(
+      initialDirectory,
+    );
+
+    final master = await downloadManager.downloadHlsFromUrl(
+      url: url,
+      headers: headers,
+    );
+
+    final masterPath =
+        master.path.replaceFirst('${initialDirectory.path}/', '');
+
+    final server = await _startServerForFiles(
+      initialDirectory,
+    );
+
+    final videoPlayerController = VideoPlayerController.networkUrl(
+      Uri.parse('http://localhost:2532/$masterPath'),
+    );
+
+    // unawaited(videoPlayerController.initialize());
+
+    return ChewieController(
+      draggableProgressBar: draggableProgressBar,
+      videoPlayerController: videoPlayerController,
+      optionsTranslation: optionsTranslation,
+      aspectRatio: aspectRatio,
+      fit: fit,
+      autoInitialize: autoInitialize,
+      autoPlay: autoPlay,
+      startAt: startAt,
+      server: server,
+      looping: looping,
+      maxScale: maxScale,
+      transformationController: transformationController,
+      fullScreenByDefault: fullScreenByDefault,
+      cupertinoProgressColors: cupertinoProgressColors,
+      materialProgressColors: materialProgressColors,
+      materialSeekButtonFadeDuration: materialSeekButtonFadeDuration,
+      materialSeekButtonSize: materialSeekButtonSize,
+      placeholder: placeholder,
+      overlay: overlay,
+      zoomAndPan: zoomAndPan,
+      showControlsOnInitialize: showControlsOnInitialize,
+      showOptions: showOptions,
+      optionsBuilder: optionsBuilder,
+      additionalOptions: additionalOptions,
+      showControls: showControls,
+      subtitle: subtitle,
+      subtitleBuilder: subtitleBuilder,
+      customControls: customControls,
+      errorBuilder: errorBuilder,
+      bufferingBuilder: bufferingBuilder,
+      allowedScreenSleep: allowedScreenSleep,
+      isLive: isLive,
+      allowFullScreen: allowFullScreen,
+      allowMuting: allowMuting,
+      allowPlaybackSpeedChanging: allowPlaybackSpeedChanging,
+      useRootNavigator: useRootNavigator,
+      playbackSpeeds: playbackSpeeds,
+      controlsSafeAreaMinimum: controlsSafeAreaMinimum,
+      systemOverlaysOnEnterFullScreen: systemOverlaysOnEnterFullScreen,
+      deviceOrientationsOnEnterFullScreen: deviceOrientationsOnEnterFullScreen,
+      systemOverlaysAfterFullScreen: systemOverlaysAfterFullScreen,
+      deviceOrientationsAfterFullScreen: deviceOrientationsAfterFullScreen,
+      routePageBuilder: routePageBuilder,
+      hideControlsTimer: hideControlsTimer,
+      progressIndicatorDelay: progressIndicatorDelay,
+    );
   }
 
   ChewieController copyWith({
@@ -577,6 +723,8 @@ class ChewieController extends ChangeNotifier {
   /// Defaults to [EdgeInsets.zero].
   final EdgeInsets controlsSafeAreaMinimum;
 
+  final HttpServer? server;
+
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider =
         context.dependOnInheritedWidgetOfExactType<ChewieControllerProvider>()!;
@@ -590,6 +738,8 @@ class ChewieController extends ChangeNotifier {
 
   int _fitIndex = 0;
 
+  final _isInitialized = ValueNotifier(false);
+
   final List<BoxFit> _fitOptions = BoxFit.values;
 
   final _fit = ValueNotifier(BoxFit.contain);
@@ -597,6 +747,8 @@ class ChewieController extends ChangeNotifier {
   List<VideoTrack> _videoTracks = [];
 
   List<AudioTrack> _audioTracks = [];
+
+  ValueNotifier<bool> get isInitialized => _isInitialized;
 
   List<VideoTrack> get videoTracks => _videoTracks;
 
@@ -610,12 +762,48 @@ class ChewieController extends ChangeNotifier {
 
   bool get isPlaying => videoPlayerController.value.isPlaying;
 
+  static Future<HttpServer> _startServerForFiles(Directory directory) async {
+    return shelf_io.serve(
+      (request) => _serverHandlerForFiles(request, directory),
+      'localhost',
+      2532,
+    );
+  }
+
+  static Future<shelf.Response> _serverHandlerForFiles(
+    shelf.Request request,
+    Directory directory,
+  ) async {
+    final file = File('${directory.path}/${request.url.path}');
+
+    try {
+      await file.readAsString();
+    } catch (err) {
+      log(err.toString());
+    }
+
+    if (file.existsSync()) {
+      return shelf.Response.ok(await file.readAsString());
+    }
+
+    return shelf.Response.forbidden('File not found');
+  }
+
+  @override
+  void dispose() {
+    videoPlayerController.dispose();
+    server?.close();
+    super.dispose();
+  }
+
   Future<dynamic> _initialize() async {
     await videoPlayerController.setLooping(looping);
 
     if ((autoInitialize || autoPlay) &&
         !videoPlayerController.value.isInitialized) {
       await videoPlayerController.initialize();
+      _isInitialized.value = true;
+      notifyListeners();
     }
 
     if (autoPlay) {
@@ -670,13 +858,8 @@ class ChewieController extends ChangeNotifier {
 
         notifyListeners();
       }
-
-      log(_videoTracks.toString());
-      log(_audioTracks.toString());
-    } on DioException catch (err) {
-      log(err.error.toString());
-      log(err.stackTrace.toString());
-      log(err.message.toString());
+    } catch (err) {
+      rethrow;
     }
   }
 

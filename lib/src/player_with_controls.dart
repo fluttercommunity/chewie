@@ -44,23 +44,30 @@ class PlayerWithControls extends StatelessWidget {
             panEnabled: chewieController.zoomAndPan,
             scaleEnabled: chewieController.zoomAndPan,
             child: Center(
-              child: ValueListenableBuilder(
-                builder: (BuildContext context, value, Widget? child) {
+              child: ListenableBuilder(
+                builder: (BuildContext context, Widget? child) {
                   return SizedBox.expand(
                     child: FittedBox(
-                      fit: value,
+                      fit: chewieController.fit.value,
                       child: SizedBox(
                         width: chewieController
                             .videoPlayerController.value.size.width,
                         height: chewieController
                             .videoPlayerController.value.size.height,
-                        child: child,
+                        child: chewieController.isInitialized.value
+                            ? child
+                            : chewieController.placeholder ?? const SizedBox(),
                       ),
                     ),
                   );
                 },
-                valueListenable: chewieController.fit,
-                child: VideoPlayer(chewieController.videoPlayerController),
+                listenable: Listenable.merge([
+                  chewieController.fit,
+                  chewieController.isInitialized,
+                ]),
+                child: VideoPlayer(
+                  chewieController.videoPlayerController,
+                ),
               ),
             ),
           ),
