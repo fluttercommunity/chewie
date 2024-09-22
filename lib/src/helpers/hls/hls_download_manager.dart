@@ -3,6 +3,16 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
+class HlsDownloaded {
+  const HlsDownloaded({
+    required this.master,
+    required this.origin,
+  });
+
+  final File master;
+  final File origin;
+}
+
 class HlsDownloadManager {
   HlsDownloadManager(this.directory);
 
@@ -10,23 +20,31 @@ class HlsDownloadManager {
 
   late final tmpPath = '${directory.path}/tmp-media';
 
-  Future<File> downloadHlsFromUrl({
+  Future<HlsDownloaded> downloadHlsFromUrl({
     required String url,
     Map<String, dynamic>? headers,
   }) async {
     try {
       await cleanTmpFiles();
 
-      final masterFile = File('$tmpPath/master.m3u8');
+      final master = File('$tmpPath/master.m3u8');
+      final origin = File('$tmpPath/origin.m3u8');
 
-      await Dio(BaseOptions(headers: headers)).download(url, masterFile.path);
+      await Dio(BaseOptions(headers: headers)).download(url, master.path);
+
+      await origin.writeAsString(
+        await master.readAsString(),
+      );
 
       await parseAndDownloadPlaylists(
-        data: await masterFile.readAsString(),
+        data: await master.readAsString(),
         url: url,
       );
 
-      return masterFile;
+      return HlsDownloaded(
+        master: master,
+        origin: origin,
+      );
     } catch (err) {
       log('Error downloading master playlist: $err');
       rethrow;

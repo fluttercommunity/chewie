@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../chewie.dart';
+import '../../../chewie_player.dart';
 import '../../../config/icons.dart';
 import '../../../gen/locale_keys.g.dart';
 import '../../../helpers/models/audio_track.dart';
@@ -68,18 +69,46 @@ class _SettingsViewState extends State<SettingsView> {
           onPressBack: () => _animateTo(0),
           title: LocaleKeys.player_settings_quality.tr(),
           items: widget.controller.videoTracks,
+          onItemTap: (track) {
+            widget.controller.setVideoTrack(track);
+            setState(() {});
+            Navigator.pop(context);
+          },
+          selectedItem: widget.controller.videoTrack,
           buildItemLabel: (item) {
             return item.name ?? item.resolution?.split('x').last ?? 'Unknown';
           },
         ),
-        GenericSimpleChooseSheet<AudioTrack>(
-          onPressBack: () => _animateTo(0),
-          title: LocaleKeys.player_settings_lang.tr(),
-          items: widget.controller.audioTracks,
-          buildItemLabel: (item) {
-            return item.name ?? 'Unknown';
-          },
-        ),
+        if (widget.controller.audioTracks.isNotEmpty)
+          GenericSimpleChooseSheet<AudioTrack>(
+            onPressBack: () => _animateTo(0),
+            title: LocaleKeys.player_settings_lang.tr(),
+            items: widget.controller.audioTracks.where(
+              (item) {
+                if (item.groupId == null) {
+                  return true;
+                }
+
+                final track = widget.controller.videoTrack;
+
+                if (track.isAuto) {
+                  return item.groupId ==
+                      widget.controller.audioTracks.first.groupId;
+                }
+
+                return item.groupId == track.audioGroupId;
+              },
+            ).toList(),
+            selectedItem: widget.controller.audioTrack,
+            onItemTap: (track) {
+              widget.controller.setAudioTrack(track);
+              setState(() {});
+              Navigator.pop(context);
+            },
+            buildItemLabel: (item) {
+              return item.name ?? 'Unknown';
+            },
+          ),
         GenericSimpleChooseSheet<double>(
           onPressBack: () => _animateTo(0),
           items: widget.controller.playbackSpeeds,
@@ -88,18 +117,19 @@ class _SettingsViewState extends State<SettingsView> {
           onItemTap: (item) {
             widget.controller.videoPlayerController.setPlaybackSpeed(item);
             setState(() {});
+            Navigator.pop(context);
           },
           buildItemLabel: (double item) {
             return item.toString();
           },
         ),
-        GenericSimpleChooseSheet<dynamic>(
-          onPressBack: () => _animateTo(0),
-          title: LocaleKeys.player_settings_subtitle.tr(),
-          buildItemLabel: (item) {
-            return '';
-          },
-        ),
+        // GenericSimpleChooseSheet<dynamic>(
+        //   onPressBack: () => _animateTo(0),
+        //   title: LocaleKeys.player_settings_subtitle.tr(),
+        //   buildItemLabel: (item) {
+        //     return '';
+        //   },
+        // ),
       ][_selectedPage],
     ];
 
@@ -143,28 +173,31 @@ class SettingsMainView extends StatelessWidget {
           PlayerTileButton(
             onPressed: () => onPageChange(0),
             title: LocaleKeys.player_settings_quality.tr(),
-            value: '',
+            value: controller.videoTrack.name ??
+                controller.videoTrack.resolution?.split('x').last ??
+                'Unknown',
             icon: PlayerIcons.settings,
           ),
-          PlayerTileButton(
-            onPressed: () => onPageChange(1),
-            title: LocaleKeys.player_settings_lang.tr(),
-            value: '',
-            icon: PlayerIcons.language,
-          ),
+          if (controller.audioTracks.isNotEmpty)
+            PlayerTileButton(
+              onPressed: () => onPageChange(1),
+              title: LocaleKeys.player_settings_lang.tr(),
+              value: controller.audioTrack?.name ?? 'Default',
+              icon: PlayerIcons.language,
+            ),
           PlayerTileButton(
             onPressed: () => onPageChange(2),
             title: LocaleKeys.player_settings_speed.tr(),
             value: _videoPlayerController.value.playbackSpeed.toString(),
             icon: PlayerIcons.speed,
           ),
-          PlayerTileButton(
-            onPressed: () => onPageChange(3),
-            title: LocaleKeys.player_settings_subtitle.tr(),
-            isShowDivider: false,
-            value: '',
-            icon: PlayerIcons.subtitle,
-          ),
+          // PlayerTileButton(
+          //   onPressed: () => onPageChange(3),
+          //   title: LocaleKeys.player_settings_subtitle.tr(),
+          //   isShowDivider: false,
+          //   value: '',
+          //   icon: PlayerIcons.subtitle,
+          // ),
         ],
       ),
     );

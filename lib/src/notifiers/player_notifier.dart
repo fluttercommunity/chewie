@@ -32,7 +32,7 @@ class PlayerNotifier extends ChangeNotifier {
   // ignore: prefer_constructors_over_static_methods
   static PlayerNotifier init() {
     return PlayerNotifier._(
-      true,
+      false,
       false,
     );
   }

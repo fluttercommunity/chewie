@@ -7,6 +7,7 @@ class VideoTrack {
     this.uri,
     this.programId,
     this.name,
+    this.isAuto = false,
   });
   final int? bandwidth;
   final String? resolution;
@@ -15,6 +16,7 @@ class VideoTrack {
   final String? uri;
   final int? programId;
   final String? name;
+  final bool isAuto;
 
   VideoTrack copyWith({
     int? bandwidth,
@@ -24,6 +26,7 @@ class VideoTrack {
     String? uri,
     int? programId,
     String? name,
+    bool? isAuto,
   }) {
     return VideoTrack(
       bandwidth: bandwidth ?? this.bandwidth,
@@ -33,6 +36,7 @@ class VideoTrack {
       uri: uri ?? this.uri,
       programId: programId ?? this.programId,
       name: name ?? this.name,
+      isAuto: isAuto ?? this.isAuto,
     );
   }
 

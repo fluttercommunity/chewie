@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -273,10 +272,12 @@ class ChewieState extends State<Chewie> {
 /// `VideoPlayerController`.
 class ChewieController extends ChangeNotifier {
   ChewieController({
-    required this.videoPlayerController,
+    required VideoPlayerController videoPlayerController,
     double? aspectRatio,
     BoxFit? fit,
+    HlsDownloaded? hlsMaster,
     this.optionsTranslation,
+    this.directory,
     this.autoInitialize = false,
     this.autoPlay = false,
     this.draggableProgressBar = true,
@@ -324,6 +325,8 @@ class ChewieController extends ChangeNotifier {
         ) {
     _aspectRatio = aspectRatio;
     _fit.value = fit ?? _fit.value;
+    _hlsMaster = hlsMaster;
+    _videoPlayerController = videoPlayerController;
     _initialize();
   }
 
@@ -399,13 +402,13 @@ class ChewieController extends ChangeNotifier {
       initialDirectory,
     );
 
-    final master = await downloadManager.downloadHlsFromUrl(
+    final downloaded = await downloadManager.downloadHlsFromUrl(
       url: url,
       headers: headers,
     );
 
     final masterPath =
-        master.path.replaceFirst('${initialDirectory.path}/', '');
+        downloaded.master.path.replaceFirst('${initialDirectory.path}/', '');
 
     final server = await _startServerForFiles(
       initialDirectory,
@@ -423,12 +426,14 @@ class ChewieController extends ChangeNotifier {
       optionsTranslation: optionsTranslation,
       aspectRatio: aspectRatio,
       fit: fit,
+      directory: initialDirectory,
       autoInitialize: autoInitialize,
       autoPlay: autoPlay,
       startAt: startAt,
       server: server,
       looping: looping,
       maxScale: maxScale,
+      hlsMaster: downloaded,
       transformationController: transformationController,
       fullScreenByDefault: fullScreenByDefault,
       cupertinoProgressColors: cupertinoProgressColors,
@@ -470,6 +475,8 @@ class ChewieController extends ChangeNotifier {
     VideoPlayerController? videoPlayerController,
     OptionsTranslation? optionsTranslation,
     double? aspectRatio,
+    HlsDownloaded? hlsMaster,
+    Directory? directory,
     BoxFit? fit,
     bool? autoInitialize,
     bool? autoPlay,
@@ -519,8 +526,7 @@ class ChewieController extends ChangeNotifier {
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
-      videoPlayerController:
-          videoPlayerController ?? this.videoPlayerController,
+      videoPlayerController: videoPlayerController ?? _videoPlayerController,
       optionsTranslation: optionsTranslation ?? this.optionsTranslation,
       aspectRatio: aspectRatio ?? this.aspectRatio,
       fit: fit ?? this.fit.value,
@@ -538,6 +544,8 @@ class ChewieController extends ChangeNotifier {
       materialSeekButtonSize:
           materialSeekButtonSize ?? this.materialSeekButtonSize,
       placeholder: placeholder ?? this.placeholder,
+      hlsMaster: hlsMaster ?? _hlsMaster,
+      directory: directory ?? this.directory,
       overlay: overlay ?? this.overlay,
       showControlsOnInitialize:
           showControlsOnInitialize ?? this.showControlsOnInitialize,
@@ -574,7 +582,7 @@ class ChewieController extends ChangeNotifier {
     );
   }
 
-  static const defaultHideControlsTimer = Duration(seconds: 3);
+  static const defaultHideControlsTimer = Duration(seconds: 5);
 
   /// If false, the options button in MaterialUI and MaterialDesktopUI
   /// won't be shown.
@@ -609,7 +617,9 @@ class ChewieController extends ChangeNotifier {
   Subtitles? subtitle;
 
   /// The controller for the video you want to play
-  final VideoPlayerController videoPlayerController;
+  late VideoPlayerController _videoPlayerController;
+
+  VideoPlayerController get videoPlayerController => _videoPlayerController;
 
   /// Initialize the Video on Startup. This will prep the video for playback.
   final bool autoInitialize;
@@ -625,6 +635,8 @@ class ChewieController extends ChangeNotifier {
 
   /// Whether or not the video should loop
   final bool looping;
+
+  final Directory? directory;
 
   /// Wether or not to show the controls when initializing the widget.
   final bool showControlsOnInitialize;
@@ -738,6 +750,8 @@ class ChewieController extends ChangeNotifier {
 
   int _fitIndex = 0;
 
+  HlsDownloaded? _hlsMaster;
+
   final _isInitialized = ValueNotifier(false);
 
   final List<BoxFit> _fitOptions = BoxFit.values;
@@ -748,9 +762,19 @@ class ChewieController extends ChangeNotifier {
 
   List<AudioTrack> _audioTracks = [];
 
+  final defaultTrack = VideoTrack(isAuto: true, name: 'Auto');
+
+  late VideoTrack _videoTrack = defaultTrack;
+
+  AudioTrack? _audioTrack;
+
   ValueNotifier<bool> get isInitialized => _isInitialized;
 
   List<VideoTrack> get videoTracks => _videoTracks;
+
+  VideoTrack get videoTrack => _videoTrack;
+
+  AudioTrack? get audioTrack => _audioTrack;
 
   List<AudioTrack> get audioTracks => _audioTracks;
 
@@ -760,7 +784,84 @@ class ChewieController extends ChangeNotifier {
 
   bool get isFullScreen => _isFullScreen;
 
-  bool get isPlaying => videoPlayerController.value.isPlaying;
+  bool get isPlaying => _videoPlayerController.value.isPlaying;
+
+  Future<void> setVideoTrack(VideoTrack track) async {
+    if (directory != null && _hlsMaster != null) {
+      final origin = await _hlsMaster!.origin.readAsString();
+      _videoTrack = track;
+
+      final changed = track.isAuto
+          ? _audioTrack != null
+              ? HlsParser(
+                  playlistContent: origin,
+                ).changeAudio(_audioTrack!)
+              : origin
+          : HlsParser(
+              playlistContent: origin,
+            ).changeResolution(track);
+
+      await _hlsMaster?.master.writeAsString(
+        changed,
+      );
+
+      if (!track.isAuto && track.audioGroupId != null) {
+        if (_audioTrack?.groupId != null) {
+          final audioTrackGroup = _audioTracks.where(
+            (item) =>
+                item.language == _audioTrack?.language &&
+                item.groupId == track.audioGroupId,
+          );
+
+          final audioTrack = audioTrackGroup.firstOrNull;
+
+          if (audioTrack != null) {
+            await setAudioTrack(audioTrack);
+
+            return;
+          }
+        }
+      }
+
+      await reloadDataSource();
+    }
+  }
+
+  Future<void> setAudioTrack(AudioTrack track) async {
+    if (directory != null && _hlsMaster != null) {
+      final origin = _hlsMaster!.origin;
+      _audioTrack = track;
+
+      final changed = HlsParser(
+        playlistContent: await origin.readAsString(),
+      ).changeAudio(
+        track,
+        targetVideoTrack: _videoTrack.isAuto ? null : _videoTrack,
+      );
+
+      await _hlsMaster?.master.writeAsString(
+        changed,
+      );
+
+      await reloadDataSource();
+    }
+  }
+
+  Future<void> reloadDataSource() async {
+    final prevPosition = _videoPlayerController.value.position;
+    _isInitialized.value = false;
+    await _videoPlayerController.dispose();
+    _videoPlayerController = VideoPlayerController.networkUrl(
+      Uri.parse(_videoPlayerController.dataSource),
+    );
+    await _videoPlayerController.initialize();
+    await _videoPlayerController.initialize().then((_) async {
+      await _initialize();
+      _isInitialized.value = true;
+      await _videoPlayerController.seekTo(prevPosition);
+      await _videoPlayerController.play();
+    });
+  }
 
   static Future<HttpServer> _startServerForFiles(Directory directory) async {
     return shelf_io.serve(
@@ -791,17 +892,17 @@ class ChewieController extends ChangeNotifier {
 
   @override
   void dispose() {
-    videoPlayerController.dispose();
+    _videoPlayerController.dispose();
     server?.close();
     super.dispose();
   }
 
   Future<dynamic> _initialize() async {
-    await videoPlayerController.setLooping(looping);
+    await _videoPlayerController.setLooping(looping);
 
     if ((autoInitialize || autoPlay) &&
-        !videoPlayerController.value.isInitialized) {
-      await videoPlayerController.initialize();
+        !_videoPlayerController.value.isInitialized) {
+      await _videoPlayerController.initialize();
       _isInitialized.value = true;
       notifyListeners();
     }
@@ -811,62 +912,38 @@ class ChewieController extends ChangeNotifier {
         enterFullScreen();
       }
 
-      await videoPlayerController.play();
+      await _videoPlayerController.play();
     }
 
     if (startAt != null) {
-      await videoPlayerController.seekTo(startAt!);
+      await _videoPlayerController.seekTo(startAt!);
     }
 
     if (fullScreenByDefault) {
-      videoPlayerController.addListener(_fullScreenListener);
+      _videoPlayerController.addListener(_fullScreenListener);
     }
 
-    await _initializeHlsData();
+    await _initializeHlsDataFromNetwork();
   }
 
-  Future<void> _initializeHlsData() async {
-    final dataSourceType = videoPlayerController.dataSourceType;
+  Future<void> _initializeHlsDataFromNetwork() async {
+    if (_hlsMaster != null && _videoTracks.isEmpty) {
+      final parser = HlsParser(
+        playlistContent: await _hlsMaster!.origin.readAsString(),
+      );
 
-    if (videoPlayerController.dataSource.contains('.m3u8')) {
-      switch (dataSourceType) {
-        case DataSourceType.network:
-        case DataSourceType.contentUri:
-          await _initializeHlsDataFromNetwork(
-            videoPlayerController.dataSource,
-            headers: videoPlayerController.httpHeaders,
-          );
-        case DataSourceType.asset:
-        case DataSourceType.file:
-      }
-    }
-  }
+      _videoTracks = [defaultTrack, ...parser.parseVideoTracks()];
 
-  Future<void> _initializeHlsDataFromNetwork(
-    String url, {
-    Map<String, dynamic>? headers,
-  }) async {
-    try {
-      final res = await Dio(BaseOptions()).get<String>(url);
+      _audioTracks = parser.parseAudioTracks();
 
-      if (res.data != null) {
-        final parser = HlsParser(playlistContent: res.data!);
-
-        _videoTracks = parser.parseVideoTracks();
-
-        _audioTracks = parser.parseAudioTracks();
-
-        notifyListeners();
-      }
-    } catch (err) {
-      rethrow;
+      notifyListeners();
     }
   }
 
   Future<void> _fullScreenListener() async {
-    if (videoPlayerController.value.isPlaying && !_isFullScreen) {
+    if (_videoPlayerController.value.isPlaying && !_isFullScreen) {
       enterFullScreen();
-      videoPlayerController.removeListener(_fullScreenListener);
+      _videoPlayerController.removeListener(_fullScreenListener);
     }
   }
 
@@ -895,24 +972,24 @@ class ChewieController extends ChangeNotifier {
   }
 
   Future<void> play() async {
-    await videoPlayerController.play();
+    await _videoPlayerController.play();
   }
 
   // ignore: avoid_positional_boolean_parameters
   Future<void> setLooping(bool looping) async {
-    await videoPlayerController.setLooping(looping);
+    await _videoPlayerController.setLooping(looping);
   }
 
   Future<void> pause() async {
-    await videoPlayerController.pause();
+    await _videoPlayerController.pause();
   }
 
   Future<void> seekTo(Duration moment) async {
-    await videoPlayerController.seekTo(moment);
+    await _videoPlayerController.seekTo(moment);
   }
 
   Future<void> setVolume(double volume) async {
-    await videoPlayerController.setVolume(volume);
+    await _videoPlayerController.setVolume(volume);
   }
 
   void switchFit() {

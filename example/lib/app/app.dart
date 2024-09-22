@@ -87,7 +87,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   }
 
   String src =
-      "https://vod02.splay.uz/hls8/Saboq%2055-qism%20%28Serial%20Rizanova%29/_tmp_/master.m3u8";
+      "https://vod03.splay.uz/hls10/Debris%202021%20S01E11/_tmp_/master.m3u8";
 
   Future<String> parseM3U8(String master) async {
     final resolutionPattern = RegExp(r'RESOLUTION=(\d+x\d+)');

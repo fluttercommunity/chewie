@@ -34,23 +34,25 @@ class PlayerBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Gap(8),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: PlayerColors.greyB8,
-              borderRadius: BorderRadius.circular(50),
+    return SafeArea(
+      child: Material(
+        color: Colors.transparent,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Gap(8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: PlayerColors.greyB8,
+                borderRadius: BorderRadius.circular(50),
+              ),
             ),
-          ),
-          const Gap(16),
-          child,
-        ],
+            const Gap(16),
+            child,
+          ],
+        ),
       ),
     );
   }

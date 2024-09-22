@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 import 'chewie_player.dart';
+import 'config/colors.dart';
 import 'helpers/adaptive_controls.dart';
 import 'notifiers/index.dart';
 
@@ -55,7 +57,9 @@ class PlayerWithControls extends StatelessWidget {
                         height: chewieController
                             .videoPlayerController.value.size.height,
                         child: chewieController.isInitialized.value
-                            ? child
+                            ? VideoPlayer(
+                                chewieController.videoPlayerController,
+                              )
                             : chewieController.placeholder ?? const SizedBox(),
                       ),
                     ),
@@ -65,9 +69,6 @@ class PlayerWithControls extends StatelessWidget {
                   chewieController.fit,
                   chewieController.isInitialized,
                 ]),
-                child: VideoPlayer(
-                  chewieController.videoPlayerController,
-                ),
               ),
             ),
           ),
@@ -92,13 +93,28 @@ class PlayerWithControls extends StatelessWidget {
               ),
             ),
           ),
-          if (!chewieController.isFullScreen)
-            buildControls(context, chewieController)
-          else
-            SafeArea(
-              bottom: false,
-              child: buildControls(context, chewieController),
-            ),
+          ValueListenableBuilder(
+            valueListenable: chewieController.isInitialized,
+            builder: (context, value, child) {
+              if (!value) {
+                return const Center(
+                  child: CupertinoActivityIndicator(
+                    color: PlayerColors.white,
+                    radius: 20,
+                  ),
+                );
+              }
+
+              if (!chewieController.isFullScreen) {
+                return buildControls(context, chewieController);
+              } else {
+                return SafeArea(
+                  bottom: false,
+                  child: buildControls(context, chewieController),
+                );
+              }
+            },
+          ),
         ],
       );
     }
