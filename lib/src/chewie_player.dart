@@ -260,6 +260,18 @@ class ChewieState extends State<Chewie> {
   }
 }
 
+class MediaControls {
+  MediaControls({
+    this.onNext,
+    this.onPrev,
+    this.onOpen,
+  });
+
+  VoidCallback? onNext;
+  VoidCallback? onPrev;
+  VoidCallback? onOpen;
+}
+
 /// The ChewieController is used to configure and drive the Chewie Player
 /// Widgets. It provides methods to control playback, such as [pause] and
 /// [play], as well as methods that control the visual appearance of the player,
@@ -277,6 +289,7 @@ class ChewieController extends ChangeNotifier {
     BoxFit? fit,
     HlsDownloaded? hlsMaster,
     this.optionsTranslation,
+    this.mediaControls,
     this.directory,
     this.autoInitialize = false,
     this.autoPlay = false,
@@ -333,6 +346,7 @@ class ChewieController extends ChangeNotifier {
   static Future<ChewieController> fromHlsUrl({
     required String url,
     Map<String, dynamic>? headers,
+    MediaControls? mediaControls,
     Directory? directory,
     OptionsTranslation? optionsTranslation,
     double? aspectRatio,
@@ -433,6 +447,7 @@ class ChewieController extends ChangeNotifier {
       server: server,
       looping: looping,
       maxScale: maxScale,
+      mediaControls: mediaControls,
       hlsMaster: downloaded,
       transformationController: transformationController,
       fullScreenByDefault: fullScreenByDefault,
@@ -474,12 +489,14 @@ class ChewieController extends ChangeNotifier {
   ChewieController copyWith({
     VideoPlayerController? videoPlayerController,
     OptionsTranslation? optionsTranslation,
+    MediaControls? mediaControls,
     double? aspectRatio,
     HlsDownloaded? hlsMaster,
     Directory? directory,
     BoxFit? fit,
     bool? autoInitialize,
     bool? autoPlay,
+    HttpServer? server,
     bool? draggableProgressBar,
     Duration? startAt,
     bool? looping,
@@ -534,6 +551,7 @@ class ChewieController extends ChangeNotifier {
       autoPlay: autoPlay ?? this.autoPlay,
       startAt: startAt ?? this.startAt,
       looping: looping ?? this.looping,
+      mediaControls: mediaControls ?? this.mediaControls,
       fullScreenByDefault: fullScreenByDefault ?? this.fullScreenByDefault,
       cupertinoProgressColors:
           cupertinoProgressColors ?? this.cupertinoProgressColors,
@@ -545,6 +563,7 @@ class ChewieController extends ChangeNotifier {
           materialSeekButtonSize ?? this.materialSeekButtonSize,
       placeholder: placeholder ?? this.placeholder,
       hlsMaster: hlsMaster ?? _hlsMaster,
+      server: server ?? this.server,
       directory: directory ?? this.directory,
       overlay: overlay ?? this.overlay,
       showControlsOnInitialize:
@@ -583,6 +602,8 @@ class ChewieController extends ChangeNotifier {
   }
 
   static const defaultHideControlsTimer = Duration(seconds: 5);
+
+  final MediaControls? mediaControls;
 
   /// If false, the options button in MaterialUI and MaterialDesktopUI
   /// won't be shown.
@@ -854,7 +875,6 @@ class ChewieController extends ChangeNotifier {
     _videoPlayerController = VideoPlayerController.networkUrl(
       Uri.parse(_videoPlayerController.dataSource),
     );
-    await _videoPlayerController.initialize();
     await _videoPlayerController.initialize().then((_) async {
       await _initialize();
       _isInitialized.value = true;
@@ -898,6 +918,12 @@ class ChewieController extends ChangeNotifier {
   }
 
   Future<dynamic> _initialize() async {
+    isInitialized.value = _videoPlayerController.value.isInitialized;
+
+    unawaited(_initializeHlsDataFromNetwork());
+
+    if (isInitialized.value) return;
+
     await _videoPlayerController.setLooping(looping);
 
     if ((autoInitialize || autoPlay) &&
@@ -922,8 +948,6 @@ class ChewieController extends ChangeNotifier {
     if (fullScreenByDefault) {
       _videoPlayerController.addListener(_fullScreenListener);
     }
-
-    await _initializeHlsDataFromNetwork();
   }
 
   Future<void> _initializeHlsDataFromNetwork() async {

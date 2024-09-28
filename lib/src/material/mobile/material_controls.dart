@@ -309,6 +309,7 @@ class _MaterialControlsState extends State<MaterialControls>
     BuildContext context,
   ) {
     final iconColor = Theme.of(context).textTheme.labelLarge!.color;
+    final mediaControls = chewieController.mediaControls;
 
     return IgnorePointer(
       ignoring: notifier.lockStuff,
@@ -348,11 +349,13 @@ class _MaterialControlsState extends State<MaterialControls>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      PlayerIconButton(
-                        onPressed: () {},
-                        icon: PlayerIcons.stack,
-                      ),
-                      const Gap(4),
+                      if (mediaControls?.onOpen != null) ...[
+                        PlayerIconButton(
+                          onPressed: mediaControls!.onOpen!,
+                          icon: PlayerIcons.stack,
+                        ),
+                        const Gap(4),
+                      ],
                       PlayerIconButton(
                         onPressed: () {
                           showPlayerSettings(
@@ -363,15 +366,17 @@ class _MaterialControlsState extends State<MaterialControls>
                         icon: PlayerIcons.settings,
                       ),
                       const Spacer(),
-                      PlayerIconButton(
-                        onPressed: () {},
-                        icon: PlayerIcons.skipLeft,
-                      ),
+                      if (mediaControls?.onPrev != null)
+                        PlayerIconButton(
+                          onPressed: mediaControls!.onPrev!,
+                          icon: PlayerIcons.skipLeft,
+                        ),
                       const Gap(4),
-                      PlayerIconButton(
-                        onPressed: () {},
-                        icon: PlayerIcons.skipRight,
-                      ),
+                      if (mediaControls?.onNext != null)
+                        PlayerIconButton(
+                          onPressed: mediaControls!.onNext!,
+                          icon: PlayerIcons.skipRight,
+                        ),
                       const Gap(4),
                       if (chewieController.allowFullScreen)
                         _buildExpandButton(),

@@ -10,7 +10,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:system_files_viewer/system_files_viewer.dart';
-import 'package:video_player/video_player.dart';
 
 class ChewieDemo extends StatefulWidget {
   const ChewieDemo({
@@ -52,7 +51,6 @@ Future<SecurityContext> getSecurityContext() async {
 
 class _ChewieDemoState extends State<ChewieDemo> {
   TargetPlatform? _platform;
-  late VideoPlayerController _videoPlayerController1;
   ChewieController? _chewieController;
   int? bufferDelay;
   File? masterFile;
@@ -175,21 +173,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   Future<void> initializePlayer() async {
     // final directory = await getTemporaryDirectory();
     await _startServer();
-    _videoPlayerController1 = VideoPlayerController.networkUrl(Uri.parse(src));
-    await _videoPlayerController1.initialize();
-    _createChewieController();
     setState(() {});
-  }
-
-  void _createChewieController() {
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController1,
-      autoPlay: true,
-      looping: true,
-      allowFullScreen: true,
-      allowedScreenSleep: false,
-      hideControlsTimer: const Duration(minutes: 3),
-    );
   }
 
   Future<void> _openFilesPage() async {
@@ -291,76 +275,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       children: <Widget>[
                         Expanded(
                           child: TextButton(
-                            onPressed: () async {
-                              log('start');
-                              final startAt =
-                                  (await _videoPlayerController1.position) ??
-                                      Duration.zero;
-                              await _chewieController?.pause();
-                              _videoPlayerController1.dispose();
-                              _videoPlayerController1 =
-                                  VideoPlayerController.networkUrl(
-                                Uri.parse(
-                                    'http://localhost:8080/master240.m3u8'),
-                              );
-                              await _videoPlayerController1.initialize();
-                              _videoPlayerController1.seekTo(startAt);
-                              _chewieController = _chewieController!.copyWith(
-                                videoPlayerController: _videoPlayerController1,
-                                autoPlay: true,
-                                looping: true,
-                              );
-                              log('changed');
-                              setState(() {});
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16.0),
-                              child: Text("set 240p"),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () async {
-                              log('start');
-                              final startAt =
-                                  (await _videoPlayerController1.position) ??
-                                      Duration.zero;
-                              await _chewieController?.pause();
-                              _videoPlayerController1.dispose();
-                              _videoPlayerController1 =
-                                  VideoPlayerController.networkUrl(
-                                Uri.parse(
-                                    'http://localhost:8080/master720.m3u8'),
-                              );
-                              await _videoPlayerController1.initialize();
-                              _videoPlayerController1.seekTo(startAt);
-                              _chewieController = _chewieController!.copyWith(
-                                videoPlayerController: _videoPlayerController1,
-                                autoPlay: true,
-                                looping: true,
-                              );
-                              log('changed');
-                              setState(() {});
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16.0),
-                              child: Text("set 720p"),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: TextButton(
                             onPressed: () {
-                              setState(() {
-                                _videoPlayerController1.pause();
-                                _videoPlayerController1.seekTo(Duration.zero);
-                                _createChewieController();
-                              });
+                              setState(() {});
                             },
                             child: const Padding(
                               padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -371,13 +287,13 @@ class _ChewieDemoState extends State<ChewieDemo> {
                         Expanded(
                           child: TextButton(
                             onPressed: () {
-                              setState(() {
-                                _chewieController = _chewieController!.copyWith(
-                                  videoPlayerController:
-                                      _videoPlayerController1,
-                                  autoPlay: true,
-                                  looping: true,
-                                  /* subtitle: Subtitles([
+                              // setState(() {
+                              // _chewieController = _chewieController!.copyWith(
+                              //   videoPlayerController:
+                              //       _videoPlayerController1,
+                              //   autoPlay: true,
+                              //   looping: true,
+                              /* subtitle: Subtitles([
                               Subtitle(
                                 index: 0,
                                 start: Duration.zero,
@@ -398,8 +314,8 @@ class _ChewieDemoState extends State<ChewieDemo> {
                                 style: const TextStyle(color: Colors.white),
                               ),
                             ), */
-                                );
-                              });
+                              // );
+                              // });
                             },
                             child: const Padding(
                               padding: EdgeInsets.symmetric(vertical: 16.0),
@@ -419,6 +335,46 @@ class _ChewieDemoState extends State<ChewieDemo> {
                             child: const Padding(
                               padding: EdgeInsets.symmetric(vertical: 16.0),
                               child: Text("Open files"),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () {
+                              if (_chewieController?.mediaControls?.onNext ==
+                                  null) {
+                                _chewieController = _chewieController?.copyWith(
+                                  mediaControls: MediaControls(
+                                    onNext: () {
+                                      log('on next');
+                                    },
+                                    onOpen: () {
+                                      log('on open');
+                                    },
+                                    onPrev: () {
+                                      log('on prev');
+                                    },
+                                  ),
+                                );
+                              } else {
+                                _chewieController = _chewieController?.copyWith(
+                                  mediaControls: MediaControls(
+                                    onNext: null,
+                                    onOpen: null,
+                                    onPrev: null,
+                                  ),
+                                );
+                              }
+
+                              setState(() {});
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16.0),
+                              child: Text("Media controls"),
                             ),
                           ),
                         ),
