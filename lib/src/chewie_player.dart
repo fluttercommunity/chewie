@@ -272,6 +272,16 @@ class MediaControls {
   VoidCallback? onOpen;
 }
 
+class MediaThumbnail {
+  const MediaThumbnail({
+    required this.medium,
+    required this.large,
+  });
+
+  final String? medium;
+  final String? large;
+}
+
 /// The ChewieController is used to configure and drive the Chewie Player
 /// Widgets. It provides methods to control playback, such as [pause] and
 /// [play], as well as methods that control the visual appearance of the player,
@@ -289,6 +299,7 @@ class ChewieController extends ChangeNotifier {
     BoxFit? fit,
     HlsDownloaded? hlsMaster,
     this.optionsTranslation,
+    this.thumbnails,
     this.mediaControls,
     this.directory,
     this.autoInitialize = false,
@@ -347,6 +358,7 @@ class ChewieController extends ChangeNotifier {
     required String url,
     Map<String, dynamic>? headers,
     MediaControls? mediaControls,
+    MediaThumbnail? thumbnails,
     Directory? directory,
     OptionsTranslation? optionsTranslation,
     double? aspectRatio,
@@ -435,6 +447,7 @@ class ChewieController extends ChangeNotifier {
     // unawaited(videoPlayerController.initialize());
 
     return ChewieController(
+      thumbnails: thumbnails,
       draggableProgressBar: draggableProgressBar,
       videoPlayerController: videoPlayerController,
       optionsTranslation: optionsTranslation,
@@ -490,6 +503,7 @@ class ChewieController extends ChangeNotifier {
     VideoPlayerController? videoPlayerController,
     OptionsTranslation? optionsTranslation,
     MediaControls? mediaControls,
+    MediaThumbnail? thumbnails,
     double? aspectRatio,
     HlsDownloaded? hlsMaster,
     Directory? directory,
@@ -542,6 +556,7 @@ class ChewieController extends ChangeNotifier {
     )? routePageBuilder,
   }) {
     return ChewieController(
+      thumbnails: thumbnails ?? this.thumbnails,
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
       videoPlayerController: videoPlayerController ?? _videoPlayerController,
       optionsTranslation: optionsTranslation ?? this.optionsTranslation,
@@ -604,6 +619,8 @@ class ChewieController extends ChangeNotifier {
   static const defaultHideControlsTimer = Duration(seconds: 5);
 
   final MediaControls? mediaControls;
+
+  final MediaThumbnail? thumbnails;
 
   /// If false, the options button in MaterialUI and MaterialDesktopUI
   /// won't be shown.

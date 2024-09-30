@@ -13,6 +13,7 @@ import '../../config/colors.dart';
 import '../../config/icons.dart';
 import '../../helpers/extensions.dart';
 import '../../helpers/utils.dart';
+import '../../helpers/vtt_parser.dart';
 import '../../models/option_item.dart';
 import '../../models/subtitle_model.dart';
 import '../../notifiers/index.dart';
@@ -60,6 +61,9 @@ class _MaterialControlsState extends State<MaterialControls>
 
   ChewieController? _chewieController;
   ChewieController get chewieController => _chewieController!;
+
+  List<WebVTTEntry>? _thumbnails;
+  List<WebVTTEntry>? _thumbnailsPlaceholder;
 
   @override
   void initState() {
@@ -337,7 +341,7 @@ class _MaterialControlsState extends State<MaterialControls>
                         child: Row(
                           children: [
                             _buildProgressBar(),
-                            const Gap(8),
+                            const Gap(12),
                             if (chewieController.isLive)
                               const Text('LIVE')
                             else
@@ -577,6 +581,16 @@ class _MaterialControlsState extends State<MaterialControls>
         });
       });
     }
+
+    final thumbLarge = chewieController.thumbnails?.large;
+    final thumbMedium = chewieController.thumbnails?.large;
+
+    if (thumbLarge != null) {
+      _thumbnails = WebVTTParser().parse(thumbLarge);
+    }
+    if (thumbMedium != null) {
+      _thumbnailsPlaceholder = WebVTTParser().parse(thumbMedium);
+    }
   }
 
   void _onExpandCollapse() {
@@ -712,6 +726,8 @@ class _MaterialControlsState extends State<MaterialControls>
 
           _startHideTimer();
         },
+        thumbnails: _thumbnails,
+        thumbnailsPlaceholder: _thumbnailsPlaceholder,
         draggableProgressBar: chewieController.draggableProgressBar,
       ),
     );

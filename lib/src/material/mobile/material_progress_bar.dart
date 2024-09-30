@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../chewie_progress_colors.dart';
+import '../../helpers/vtt_parser.dart';
 import '../../progress_bar.dart';
 
 class MaterialVideoProgressBar extends StatelessWidget {
@@ -12,6 +13,8 @@ class MaterialVideoProgressBar extends StatelessWidget {
     this.handleHeight = 8,
     this.onDragEnd,
     this.onDragStart,
+    this.thumbnailsPlaceholder,
+    this.thumbnails,
     this.onDragUpdate,
     super.key,
     this.draggableProgressBar = true,
@@ -27,6 +30,8 @@ class MaterialVideoProgressBar extends StatelessWidget {
   final VoidCallback? onDragEnd;
   final VoidCallback? onDragUpdate;
   final bool draggableProgressBar;
+  final List<WebVTTEntry>? thumbnails;
+  final List<WebVTTEntry>? thumbnailsPlaceholder;
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +42,10 @@ class MaterialVideoProgressBar extends StatelessWidget {
       drawShadow: true,
       colors: colors,
       onDragEnd: onDragEnd,
+      thumbnails: thumbnails,
       onDragStart: onDragStart,
       onDragUpdate: onDragUpdate,
+      thumbnailsPlaceholder: thumbnailsPlaceholder,
       draggableProgressBar: draggableProgressBar,
     );
   }

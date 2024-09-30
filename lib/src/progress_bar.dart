@@ -1,7 +1,14 @@
+import 'dart:async';
+import 'dart:developer';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../chewie.dart';
+import 'helpers/vtt_parser.dart';
 
 class VideoProgressBar extends StatefulWidget {
   VideoProgressBar(
@@ -9,11 +16,13 @@ class VideoProgressBar extends StatefulWidget {
     required this.barHeight,
     required this.handleHeight,
     required this.drawShadow,
-    ChewieProgressColors? colors,
-    this.onDragEnd,
-    this.onDragStart,
-    this.onDragUpdate,
     this.draggableProgressBar = true,
+    this.thumbnailsPlaceholder,
+    this.onDragUpdate,
+    this.onDragStart,
+    this.onDragEnd,
+    this.thumbnails,
+    ChewieProgressColors? colors,
     super.key,
   }) : colors = colors ?? ChewieProgressColors();
 
@@ -27,6 +36,9 @@ class VideoProgressBar extends StatefulWidget {
   final double handleHeight;
   final bool drawShadow;
   final bool draggableProgressBar;
+
+  final List<WebVTTEntry>? thumbnails;
+  final List<WebVTTEntry>? thumbnailsPlaceholder;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -60,11 +72,17 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   }
 
   void _seekToRelativePosition(Offset globalPosition) {
-    controller.seekTo(
+    controller
+        .seekTo(
       context.calcRelativePosition(
         controller.value.duration,
         globalPosition,
       ),
+    )
+        .then(
+      (_) {
+        _latestDraggableOffset = null;
+      },
     );
   }
 
@@ -72,12 +90,14 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   Widget build(BuildContext context) {
     final child = Center(
       child: StaticProgressBar(
-        value: controller.value,
         colors: widget.colors,
+        value: controller.value,
         barHeight: widget.barHeight,
-        handleHeight: widget.handleHeight,
         drawShadow: widget.drawShadow,
+        thumbnails: widget.thumbnails,
+        handleHeight: widget.handleHeight,
         latestDraggableOffset: _latestDraggableOffset,
+        thumbnailsPlaceholder: widget.thumbnailsPlaceholder,
       ),
     );
 
@@ -110,15 +130,16 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
               if (_latestDraggableOffset != null) {
                 _seekToRelativePosition(_latestDraggableOffset!);
-                _latestDraggableOffset = null;
+                // _latestDraggableOffset = null;
               }
 
               widget.onDragEnd?.call();
             },
-            onTapDown: (TapDownDetails details) {
+            onTapUp: (TapUpDetails details) {
               if (!controller.value.isInitialized) {
                 return;
               }
+              _latestDraggableOffset = details.globalPosition;
               _seekToRelativePosition(details.globalPosition);
             },
             child: child,
@@ -127,15 +148,17 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   }
 }
 
-class StaticProgressBar extends StatelessWidget {
+class StaticProgressBar extends StatefulWidget {
   const StaticProgressBar({
     required this.value,
     required this.colors,
     required this.barHeight,
     required this.handleHeight,
     required this.drawShadow,
-    super.key,
     this.latestDraggableOffset,
+    this.thumbnailsPlaceholder,
+    this.thumbnails,
+    super.key,
   });
 
   final Offset? latestDraggableOffset;
@@ -146,6 +169,64 @@ class StaticProgressBar extends StatelessWidget {
   final double handleHeight;
   final bool drawShadow;
 
+  final List<WebVTTEntry>? thumbnails;
+  final List<WebVTTEntry>? thumbnailsPlaceholder;
+
+  @override
+  State<StaticProgressBar> createState() => _StaticProgressBarState();
+}
+
+class _StaticProgressBarState extends State<StaticProgressBar> {
+  ui.Image? _thumbImage;
+  final Dio _dio = Dio();
+
+  Future<void> _loadImage() async {
+    const networkImage = 'https://picsum.photos/500/300';
+
+    try {
+      final imageBytes = await _fetchImageBytesWithCache(networkImage);
+
+      ui.decodeImageFromList(Uint8List.fromList(imageBytes), (img) {
+        setState(() {
+          _thumbImage = img;
+        });
+      });
+    } catch (e) {
+      print('Failed to load image: $e');
+    }
+  }
+
+  Future<Uint8List> _fetchImageBytesWithCache(String url) async {
+    try {
+      final response = await _dio.get<List<int>>(
+        url,
+        options: Options(
+          responseType: ResponseType.bytes,
+        ),
+      );
+
+      return Uint8List.fromList(response.data!);
+    } catch (e) {
+      throw Exception('Failed to fetch image with Dio: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _loadImage();
+  }
+
+  @override
+  void didUpdateWidget(covariant StaticProgressBar oldWidget) {
+    if (oldWidget.latestDraggableOffset != widget.latestDraggableOffset) {
+      log(oldWidget.latestDraggableOffset.toString());
+    }
+
+    super.didUpdateWidget(oldWidget);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -154,17 +235,18 @@ class StaticProgressBar extends StatelessWidget {
       color: Colors.transparent,
       child: CustomPaint(
         painter: _ProgressBarPainter(
-          value: value,
-          draggableValue: latestDraggableOffset != null
+          value: widget.value,
+          draggableValue: widget.latestDraggableOffset != null
               ? context.calcRelativePosition(
-                  value.duration,
-                  latestDraggableOffset!,
+                  widget.value.duration,
+                  widget.latestDraggableOffset!,
                 )
               : null,
-          colors: colors,
-          barHeight: barHeight,
-          handleHeight: handleHeight,
-          drawShadow: drawShadow,
+          colors: widget.colors,
+          barHeight: widget.barHeight,
+          handleHeight: widget.handleHeight,
+          drawShadow: widget.drawShadow,
+          thumbImage: _thumbImage,
         ),
       ),
     );
@@ -179,6 +261,7 @@ class _ProgressBarPainter extends CustomPainter {
     required this.handleHeight,
     required this.drawShadow,
     required this.draggableValue,
+    this.thumbImage,
   });
 
   VideoPlayerValue value;
@@ -191,6 +274,8 @@ class _ProgressBarPainter extends CustomPainter {
   /// The value of the draggable progress bar.
   /// If null, the progress bar is not being dragged.
   final Duration? draggableValue;
+
+  final ui.Image? thumbImage;
 
   @override
   bool shouldRepaint(CustomPainter painter) {
@@ -262,6 +347,48 @@ class _ProgressBarPainter extends CustomPainter {
       handleHeight,
       colors.handlePaint,
     );
+
+    // final paint = Paint();
+
+    // final dst = Rect.fromLTWH(
+    //   playedPart - 200 / 2,
+    //   -110,
+    //   200,
+    //   100,
+    // );
+
+    // const borderRadius = 12.0;
+
+    // final backgroundPaint = Paint()..color = Colors.black;
+
+    // canvas.drawRect(dst, backgroundPaint);
+
+    // final borderPaint = Paint()
+    //   ..color = Colors.white
+    //   ..style = PaintingStyle.stroke
+    //   ..strokeWidth = 3;
+
+    // final rRect = RRect.fromRectAndRadius(
+    //   dst,
+    //   const Radius.circular(
+    //     borderRadius,
+    //   ),
+    // );
+
+    // canvas
+    //   ..drawRRect(rRect, borderPaint)
+    //   ..clipRRect(rRect);
+
+    // if (thumbImage != null) {
+    //   final src = Rect.fromLTWH(
+    //     0,
+    //     0,
+    //     thumbImage!.width.toDouble(),
+    //     thumbImage!.height.toDouble(),
+    //   );
+
+    //   canvas.drawImageRect(thumbImage!, src, dst, paint);
+    // }
   }
 }
 
