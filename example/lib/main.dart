@@ -60,3 +60,28 @@ class MyWidget extends StatelessWidget {
     );
   }
 }
+
+@pragma('vm:entry-point')
+void pipMain() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  HttpOverrides.global = MyHttpOverrides();
+
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('ru'),
+        Locale('uz'),
+      ],
+      startLocale: const Locale('ru'),
+      path: 'assets/locales',
+      assetLoader: const CodegenLoader(),
+      extraAssetLoaders: const [
+        TranslationsLoader(
+          packageName: 'chewie',
+        ),
+      ],
+      child: const MyWidget(),
+    ),
+  );
+}

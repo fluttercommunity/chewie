@@ -20,6 +20,7 @@ dependencies:
   system_files_viewer: ^1.0.5
   shelf: ^1.4.1
   easy_localization: ^3.0.7
+  fl_pip: ^3.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

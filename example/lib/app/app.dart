@@ -72,6 +72,15 @@ class _ChewieDemoState extends State<ChewieDemo> {
         _chewieController = await ChewieController.fromHlsUrl(
           url: src,
           autoPlay: true,
+          deviceOrientationsOnEnterFullScreen: [
+            DeviceOrientation.landscapeLeft,
+            DeviceOrientation.landscapeRight,
+            DeviceOrientation.portraitUp,
+          ],
+          customControls: ChewieCustomControls.v1Controls
+            ..onHelpPressed = () {
+              log('show help');
+            },
         );
       } catch (err) {}
       setState(() {});
