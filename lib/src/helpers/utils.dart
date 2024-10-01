@@ -14,5 +14,9 @@ String formatDuration(Duration position) {
 
   final formattedTime = '$hoursString:$minutesString:$secondsString';
 
+  if (hours == 0) {
+    return '$minutesString:$secondsString';
+  }
+
   return formattedTime;
 }

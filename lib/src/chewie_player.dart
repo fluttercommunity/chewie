@@ -442,6 +442,9 @@ class ChewieController extends ChangeNotifier {
 
     final videoPlayerController = VideoPlayerController.networkUrl(
       Uri.parse('http://localhost:2532/$masterPath'),
+      videoPlayerOptions: VideoPlayerOptions(
+        allowBackgroundPlayback: true,
+      ),
     );
 
     // unawaited(videoPlayerController.initialize());

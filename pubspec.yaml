@@ -12,9 +12,11 @@ dependencies:
   dio: ^5.7.0
   easy_localization: ^3.0.7
   expandable_page_view: ^1.0.17
+  fl_pip: ^3.1.0
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.0
+  flutter_cast_video: ^1.2.0
   flutter_svg: ^2.0.10+1
   gap: ^3.0.1
   modal_bottom_sheet: ^3.0.0
@@ -36,4 +38,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icons/
+    - assets/icons/custom/v1/
     - assets/locales/

@@ -55,3 +55,25 @@ class PlayerIcons {
 
   static const disableFullScreen = '$assetsIcons/disable_full_screen.svg';
 }
+
+class PlayerIconsCustom {
+  static CustomIconsV1 get v1 => CustomIconsV1();
+}
+
+class CustomIconsV1 {
+  final assetsIcons = 'assets/icons/custom/v1';
+
+  late final settings = '$assetsIcons/settings.svg';
+
+  late final backward10 = '$assetsIcons/backward_10.svg';
+
+  late final forward10 = '$assetsIcons/forward_10.svg';
+
+  late final help = '$assetsIcons/help.svg';
+
+  late final pictureInPicture = '$assetsIcons/picture_in_picture.svg';
+
+  late final skipForward = '$assetsIcons/skip_forward.svg';
+
+  late final skipBackward = '$assetsIcons/skip_backward.svg';
+}

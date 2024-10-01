@@ -23,3 +23,11 @@ class PlayerColors {
 
   static final highlightColor = white.withOpacity(0.2);
 }
+
+class PlayerColorsCustom {
+  static CustomColorsV1 get v1 => CustomColorsV1();
+}
+
+class CustomColorsV1 {
+  final primary = const Color(0xFF5A93E8);
+}
