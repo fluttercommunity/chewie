@@ -76,4 +76,6 @@ class CustomIconsV1 {
   late final skipForward = '$assetsIcons/skip_forward.svg';
 
   late final skipBackward = '$assetsIcons/skip_backward.svg';
+
+  late final enterFullScreen = '$assetsIcons/enter_full_screen.svg';
 }

@@ -45,7 +45,7 @@ class V1Controls extends StatefulWidget {
 }
 
 class _V1ControlsState extends State<V1Controls>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+    with SingleTickerProviderStateMixin {
   late var _subtitlesPosition = Duration.zero;
   late VideoPlayerController controller;
   late VideoPlayerValue _latestValue;
@@ -73,7 +73,6 @@ class _V1ControlsState extends State<V1Controls>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     notifier = Provider.of<PlayerNotifier>(context, listen: false);
   }
 
@@ -140,7 +139,6 @@ class _V1ControlsState extends State<V1Controls>
   @override
   void dispose() {
     _dispose();
-    WidgetsBinding.instance.removeObserver(this);
 
     super.dispose();
   }
@@ -164,17 +162,6 @@ class _V1ControlsState extends State<V1Controls>
     }
 
     super.didChangeDependencies();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-
-    if (state == AppLifecycleState.paused) {
-      controller.play();
-    } else if (state == AppLifecycleState.resumed) {
-      _showOrHide();
-    }
   }
 
   ChromeCastController? _chromeCastController;
@@ -247,7 +234,8 @@ class _V1ControlsState extends State<V1Controls>
                             },
                             icon: PlayerIconsCustom.v1.pictureInPicture,
                           ),
-                        ],
+                        ] else
+                          const Gap(8),
                       ],
                     ),
                   ),
@@ -381,7 +369,7 @@ class _V1ControlsState extends State<V1Controls>
       onPressed: _onExpandCollapse,
       icon: chewieController.isFullScreen
           ? PlayerIcons.disableFullScreen
-          : PlayerIcons.enableFullScreen,
+          : PlayerIconsCustom.v1.enterFullScreen,
     );
   }
 
