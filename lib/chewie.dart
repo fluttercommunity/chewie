@@ -3,6 +3,8 @@ export 'src/chewie_progress_colors.dart';
 export 'src/cupertino/cupertino_controls.dart';
 export 'src/custom_controls.dart';
 export 'src/helpers/asset/translations_loader.dart';
+export 'src/helpers/hls/hls_download_manager.dart';
+export 'src/helpers/hls/hls_parser.dart';
 export 'src/material/mobile/material_controls.dart';
 export 'src/material/mobile/material_desktop_controls.dart';
 export 'src/material/mobile/material_progress_bar.dart';
