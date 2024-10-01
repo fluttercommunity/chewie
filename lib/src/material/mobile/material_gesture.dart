@@ -111,9 +111,7 @@ class _MaterialGestureState extends State<MaterialGesture> {
         children: [
           Expanded(
             child: GestureDetector(
-              onTapDown: (details) {
-                widget.onTap();
-              },
+              onTap: widget.onTap,
               onDoubleTap: () async {
                 final position =
                     (await widget.controller.videoPlayerController.position) ??
@@ -134,9 +132,7 @@ class _MaterialGestureState extends State<MaterialGesture> {
           ),
           Expanded(
             child: GestureDetector(
-              onTapDown: (details) {
-                widget.onTap();
-              },
+              onTap: widget.onTap,
               onDoubleTap: () async {
                 final position =
                     (await widget.controller.videoPlayerController.position) ??

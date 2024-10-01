@@ -21,7 +21,6 @@ import '../../../helpers/vtt_parser.dart';
 import '../../../notifiers/index.dart';
 import '../../../widgets/animations/player_animated_size.dart';
 import '../../widgets/buttons/player_icon_button.dart';
-import '../../widgets/playback_speed_dialog.dart';
 import '../material_gesture.dart';
 import '../material_settings/material_settings_main.dart';
 
@@ -383,8 +382,6 @@ class _V1ControlsState extends State<V1Controls>
         _cancelAndRestartTimer();
       }
     } else {
-      _playPause();
-
       setState(() {
         notifier.hideStuff = true;
       });
@@ -459,28 +456,6 @@ class _V1ControlsState extends State<V1Controls>
     );
   }
 
-  Future<void> _onSpeedButtonTap() async {
-    _hideTimer?.cancel();
-
-    final chosenSpeed = await showModalBottomSheet<double>(
-      context: context,
-      isScrollControlled: true,
-      useRootNavigator: chewieController.useRootNavigator,
-      builder: (context) => PlaybackSpeedDialog(
-        speeds: chewieController.playbackSpeeds,
-        selected: _latestValue.playbackSpeed,
-      ),
-    );
-
-    if (chosenSpeed != null) {
-      await controller.setPlaybackSpeed(chosenSpeed);
-    }
-
-    if (_latestValue.isPlaying) {
-      _startHideTimer();
-    }
-  }
-
   Widget _buildPosition(Color? iconColor) {
     final position = _latestValue.position;
 
@@ -501,36 +476,6 @@ class _V1ControlsState extends State<V1Controls>
         color: PlayerColors.white,
       ),
     );
-  }
-
-  Widget _buildSubtitleToggle() {
-    //if don't have subtitle hidden button
-    if (chewieController.subtitle?.isEmpty ?? true) {
-      return const SizedBox();
-    }
-    return GestureDetector(
-      onTap: _onSubtitleTap,
-      child: Container(
-        height: barHeight,
-        color: Colors.transparent,
-        padding: const EdgeInsets.only(
-          left: 12,
-          right: 12,
-        ),
-        child: Icon(
-          _subtitleOn
-              ? Icons.closed_caption
-              : Icons.closed_caption_off_outlined,
-          color: _subtitleOn ? Colors.white : Colors.grey[700],
-        ),
-      ),
-    );
-  }
-
-  void _onSubtitleTap() {
-    setState(() {
-      _subtitleOn = !_subtitleOn;
-    });
   }
 
   void _cancelAndRestartTimer() {
