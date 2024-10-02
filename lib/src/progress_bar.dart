@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -229,9 +230,7 @@ class _StaticProgressBarState extends State<StaticProgressBar> {
         final imageBytes = await _fetchImageBytesWithCache(networkImage);
 
         ui.decodeImageFromList(Uint8List.fromList(imageBytes), (img) {
-          setState(() {
-            _thumbImage = img;
-          });
+          _thumbImage = img;
         });
       }
 
@@ -242,15 +241,13 @@ class _StaticProgressBarState extends State<StaticProgressBar> {
           final imageBytes = await _fetchImageBytesWithCache(networkImage);
 
           ui.decodeImageFromList(Uint8List.fromList(imageBytes), (img) {
-            setState(() {
-              _thumbImage = img;
-              _largeImageLoaded = true;
-            });
+            _thumbImage = img;
+            _largeImageLoaded = true;
           });
         }),
       );
     } catch (e) {
-      print('Failed to load image: $e');
+      log('Failed to load image: $e');
     }
   }
 
