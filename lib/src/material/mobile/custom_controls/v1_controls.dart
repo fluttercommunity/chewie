@@ -82,11 +82,22 @@ class _V1ControlsState extends State<V1Controls>
             context,
             chewieController.videoPlayerController.value.errorDescription!,
           ) ??
-          const Center(
-            child: Icon(
-              Icons.error,
-              color: Colors.white,
-              size: 42,
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.error,
+                  color: Colors.white,
+                  size: 42,
+                ),
+                TextButton(
+                  onPressed: () {
+                    chewieController.reloadDataSource();
+                  },
+                  child: const Text('Reload'),
+                ),
+              ],
             ),
           );
     }
@@ -229,7 +240,11 @@ class _V1ControlsState extends State<V1Controls>
                                 chewieController.enterFullScreen();
                               }
 
-                              await FlPiP().enable();
+                              await FlPiP().enable(
+                                android: const FlPiPAndroidConfig(
+                                  aspectRatio: Rational.landscape(),
+                                ),
+                              );
                             },
                             icon: PlayerIconsCustom.v1.pictureInPicture,
                           ),

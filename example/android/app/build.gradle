@@ -48,7 +48,8 @@ android {
 
     defaultConfig {
         applicationId  "com.example.example"
-        minSdk 21
+        minSdkVersion 25 
+        minSdk 25
         targetSdk 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -68,4 +69,6 @@ flutter {
 }
 
 dependencies {
+    implementation 'com.google.android.gms:play-services-cast-framework:21.0.1'
+    implementation 'com.google.android.exoplayer:extension-cast:2.17.1'
 }

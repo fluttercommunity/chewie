@@ -27,6 +27,7 @@ class HlsParser {
         language: attributes['LANGUAGE'] ?? 'und', // Handle missing language
         name: attributes['NAME'] ?? 'unknown',
         isDefault: attributes['DEFAULT'] == 'YES',
+        channels: attributes['CHANNELS'],
         uri: attributes['URI'] ?? '',
       );
     }).toList();
@@ -93,13 +94,13 @@ class HlsParser {
     if (matchingAudioTrack == null) {
       for (final audioTrack in audioTracks) {
         buffer.writeln(
-          '#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.groupId}",NAME="${audioTrack.name}",DEFAULT=${audioTrack.isDefault ?? true ? "YES" : "NO"},LANGUAGE="${audioTrack.language}",CHANNELS="${audioTrack.channels}",URI="${audioTrack.uri}"',
+          '#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${audioTrack.groupId}",NAME="${audioTrack.name}",DEFAULT=${audioTrack.isDefault ?? true ? "YES" : "NO"},LANGUAGE="${audioTrack.language}",CHANNELS="${audioTrack.channels ?? 2}",URI="${audioTrack.uri}"',
         );
       }
     } else {
       // Only add the matching audio track
       buffer.writeln(
-        '#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${matchingAudioTrack.groupId}",NAME="${matchingAudioTrack.name}",DEFAULT=${matchingAudioTrack.isDefault ?? true ? "YES" : "NO"},LANGUAGE="${matchingAudioTrack.language}",CHANNELS="${matchingAudioTrack.channels}",URI="${matchingAudioTrack.uri}"',
+        '#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="${matchingAudioTrack.groupId}",NAME="${matchingAudioTrack.name}",DEFAULT=${matchingAudioTrack.isDefault ?? true ? "YES" : "NO"},LANGUAGE="${matchingAudioTrack.language}",CHANNELS="${matchingAudioTrack.channels ?? 2}",URI="${matchingAudioTrack.uri}"',
       );
     }
 
