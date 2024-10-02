@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/services.dart';
 
-class WebVTTEntry {
+// ignore: must_be_immutable
+class WebVTTEntry extends Equatable {
   WebVTTEntry({
     required this.startTime,
     required this.gridSize,
@@ -24,6 +26,9 @@ class WebVTTEntry {
     // ignore: lines_longer_than_80_chars
     return 'Start: $startTime, End: $endTime, Offset: $offset, Size: $size, Url: $url, GridSize: $gridSize';
   }
+
+  @override
+  List<Object?> get props => [url, size, endTime, startTime];
 }
 
 class WebVTTParser {

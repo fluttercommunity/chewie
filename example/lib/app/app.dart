@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:chewie/chewie.dart';
 import 'package:chewie_example/app/theme.dart';
+import 'package:chewie_example/app/thumbnail_test.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -72,15 +73,16 @@ class _ChewieDemoState extends State<ChewieDemo> {
         _chewieController = await ChewieController.fromHlsUrl(
           url: src,
           autoPlay: true,
+          thumbnails: const MediaThumbnail(
+            medium: thumbnailTest,
+            large: thumbnailTest,
+          ),
+          customControls: ChewieCustomControls.v1Controls,
           deviceOrientationsOnEnterFullScreen: [
             DeviceOrientation.landscapeLeft,
             DeviceOrientation.landscapeRight,
             DeviceOrientation.portraitUp,
           ],
-          customControls: ChewieCustomControls.v1Controls
-            ..onHelpPressed = () {
-              log('show help');
-            },
         );
       } catch (err) {}
       setState(() {});

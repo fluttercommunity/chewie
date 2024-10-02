@@ -1,14 +1,15 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 import '../chewie.dart';
 import 'helpers/vtt_parser.dart';
+import 'widgets/animations/player_animation.dart';
 
 class VideoProgressBar extends StatefulWidget {
   VideoProgressBar(
@@ -53,11 +54,11 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
     setState(() {});
   }
 
-  bool _controllerWasPlaying = false;
-
   Offset? _latestDraggableOffset;
 
   VideoPlayerController get controller => widget.controller;
+
+  bool _showThumbnail = false;
 
   @override
   void initState() {
@@ -88,16 +89,44 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
   @override
   Widget build(BuildContext context) {
+    final position = _latestDraggableOffset != null
+        ? context.calcRelativePosition(
+            controller.value.duration,
+            _latestDraggableOffset!,
+          )
+        : null;
+
+    final thumbnail = position != null
+        ? widget.thumbnails?.where(
+            (element) {
+              return element.startTime.inMilliseconds <=
+                      position.inMilliseconds &&
+                  element.endTime.inMilliseconds >= position.inMilliseconds;
+            },
+          ).firstOrNull
+        : null;
+
+    final thumbnailPlaceholder = position != null
+        ? widget.thumbnailsPlaceholder?.where(
+            (element) {
+              return element.startTime.inMilliseconds <=
+                      position.inMilliseconds &&
+                  element.endTime.inMilliseconds >= position.inMilliseconds;
+            },
+          ).firstOrNull
+        : null;
+
     final child = Center(
       child: StaticProgressBar(
+        thumbnail: thumbnail,
         colors: widget.colors,
         value: controller.value,
         barHeight: widget.barHeight,
         drawShadow: widget.drawShadow,
-        thumbnails: widget.thumbnails,
+        showThumbnail: _showThumbnail,
         handleHeight: widget.handleHeight,
         latestDraggableOffset: _latestDraggableOffset,
-        thumbnailsPlaceholder: widget.thumbnailsPlaceholder,
+        thumbnailPlaceholder: thumbnailPlaceholder,
       ),
     );
 
@@ -107,12 +136,10 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
               if (!controller.value.isInitialized) {
                 return;
               }
-              _controllerWasPlaying = controller.value.isPlaying;
-              if (_controllerWasPlaying) {
-                controller.pause();
-              }
 
               widget.onDragStart?.call();
+
+              _showThumbnail = true;
             },
             onHorizontalDragUpdate: (DragUpdateDetails details) {
               if (!controller.value.isInitialized) {
@@ -124,16 +151,13 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
               widget.onDragUpdate?.call();
             },
             onHorizontalDragEnd: (DragEndDetails details) {
-              if (_controllerWasPlaying) {
-                controller.play();
-              }
-
               if (_latestDraggableOffset != null) {
-                _seekToRelativePosition(_latestDraggableOffset!);
-                // _latestDraggableOffset = null;
+                _seekToRelativePosition(details.globalPosition);
               }
 
               widget.onDragEnd?.call();
+
+              _showThumbnail = false;
             },
             onTapUp: (TapUpDetails details) {
               if (!controller.value.isInitialized) {
@@ -156,8 +180,9 @@ class StaticProgressBar extends StatefulWidget {
     required this.handleHeight,
     required this.drawShadow,
     this.latestDraggableOffset,
-    this.thumbnailsPlaceholder,
-    this.thumbnails,
+    this.thumbnailPlaceholder,
+    this.showThumbnail = false,
+    this.thumbnail,
     super.key,
   });
 
@@ -168,9 +193,10 @@ class StaticProgressBar extends StatefulWidget {
   final double barHeight;
   final double handleHeight;
   final bool drawShadow;
+  final bool showThumbnail;
 
-  final List<WebVTTEntry>? thumbnails;
-  final List<WebVTTEntry>? thumbnailsPlaceholder;
+  final WebVTTEntry? thumbnail;
+  final WebVTTEntry? thumbnailPlaceholder;
 
   @override
   State<StaticProgressBar> createState() => _StaticProgressBarState();
@@ -178,19 +204,51 @@ class StaticProgressBar extends StatefulWidget {
 
 class _StaticProgressBarState extends State<StaticProgressBar> {
   ui.Image? _thumbImage;
-  final Dio _dio = Dio();
+
+  bool _largeImageLoaded = false;
+
+  final Dio _dio = Dio()
+    ..interceptors.add(
+      DioCacheInterceptor(
+        options: CacheOptions(
+          store: MemCacheStore(),
+          maxStale: const Duration(hours: 1),
+        ),
+      ),
+    );
 
   Future<void> _loadImage() async {
-    const networkImage = 'https://picsum.photos/500/300';
+    if (widget.thumbnail == null) return;
 
     try {
-      final imageBytes = await _fetchImageBytesWithCache(networkImage);
+      if (widget.thumbnailPlaceholder != null) {
+        final networkImage = widget.thumbnailPlaceholder!.url;
 
-      ui.decodeImageFromList(Uint8List.fromList(imageBytes), (img) {
-        setState(() {
-          _thumbImage = img;
+        _largeImageLoaded = false;
+
+        final imageBytes = await _fetchImageBytesWithCache(networkImage);
+
+        ui.decodeImageFromList(Uint8List.fromList(imageBytes), (img) {
+          setState(() {
+            _thumbImage = img;
+          });
         });
-      });
+      }
+
+      unawaited(
+        Future.microtask(() async {
+          final networkImage = widget.thumbnail!.url;
+
+          final imageBytes = await _fetchImageBytesWithCache(networkImage);
+
+          ui.decodeImageFromList(Uint8List.fromList(imageBytes), (img) {
+            setState(() {
+              _thumbImage = img;
+              _largeImageLoaded = true;
+            });
+          });
+        }),
+      );
     } catch (e) {
       print('Failed to load image: $e');
     }
@@ -214,17 +272,17 @@ class _StaticProgressBarState extends State<StaticProgressBar> {
   @override
   void initState() {
     super.initState();
-
     _loadImage();
   }
 
   @override
   void didUpdateWidget(covariant StaticProgressBar oldWidget) {
-    if (oldWidget.latestDraggableOffset != widget.latestDraggableOffset) {
-      log(oldWidget.latestDraggableOffset.toString());
-    }
-
     super.didUpdateWidget(oldWidget);
+
+    if (widget.thumbnail != null &&
+        widget.thumbnail?.url != oldWidget.thumbnail?.url) {
+      _loadImage();
+    }
   }
 
   @override
@@ -233,21 +291,49 @@ class _StaticProgressBarState extends State<StaticProgressBar> {
       height: MediaQuery.of(context).size.height,
       width: MediaQuery.of(context).size.width,
       color: Colors.transparent,
-      child: CustomPaint(
-        painter: _ProgressBarPainter(
-          value: widget.value,
-          draggableValue: widget.latestDraggableOffset != null
-              ? context.calcRelativePosition(
-                  widget.value.duration,
-                  widget.latestDraggableOffset!,
-                )
-              : null,
-          colors: widget.colors,
-          barHeight: widget.barHeight,
-          handleHeight: widget.handleHeight,
-          drawShadow: widget.drawShadow,
-          thumbImage: _thumbImage,
-        ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: PlayerAnimation(
+              value: widget.showThumbnail && widget.thumbnail != null,
+              child: CustomPaint(
+                painter: _ProgressBarThumbPainter(
+                  imageEntry: _largeImageLoaded
+                      ? widget.thumbnail
+                      : widget.thumbnailPlaceholder,
+                  handleHeight: widget.handleHeight,
+                  value: widget.value,
+                  draggableValue: widget.latestDraggableOffset != null
+                      ? context.calcRelativePosition(
+                          widget.value.duration,
+                          widget.latestDraggableOffset!,
+                        )
+                      : null,
+                  thumbImage: _thumbImage,
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: CustomPaint(
+              painter: _ProgressBarPainter(
+                value: widget.value,
+                draggableValue: widget.latestDraggableOffset != null
+                    ? context.calcRelativePosition(
+                        widget.value.duration,
+                        widget.latestDraggableOffset!,
+                      )
+                    : null,
+                colors: widget.colors,
+                barHeight: widget.barHeight,
+                showThumbnail: widget.showThumbnail,
+                handleHeight: widget.handleHeight,
+                drawShadow: widget.drawShadow,
+                thumbImage: _thumbImage,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -261,6 +347,7 @@ class _ProgressBarPainter extends CustomPainter {
     required this.handleHeight,
     required this.drawShadow,
     required this.draggableValue,
+    this.showThumbnail = false,
     this.thumbImage,
   });
 
@@ -270,9 +357,7 @@ class _ProgressBarPainter extends CustomPainter {
   final double barHeight;
   final double handleHeight;
   final bool drawShadow;
-
-  /// The value of the draggable progress bar.
-  /// If null, the progress bar is not being dragged.
+  final bool showThumbnail;
   final Duration? draggableValue;
 
   final ui.Image? thumbImage;
@@ -347,48 +432,113 @@ class _ProgressBarPainter extends CustomPainter {
       handleHeight,
       colors.handlePaint,
     );
+  }
+}
 
-    // final paint = Paint();
+class _ProgressBarThumbPainter extends CustomPainter {
+  _ProgressBarThumbPainter({
+    required this.value,
+    required this.imageEntry,
+    required this.handleHeight,
+    required this.draggableValue,
+    this.thumbImage,
+  });
 
-    // final dst = Rect.fromLTWH(
-    //   playedPart - 200 / 2,
-    //   -110,
-    //   200,
-    //   100,
-    // );
+  VideoPlayerValue value;
+  final Duration? draggableValue;
+  final ui.Image? thumbImage;
+  final double handleHeight;
+  final WebVTTEntry? imageEntry;
 
-    // const borderRadius = 12.0;
+  @override
+  void paint(ui.Canvas canvas, ui.Size size) {
+    final paint = Paint();
 
-    // final backgroundPaint = Paint()..color = Colors.black;
+    final playedPartPercent = (draggableValue != null
+            ? draggableValue!.inMilliseconds
+            : value.position.inMilliseconds) /
+        value.duration.inMilliseconds;
 
-    // canvas.drawRect(dst, backgroundPaint);
+    final playedPart =
+        playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
 
-    // final borderPaint = Paint()
-    //   ..color = Colors.white
-    //   ..style = PaintingStyle.stroke
-    //   ..strokeWidth = 3;
+    const halfWidth = 200 / 2;
 
-    // final rRect = RRect.fromRectAndRadius(
-    //   dst,
-    //   const Radius.circular(
-    //     borderRadius,
-    //   ),
-    // );
+    var offset = playedPart;
 
-    // canvas
-    //   ..drawRRect(rRect, borderPaint)
-    //   ..clipRRect(rRect);
+    if (playedPart >= size.width - halfWidth) {
+      offset = size.width - halfWidth;
+    } else if (playedPart <= halfWidth) {
+      offset = halfWidth;
+    }
 
-    // if (thumbImage != null) {
-    //   final src = Rect.fromLTWH(
-    //     0,
-    //     0,
-    //     thumbImage!.width.toDouble(),
-    //     thumbImage!.height.toDouble(),
-    //   );
+    final dst = Rect.fromLTWH(
+      offset - halfWidth,
+      -110,
+      200,
+      100,
+    );
 
-    //   canvas.drawImageRect(thumbImage!, src, dst, paint);
-    // }
+    const borderRadius = 12.0;
+
+    final backgroundPaint = Paint()..color = Colors.black;
+
+    final borderPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3;
+
+    final rRect = RRect.fromRectAndRadius(
+      dst,
+      const Radius.circular(
+        borderRadius,
+      ),
+    );
+
+    if (thumbImage != null && imageEntry != null) {
+      const triangleBase = 20.0;
+
+      final firstLineOffset = playedPart - triangleBase / 2;
+      final secondLineOffset = playedPart + triangleBase / 2;
+
+      final path = Path()
+        ..moveTo(playedPart, 0)
+        ..lineTo(
+          playedPart <= triangleBase / 2 ? 0 : firstLineOffset,
+          -triangleBase,
+        )
+        ..lineTo(
+          playedPart > size.width - (triangleBase / 2)
+              ? size.width
+              : secondLineOffset,
+          -triangleBase,
+        )
+        ..close();
+
+      final trianglePaint = Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.fill;
+
+      canvas.drawPath(path, trianglePaint);
+
+      final src = Rect.fromLTWH(
+        0,
+        0,
+        imageEntry!.size.width,
+        imageEntry!.size.height,
+      );
+
+      canvas
+        ..drawRRect(rRect, borderPaint)
+        ..clipRRect(rRect)
+        ..drawRect(dst, backgroundPaint)
+        ..drawImageRect(thumbImage!, src, dst, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
   }
 }
 
