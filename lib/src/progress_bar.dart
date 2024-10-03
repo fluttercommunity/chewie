@@ -6,9 +6,11 @@ import 'dart:ui' as ui;
 import 'package:dio/dio.dart';
 import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:video_player/video_player.dart';
 
 import '../chewie.dart';
+import 'helpers/utils.dart';
 import 'helpers/vtt_parser.dart';
 import 'widgets/animations/player_animation.dart';
 
@@ -60,6 +62,8 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   VideoPlayerController get controller => widget.controller;
 
   bool _showThumbnail = false;
+
+  Timer? _thumbTimer;
 
   @override
   void initState() {
@@ -133,6 +137,18 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
     return widget.draggableProgressBar
         ? GestureDetector(
+            onTapDown: (details) {
+              _thumbTimer?.cancel();
+              _thumbTimer = Timer(400.ms, () {
+                _showThumbnail = true;
+                _latestDraggableOffset = details.globalPosition;
+                widget.onDragStart?.call();
+                listener();
+              });
+            },
+            onTapCancel: () {
+              _thumbTimer?.cancel();
+            },
             onHorizontalDragStart: (DragStartDetails details) {
               if (!controller.value.isInitialized) {
                 return;
@@ -158,12 +174,16 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
               widget.onDragEnd?.call();
 
+              _thumbTimer?.cancel();
               _showThumbnail = false;
             },
             onTapUp: (TapUpDetails details) {
               if (!controller.value.isInitialized) {
                 return;
               }
+              _thumbTimer?.cancel();
+              _showThumbnail = false;
+              widget.onDragEnd?.call();
               _latestDraggableOffset = details.globalPosition;
               _seekToRelativePosition(details.globalPosition);
             },
@@ -236,6 +256,8 @@ class _StaticProgressBarState extends State<StaticProgressBar> {
 
       unawaited(
         Future.microtask(() async {
+          if (widget.thumbnail == null) return;
+
           final networkImage = widget.thumbnail!.url;
 
           final imageBytes = await _fetchImageBytesWithCache(networkImage);
@@ -289,6 +311,7 @@ class _StaticProgressBarState extends State<StaticProgressBar> {
         Positioned.fill(
           child: PlayerAnimation(
             value: widget.showThumbnail && widget.thumbnail != null,
+            disableScale: true,
             child: CustomPaint(
               painter: _ProgressBarThumbPainter(
                 imageEntry: _largeImageLoaded
@@ -422,11 +445,33 @@ class _ProgressBarPainter extends CustomPainter {
       canvas.drawShadow(shadowPath, Colors.black, 0.2, false);
     }
 
+    final offset = Offset(playedPart, baseOffset + barHeight / 2);
+
     canvas.drawCircle(
-      Offset(playedPart, baseOffset + barHeight / 2),
+      offset,
       handleHeight,
       colors.handlePaint,
     );
+
+    final positionInSeconds = (draggableValue != null
+        ? draggableValue!.inSeconds
+        : value.position.inSeconds);
+
+    final textSpan = TextSpan(
+      text: formatDuration(positionInSeconds.seconds),
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 14,
+      ),
+    );
+
+    TextPainter(
+      text: textSpan,
+      textAlign: TextAlign.left,
+      textDirection: TextDirection.ltr,
+    )
+      ..layout(maxWidth: size.width)
+      ..paint(canvas, Offset(offset.dx - 20, offset.dy - 28));
   }
 }
 
@@ -469,9 +514,9 @@ class _ProgressBarThumbPainter extends CustomPainter {
 
     final dst = Rect.fromLTWH(
       offset - halfWidth,
-      -110,
+      -140,
       200,
-      100,
+      120,
     );
 
     const borderRadius = 12.0;
@@ -491,31 +536,6 @@ class _ProgressBarThumbPainter extends CustomPainter {
     );
 
     if (thumbImage != null && imageEntry != null) {
-      const triangleBase = 20.0;
-
-      final firstLineOffset = playedPart - triangleBase / 2;
-      final secondLineOffset = playedPart + triangleBase / 2;
-
-      final path = Path()
-        ..moveTo(playedPart, 0)
-        ..lineTo(
-          playedPart <= triangleBase / 2 ? 0 : firstLineOffset,
-          -triangleBase,
-        )
-        ..lineTo(
-          playedPart > size.width - (triangleBase / 2)
-              ? size.width
-              : secondLineOffset,
-          -triangleBase,
-        )
-        ..close();
-
-      final trianglePaint = Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.fill;
-
-      canvas.drawPath(path, trianglePaint);
-
       final src = Rect.fromLTWH(
         imageEntry!.offset.dx,
         imageEntry!.offset.dy,

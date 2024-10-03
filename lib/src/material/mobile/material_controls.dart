@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:fl_pip/fl_pip.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -189,10 +191,23 @@ class _MaterialControlsState extends State<MaterialControls>
                             icon: PlayerIcons.close,
                           ),
                           const Spacer(),
-                          PlayerIconButton(
-                            onPressed: () {},
-                            icon: PlayerIcons.pictureInPicture,
-                          ),
+                          if (Platform.isAndroid)
+                            PlayerIconButton(
+                              onPressed: () async {
+                                notifier.hideStuff = true;
+
+                                if (!chewieController.isFullScreen) {
+                                  chewieController.enterFullScreen();
+                                }
+
+                                await FlPiP().enable(
+                                  android: const FlPiPAndroidConfig(
+                                    aspectRatio: Rational.landscape(),
+                                  ),
+                                );
+                              },
+                              icon: PlayerIcons.pictureInPicture,
+                            ),
                           PlayerIconButton(
                             onPressed: () {
                               chewieController.switchFit();
@@ -267,7 +282,7 @@ class _MaterialControlsState extends State<MaterialControls>
         alignment: Alignment.bottomCenter,
         value: !(notifier.lockStuff || notifier.hideStuff),
         child: SizedBox(
-          height: barHeight + (chewieController.isFullScreen ? 50 : 4),
+          height: barHeight + (chewieController.isFullScreen ? 40 : 15),
           child: SafeArea(
             top: false,
             bottom: chewieController.isFullScreen,
@@ -278,34 +293,9 @@ class _MaterialControlsState extends State<MaterialControls>
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (!chewieController.isLive)
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                        ),
-                        child: Row(
-                          children: [
-                            _buildProgressBar(),
-                            const Gap(12),
-                            if (chewieController.isLive)
-                              const Text('LIVE')
-                            else
-                              _buildPosition(iconColor),
-                          ],
-                        ),
-                      ),
-                    ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      if (mediaControls?.onOpen != null) ...[
-                        PlayerIconButton(
-                          onPressed: mediaControls!.onOpen!,
-                          icon: PlayerIcons.stack,
-                        ),
-                        const Gap(4),
-                      ],
                       PlayerIconButton(
                         onPressed: () {
                           showPlayerSettings(
@@ -315,6 +305,13 @@ class _MaterialControlsState extends State<MaterialControls>
                         },
                         icon: PlayerIcons.settings,
                       ),
+                      if (mediaControls?.onOpen != null) ...[
+                        const Gap(4),
+                        PlayerIconButton(
+                          onPressed: mediaControls!.onOpen!,
+                          icon: PlayerIcons.stack,
+                        ),
+                      ],
                       const Spacer(),
                       if (mediaControls?.onPrev != null)
                         PlayerIconButton(
@@ -327,11 +324,22 @@ class _MaterialControlsState extends State<MaterialControls>
                           onPressed: mediaControls!.onNext!,
                           icon: PlayerIcons.skipRight,
                         ),
-                      const Gap(4),
                       if (chewieController.allowFullScreen)
                         _buildExpandButton(),
                     ],
                   ),
+                  if (!chewieController.isLive)
+                    Expanded(
+                      child: Row(
+                        children: [
+                          const Gap(8),
+                          _buildProgressBar(),
+                          const Gap(8),
+                          _buildDuration(iconColor),
+                          const Gap(8),
+                        ],
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -440,10 +448,20 @@ class _MaterialControlsState extends State<MaterialControls>
 
   Widget _buildPosition(Color? iconColor) {
     final position = _latestValue.position;
+
+    return Text(
+      formatDuration(position),
+      style: context.s14.copyWith(
+        color: PlayerColors.greyB8,
+      ),
+    );
+  }
+
+  Widget _buildDuration(Color? iconColor) {
     final duration = _latestValue.duration;
 
     return Text(
-      formatDuration(duration - position),
+      formatDuration(duration),
       style: context.s14.copyWith(
         color: PlayerColors.greyB8,
       ),

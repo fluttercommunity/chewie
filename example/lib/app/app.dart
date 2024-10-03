@@ -73,11 +73,15 @@ class _ChewieDemoState extends State<ChewieDemo> {
         _chewieController = await ChewieController.fromHlsUrl(
             url: src,
             autoPlay: true,
+            mediaControls: MediaControls(
+              onNext: () {},
+              onOpen: () {},
+              onPrev: () {},
+            ),
             thumbnails: const MediaThumbnail(
               medium: thumbnailTest,
               large: thumbnailTest,
             ),
-            customControls: ChewieCustomControls.v1Controls,
             deviceOrientationsAfterFullScreen: [
               DeviceOrientation.portraitUp,
             ]);

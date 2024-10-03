@@ -13,8 +13,6 @@ import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../chewie.dart';
-import 'helpers/hls/hls_download_manager.dart';
-import 'helpers/hls/hls_parser.dart';
 import 'helpers/models/audio_track.dart';
 import 'helpers/models/video_track.dart';
 import 'notifiers/player_notifier.dart';
@@ -168,7 +166,7 @@ class ChewieState extends State<Chewie> {
     onEnterFullScreen();
 
     if (!widget.controller.allowedScreenSleep) {
-      WakelockPlus.enable();
+      await WakelockPlus.enable();
     }
 
     await Navigator.of(
@@ -184,7 +182,7 @@ class ChewieState extends State<Chewie> {
     widget.controller.exitFullScreen();
 
     if (!widget.controller.allowedScreenSleep) {
-      WakelockPlus.disable();
+      await WakelockPlus.disable();
     }
 
     await SystemChrome.setEnabledSystemUIMode(
