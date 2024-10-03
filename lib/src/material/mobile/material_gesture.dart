@@ -9,12 +9,14 @@ import '../../../chewie.dart';
 
 class MaterialGesture extends StatefulWidget {
   const MaterialGesture({
+    required this.restartTimer,
     required this.controller,
     required this.onTap,
     super.key,
   });
 
   final VoidCallback onTap;
+  final VoidCallback restartTimer;
   final ChewieController controller;
 
   @override
@@ -116,6 +118,7 @@ class _MaterialGestureState extends State<MaterialGesture> {
                 final position =
                     (await widget.controller.videoPlayerController.position) ??
                         Duration.zero;
+                widget.restartTimer();
                 await widget.controller.seekTo(
                   position + (-10).seconds,
                 );
@@ -124,6 +127,8 @@ class _MaterialGestureState extends State<MaterialGesture> {
                 if (details.primaryDelta == null) return;
 
                 changeDeviceBrightness(details.primaryDelta!);
+
+                widget.restartTimer();
               },
               child: Container(
                 color: Colors.transparent,
@@ -137,6 +142,7 @@ class _MaterialGestureState extends State<MaterialGesture> {
                 final position =
                     (await widget.controller.videoPlayerController.position) ??
                         Duration.zero;
+                widget.restartTimer();
                 await widget.controller.seekTo(
                   position + 10.seconds,
                 );
@@ -145,6 +151,8 @@ class _MaterialGestureState extends State<MaterialGesture> {
                 if (details.primaryDelta == null) return;
 
                 changeDeviceVolume(details.primaryDelta!);
+
+                widget.restartTimer();
               },
               child: Container(
                 color: Colors.transparent,

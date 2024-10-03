@@ -81,6 +81,12 @@ class _PlayerAnimationState extends State<PlayerAnimation>
   }
 
   @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnimatedOpacity(
       opacity: widget.value ? 1 : 0,

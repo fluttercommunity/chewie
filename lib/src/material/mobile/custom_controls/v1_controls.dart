@@ -19,7 +19,7 @@ import '../../../helpers/extensions.dart';
 import '../../../helpers/utils.dart';
 import '../../../helpers/vtt_parser.dart';
 import '../../../notifiers/index.dart';
-import '../../../widgets/animations/player_animated_size.dart';
+import '../../../widgets/animations/player_animation.dart';
 import '../../widgets/buttons/player_icon_button.dart';
 import '../material_gesture.dart';
 import '../material_settings/material_settings_main.dart';
@@ -119,6 +119,7 @@ class _V1ControlsState extends State<V1Controls>
                   child: MaterialGesture(
                     controller: chewieController,
                     onTap: _showOrHide,
+                    restartTimer: _cancelAndRestartTimer,
                   ),
                 ),
               ),
@@ -188,9 +189,9 @@ class _V1ControlsState extends State<V1Controls>
               child: IgnorePointer(
                 ignoring: notifier.lockStuff,
                 child: Center(
-                  child: AnimatedOpacity(
-                    opacity:
-                        notifier.lockStuff || notifier.hideStuff ? 0.0 : 1.0,
+                  child: PlayerAnimation(
+                    alignment: Alignment.topCenter,
+                    value: !(notifier.lockStuff || notifier.hideStuff),
                     duration: 250.ms,
                     child: Row(
                       children: [
@@ -305,9 +306,9 @@ class _V1ControlsState extends State<V1Controls>
 
     return IgnorePointer(
       ignoring: notifier.lockStuff,
-      child: AnimatedOpacity(
-        opacity: notifier.lockStuff || notifier.hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
+      child: PlayerAnimation(
+        value: !(notifier.lockStuff || notifier.hideStuff),
+        alignment: Alignment.bottomCenter,
         child: SizedBox(
           height: barHeight + (chewieController.isFullScreen ? 20.0 : 0),
           child: SafeArea(
@@ -425,8 +426,9 @@ class _V1ControlsState extends State<V1Controls>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (!isFinished && !chewieController.isLive)
-            PlayerAnimatedSize(
+            PlayerAnimation(
               value: !notifier.lockStuff && showPlayButton,
+              alignment: Alignment.centerLeft,
               child: PlayerIconButton(
                 size: 48,
                 onPressed: _seekBackward,
@@ -458,8 +460,9 @@ class _V1ControlsState extends State<V1Controls>
                   ),
           ),
           if (!isFinished && !chewieController.isLive)
-            PlayerAnimatedSize(
+            PlayerAnimation(
               value: !notifier.lockStuff && showPlayButton,
+              alignment: Alignment.centerRight,
               child: PlayerIconButton(
                 size: 48,
                 onPressed: _seekForward,
@@ -598,6 +601,8 @@ class _V1ControlsState extends State<V1Controls>
         seconds: 10,
       ),
     );
+
+    _cancelAndRestartTimer();
   }
 
   void _startHideTimer() {

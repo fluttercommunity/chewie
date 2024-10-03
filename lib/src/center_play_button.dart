@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'animated_play_pause.dart';
-import 'widgets/animations/player_animated_size.dart';
+import 'widgets/animations/player_animation.dart';
 
 class CenterPlayButton extends StatelessWidget {
   const CenterPlayButton({
@@ -27,7 +27,7 @@ class CenterPlayButton extends StatelessWidget {
       color: Colors.transparent,
       child: Center(
         child: UnconstrainedBox(
-          child: PlayerAnimatedSize(
+          child: PlayerAnimation(
             value: show,
             child: DecoratedBox(
               decoration: BoxDecoration(

@@ -14,13 +14,10 @@ import '../../config/icons.dart';
 import '../../helpers/extensions.dart';
 import '../../helpers/utils.dart';
 import '../../helpers/vtt_parser.dart';
-import '../../models/option_item.dart';
 import '../../models/subtitle_model.dart';
 import '../../notifiers/index.dart';
-import '../../widgets/animations/player_animated_size.dart';
+import '../../widgets/animations/player_animation.dart';
 import '../widgets/buttons/player_icon_button.dart';
-import '../widgets/options_dialog.dart';
-import '../widgets/playback_speed_dialog.dart';
 import 'material_gesture.dart';
 import 'material_progress_bar.dart';
 import 'material_settings/material_settings_main.dart';
@@ -104,6 +101,7 @@ class _MaterialControlsState extends State<MaterialControls>
                   child: MaterialGesture(
                     controller: chewieController,
                     onTap: _showOrHide,
+                    restartTimer: _cancelAndRestartTimer,
                   ),
                 ),
               ),
@@ -164,50 +162,50 @@ class _MaterialControlsState extends State<MaterialControls>
       left: 8,
       right: 8,
       child: SafeArea(
-        child: Row(
-          children: [
-            Expanded(
-              child: IgnorePointer(
-                ignoring: notifier.lockStuff,
-                child: Center(
-                  child: AnimatedOpacity(
-                    opacity:
-                        notifier.lockStuff || notifier.hideStuff ? 0.0 : 1.0,
-                    duration: 250.ms,
-                    child: Row(
-                      children: [
-                        PlayerIconButton(
-                          onPressed: () {
-                            if (chewieController.isFullScreen) {
-                              chewieController.toggleFullScreen();
-                            }
-                            if (Navigator.canPop(context)) {
-                              Navigator.pop(context);
-                            }
-                          },
-                          icon: PlayerIcons.close,
-                        ),
-                        const Spacer(),
-                        PlayerIconButton(
-                          onPressed: () {},
-                          icon: PlayerIcons.pictureInPicture,
-                        ),
-                        PlayerIconButton(
-                          onPressed: () {
-                            chewieController.switchFit();
-                          },
-                          icon: PlayerIcons.fullScreen,
-                        ),
-                      ],
+        child: PlayerAnimation(
+          value: !notifier.hideStuff,
+          alignment: Alignment.topCenter,
+          child: Row(
+            children: [
+              Expanded(
+                child: IgnorePointer(
+                  ignoring: notifier.lockStuff,
+                  child: Center(
+                    child: PlayerAnimation(
+                      alignment: Alignment.topCenter,
+                      value: !notifier.lockStuff,
+                      duration: 250.ms,
+                      child: Row(
+                        children: [
+                          PlayerIconButton(
+                            onPressed: () {
+                              if (chewieController.isFullScreen) {
+                                chewieController.toggleFullScreen();
+                              }
+                              if (Navigator.canPop(context)) {
+                                Navigator.pop(context);
+                              }
+                            },
+                            icon: PlayerIcons.close,
+                          ),
+                          const Spacer(),
+                          PlayerIconButton(
+                            onPressed: () {},
+                            icon: PlayerIcons.pictureInPicture,
+                          ),
+                          PlayerIconButton(
+                            onPressed: () {
+                              chewieController.switchFit();
+                            },
+                            icon: PlayerIcons.fullScreen,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            AnimatedOpacity(
-              opacity: notifier.hideStuff ? 0.0 : 1.0,
-              duration: 250.ms,
-              child: PlayerIconButton(
+              PlayerIconButton(
                 onPressed: () {
                   notifier.lockStuff = !notifier.lockStuff;
                 },
@@ -215,60 +213,8 @@ class _MaterialControlsState extends State<MaterialControls>
                     ? PlayerIcons.lockClose
                     : PlayerIcons.lockOpen,
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOptionsButton() {
-    final options = <OptionItem>[
-      OptionItem(
-        onTap: () async {
-          Navigator.pop(context);
-          await _onSpeedButtonTap();
-        },
-        iconData: Icons.speed,
-        title: chewieController.optionsTranslation?.playbackSpeedButtonText ??
-            'Playback speed',
-      ),
-    ];
-
-    if (chewieController.additionalOptions != null &&
-        chewieController.additionalOptions!(context).isNotEmpty) {
-      options.addAll(chewieController.additionalOptions!(context));
-    }
-
-    return AnimatedOpacity(
-      opacity: notifier.lockStuff || notifier.hideStuff ? 0.0 : 1.0,
-      duration: const Duration(milliseconds: 250),
-      child: IconButton(
-        onPressed: () async {
-          _hideTimer?.cancel();
-
-          if (chewieController.optionsBuilder != null) {
-            await chewieController.optionsBuilder!(context, options);
-          } else {
-            await showModalBottomSheet<OptionItem>(
-              context: context,
-              isScrollControlled: true,
-              useRootNavigator: chewieController.useRootNavigator,
-              builder: (context) => OptionsDialog(
-                options: options,
-                cancelButtonText:
-                    chewieController.optionsTranslation?.cancelButtonText,
-              ),
-            );
-          }
-
-          if (_latestValue.isPlaying) {
-            _startHideTimer();
-          }
-        },
-        icon: const Icon(
-          Icons.more_vert,
-          color: Colors.white,
+            ],
+          ),
         ),
       ),
     );
@@ -317,11 +263,11 @@ class _MaterialControlsState extends State<MaterialControls>
 
     return IgnorePointer(
       ignoring: notifier.lockStuff,
-      child: AnimatedOpacity(
-        opacity: notifier.lockStuff || notifier.hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
+      child: PlayerAnimation(
+        alignment: Alignment.bottomCenter,
+        value: !(notifier.lockStuff || notifier.hideStuff),
         child: SizedBox(
-          height: barHeight + (chewieController.isFullScreen ? 20.0 : 4),
+          height: barHeight + (chewieController.isFullScreen ? 50 : 4),
           child: SafeArea(
             top: false,
             bottom: chewieController.isFullScreen,
@@ -444,8 +390,9 @@ class _MaterialControlsState extends State<MaterialControls>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (!isFinished && !chewieController.isLive)
-            PlayerAnimatedSize(
+            PlayerAnimation(
               value: !notifier.lockStuff && showPlayButton,
+              alignment: Alignment.centerLeft,
               child: PlayerIconButton(
                 size: 48,
                 onPressed: _seekBackward,
@@ -477,8 +424,9 @@ class _MaterialControlsState extends State<MaterialControls>
                   ),
           ),
           if (!isFinished && !chewieController.isLive)
-            PlayerAnimatedSize(
+            PlayerAnimation(
               value: !notifier.lockStuff && showPlayButton,
+              alignment: Alignment.centerRight,
               child: PlayerIconButton(
                 size: 48,
                 onPressed: _seekForward,
@@ -488,28 +436,6 @@ class _MaterialControlsState extends State<MaterialControls>
         ],
       ),
     );
-  }
-
-  Future<void> _onSpeedButtonTap() async {
-    _hideTimer?.cancel();
-
-    final chosenSpeed = await showModalBottomSheet<double>(
-      context: context,
-      isScrollControlled: true,
-      useRootNavigator: chewieController.useRootNavigator,
-      builder: (context) => PlaybackSpeedDialog(
-        speeds: chewieController.playbackSpeeds,
-        selected: _latestValue.playbackSpeed,
-      ),
-    );
-
-    if (chosenSpeed != null) {
-      await controller.setPlaybackSpeed(chosenSpeed);
-    }
-
-    if (_latestValue.isPlaying) {
-      _startHideTimer();
-    }
   }
 
   Widget _buildPosition(Color? iconColor) {
@@ -522,36 +448,6 @@ class _MaterialControlsState extends State<MaterialControls>
         color: PlayerColors.greyB8,
       ),
     );
-  }
-
-  Widget _buildSubtitleToggle() {
-    //if don't have subtitle hidden button
-    if (chewieController.subtitle?.isEmpty ?? true) {
-      return const SizedBox();
-    }
-    return GestureDetector(
-      onTap: _onSubtitleTap,
-      child: Container(
-        height: barHeight,
-        color: Colors.transparent,
-        padding: const EdgeInsets.only(
-          left: 12,
-          right: 12,
-        ),
-        child: Icon(
-          _subtitleOn
-              ? Icons.closed_caption
-              : Icons.closed_caption_off_outlined,
-          color: _subtitleOn ? Colors.white : Colors.grey[700],
-        ),
-      ),
-    );
-  }
-
-  void _onSubtitleTap() {
-    setState(() {
-      _subtitleOn = !_subtitleOn;
-    });
   }
 
   void _cancelAndRestartTimer() {
@@ -651,6 +547,8 @@ class _MaterialControlsState extends State<MaterialControls>
         seconds: -10,
       ),
     );
+
+    _cancelAndRestartTimer();
   }
 
   void _seekForward() {
@@ -659,6 +557,8 @@ class _MaterialControlsState extends State<MaterialControls>
         seconds: 10,
       ),
     );
+
+    _cancelAndRestartTimer();
   }
 
   void _startHideTimer() {

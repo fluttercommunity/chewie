@@ -284,36 +284,17 @@ class _StaticProgressBarState extends State<StaticProgressBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height,
-      width: MediaQuery.of(context).size.width,
-      color: Colors.transparent,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: PlayerAnimation(
-              value: widget.showThumbnail && widget.thumbnail != null,
-              child: CustomPaint(
-                painter: _ProgressBarThumbPainter(
-                  imageEntry: _largeImageLoaded
-                      ? widget.thumbnail
-                      : widget.thumbnailPlaceholder,
-                  handleHeight: widget.handleHeight,
-                  value: widget.value,
-                  draggableValue: widget.latestDraggableOffset != null
-                      ? context.calcRelativePosition(
-                          widget.value.duration,
-                          widget.latestDraggableOffset!,
-                        )
-                      : null,
-                  thumbImage: _thumbImage,
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: PlayerAnimation(
+            value: widget.showThumbnail && widget.thumbnail != null,
             child: CustomPaint(
-              painter: _ProgressBarPainter(
+              painter: _ProgressBarThumbPainter(
+                imageEntry: _largeImageLoaded
+                    ? widget.thumbnail
+                    : widget.thumbnailPlaceholder,
+                handleHeight: widget.handleHeight,
                 value: widget.value,
                 draggableValue: widget.latestDraggableOffset != null
                     ? context.calcRelativePosition(
@@ -321,17 +302,34 @@ class _StaticProgressBarState extends State<StaticProgressBar> {
                         widget.latestDraggableOffset!,
                       )
                     : null,
-                colors: widget.colors,
-                barHeight: widget.barHeight,
-                showThumbnail: widget.showThumbnail,
-                handleHeight: widget.handleHeight,
-                drawShadow: widget.drawShadow,
                 thumbImage: _thumbImage,
               ),
             ),
           ),
-        ],
-      ),
+        ),
+        Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          color: Colors.transparent,
+          child: CustomPaint(
+            painter: _ProgressBarPainter(
+              value: widget.value,
+              draggableValue: widget.latestDraggableOffset != null
+                  ? context.calcRelativePosition(
+                      widget.value.duration,
+                      widget.latestDraggableOffset!,
+                    )
+                  : null,
+              colors: widget.colors,
+              barHeight: widget.barHeight,
+              showThumbnail: widget.showThumbnail,
+              handleHeight: widget.handleHeight,
+              drawShadow: widget.drawShadow,
+              thumbImage: _thumbImage,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -519,8 +517,8 @@ class _ProgressBarThumbPainter extends CustomPainter {
       canvas.drawPath(path, trianglePaint);
 
       final src = Rect.fromLTWH(
-        0,
-        0,
+        imageEntry!.offset.dx,
+        imageEntry!.offset.dy,
         imageEntry!.size.width,
         imageEntry!.size.height,
       );

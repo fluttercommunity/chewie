@@ -122,13 +122,15 @@ class PlayerWithControls extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return Center(
-          child: Container(
-            color: Colors.black,
-            height: constraints.maxHeight,
-            width: constraints.maxWidth,
-            child: AspectRatio(
-              aspectRatio: calculateAspectRatio(context),
-              child: buildPlayerWithControls(chewieController, context),
+          child: ClipRRect(
+            child: Container(
+              color: Colors.black,
+              height: constraints.maxHeight,
+              width: constraints.maxWidth,
+              child: AspectRatio(
+                aspectRatio: calculateAspectRatio(context),
+                child: buildPlayerWithControls(chewieController, context),
+              ),
             ),
           ),
         );

@@ -71,19 +71,16 @@ class _ChewieDemoState extends State<ChewieDemo> {
     Future.sync(() async {
       try {
         _chewieController = await ChewieController.fromHlsUrl(
-          url: src,
-          autoPlay: true,
-          thumbnails: const MediaThumbnail(
-            medium: thumbnailTest,
-            large: thumbnailTest,
-          ),
-          customControls: ChewieCustomControls.v1Controls,
-          deviceOrientationsOnEnterFullScreen: [
-            DeviceOrientation.landscapeLeft,
-            DeviceOrientation.landscapeRight,
-            DeviceOrientation.portraitUp,
-          ],
-        );
+            url: src,
+            autoPlay: true,
+            thumbnails: const MediaThumbnail(
+              medium: thumbnailTest,
+              large: thumbnailTest,
+            ),
+            customControls: ChewieCustomControls.v1Controls,
+            deviceOrientationsAfterFullScreen: [
+              DeviceOrientation.portraitUp,
+            ]);
       } catch (err) {}
       setState(() {});
     });
