@@ -280,6 +280,16 @@ class MediaThumbnail {
   final String? large;
 }
 
+class MediaDescription {
+  const MediaDescription({
+    this.subtitle,
+    this.title,
+  });
+
+  final String? title;
+  final String? subtitle;
+}
+
 /// The ChewieController is used to configure and drive the Chewie Player
 /// Widgets. It provides methods to control playback, such as [pause] and
 /// [play], as well as methods that control the visual appearance of the player,
@@ -322,6 +332,7 @@ class ChewieController extends ChangeNotifier {
     this.maxScale = 2.5,
     this.subtitle,
     this.subtitleBuilder,
+    this.description,
     this.customControls,
     this.errorBuilder,
     this.bufferingBuilder,
@@ -354,6 +365,7 @@ class ChewieController extends ChangeNotifier {
 
   static Future<ChewieController> fromHlsUrl({
     required String url,
+    MediaDescription? description,
     Map<String, dynamic>? headers,
     MediaControls? mediaControls,
     MediaThumbnail? thumbnails,
@@ -458,6 +470,7 @@ class ChewieController extends ChangeNotifier {
       autoInitialize: autoInitialize,
       autoPlay: autoPlay,
       startAt: startAt,
+      description: description,
       server: server,
       looping: looping,
       maxScale: maxScale,
@@ -501,6 +514,7 @@ class ChewieController extends ChangeNotifier {
   }
 
   ChewieController copyWith({
+    MediaDescription? description,
     VideoPlayerController? videoPlayerController,
     OptionsTranslation? optionsTranslation,
     MediaControls? mediaControls,
@@ -580,6 +594,7 @@ class ChewieController extends ChangeNotifier {
       placeholder: placeholder ?? this.placeholder,
       hlsMaster: hlsMaster ?? _hlsMaster,
       server: server ?? this.server,
+      description: description ?? this.description,
       directory: directory ?? this.directory,
       overlay: overlay ?? this.overlay,
       showControlsOnInitialize:
@@ -622,6 +637,8 @@ class ChewieController extends ChangeNotifier {
   final MediaControls? mediaControls;
 
   final MediaThumbnail? thumbnails;
+
+  final MediaDescription? description;
 
   /// If false, the options button in MaterialUI and MaterialDesktopUI
   /// won't be shown.

@@ -78,6 +78,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
               onOpen: () {},
               onPrev: () {},
             ),
+            description: const MediaDescription(
+              title: 'Тень и кость (сериал 2021)',
+            ),
             thumbnails: const MediaThumbnail(
               medium: thumbnailTest,
               large: thumbnailTest,

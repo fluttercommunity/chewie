@@ -167,67 +167,94 @@ class _MaterialControlsState extends State<MaterialControls>
         child: PlayerAnimation(
           value: !notifier.hideStuff,
           alignment: Alignment.topCenter,
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: IgnorePointer(
-                  ignoring: notifier.lockStuff,
-                  child: Center(
-                    child: PlayerAnimation(
-                      alignment: Alignment.topCenter,
-                      value: !notifier.lockStuff,
-                      duration: 250.ms,
-                      child: Row(
-                        children: [
-                          PlayerIconButton(
-                            onPressed: () {
-                              if (chewieController.isFullScreen) {
-                                chewieController.toggleFullScreen();
-                              }
-                              if (Navigator.canPop(context)) {
-                                Navigator.pop(context);
-                              }
-                            },
-                            icon: PlayerIcons.close,
-                          ),
-                          const Spacer(),
-                          if (Platform.isAndroid)
-                            PlayerIconButton(
-                              onPressed: () async {
-                                notifier.hideStuff = true;
+              Row(
+                children: [
+                  Expanded(
+                    child: IgnorePointer(
+                      ignoring: notifier.lockStuff,
+                      child: Center(
+                        child: PlayerAnimation(
+                          alignment: Alignment.topCenter,
+                          value: !notifier.lockStuff,
+                          duration: 250.ms,
+                          child: Row(
+                            children: [
+                              PlayerIconButton(
+                                onPressed: () {
+                                  if (chewieController.isFullScreen) {
+                                    chewieController.toggleFullScreen();
+                                  }
+                                  if (Navigator.canPop(context)) {
+                                    Navigator.pop(context);
+                                  }
+                                },
+                                icon: PlayerIcons.close,
+                              ),
+                              const Spacer(),
+                              if (Platform.isAndroid)
+                                PlayerIconButton(
+                                  onPressed: () async {
+                                    notifier.hideStuff = true;
 
-                                if (!chewieController.isFullScreen) {
-                                  chewieController.enterFullScreen();
-                                }
+                                    if (!chewieController.isFullScreen) {
+                                      chewieController.enterFullScreen();
+                                    }
 
-                                await FlPiP().enable(
-                                  android: const FlPiPAndroidConfig(
-                                    aspectRatio: Rational.landscape(),
-                                  ),
-                                );
-                              },
-                              icon: PlayerIcons.pictureInPicture,
-                            ),
-                          PlayerIconButton(
-                            onPressed: () {
-                              chewieController.switchFit();
-                            },
-                            icon: PlayerIcons.fullScreen,
+                                    await FlPiP().enable(
+                                      android: const FlPiPAndroidConfig(
+                                        aspectRatio: Rational.landscape(),
+                                      ),
+                                    );
+                                  },
+                                  icon: PlayerIcons.pictureInPicture,
+                                ),
+                              PlayerIconButton(
+                                onPressed: () {
+                                  chewieController.switchFit();
+                                },
+                                icon: PlayerIcons.fullScreen,
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
+                  PlayerIconButton(
+                    onPressed: () {
+                      notifier.lockStuff = !notifier.lockStuff;
+                    },
+                    icon: notifier.lockStuff
+                        ? PlayerIcons.lockClose
+                        : PlayerIcons.lockOpen,
+                  ),
+                ],
+              ),
+              if (chewieController.description?.title != null)
+                Text(
+                  chewieController.description!.title!,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  style: (chewieController.isFullScreen
+                          ? context.s20
+                          : context.s16)
+                      .w600,
+                  maxLines: 2,
                 ),
-              ),
-              PlayerIconButton(
-                onPressed: () {
-                  notifier.lockStuff = !notifier.lockStuff;
-                },
-                icon: notifier.lockStuff
-                    ? PlayerIcons.lockClose
-                    : PlayerIcons.lockOpen,
-              ),
+              if (chewieController.description?.subtitle != null)
+                Text(
+                  chewieController.description!.subtitle!,
+                  style: (chewieController.isFullScreen
+                          ? context.s16
+                          : context.s14)
+                      .w600
+                      .copyWith(
+                        color: PlayerColors.greyB8,
+                      ),
+                ),
             ],
           ),
         ),
