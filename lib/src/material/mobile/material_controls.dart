@@ -282,7 +282,7 @@ class _MaterialControlsState extends State<MaterialControls>
         alignment: Alignment.bottomCenter,
         value: !(notifier.lockStuff || notifier.hideStuff),
         child: SizedBox(
-          height: barHeight + (chewieController.isFullScreen ? 40 : 15),
+          height: barHeight + (chewieController.isFullScreen ? 40 : 0),
           child: SafeArea(
             top: false,
             bottom: chewieController.isFullScreen,
@@ -293,6 +293,18 @@ class _MaterialControlsState extends State<MaterialControls>
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  if (!chewieController.isLive)
+                    Expanded(
+                      child: Row(
+                        children: [
+                          const Gap(8),
+                          _buildProgressBar(),
+                          const Gap(8),
+                          _buildDuration(iconColor),
+                          const Gap(8),
+                        ],
+                      ),
+                    ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
@@ -328,18 +340,6 @@ class _MaterialControlsState extends State<MaterialControls>
                         _buildExpandButton(),
                     ],
                   ),
-                  if (!chewieController.isLive)
-                    Expanded(
-                      child: Row(
-                        children: [
-                          const Gap(8),
-                          _buildProgressBar(),
-                          const Gap(8),
-                          _buildDuration(iconColor),
-                          const Gap(8),
-                        ],
-                      ),
-                    ),
                 ],
               ),
             ),

@@ -514,7 +514,7 @@ class _ProgressBarThumbPainter extends CustomPainter {
 
     final dst = Rect.fromLTWH(
       offset - halfWidth,
-      -140,
+      -150,
       200,
       120,
     );
