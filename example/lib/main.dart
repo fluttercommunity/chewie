@@ -5,6 +5,7 @@ import 'package:chewie_example/app/app.dart';
 import 'package:chewie_example/src/gen/codegen_loader.g.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -25,20 +26,22 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
 
   runApp(
-    EasyLocalization(
-      supportedLocales: const [
-        Locale('ru'),
-        Locale('uz'),
-      ],
-      startLocale: const Locale('ru'),
-      path: 'assets/locales',
-      assetLoader: const CodegenLoader(),
-      extraAssetLoaders: const [
-        TranslationsLoader(
-          packageName: 'chewie',
-        ),
-      ],
-      child: const MyWidget(),
+    ProviderScope(
+      child: EasyLocalization(
+        supportedLocales: const [
+          Locale('ru'),
+          Locale('uz'),
+        ],
+        startLocale: const Locale('ru'),
+        path: 'assets/locales',
+        assetLoader: const CodegenLoader(),
+        extraAssetLoaders: const [
+          TranslationsLoader(
+            packageName: 'chewie',
+          ),
+        ],
+        child: const MyWidget(),
+      ),
     ),
   );
 }
