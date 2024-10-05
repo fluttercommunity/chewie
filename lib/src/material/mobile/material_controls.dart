@@ -1,10 +1,12 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:developer';
 
 import 'package:fl_pip/fl_pip.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_cast_video/flutter_cast_video.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -158,6 +160,8 @@ class _MaterialControlsState extends State<MaterialControls>
     super.didChangeDependencies();
   }
 
+  ChromeCastController? _chromeCastController;
+
   Widget _buildActionBar() {
     return Positioned(
       top: 8,
@@ -194,7 +198,30 @@ class _MaterialControlsState extends State<MaterialControls>
                                 icon: PlayerIcons.close,
                               ),
                               const Spacer(),
-                              if (Platform.isAndroid)
+                              if (kDebugMode)
+                                SizedBox(
+                                  height: 20,
+                                  child: ChromeCastButton(
+                                    size: 20,
+                                    color: Colors.white,
+                                    onRequestFailed: (err) {
+                                      log(err.toString());
+                                    },
+                                    onButtonCreated: (controller) async {
+                                      _chromeCastController = controller;
+                                      setState(() {});
+                                      await _chromeCastController
+                                          ?.addSessionListener();
+                                    },
+                                    onSessionStarted: () {
+                                      _chromeCastController?.loadMedia(
+                                        'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+                                      );
+                                    },
+                                  ),
+                                ),
+                              const Gap(12),
+                              if (kDebugMode)
                                 PlayerIconButton(
                                   onPressed: () async {
                                     notifier.hideStuff = true;
@@ -203,11 +230,7 @@ class _MaterialControlsState extends State<MaterialControls>
                                       chewieController.enterFullScreen();
                                     }
 
-                                    await FlPiP().enable(
-                                      android: const FlPiPAndroidConfig(
-                                        aspectRatio: Rational.landscape(),
-                                      ),
-                                    );
+                                    await FlPiP().enable();
                                   },
                                   icon: PlayerIcons.pictureInPicture,
                                 ),
