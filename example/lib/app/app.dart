@@ -78,6 +78,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
               onOpen: () {},
               onPrev: () {},
             ),
+            customControls: ChewieCustomControls.v1Controls,
             description: const MediaDescription(
               title: 'Тень и кость (сериал 2021)',
             ),

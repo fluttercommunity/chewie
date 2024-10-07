@@ -93,41 +93,46 @@ class _MaterialControlsState extends State<MaterialControls>
         _cancelAndRestartTimer();
       },
       child: GestureDetector(
-        onTap: _cancelAndRestartTimer,
-        child: AbsorbPointer(
-          absorbing: notifier.hideStuff,
-          child: Stack(
-            children: [
-              _buildHitArea(),
-              Positioned.fill(
-                child: IgnorePointer(
-                  ignoring: notifier.lockStuff,
-                  child: MaterialGesture(
-                    controller: chewieController,
-                    onTap: _showOrHide,
-                    restartTimer: _cancelAndRestartTimer,
-                  ),
+        onTap: () {
+          if (notifier.hideStuff) {
+            _cancelAndRestartTimer();
+          } else {
+            _showOrHide();
+          }
+        },
+        behavior: HitTestBehavior.opaque,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: IgnorePointer(
+                ignoring: notifier.lockStuff,
+                child: MaterialGesture(
+                  controller: chewieController,
+                  restartTimer: () {
+                    if (!notifier.hideStuff) {
+                      _cancelAndRestartTimer();
+                    }
+                  },
                 ),
               ),
-              _buildPlayPause(),
-              _buildActionBar(),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  if (_subtitleOn)
-                    Transform.translate(
-                      offset: Offset(
-                        0,
-                        notifier.hideStuff ? barHeight * 0.8 : 0.0,
-                      ),
-                      child:
-                          _buildSubtitles(context, chewieController.subtitle!),
+            ),
+            _buildPlayPause(),
+            _buildActionBar(),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                if (_subtitleOn)
+                  Transform.translate(
+                    offset: Offset(
+                      0,
+                      notifier.hideStuff ? barHeight * 0.8 : 0.0,
                     ),
-                  _buildBottomBar(context),
-                ],
-              ),
-            ],
-          ),
+                    child: _buildSubtitles(context, chewieController.subtitle!),
+                  ),
+                _buildBottomBar(context),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -256,28 +261,36 @@ class _MaterialControlsState extends State<MaterialControls>
                   ),
                 ],
               ),
-              if (chewieController.description?.title != null)
-                Text(
-                  chewieController.description!.title!,
-                  textAlign: TextAlign.center,
-                  overflow: TextOverflow.ellipsis,
-                  style: (chewieController.isFullScreen
-                          ? context.s20
-                          : context.s16)
-                      .w600,
-                  maxLines: 2,
-                ),
-              if (chewieController.description?.subtitle != null)
-                Text(
-                  chewieController.description!.subtitle!,
-                  style: (chewieController.isFullScreen
-                          ? context.s16
-                          : context.s14)
-                      .w600
-                      .copyWith(
-                        color: PlayerColors.greyB8,
+              PlayerAnimation(
+                value: !notifier.lockStuff,
+                alignment: Alignment.topCenter,
+                child: Column(
+                  children: [
+                    if (chewieController.description?.title != null)
+                      Text(
+                        chewieController.description!.title!,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        style: (chewieController.isFullScreen
+                                ? context.s20
+                                : context.s16)
+                            .w600,
+                        maxLines: 2,
                       ),
+                    if (chewieController.description?.subtitle != null)
+                      Text(
+                        chewieController.description!.subtitle!,
+                        style: (chewieController.isFullScreen
+                                ? context.s16
+                                : context.s14)
+                            .w600
+                            .copyWith(
+                              color: PlayerColors.greyB8,
+                            ),
+                      ),
+                  ],
                 ),
+              ),
             ],
           ),
         ),
@@ -424,16 +437,6 @@ class _MaterialControlsState extends State<MaterialControls>
         notifier.hideStuff = true;
       });
     }
-  }
-
-  Widget _buildHitArea() {
-    return GestureDetector(
-      onTap: _showOrHide,
-      child: Container(
-        alignment: Alignment.center,
-        color: Colors.transparent,
-      ),
-    );
   }
 
   Widget _buildPlayPause() {

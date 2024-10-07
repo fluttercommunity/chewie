@@ -105,14 +105,7 @@ class PlayerWithControls extends StatelessWidget {
                 );
               }
 
-              if (!chewieController.isFullScreen) {
-                return buildControls(context, chewieController);
-              } else {
-                return SafeArea(
-                  bottom: false,
-                  child: buildControls(context, chewieController),
-                );
-              }
+              return buildControls(context, chewieController);
             },
           ),
         ],

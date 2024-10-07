@@ -11,6 +11,7 @@ dependencies:
   cupertino_icons: ^1.0.5
   dio: ^5.7.0
   dio_cache_interceptor: ^3.5.0
+  double_tap_player_view: ^2.0.3
   easy_localization: ^3.0.7
   equatable: ^2.0.5
   expandable_page_view: ^1.0.17

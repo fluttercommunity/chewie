@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:fl_pip/fl_pip.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_cast_video/flutter_cast_video.dart';
@@ -107,41 +107,45 @@ class _V1ControlsState extends State<V1Controls>
         _cancelAndRestartTimer();
       },
       child: GestureDetector(
-        onTap: _cancelAndRestartTimer,
-        child: AbsorbPointer(
-          absorbing: notifier.hideStuff,
-          child: Stack(
-            children: [
-              _buildHitArea(),
-              Positioned.fill(
-                child: IgnorePointer(
-                  ignoring: notifier.lockStuff,
-                  child: MaterialGesture(
-                    controller: chewieController,
-                    onTap: _showOrHide,
-                    restartTimer: _cancelAndRestartTimer,
-                  ),
+        onTap: () {
+          if (notifier.hideStuff) {
+            _cancelAndRestartTimer();
+          } else {
+            _showOrHide();
+          }
+        },
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: IgnorePointer(
+                ignoring: notifier.lockStuff,
+                child: MaterialGesture(
+                  controller: chewieController,
+                  restartTimer: () {
+                    if (!notifier.hideStuff) {
+                      _cancelAndRestartTimer();
+                    }
+                  },
                 ),
               ),
-              _buildPlayPause(),
-              _buildActionBar(),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  if (_subtitleOn)
-                    Transform.translate(
-                      offset: Offset(
-                        0,
-                        notifier.hideStuff ? barHeight * 0.8 : 0.0,
-                      ),
-                      child:
-                          _buildSubtitles(context, chewieController.subtitle!),
+            ),
+            _buildPlayPause(),
+            _buildActionBar(),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                if (_subtitleOn)
+                  Transform.translate(
+                    offset: Offset(
+                      0,
+                      notifier.hideStuff ? barHeight * 0.8 : 0.0,
                     ),
-                  _buildBottomBar(context),
-                ],
-              ),
-            ],
-          ),
+                    child: _buildSubtitles(context, chewieController.subtitle!),
+                  ),
+                _buildBottomBar(context),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -213,27 +217,29 @@ class _V1ControlsState extends State<V1Controls>
                             icon: PlayerIconsCustom.v1.help,
                           ),
                         const Gap(6),
-                        ChromeCastButton(
-                          size: 28,
-                          color: Colors.white,
-                          onRequestFailed: (err) {
-                            log(err.toString());
-                          },
-                          onButtonCreated: (controller) async {
-                            _chromeCastController = controller;
-                            setState(() {});
-                            await _chromeCastController?.addSessionListener();
-                          },
-                          onSessionStarted: () {
-                            _chromeCastController?.loadMedia(
-                              chewieController.videoPlayerController.dataSource,
-                            );
-                          },
-                        ),
-                        if (Platform.isAndroid) ...[
-                          const Gap(4),
+                        if (kDebugMode)
+                          ChromeCastButton(
+                            size: 28,
+                            color: Colors.white,
+                            onRequestFailed: (err) {
+                              log(err.toString());
+                            },
+                            onButtonCreated: (controller) async {
+                              _chromeCastController = controller;
+                              setState(() {});
+                              await _chromeCastController?.addSessionListener();
+                            },
+                            onSessionStarted: () {
+                              _chromeCastController?.loadMedia(
+                                chewieController
+                                    .videoPlayerController.dataSource,
+                              );
+                            },
+                          ),
+                        const Gap(10),
+                        if (kDebugMode)
                           PlayerIconButton(
-                            size: 36,
+                            size: 38,
                             onPressed: () async {
                               notifier.hideStuff = true;
 
@@ -249,8 +255,13 @@ class _V1ControlsState extends State<V1Controls>
                             },
                             icon: PlayerIconsCustom.v1.pictureInPicture,
                           ),
-                        ] else
-                          const Gap(8),
+                        PlayerIconButton(
+                          size: 36,
+                          onPressed: () {
+                            chewieController.switchFit();
+                          },
+                          icon: PlayerIcons.fullScreen,
+                        ),
                       ],
                     ),
                   ),
@@ -301,7 +312,6 @@ class _V1ControlsState extends State<V1Controls>
   Widget _buildBottomBar(
     BuildContext context,
   ) {
-    final iconColor = Theme.of(context).textTheme.labelLarge!.color;
     final mediaControls = chewieController.mediaControls;
 
     return IgnorePointer(
@@ -321,20 +331,18 @@ class _V1ControlsState extends State<V1Controls>
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.only(
+                        left: 8,
+                        right: 12,
+                      ),
+                      child: _buildProgressBar(),
+                    ),
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      const Gap(8),
-                      _buildPosition(iconColor),
-                      const Spacer(),
-                      _buildDuration(),
-                      const Gap(10),
-                      if (mediaControls?.onOpen != null) ...[
-                        PlayerIconButton(
-                          onPressed: mediaControls!.onOpen!,
-                          icon: PlayerIcons.stack,
-                        ),
-                      ],
                       PlayerIconButton(
                         onPressed: () {
                           showPlayerSettings(
@@ -344,6 +352,15 @@ class _V1ControlsState extends State<V1Controls>
                         },
                         icon: PlayerIconsCustom.v1.settings,
                       ),
+                      if (mediaControls?.onOpen != null) ...[
+                        PlayerIconButton(
+                          onPressed: mediaControls!.onOpen!,
+                          icon: PlayerIcons.stack,
+                        ),
+                      ],
+                      const Gap(10),
+                      _buildDuration(),
+                      const Spacer(),
                       if (mediaControls?.onPrev != null) ...[
                         PlayerIconButton(
                           onPressed: mediaControls!.onPrev!,
@@ -360,16 +377,6 @@ class _V1ControlsState extends State<V1Controls>
                         _buildExpandButton(),
                     ],
                   ),
-                  if (!chewieController.isLive)
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.only(
-                          left: 8,
-                          right: 12,
-                        ),
-                        child: _buildProgressBar(),
-                      ),
-                    ),
                 ],
               ),
             ),

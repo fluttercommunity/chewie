@@ -1,21 +1,22 @@
 import 'dart:async';
 
+import 'package:double_tap_player_view/double_tap_player_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:volume_controller/volume_controller.dart';
 
 import '../../../chewie.dart';
+import '../../config/colors.dart';
+import '../../helpers/extensions.dart';
 
 class MaterialGesture extends StatefulWidget {
   const MaterialGesture({
     required this.restartTimer,
     required this.controller,
-    required this.onTap,
     super.key,
   });
 
-  final VoidCallback onTap;
   final VoidCallback restartTimer;
   final ChewieController controller;
 
@@ -105,61 +106,41 @@ class _MaterialGestureState extends State<MaterialGesture> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      minimum: const EdgeInsets.symmetric(
-        vertical: 60,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: widget.onTap,
-              onDoubleTap: () async {
-                final position =
-                    (await widget.controller.videoPlayerController.position) ??
-                        Duration.zero;
-                widget.restartTimer();
-                await widget.controller.seekTo(
-                  position + (-10).seconds,
-                );
-              },
-              onVerticalDragUpdate: (details) {
-                if (details.primaryDelta == null) return;
+    return GestureDetector(
+      onVerticalDragUpdate: (details) {
+        if (details.primaryDelta == null) return;
 
-                changeDeviceBrightness(details.primaryDelta!);
+        if (details.globalPosition.dx < context.width / 2) {
+          changeDeviceBrightness(details.primaryDelta!);
+        } else {
+          changeDeviceVolume(details.primaryDelta!);
+        }
 
-                widget.restartTimer();
-              },
-              child: Container(
-                color: Colors.transparent,
-              ),
-            ),
+        widget.restartTimer();
+      },
+      child: DoubleTapPlayerView(
+        doubleTapConfig: DoubleTapConfig.create(
+          iconRight: const Icon(
+            Icons.fast_forward_rounded,
+            size: 40,
+            color: PlayerColors.white,
           ),
-          Expanded(
-            child: GestureDetector(
-              onTap: widget.onTap,
-              onDoubleTap: () async {
-                final position =
-                    (await widget.controller.videoPlayerController.position) ??
-                        Duration.zero;
-                widget.restartTimer();
-                await widget.controller.seekTo(
-                  position + 10.seconds,
-                );
-              },
-              onVerticalDragUpdate: (details) {
-                if (details.primaryDelta == null) return;
-
-                changeDeviceVolume(details.primaryDelta!);
-
-                widget.restartTimer();
-              },
-              child: Container(
-                color: Colors.transparent,
-              ),
-            ),
+          iconLeft: const Icon(
+            Icons.fast_rewind_rounded,
+            size: 40,
+            color: PlayerColors.white,
           ),
-        ],
+          onDoubleTap: (lr) async {
+            final position =
+                (await widget.controller.videoPlayerController.position) ??
+                    Duration.zero;
+            widget.restartTimer();
+            await widget.controller.seekTo(
+              position + (lr == Lr.RIGHT ? 10.seconds : -10.seconds),
+            );
+          },
+        ),
+        child: const ColoredBox(color: Colors.transparent),
       ),
     );
   }
