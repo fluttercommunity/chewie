@@ -216,8 +216,8 @@ class _V1ControlsState extends State<V1Controls>
                             onPressed: widget.onHelpPressed!,
                             icon: PlayerIconsCustom.v1.help,
                           ),
-                        const Gap(6),
-                        if (kDebugMode)
+                        if (kDebugMode) ...[
+                          const Gap(10),
                           ChromeCastButton(
                             size: 28,
                             color: Colors.white,
@@ -236,8 +236,9 @@ class _V1ControlsState extends State<V1Controls>
                               );
                             },
                           ),
-                        const Gap(10),
-                        if (kDebugMode)
+                          const Gap(10),
+                        ],
+                        if (kDebugMode) ...[
                           PlayerIconButton(
                             size: 38,
                             onPressed: () async {
@@ -255,6 +256,7 @@ class _V1ControlsState extends State<V1Controls>
                             },
                             icon: PlayerIconsCustom.v1.pictureInPicture,
                           ),
+                        ],
                         PlayerIconButton(
                           size: 36,
                           onPressed: () {
