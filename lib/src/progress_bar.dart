@@ -492,8 +492,6 @@ class _ProgressBarThumbPainter extends CustomPainter {
 
   @override
   void paint(ui.Canvas canvas, ui.Size size) {
-    final paint = Paint();
-
     final playedPartPercent = (draggableValue != null
             ? draggableValue!.inMilliseconds
             : value.position.inMilliseconds) /
@@ -536,6 +534,10 @@ class _ProgressBarThumbPainter extends CustomPainter {
     );
 
     if (thumbImage != null && imageEntry != null) {
+      final imagePaint = Paint()
+        ..isAntiAlias = true
+        ..filterQuality = FilterQuality.high;
+
       final src = Rect.fromLTWH(
         imageEntry!.offset.dx,
         imageEntry!.offset.dy,
@@ -547,7 +549,7 @@ class _ProgressBarThumbPainter extends CustomPainter {
         ..drawRRect(rRect, borderPaint)
         ..clipRRect(rRect)
         ..drawRect(dst, backgroundPaint)
-        ..drawImageRect(thumbImage!, src, dst, paint);
+        ..drawImageRect(thumbImage!, src, dst, imagePaint);
     }
   }
 
