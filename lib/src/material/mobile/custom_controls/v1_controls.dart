@@ -102,51 +102,46 @@ class _V1ControlsState extends State<V1Controls>
           );
     }
 
-    return MouseRegion(
-      onHover: (_) {
-        _cancelAndRestartTimer();
+    return GestureDetector(
+      onTap: () {
+        if (notifier.hideStuff) {
+          _cancelAndRestartTimer();
+        } else {
+          _showOrHide();
+        }
       },
-      child: GestureDetector(
-        onTap: () {
-          if (notifier.hideStuff) {
-            _cancelAndRestartTimer();
-          } else {
-            _showOrHide();
-          }
-        },
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: IgnorePointer(
-                ignoring: notifier.lockStuff,
-                child: MaterialGesture(
-                  controller: chewieController,
-                  restartTimer: () {
-                    if (!notifier.hideStuff) {
-                      _cancelAndRestartTimer();
-                    }
-                  },
-                ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: IgnorePointer(
+              ignoring: notifier.lockStuff,
+              child: MaterialGesture(
+                controller: chewieController,
+                restartTimer: () {
+                  if (!notifier.hideStuff) {
+                    _cancelAndRestartTimer();
+                  }
+                },
               ),
             ),
-            _buildPlayPause(),
-            _buildActionBar(),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                if (_subtitleOn)
-                  Transform.translate(
-                    offset: Offset(
-                      0,
-                      notifier.hideStuff ? barHeight * 0.8 : 0.0,
-                    ),
-                    child: _buildSubtitles(context, chewieController.subtitle!),
+          ),
+          _buildPlayPause(),
+          _buildActionBar(),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              if (_subtitleOn)
+                Transform.translate(
+                  offset: Offset(
+                    0,
+                    notifier.hideStuff ? barHeight * 0.8 : 0.0,
                   ),
-                _buildBottomBar(context),
-              ],
-            ),
-          ],
-        ),
+                  child: _buildSubtitles(context, chewieController.subtitle!),
+                ),
+              _buildBottomBar(context),
+            ],
+          ),
+        ],
       ),
     );
   }
