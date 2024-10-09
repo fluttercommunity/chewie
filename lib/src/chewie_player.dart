@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cast_video/flutter_cast_video.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shelf/shelf.dart' as shelf;
@@ -201,17 +202,6 @@ class ChewieState extends State<Chewie> {
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
-    // if (widget.controller.systemOverlaysOnEnterFullScreen != null) {
-    //   /// Optional user preferred settings
-    //   SystemChrome.setEnabledSystemUIMode(
-    //     SystemUiMode.manual,
-    //     overlays: widget.controller.systemOverlaysOnEnterFullScreen,
-    //   );
-    // } else {
-    //   /// Default behavior
-    //   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
-    // }
-
     if (widget.controller.deviceOrientationsOnEnterFullScreen != null) {
       /// Optional user preferred settings
       SystemChrome.setPreferredOrientations(
@@ -280,6 +270,14 @@ class MediaThumbnail {
   final String? large;
 }
 
+class MediaChromeCast {
+  const MediaChromeCast({
+    required this.onSessionStarted,
+  });
+
+  final FutureOr<String> Function() onSessionStarted;
+}
+
 class MediaDescription {
   const MediaDescription({
     this.subtitle,
@@ -308,6 +306,7 @@ class ChewieController extends ChangeNotifier {
     HlsDownloaded? hlsMaster,
     this.optionsTranslation,
     this.thumbnails,
+    this.chromeCast,
     this.mediaControls,
     this.directory,
     this.autoInitialize = false,
@@ -366,6 +365,7 @@ class ChewieController extends ChangeNotifier {
   static Future<ChewieController> fromHlsUrl({
     required String url,
     MediaDescription? description,
+    MediaChromeCast? chromeCast,
     Map<String, dynamic>? headers,
     MediaControls? mediaControls,
     MediaThumbnail? thumbnails,
@@ -446,20 +446,23 @@ class ChewieController extends ChangeNotifier {
     final masterPath =
         downloaded.master.path.replaceFirst('${initialDirectory.path}/', '');
 
+    final random = Random();
+    final randomPort = 1000 + random.nextInt(9000);
+
     final server = await _startServerForFiles(
       initialDirectory,
+      port: randomPort,
     );
 
     final videoPlayerController = VideoPlayerController.networkUrl(
-      Uri.parse('http://localhost:2532/$masterPath'),
+      Uri.parse('http://localhost:$randomPort/$masterPath'),
       videoPlayerOptions: VideoPlayerOptions(
         allowBackgroundPlayback: true,
       ),
     );
 
-    // unawaited(videoPlayerController.initialize());
-
     return ChewieController(
+      chromeCast: chromeCast,
       thumbnails: thumbnails,
       draggableProgressBar: draggableProgressBar,
       videoPlayerController: videoPlayerController,
@@ -515,6 +518,7 @@ class ChewieController extends ChangeNotifier {
 
   ChewieController copyWith({
     MediaDescription? description,
+    MediaChromeCast? chromeCast,
     VideoPlayerController? videoPlayerController,
     OptionsTranslation? optionsTranslation,
     MediaControls? mediaControls,
@@ -572,6 +576,7 @@ class ChewieController extends ChangeNotifier {
   }) {
     return ChewieController(
       thumbnails: thumbnails ?? this.thumbnails,
+      chromeCast: chromeCast ?? this.chromeCast,
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
       videoPlayerController: videoPlayerController ?? _videoPlayerController,
       optionsTranslation: optionsTranslation ?? this.optionsTranslation,
@@ -639,6 +644,8 @@ class ChewieController extends ChangeNotifier {
   final MediaThumbnail? thumbnails;
 
   final MediaDescription? description;
+
+  final MediaChromeCast? chromeCast;
 
   /// If false, the options button in MaterialUI and MaterialDesktopUI
   /// won't be shown.
@@ -824,6 +831,8 @@ class ChewieController extends ChangeNotifier {
 
   AudioTrack? _audioTrack;
 
+  ChromeCastController? _chromeCastController;
+
   ValueNotifier<bool> get isInitialized => _isInitialized;
 
   List<VideoTrack> get videoTracks => _videoTracks;
@@ -841,6 +850,22 @@ class ChewieController extends ChangeNotifier {
   bool get isFullScreen => _isFullScreen;
 
   bool get isPlaying => _videoPlayerController.value.isPlaying;
+
+  ChromeCastController? get chromeCastController => _chromeCastController;
+
+  Future<void> setChromeCastController(ChromeCastController controller) async {
+    _chromeCastController = controller;
+    await _chromeCastController?.addSessionListener();
+  }
+
+  Future<void> onSessionStarted() async {
+    await _chromeCastController?.loadMedia(
+      await chromeCast!.onSessionStarted(),
+      title: description?.title ?? '',
+      subtitle: description?.subtitle ?? '',
+    );
+    await _videoPlayerController.pause();
+  }
 
   Future<void> setVideoTrack(VideoTrack track) async {
     if (directory != null && _hlsMaster != null) {
@@ -918,11 +943,14 @@ class ChewieController extends ChangeNotifier {
     });
   }
 
-  static Future<HttpServer> _startServerForFiles(Directory directory) async {
+  static Future<HttpServer> _startServerForFiles(
+    Directory directory, {
+    required int port,
+  }) async {
     return shelf_io.serve(
       (request) => _serverHandlerForFiles(request, directory),
       'localhost',
-      2532,
+      port,
     );
   }
 
@@ -931,12 +959,6 @@ class ChewieController extends ChangeNotifier {
     Directory directory,
   ) async {
     final file = File('${directory.path}/${request.url.path}');
-
-    try {
-      await file.readAsString();
-    } catch (err) {
-      log(err.toString());
-    }
 
     if (file.existsSync()) {
       return shelf.Response.ok(await file.readAsString());

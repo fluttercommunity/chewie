@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:fl_pip/fl_pip.dart';
 import 'package:flutter/cupertino.dart';
@@ -165,8 +164,6 @@ class _MaterialControlsState extends State<MaterialControls>
     super.didChangeDependencies();
   }
 
-  ChromeCastController? _chromeCastController;
-
   Widget _buildActionBar() {
     return Positioned(
       top: 8,
@@ -203,25 +200,26 @@ class _MaterialControlsState extends State<MaterialControls>
                                 icon: PlayerIcons.close,
                               ),
                               const Spacer(),
-                              if (kDebugMode)
+                              if (chewieController.chromeCast != null)
                                 SizedBox(
                                   height: 20,
                                   child: ChromeCastButton(
                                     size: 20,
                                     color: Colors.white,
                                     onRequestFailed: (err) {
-                                      log(err.toString());
+                                      notifier.showCastControls = false;
+                                      _chewieController?.play();
                                     },
-                                    onButtonCreated: (controller) async {
-                                      _chromeCastController = controller;
-                                      setState(() {});
-                                      await _chromeCastController
-                                          ?.addSessionListener();
+                                    onSessionEnded: () {
+                                      notifier.showCastControls = false;
+                                      _chewieController?.play();
                                     },
-                                    onSessionStarted: () {
-                                      _chromeCastController?.loadMedia(
-                                        'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-                                      );
+                                    onButtonCreated: chewieController
+                                        .setChromeCastController,
+                                    onSessionStarted: () async {
+                                      await chewieController.onSessionStarted();
+
+                                      notifier.showCastControls = true;
                                     },
                                   ),
                                 ),
@@ -495,17 +493,6 @@ class _MaterialControlsState extends State<MaterialControls>
               ),
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildPosition(Color? iconColor) {
-    final position = _latestValue.position;
-
-    return Text(
-      formatDuration(position),
-      style: context.s14.copyWith(
-        color: PlayerColors.greyB8,
       ),
     );
   }

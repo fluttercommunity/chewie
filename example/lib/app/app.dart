@@ -78,8 +78,12 @@ class _ChewieDemoState extends State<ChewieDemo> {
               onOpen: () {},
               onPrev: () {},
             ),
-            customControls: ChewieCustomControls.v1Controls
-              ..onHelpPressed = () {},
+            chromeCast: MediaChromeCast(
+              onSessionStarted: () {
+                return 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+              },
+            ),
+            zoomAndPan: true,
             description: const MediaDescription(
               title: 'Тень и кость (сериал 2021)',
             ),

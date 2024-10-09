@@ -6,6 +6,7 @@ import 'package:video_player/video_player.dart';
 import 'chewie_player.dart';
 import 'config/colors.dart';
 import 'helpers/adaptive_controls.dart';
+import 'material/mobile/material_chrome_cast_controls.dart';
 import 'notifiers/index.dart';
 
 class PlayerWithControls extends StatelessWidget {
@@ -27,9 +28,9 @@ class PlayerWithControls extends StatelessWidget {
       BuildContext context,
       ChewieController chewieController,
     ) {
-      return chewieController.showControls
-          ? chewieController.customControls ?? const AdaptiveControls()
-          : const SizedBox();
+      return _BuildControls(
+        controller: chewieController,
+      );
     }
 
     Widget buildPlayerWithControls(
@@ -57,9 +58,7 @@ class PlayerWithControls extends StatelessWidget {
                         height: chewieController
                             .videoPlayerController.value.size.height,
                         child: chewieController.isInitialized.value
-                            ? VideoPlayer(
-                                chewieController.videoPlayerController,
-                              )
+                            ? child
                             : chewieController.placeholder ?? const SizedBox(),
                       ),
                     ),
@@ -69,6 +68,18 @@ class PlayerWithControls extends StatelessWidget {
                   chewieController.fit,
                   chewieController.isInitialized,
                 ]),
+                child: Consumer<PlayerNotifier>(
+                  builder: (BuildContext context, value, Widget? child) {
+                    if (value.showCastControls) {
+                      return const SizedBox();
+                    }
+
+                    return child!;
+                  },
+                  child: VideoPlayer(
+                    chewieController.videoPlayerController,
+                  ),
+                ),
               ),
             ),
           ),
@@ -129,5 +140,53 @@ class PlayerWithControls extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class _BuildControls extends StatefulWidget {
+  const _BuildControls({required this.controller});
+
+  final ChewieController controller;
+
+  @override
+  State<_BuildControls> createState() => _BuildControlsState();
+}
+
+class _BuildControlsState extends State<_BuildControls> {
+  late final _notifier = Provider.of<PlayerNotifier>(context, listen: false);
+
+  bool _showCastControls = false;
+
+  void _listener() {
+    if (_notifier.showCastControls != _showCastControls) {
+      setState(() {
+        _showCastControls = _notifier.showCastControls;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    _notifier.addListener(_listener);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _notifier.removeListener(_listener);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_showCastControls) {
+      return const MaterialChromeCastControls();
+    }
+
+    if (!widget.controller.showControls) {
+      return const SizedBox();
+    }
+
+    return widget.controller.customControls ?? const AdaptiveControls();
   }
 }

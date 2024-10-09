@@ -54,6 +54,8 @@ class PlayerIcons {
   static const enableFullScreen = '$assetsIcons/enable_full_screen.svg';
 
   static const disableFullScreen = '$assetsIcons/disable_full_screen.svg';
+
+  static const chromeCast = '$assetsIcons/chrome_cast.svg';
 }
 
 class PlayerIconsCustom {

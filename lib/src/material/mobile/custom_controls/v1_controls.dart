@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:fl_pip/fl_pip.dart';
 import 'package:flutter/cupertino.dart';
@@ -174,8 +173,6 @@ class _V1ControlsState extends State<V1Controls>
     super.didChangeDependencies();
   }
 
-  ChromeCastController? _chromeCastController;
-
   Widget _buildActionBar() {
     return Positioned(
       top: 8,
@@ -211,24 +208,23 @@ class _V1ControlsState extends State<V1Controls>
                             onPressed: widget.onHelpPressed!,
                             icon: PlayerIconsCustom.v1.help,
                           ),
-                        if (kDebugMode) ...[
+                        if (chewieController.chromeCast != null) ...[
                           const Gap(10),
                           ChromeCastButton(
                             size: 28,
                             color: Colors.white,
                             onRequestFailed: (err) {
-                              log(err.toString());
+                              notifier.showCastControls = false;
                             },
-                            onButtonCreated: (controller) async {
-                              _chromeCastController = controller;
-                              setState(() {});
-                              await _chromeCastController?.addSessionListener();
+                            onSessionEnded: () {
+                              notifier.showCastControls = false;
+                              _chewieController?.play();
                             },
-                            onSessionStarted: () {
-                              _chromeCastController?.loadMedia(
-                                chewieController
-                                    .videoPlayerController.dataSource,
-                              );
+                            onButtonCreated:
+                                chewieController.setChromeCastController,
+                            onSessionStarted: () async {
+                              await chewieController.onSessionStarted();
+                              notifier.showCastControls = true;
                             },
                           ),
                           const Gap(10),
