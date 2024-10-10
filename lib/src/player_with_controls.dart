@@ -58,7 +58,22 @@ class PlayerWithControls extends StatelessWidget {
                         height: chewieController
                             .videoPlayerController.value.size.height,
                         child: chewieController.isInitialized.value
-                            ? child
+                            ? Consumer<PlayerNotifier>(
+                                builder: (
+                                  BuildContext context,
+                                  value,
+                                  Widget? child,
+                                ) {
+                                  if (value.showCastControls) {
+                                    return const SizedBox();
+                                  }
+
+                                  return child!;
+                                },
+                                child: VideoPlayer(
+                                  chewieController.videoPlayerController,
+                                ),
+                              )
                             : chewieController.placeholder ?? const SizedBox(),
                       ),
                     ),
@@ -68,18 +83,6 @@ class PlayerWithControls extends StatelessWidget {
                   chewieController.fit,
                   chewieController.isInitialized,
                 ]),
-                child: Consumer<PlayerNotifier>(
-                  builder: (BuildContext context, value, Widget? child) {
-                    if (value.showCastControls) {
-                      return const SizedBox();
-                    }
-
-                    return child!;
-                  },
-                  child: VideoPlayer(
-                    chewieController.videoPlayerController,
-                  ),
-                ),
               ),
             ),
           ),
