@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:fl_pip/fl_pip.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -232,8 +231,6 @@ class _MaterialControlsState extends State<MaterialControls>
                                     if (!chewieController.isFullScreen) {
                                       chewieController.enterFullScreen();
                                     }
-
-                                    await FlPiP().enable();
                                   },
                                   icon: PlayerIcons.pictureInPicture,
                                 ),
