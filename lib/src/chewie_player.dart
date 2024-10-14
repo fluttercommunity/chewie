@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cast_video/flutter_cast_video.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pip_manager/pip_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as shelf_io;
@@ -862,6 +863,14 @@ class ChewieController extends ChangeNotifier {
   bool get isPlaying => _videoPlayerController.value.isPlaying;
 
   ChromeCastController? get chromeCastController => _chromeCastController;
+
+  void startPip() {
+    if (!isFullScreen) {
+      enterFullScreen();
+    }
+
+    PiPManager.startPictureInPictureMode();
+  }
 
   Future<void> setChromeCastController(ChromeCastController controller) async {
     _chromeCastController = controller;

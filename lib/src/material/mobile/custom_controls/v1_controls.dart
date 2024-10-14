@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_cast_video/flutter_cast_video.dart';
@@ -228,15 +228,13 @@ class _V1ControlsState extends State<V1Controls>
                           ),
                           const Gap(10),
                         ],
-                        if (kDebugMode) ...[
+                        if (Platform.isAndroid) ...[
                           PlayerIconButton(
                             size: 38,
                             onPressed: () async {
                               notifier.hideStuff = true;
 
-                              if (!chewieController.isFullScreen) {
-                                chewieController.enterFullScreen();
-                              }
+                              chewieController.startPip();
                             },
                             icon: PlayerIconsCustom.v1.pictureInPicture,
                           ),
