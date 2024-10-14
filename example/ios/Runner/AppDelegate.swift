@@ -1,13 +1,12 @@
 import UIKit
 import Flutter
 import GoogleCast
-import fl_pip
 
 @main
-@objc class AppDelegate: FlFlutterAppDelegate, GCKLoggerDelegate {
+@objc class AppDelegate: FlutterAppDelegate, GCKLoggerDelegate {
     let kReceiverAppID = kGCKDefaultMediaReceiverApplicationID
     let kDebugLoggingEnabled = true
-    
+
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -19,9 +18,5 @@ import fl_pip
         GCKCastContext.sharedInstance().useDefaultExpandedMediaControls = true
         GCKLogger.sharedInstance().delegate = self
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-    }
-    
-    override func registerPlugin(_ registry: FlutterPluginRegistry) {
-        GeneratedPluginRegistrant.register(with: registry)
     }
 }

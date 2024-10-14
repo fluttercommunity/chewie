@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,7 @@ import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../chewie.dart';
+import 'audio_controls.dart';
 import 'helpers/models/audio_track.dart';
 import 'helpers/models/video_track.dart';
 import 'notifiers/player_notifier.dart';
@@ -281,10 +283,16 @@ class MediaChromeCast {
 class MediaDescription {
   const MediaDescription({
     this.subtitle,
+    this.artist,
+    this.poster,
+    this.album,
     this.title,
   });
 
   final String? title;
+  final String? album;
+  final String? artist;
+  final String? poster;
   final String? subtitle;
 }
 
@@ -833,6 +841,8 @@ class ChewieController extends ChangeNotifier {
 
   ChromeCastController? _chromeCastController;
 
+  AudioPlayerHandler? _audioHandler;
+
   ValueNotifier<bool> get isInitialized => _isInitialized;
 
   List<VideoTrack> get videoTracks => _videoTracks;
@@ -934,9 +944,13 @@ class ChewieController extends ChangeNotifier {
     await _videoPlayerController.dispose();
     _videoPlayerController = VideoPlayerController.networkUrl(
       Uri.parse(_videoPlayerController.dataSource),
+      videoPlayerOptions: VideoPlayerOptions(
+        allowBackgroundPlayback: true,
+      ),
     );
+
     await _videoPlayerController.initialize().then((_) async {
-      await _initialize();
+      unawaited(_initialize());
       _isInitialized.value = true;
       await _videoPlayerController.seekTo(prevPosition);
       await _videoPlayerController.play();
@@ -970,6 +984,7 @@ class ChewieController extends ChangeNotifier {
   @override
   void dispose() {
     _videoPlayerController.dispose();
+    _audioHandler?.streamController.close();
     server?.close();
     super.dispose();
   }
@@ -1005,6 +1020,45 @@ class ChewieController extends ChangeNotifier {
     if (fullScreenByDefault) {
       _videoPlayerController.addListener(_fullScreenListener);
     }
+
+    try {
+      await initializeAudio();
+      // ignore: empty_catches
+    } catch (err) {}
+  }
+
+  Future<void> initializeAudio() async {
+    _audioHandler = await AudioService.init(
+      builder: AudioPlayerHandler.new,
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'uz.intersoft.chewie.channel.audio',
+        androidNotificationChannelName: 'Audio playback',
+        androidNotificationOngoing: true,
+      ),
+    );
+
+    _audioHandler?.setMedia(
+      MediaItem(
+        id: videoPlayerController.dataSource,
+        title: description?.title ?? 'Unknown',
+        album: description?.album,
+        artist: description?.artist,
+        artUri: Uri.tryParse(description?.poster ?? ''),
+        duration: _videoPlayerController.value.duration,
+      ),
+    );
+
+    _audioHandler?.setVideoFunctions(_videoPlayerController.play,
+        _videoPlayerController.pause, _videoPlayerController.seekTo, () {
+      _videoPlayerController
+        ..seekTo(Duration.zero)
+        ..pause();
+    });
+
+    _audioHandler?.initializeStreamController(_videoPlayerController);
+
+    await _audioHandler?.playbackState
+        .addStream(_audioHandler!.streamController.stream);
   }
 
   Future<void> _initializeHlsDataFromNetwork() async {

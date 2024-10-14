@@ -9,121 +9,55 @@ import 'helpers/adaptive_controls.dart';
 import 'material/mobile/material_chrome_cast_controls.dart';
 import 'notifiers/index.dart';
 
-class PlayerWithControls extends StatelessWidget {
+class PlayerWithControls extends StatefulWidget {
   const PlayerWithControls({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final chewieController = ChewieController.of(context);
+  State<PlayerWithControls> createState() => _PlayerWithControlsState();
+}
 
+class _PlayerWithControlsState extends State<PlayerWithControls>
+    with WidgetsBindingObserver {
+  late ChewieController _chewieController = ChewieController.of(context);
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
+      if (_chewieController.isPlaying) {
+        _chewieController.play();
+      }
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void didChangeDependencies() {
+    _chewieController = ChewieController.of(context);
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     double calculateAspectRatio(BuildContext context) {
       final size = MediaQuery.of(context).size;
       final width = size.width;
       final height = size.height;
 
       return width > height ? width / height : height / width;
-    }
-
-    Widget buildControls(
-      BuildContext context,
-      ChewieController chewieController,
-    ) {
-      return _BuildControls(
-        controller: chewieController,
-      );
-    }
-
-    Widget buildPlayerWithControls(
-      ChewieController chewieController,
-      BuildContext context,
-    ) {
-      return Stack(
-        children: <Widget>[
-          if (chewieController.placeholder != null)
-            chewieController.placeholder!,
-          InteractiveViewer(
-            transformationController: chewieController.transformationController,
-            maxScale: chewieController.maxScale,
-            panEnabled: chewieController.zoomAndPan,
-            scaleEnabled: chewieController.zoomAndPan,
-            child: Center(
-              child: ListenableBuilder(
-                builder: (BuildContext context, Widget? child) {
-                  return SizedBox.expand(
-                    child: FittedBox(
-                      fit: chewieController.fit.value,
-                      child: SizedBox(
-                        width: chewieController
-                            .videoPlayerController.value.size.width,
-                        height: chewieController
-                            .videoPlayerController.value.size.height,
-                        child: chewieController.isInitialized.value
-                            ? Consumer<PlayerNotifier>(
-                                builder: (
-                                  BuildContext context,
-                                  value,
-                                  Widget? child,
-                                ) {
-                                  if (value.showCastControls) {
-                                    return const SizedBox();
-                                  }
-
-                                  return child!;
-                                },
-                                child: VideoPlayer(
-                                  chewieController.videoPlayerController,
-                                ),
-                              )
-                            : chewieController.placeholder ?? const SizedBox(),
-                      ),
-                    ),
-                  );
-                },
-                listenable: Listenable.merge([
-                  chewieController.fit,
-                  chewieController.isInitialized,
-                ]),
-              ),
-            ),
-          ),
-          if (chewieController.overlay != null) chewieController.overlay!,
-          Consumer<PlayerNotifier>(
-            builder: (
-              BuildContext context,
-              PlayerNotifier notifier,
-              Widget? widget,
-            ) =>
-                Visibility(
-              visible: !notifier.hideStuff,
-              child: AnimatedOpacity(
-                opacity: notifier.hideStuff ? 0.0 : 0.8,
-                duration: const Duration(
-                  milliseconds: 250,
-                ),
-                child: const DecoratedBox(
-                  decoration: BoxDecoration(color: Colors.black54),
-                  child: SizedBox.expand(),
-                ),
-              ),
-            ),
-          ),
-          ValueListenableBuilder(
-            valueListenable: chewieController.isInitialized,
-            builder: (context, value, child) {
-              if (!value) {
-                return const Center(
-                  child: CupertinoActivityIndicator(
-                    color: PlayerColors.white,
-                    radius: 20,
-                  ),
-                );
-              }
-
-              return buildControls(context, chewieController);
-            },
-          ),
-        ],
-      );
     }
 
     return LayoutBuilder(
@@ -136,7 +70,92 @@ class PlayerWithControls extends StatelessWidget {
               width: constraints.maxWidth,
               child: AspectRatio(
                 aspectRatio: calculateAspectRatio(context),
-                child: buildPlayerWithControls(chewieController, context),
+                child: Stack(
+                  children: <Widget>[
+                    if (_chewieController.placeholder != null)
+                      _chewieController.placeholder!,
+                    Center(
+                      child: ListenableBuilder(
+                        builder: (BuildContext context, Widget? child) {
+                          return SizedBox.expand(
+                            child: FittedBox(
+                              fit: _chewieController.fit.value,
+                              child: SizedBox(
+                                width: _chewieController
+                                    .videoPlayerController.value.size.width,
+                                height: _chewieController
+                                    .videoPlayerController.value.size.height,
+                                child: _chewieController.isInitialized.value
+                                    ? Consumer<PlayerNotifier>(
+                                        builder: (
+                                          BuildContext context,
+                                          value,
+                                          Widget? child,
+                                        ) {
+                                          if (value.showCastControls) {
+                                            return const SizedBox();
+                                          }
+
+                                          return child!;
+                                        },
+                                        child: VideoPlayer(
+                                          _chewieController
+                                              .videoPlayerController,
+                                        ),
+                                      )
+                                    : _chewieController.placeholder ??
+                                        const SizedBox(),
+                              ),
+                            ),
+                          );
+                        },
+                        listenable: Listenable.merge([
+                          _chewieController.fit,
+                          _chewieController.isInitialized,
+                        ]),
+                      ),
+                    ),
+                    if (_chewieController.overlay != null)
+                      _chewieController.overlay!,
+                    Consumer<PlayerNotifier>(
+                      builder: (
+                        BuildContext context,
+                        PlayerNotifier notifier,
+                        Widget? widget,
+                      ) =>
+                          Visibility(
+                        visible: !notifier.hideStuff,
+                        child: AnimatedOpacity(
+                          opacity: notifier.hideStuff ? 0.0 : 0.8,
+                          duration: const Duration(
+                            milliseconds: 250,
+                          ),
+                          child: const DecoratedBox(
+                            decoration: BoxDecoration(color: Colors.black54),
+                            child: SizedBox.expand(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    ValueListenableBuilder(
+                      valueListenable: _chewieController.isInitialized,
+                      builder: (context, value, child) {
+                        if (!value) {
+                          return const Center(
+                            child: CupertinoActivityIndicator(
+                              color: PlayerColors.white,
+                              radius: 20,
+                            ),
+                          );
+                        }
+
+                        return _BuildControls(
+                          controller: _chewieController,
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

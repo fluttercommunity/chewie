@@ -38,8 +38,7 @@ class MaterialControls extends StatefulWidget {
   }
 }
 
-class _MaterialControlsState extends State<MaterialControls>
-    with SingleTickerProviderStateMixin {
+class _MaterialControlsState extends State<MaterialControls> {
   late var _subtitlesPosition = Duration.zero;
   late VideoPlayerController controller;
   late VideoPlayerValue _latestValue;
@@ -51,7 +50,6 @@ class _MaterialControlsState extends State<MaterialControls>
   Timer? _initTimer;
 
   bool _displayBufferingIndicator = false;
-  bool _displayTapped = false;
   bool _subtitleOn = false;
   bool _dragging = false;
 
@@ -72,66 +70,47 @@ class _MaterialControlsState extends State<MaterialControls>
 
   @override
   Widget build(BuildContext context) {
-    if (_latestValue.hasError) {
-      return chewieController.errorBuilder?.call(
-            context,
-            chewieController.videoPlayerController.value.errorDescription!,
-          ) ??
-          const Center(
-            child: Icon(
-              Icons.error,
-              color: Colors.white,
-              size: 42,
-            ),
-          );
-    }
-
-    return MouseRegion(
-      onHover: (_) {
-        _cancelAndRestartTimer();
+    return GestureDetector(
+      onTap: () {
+        if (notifier.hideStuff) {
+          _cancelAndRestartTimer();
+        } else {
+          _showOrHide();
+        }
       },
-      child: GestureDetector(
-        onTap: () {
-          if (notifier.hideStuff) {
-            _cancelAndRestartTimer();
-          } else {
-            _showOrHide();
-          }
-        },
-        behavior: HitTestBehavior.opaque,
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: IgnorePointer(
-                ignoring: notifier.lockStuff,
-                child: MaterialGesture(
-                  controller: chewieController,
-                  restartTimer: () {
-                    if (!notifier.hideStuff) {
-                      _cancelAndRestartTimer();
-                    }
-                  },
-                ),
+      behavior: HitTestBehavior.opaque,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: IgnorePointer(
+              ignoring: notifier.lockStuff,
+              child: MaterialGesture(
+                controller: chewieController,
+                restartTimer: () {
+                  if (!notifier.hideStuff) {
+                    _cancelAndRestartTimer();
+                  }
+                },
               ),
             ),
-            _buildPlayPause(),
-            _buildActionBar(),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                if (_subtitleOn)
-                  Transform.translate(
-                    offset: Offset(
-                      0,
-                      notifier.hideStuff ? barHeight * 0.8 : 0.0,
-                    ),
-                    child: _buildSubtitles(context, chewieController.subtitle!),
+          ),
+          _buildPlayPause(),
+          _buildActionBar(),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              if (_subtitleOn)
+                Transform.translate(
+                  offset: Offset(
+                    0,
+                    notifier.hideStuff ? barHeight * 0.8 : 0.0,
                   ),
-                _buildBottomBar(context),
-              ],
-            ),
-          ],
-        ),
+                  child: _buildSubtitles(context, chewieController.subtitle!),
+                ),
+              _buildBottomBar(context),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -227,10 +206,6 @@ class _MaterialControlsState extends State<MaterialControls>
                                 PlayerIconButton(
                                   onPressed: () async {
                                     notifier.hideStuff = true;
-
-                                    if (!chewieController.isFullScreen) {
-                                      chewieController.enterFullScreen();
-                                    }
                                   },
                                   icon: PlayerIcons.pictureInPicture,
                                 ),
@@ -418,7 +393,7 @@ class _MaterialControlsState extends State<MaterialControls>
 
   void _showOrHide() {
     if (_latestValue.isPlaying) {
-      if (_displayTapped) {
+      if (!notifier.hideStuff) {
         setState(() {
           notifier.hideStuff = true;
         });
@@ -426,8 +401,6 @@ class _MaterialControlsState extends State<MaterialControls>
         _cancelAndRestartTimer();
       }
     } else {
-      _playPause();
-
       setState(() {
         notifier.hideStuff = true;
       });
@@ -511,7 +484,6 @@ class _MaterialControlsState extends State<MaterialControls>
 
     setState(() {
       notifier.hideStuff = false;
-      _displayTapped = true;
     });
   }
 

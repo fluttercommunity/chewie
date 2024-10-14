@@ -1,6 +1,6 @@
 name: chewie_example
 description: An example of how to use the chewie for Flutter
-version: 1.0.0
+version: 1.0.0+1
 publish_to: none
 
 environment:
