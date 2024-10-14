@@ -77,8 +77,8 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
     super.deactivate();
   }
 
-  void _seekToRelativePosition(Offset globalPosition) {
-    controller
+  Future<void> _seekToRelativePosition(Offset globalPosition) async {
+    await controller
         .seekTo(
       context.calcRelativePosition(
         controller.value.duration,
@@ -86,7 +86,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
       ),
     )
         .then(
-      (_) {
+      (_) async {
         _latestDraggableOffset = null;
       },
     );

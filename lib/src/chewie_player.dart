@@ -10,6 +10,7 @@ import 'package:flutter_cast_video/flutter_cast_video.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pip_manager/pip_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:video_player/video_player.dart';
@@ -74,6 +75,7 @@ class ChewieState extends State<Chewie> {
     if (oldWidget.controller != widget.controller) {
       widget.controller.addListener(listener);
     }
+
     super.didUpdateWidget(oldWidget);
     if (_isFullScreen != isControllerFullScreen) {
       widget.controller._isFullScreen = _isFullScreen;
@@ -369,6 +371,8 @@ class ChewieController extends ChangeNotifier {
     _hlsMaster = hlsMaster;
     _videoPlayerController = videoPlayerController;
     _initialize();
+    _initializeSpeed();
+    _videoPlayerController.addListener(_listenerSpeed);
   }
 
   static Future<ChewieController> fromHlsUrl({
@@ -467,6 +471,7 @@ class ChewieController extends ChangeNotifier {
       Uri.parse('http://localhost:$randomPort/$masterPath'),
       videoPlayerOptions: VideoPlayerOptions(
         allowBackgroundPlayback: true,
+        mixWithOthers: true,
       ),
     );
 
@@ -644,6 +649,26 @@ class ChewieController extends ChangeNotifier {
       progressIndicatorDelay:
           progressIndicatorDelay ?? this.progressIndicatorDelay,
     );
+  }
+
+  Future<void> _initializeSpeed() async {
+    final pref = await SharedPreferences.getInstance();
+
+    final speed = pref.getDouble(speedKey);
+
+    if (speed != null) {
+      await _videoPlayerController.setPlaybackSpeed(speed);
+    }
+  }
+
+  Future<void> _listenerSpeed() async {
+    if (_videoPlayerController.value.isPlaying) {
+      if (Platform.isIOS) {
+        await _videoPlayerController.setPlaybackSpeed(
+          _videoPlayerController.value.playbackSpeed,
+        );
+      }
+    }
   }
 
   static const defaultHideControlsTimer = Duration(seconds: 5);
@@ -949,12 +974,14 @@ class ChewieController extends ChangeNotifier {
 
   Future<void> reloadDataSource() async {
     final prevPosition = _videoPlayerController.value.position;
+    final speed = _videoPlayerController.value.playbackSpeed;
     _isInitialized.value = false;
     await _videoPlayerController.dispose();
     _videoPlayerController = VideoPlayerController.networkUrl(
       Uri.parse(_videoPlayerController.dataSource),
       videoPlayerOptions: VideoPlayerOptions(
         allowBackgroundPlayback: true,
+        mixWithOthers: true,
       ),
     );
 
@@ -962,8 +989,12 @@ class ChewieController extends ChangeNotifier {
       unawaited(_initialize());
       _isInitialized.value = true;
       await _videoPlayerController.seekTo(prevPosition);
+      await _videoPlayerController.setPlaybackSpeed(speed);
       await _videoPlayerController.play();
+      _videoPlayerController.addListener(_listenerSpeed);
     });
+
+    notifyListeners();
   }
 
   static Future<HttpServer> _startServerForFiles(
@@ -992,7 +1023,10 @@ class ChewieController extends ChangeNotifier {
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
+    _videoPlayerController
+      ..removeListener(_listenerSpeed)
+      ..dispose();
+
     _audioHandler?.dispose();
     _audioHandler?.streamController.close();
     _audioHandler = null;

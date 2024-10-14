@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../chewie.dart';
@@ -10,6 +11,7 @@ import '../../../config/icons.dart';
 import '../../../gen/locale_keys.g.dart';
 import '../../../helpers/models/audio_track.dart';
 import '../../../helpers/models/video_track.dart';
+import '../../../player_with_controls.dart';
 import '../../../widgets/sheet/player_bottom_sheet.dart';
 import '../../widgets/buttons/player_tile_button.dart';
 import 'generic_simple_choose_sheet.dart';
@@ -114,9 +116,16 @@ class _SettingsViewState extends State<SettingsView> {
           items: widget.controller.playbackSpeeds,
           title: LocaleKeys.player_settings_speed.tr(),
           selectedItem: _videoController.value.playbackSpeed,
-          onItemTap: (item) {
-            widget.controller.videoPlayerController.setPlaybackSpeed(item);
+          onItemTap: (item) async {
+            await widget.controller.videoPlayerController
+                .setPlaybackSpeed(item);
+
+            final pref = await SharedPreferences.getInstance();
+
+            await pref.setDouble(speedKey, item);
+
             setState(() {});
+
             Navigator.pop(context);
           },
           buildItemLabel: (double item) {

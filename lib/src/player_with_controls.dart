@@ -9,6 +9,8 @@ import 'helpers/adaptive_controls.dart';
 import 'material/mobile/material_chrome_cast_controls.dart';
 import 'notifiers/index.dart';
 
+const speedKey = 'player:playback_speed';
+
 class PlayerWithControls extends StatefulWidget {
   const PlayerWithControls({super.key});
 
@@ -23,6 +25,7 @@ class _PlayerWithControlsState extends State<PlayerWithControls>
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
+
     super.initState();
   }
 
@@ -47,6 +50,7 @@ class _PlayerWithControlsState extends State<PlayerWithControls>
   @override
   void didChangeDependencies() {
     _chewieController = ChewieController.of(context);
+
     super.didChangeDependencies();
   }
 

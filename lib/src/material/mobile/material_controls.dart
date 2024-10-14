@@ -555,18 +555,21 @@ class _MaterialControlsState extends State<MaterialControls> {
     });
   }
 
-  void _seekRelative(Duration relativeSeek) {
+  Future<void> _seekRelative(Duration relativeSeek) async {
     _cancelAndRestartTimer();
     final position = _latestValue.position + relativeSeek;
     final duration = _latestValue.duration;
 
     if (position < Duration.zero) {
-      controller.seekTo(Duration.zero);
+      await controller.seekTo(Duration.zero);
     } else if (position > duration) {
-      controller.seekTo(duration);
+      await controller.seekTo(duration);
     } else {
-      controller.seekTo(position);
+      await controller.seekTo(position);
     }
+
+    await controller.pause();
+    await controller.play();
   }
 
   void _seekBackward() {
