@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,52 +9,13 @@ import 'helpers/adaptive_controls.dart';
 import 'material/mobile/material_chrome_cast_controls.dart';
 import 'notifiers/index.dart';
 
-class PlayerWithControls extends StatefulWidget {
+class PlayerWithControls extends StatelessWidget {
   const PlayerWithControls({super.key});
 
   @override
-  State<PlayerWithControls> createState() => _PlayerWithControlsState();
-}
-
-class _PlayerWithControlsState extends State<PlayerWithControls>
-    with WidgetsBindingObserver {
-  late ChewieController _chewieController = ChewieController.of(context);
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addObserver(this);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden) {
-      if (_chewieController.isPlaying) {
-        _chewieController.play();
-        if (Platform.isAndroid) {
-          _chewieController.startPip();
-        }
-      }
-    }
-    super.didChangeAppLifecycleState(state);
-  }
-
-  @override
-  void didChangeDependencies() {
-    _chewieController = ChewieController.of(context);
-    super.didChangeDependencies();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final chewieController = ChewieController.of(context);
+
     double calculateAspectRatio(BuildContext context) {
       final size = MediaQuery.of(context).size;
       final width = size.width;
@@ -77,20 +36,20 @@ class _PlayerWithControlsState extends State<PlayerWithControls>
                 aspectRatio: calculateAspectRatio(context),
                 child: Stack(
                   children: <Widget>[
-                    if (_chewieController.placeholder != null)
-                      _chewieController.placeholder!,
+                    if (chewieController.placeholder != null)
+                      chewieController.placeholder!,
                     Center(
                       child: ListenableBuilder(
                         builder: (BuildContext context, Widget? child) {
                           return SizedBox.expand(
                             child: FittedBox(
-                              fit: _chewieController.fit.value,
+                              fit: chewieController.fit.value,
                               child: SizedBox(
-                                width: _chewieController
+                                width: chewieController
                                     .videoPlayerController.value.size.width,
-                                height: _chewieController
+                                height: chewieController
                                     .videoPlayerController.value.size.height,
-                                child: _chewieController.isInitialized.value
+                                child: chewieController.isInitialized.value
                                     ? Consumer<PlayerNotifier>(
                                         builder: (
                                           BuildContext context,
@@ -104,24 +63,24 @@ class _PlayerWithControlsState extends State<PlayerWithControls>
                                           return child!;
                                         },
                                         child: VideoPlayer(
-                                          _chewieController
+                                          chewieController
                                               .videoPlayerController,
                                         ),
                                       )
-                                    : _chewieController.placeholder ??
+                                    : chewieController.placeholder ??
                                         const SizedBox(),
                               ),
                             ),
                           );
                         },
                         listenable: Listenable.merge([
-                          _chewieController.fit,
-                          _chewieController.isInitialized,
+                          chewieController.fit,
+                          chewieController.isInitialized,
                         ]),
                       ),
                     ),
-                    if (_chewieController.overlay != null)
-                      _chewieController.overlay!,
+                    if (chewieController.overlay != null)
+                      chewieController.overlay!,
                     Consumer<PlayerNotifier>(
                       builder: (
                         BuildContext context,
@@ -143,7 +102,7 @@ class _PlayerWithControlsState extends State<PlayerWithControls>
                       ),
                     ),
                     ValueListenableBuilder(
-                      valueListenable: _chewieController.isInitialized,
+                      valueListenable: chewieController.isInitialized,
                       builder: (context, value, child) {
                         if (!value) {
                           return const Center(
@@ -155,7 +114,7 @@ class _PlayerWithControlsState extends State<PlayerWithControls>
                         }
 
                         return _BuildControls(
-                          controller: _chewieController,
+                          controller: chewieController,
                         );
                       },
                     ),
