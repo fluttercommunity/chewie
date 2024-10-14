@@ -54,6 +54,12 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   @override
   Future<void> stop() async => _videoStop!();
 
+  void dispose() {
+    streamController.add(
+      PlaybackState(),
+    );
+  }
+
   void initializeStreamController(
     VideoPlayerController? videoPlayerController,
   ) {

@@ -984,7 +984,7 @@ class ChewieController extends ChangeNotifier {
   @override
   void dispose() {
     _videoPlayerController.dispose();
-    _audioHandler?.stop();
+    _audioHandler?.dispose();
     _audioHandler?.streamController.close();
     _audioHandler = null;
     server?.close();
