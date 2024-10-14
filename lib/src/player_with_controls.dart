@@ -9,13 +9,49 @@ import 'helpers/adaptive_controls.dart';
 import 'material/mobile/material_chrome_cast_controls.dart';
 import 'notifiers/index.dart';
 
-class PlayerWithControls extends StatelessWidget {
+class PlayerWithControls extends StatefulWidget {
   const PlayerWithControls({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final chewieController = ChewieController.of(context);
+  State<PlayerWithControls> createState() => _PlayerWithControlsState();
+}
 
+class _PlayerWithControlsState extends State<PlayerWithControls>
+    with WidgetsBindingObserver {
+  late ChewieController _chewieController = ChewieController.of(context);
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.hidden) {
+      if (_chewieController.isPlaying) {
+        _chewieController.play();
+      }
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void didChangeDependencies() {
+    _chewieController = ChewieController.of(context);
+    super.didChangeDependencies();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     double calculateAspectRatio(BuildContext context) {
       final size = MediaQuery.of(context).size;
       final width = size.width;
@@ -36,20 +72,20 @@ class PlayerWithControls extends StatelessWidget {
                 aspectRatio: calculateAspectRatio(context),
                 child: Stack(
                   children: <Widget>[
-                    if (chewieController.placeholder != null)
-                      chewieController.placeholder!,
+                    if (_chewieController.placeholder != null)
+                      _chewieController.placeholder!,
                     Center(
                       child: ListenableBuilder(
                         builder: (BuildContext context, Widget? child) {
                           return SizedBox.expand(
                             child: FittedBox(
-                              fit: chewieController.fit.value,
+                              fit: _chewieController.fit.value,
                               child: SizedBox(
-                                width: chewieController
+                                width: _chewieController
                                     .videoPlayerController.value.size.width,
-                                height: chewieController
+                                height: _chewieController
                                     .videoPlayerController.value.size.height,
-                                child: chewieController.isInitialized.value
+                                child: _chewieController.isInitialized.value
                                     ? Consumer<PlayerNotifier>(
                                         builder: (
                                           BuildContext context,
@@ -63,24 +99,24 @@ class PlayerWithControls extends StatelessWidget {
                                           return child!;
                                         },
                                         child: VideoPlayer(
-                                          chewieController
+                                          _chewieController
                                               .videoPlayerController,
                                         ),
                                       )
-                                    : chewieController.placeholder ??
+                                    : _chewieController.placeholder ??
                                         const SizedBox(),
                               ),
                             ),
                           );
                         },
                         listenable: Listenable.merge([
-                          chewieController.fit,
-                          chewieController.isInitialized,
+                          _chewieController.fit,
+                          _chewieController.isInitialized,
                         ]),
                       ),
                     ),
-                    if (chewieController.overlay != null)
-                      chewieController.overlay!,
+                    if (_chewieController.overlay != null)
+                      _chewieController.overlay!,
                     Consumer<PlayerNotifier>(
                       builder: (
                         BuildContext context,
@@ -102,7 +138,7 @@ class PlayerWithControls extends StatelessWidget {
                       ),
                     ),
                     ValueListenableBuilder(
-                      valueListenable: chewieController.isInitialized,
+                      valueListenable: _chewieController.isInitialized,
                       builder: (context, value, child) {
                         if (!value) {
                           return const Center(
@@ -114,7 +150,7 @@ class PlayerWithControls extends StatelessWidget {
                         }
 
                         return _BuildControls(
-                          controller: chewieController,
+                          controller: _chewieController,
                         );
                       },
                     ),
