@@ -1041,7 +1041,7 @@ class ChewieController extends ChangeNotifier {
 
     _audioHandler?.setMedia(
       MediaItem(
-        id: videoPlayerController.dataSource,
+        id: 'uz.intersoft.chewie',
         title: description?.title ?? 'Unknown',
         album: description?.album,
         artist: description?.artist,
