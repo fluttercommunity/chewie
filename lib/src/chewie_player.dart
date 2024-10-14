@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:audio_service/audio_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cast_video/flutter_cast_video.dart';
@@ -180,10 +179,6 @@ class ChewieState extends State<Chewie> {
       rootNavigator: widget.controller.useRootNavigator,
     ).push(route);
 
-    if (kIsWeb) {
-      _reInitializeControllers();
-    }
-
     _isFullScreen = false;
     widget.controller.exitFullScreen();
 
@@ -238,18 +233,6 @@ class ChewieState extends State<Chewie> {
         SystemChrome.setPreferredOrientations(DeviceOrientation.values);
       }
     }
-  }
-
-  ///When viewing full screen on web, returning from full screen causes original video to lose the picture.
-  ///We re initialise controllers for web only when returning from full screen
-  void _reInitializeControllers() {
-    final prevPosition = widget.controller.videoPlayerController.value.position;
-    widget.controller.videoPlayerController.initialize().then((_) async {
-      await widget.controller._initialize();
-      await widget.controller.videoPlayerController.seekTo(prevPosition);
-      await widget.controller.videoPlayerController.play();
-      await widget.controller.videoPlayerController.pause();
-    });
   }
 }
 
