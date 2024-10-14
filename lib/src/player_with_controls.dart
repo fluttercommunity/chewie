@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +41,9 @@ class _PlayerWithControlsState extends State<PlayerWithControls>
         state == AppLifecycleState.hidden) {
       if (_chewieController.isPlaying) {
         _chewieController.play();
+        if (Platform.isAndroid) {
+          _chewieController.startPip();
+        }
       }
     }
     super.didChangeAppLifecycleState(state);
