@@ -105,7 +105,6 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     streamController.add(
       PlaybackState(),
     );
-    audioPlayer?.dispose();
   }
 
   void initializeStreamController(
