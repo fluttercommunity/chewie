@@ -35,8 +35,9 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     );
   }
 
-  Future<void> startBgPlay(Duration position) async {
+  Future<void> startBgPlay(Duration position, double speed) async {
     await audioPlayer?.seek(position);
+    await audioPlayer!.setSpeed(speed);
     await audioPlayer?.play();
   }
 

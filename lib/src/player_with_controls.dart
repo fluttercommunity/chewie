@@ -54,6 +54,7 @@ class _PlayerWithControlsState extends State<PlayerWithControls>
         await _chewieController.pause();
         await _chewieController.audioHandler?.startBgPlay(
           _chewieController.videoPlayerController.value.position,
+          _chewieController.videoPlayerController.value.playbackSpeed,
         );
       }
     }
@@ -63,7 +64,7 @@ class _PlayerWithControlsState extends State<PlayerWithControls>
       final lastPosition = _chewieController.audioHandler?.stopBgPlay();
       log(lastPosition.toString());
       if (lastPosition == null) return;
-      await _chewieController.videoPlayerController.seekTo(await lastPosition);
+      await _chewieController.videoPlayerController.seekTo(lastPosition);
       await _chewieController.play();
     }
     super.didChangeAppLifecycleState(state);
