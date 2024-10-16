@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_cast_video/flutter_cast_video.dart';
@@ -202,7 +202,7 @@ class _MaterialControlsState extends State<MaterialControls> {
                                   ),
                                 ),
                               const Gap(12),
-                              if (Platform.isAndroid)
+                              if (kDebugMode)
                                 PlayerIconButton(
                                   onPressed: () async {
                                     notifier.hideStuff = true;
