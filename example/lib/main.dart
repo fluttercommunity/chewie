@@ -25,6 +25,8 @@ void main() async {
   // .setTrustedCertificatesBytes(data.buffer.asUint8List());
   HttpOverrides.global = MyHttpOverrides();
 
+  await ChewieController.initializeBg();
+
   runApp(
     ProviderScope(
       child: EasyLocalization(

@@ -1,7 +1,10 @@
 import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:video_player/video_player.dart';
+
+import 'player_with_controls.dart';
 
 class MediaState {
   MediaState(this.mediaItem, this.position);
@@ -14,6 +17,8 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   late StreamController<PlaybackState> streamController;
 
   MediaItem? media;
+  AudioPlayer? audioPlayer;
+  Duration? position;
 
   late void Function(Duration)? _videoSeek;
   late void Function()? _videoPlay;
@@ -22,6 +27,23 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
   void setMedia(MediaItem newMedia) {
     media = newMedia;
+    audioPlayer = AudioPlayer();
+    audioPlayer?.createPositionStream();
+    audioPlayer?.setUrl(
+      media!.id,
+      tag: newMedia,
+    );
+  }
+
+  Future<void> startBgPlay(Duration position) async {
+    await audioPlayer?.seek(position);
+    await audioPlayer?.play();
+  }
+
+  Duration? stopBgPlay() {
+    audioPlayer?.stop();
+
+    return position;
   }
 
   void setVideoFunctions(
@@ -43,27 +65,54 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
   // your audio playback logic in one place.
 
   @override
-  Future<void> play() async => _videoPlay!();
+  Future<void> play() async {
+    if (isInBg) {
+      await audioPlayer!.play();
+      return;
+    }
+    _videoPlay!();
+  }
 
   @override
-  Future<void> pause() async => _videoPause!();
+  Future<void> pause() async {
+    if (isInBg) {
+      await audioPlayer!.pause();
+      return;
+    }
+    _videoPause!();
+  }
 
   @override
-  Future<void> seek(Duration position) async => _videoSeek!(position);
+  Future<void> seek(Duration position) async {
+    if (isInBg) {
+      await audioPlayer!.seek(position);
+      return;
+    }
+    _videoSeek!(position);
+  }
 
   @override
-  Future<void> stop() async => _videoStop!();
+  Future<void> stop() async {
+    if (isInBg) {
+      await audioPlayer!.seek(Duration.zero);
+      return;
+    }
+    _videoStop!();
+  }
 
   void dispose() {
     streamController.add(
       PlaybackState(),
     );
+    audioPlayer?.dispose();
   }
 
   void initializeStreamController(
     VideoPlayerController? videoPlayerController,
   ) {
-    bool isPlaying() => videoPlayerController?.value.isPlaying ?? false;
+    bool isPlaying() => isInBg
+        ? audioPlayer?.playing ?? false
+        : videoPlayerController?.value.isPlaying ?? false;
 
     AudioProcessingState processingState() {
       if (videoPlayerController == null) return AudioProcessingState.idle;
@@ -74,6 +123,14 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
     }
 
     Duration bufferedPosition() {
+      if (audioPlayer != null && audioPlayer!.playing) {
+        try {
+          return audioPlayer!.bufferedPosition;
+        } catch (err) {
+          return Duration.zero;
+        }
+      }
+
       try {
         final currentBufferedRange =
             videoPlayerController?.value.buffered.firstWhere((durationRange) {
@@ -106,8 +163,10 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
           androidCompactActionIndices: const [0, 1, 3],
           processingState: processingState(),
           playing: isPlaying(),
-          updatePosition:
-              videoPlayerController?.value.position ?? Duration.zero,
+          updatePosition: ((audioPlayer?.playing ?? false)
+                  ? audioPlayer?.position
+                  : videoPlayerController?.value.position) ??
+              Duration.zero,
           bufferedPosition: bufferedPosition(),
           speed: videoPlayerController?.value.playbackSpeed ?? 1.0,
         ),
@@ -116,6 +175,12 @@ class AudioPlayerHandler extends BaseAudioHandler with SeekHandler {
 
     void startStream() {
       videoPlayerController?.addListener(addVideoEvent);
+      audioPlayer?.playbackEventStream.listen((data) {
+        addVideoEvent();
+      });
+      audioPlayer?.positionStream.listen((data) {
+        position = data;
+      });
     }
 
     void stopStream() {

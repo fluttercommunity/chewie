@@ -852,6 +852,8 @@ class ChewieController extends ChangeNotifier {
 
   AudioPlayerHandler? _audioHandler;
 
+  AudioPlayerHandler? get audioHandler => _audioHandler;
+
   ValueNotifier<bool> get isInitialized => _isInitialized;
 
   List<VideoTrack> get videoTracks => _videoTracks;
@@ -892,6 +894,14 @@ class ChewieController extends ChangeNotifier {
       subtitle: description?.subtitle ?? '',
     );
     await _videoPlayerController.pause();
+  }
+
+  static Future<void> initializeBg() async {
+    // return JustAudioBackground.init(
+    //   androidNotificationChannelId: 'uz.intersoft.chewie.channel.audio',
+    //   androidNotificationChannelName: 'Audio playback',
+    //   androidNotificationOngoing: true,
+    // );
   }
 
   Future<void> setVideoTrack(VideoTrack track) async {

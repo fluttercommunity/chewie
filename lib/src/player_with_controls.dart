@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +12,7 @@ import 'material/mobile/material_chrome_cast_controls.dart';
 import 'notifiers/index.dart';
 
 const speedKey = 'player:playback_speed';
+bool isInBg = false;
 
 class PlayerWithControls extends StatefulWidget {
   const PlayerWithControls({super.key});
@@ -37,12 +40,31 @@ class _PlayerWithControlsState extends State<PlayerWithControls>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden) {
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    log(state.name);
+    log(isInBg.toString());
+
+    if (!isInBg) {
+      isInBg = state == AppLifecycleState.paused ||
+          state == AppLifecycleState.hidden;
+    }
+
+    if (isInBg) {
       if (_chewieController.isPlaying) {
-        _chewieController.play();
+        await _chewieController.pause();
+        await _chewieController.audioHandler?.startBgPlay(
+          _chewieController.videoPlayerController.value.position,
+        );
       }
+    }
+
+    if (state == AppLifecycleState.resumed && isInBg) {
+      isInBg = false;
+      final lastPosition = _chewieController.audioHandler?.stopBgPlay();
+      log(lastPosition.toString());
+      if (lastPosition == null) return;
+      await _chewieController.videoPlayerController.seekTo(await lastPosition);
+      await _chewieController.play();
     }
     super.didChangeAppLifecycleState(state);
   }
