@@ -6,8 +6,11 @@ class AdaptiveControls extends StatelessWidget {
     super.key,
   });
 
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     switch (Theme.of(context).platform) {
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:

@@ -25,6 +25,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
   late VideoPlayerController _videoPlayerController2;
   ChewieController? _chewieController;
   int? bufferDelay;
+  bool _showSubtitles = false;
 
   @override
   void initState() {
@@ -113,6 +114,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       videoPlayerController: _videoPlayerController1,
       autoPlay: true,
       looping: true,
+      showSubtitle: _showSubtitles,
       progressIndicatorDelay:
           bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
 
@@ -198,11 +200,27 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       ),
               ),
             ),
-            TextButton(
-              onPressed: () {
-                _chewieController?.enterFullScreen();
-              },
-              child: const Text('Fullscreen'),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      _chewieController?.enterFullScreen();
+                    },
+                    child: const Text('Fullscreen'),
+                  ),
+                ),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _showSubtitles = !_showSubtitles;
+                      });
+                    },
+                    child: const Text('Toggle Subtitles'),
+                  ),
+                ),
+              ],
             ),
             Row(
               children: <Widget>[
