@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 class AdaptiveControls extends StatelessWidget {
   const AdaptiveControls({
     super.key,
-    this.showSubtitle = false,
   });
 
-  final bool showSubtitle;
 
   @override
   Widget build(
@@ -24,10 +22,9 @@ class AdaptiveControls extends StatelessWidget {
         return const MaterialDesktopControls();
 
       case TargetPlatform.iOS:
-        return CupertinoControls(
-          backgroundColor: const Color.fromRGBO(41, 41, 41, 0.7),
-          iconColor: const Color.fromARGB(255, 200, 200, 200),
-          showSubtitle: showSubtitle,
+        return const CupertinoControls(
+          backgroundColor: Color.fromRGBO(41, 41, 41, 0.7),
+          iconColor: Color.fromARGB(255, 200, 200, 200),
         );
       default:
         return const MaterialControls();

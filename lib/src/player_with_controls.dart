@@ -25,10 +25,7 @@ class PlayerWithControls extends StatelessWidget {
       ChewieController chewieController,
     ) {
       return chewieController.showControls
-          ? chewieController.customControls ??
-              AdaptiveControls(
-                showSubtitle: chewieController.showSubtitle,
-              )
+          ? chewieController.customControls ?? const AdaptiveControls()
           : const SizedBox();
     }
 
