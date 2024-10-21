@@ -22,12 +22,14 @@ class CupertinoControls extends StatefulWidget {
     required this.backgroundColor,
     required this.iconColor,
     this.showPlayButton = true,
+    this.showSubtitle = false,
     super.key,
   });
 
   final Color backgroundColor;
   final Color iconColor;
   final bool showPlayButton;
+  final bool showSubtitle;
 
   @override
   State<StatefulWidget> createState() {
@@ -60,6 +62,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
   void initState() {
     super.initState();
     notifier = Provider.of<PlayerNotifier>(context, listen: false);
+    _subtitleOn = widget.showSubtitle;
   }
 
   @override
