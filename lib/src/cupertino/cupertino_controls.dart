@@ -145,11 +145,13 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
     final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     _chewieController?.addListener(() {
-      setState(() {
-        controller = chewieController.videoPlayerController;
+      if (mounted) {
+        setState(() {
+          controller = chewieController.videoPlayerController;
+        });
         _dispose();
         _initialize();
-      });
+      }
     });
     controller = chewieController.videoPlayerController;
 
