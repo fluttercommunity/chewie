@@ -310,6 +310,7 @@ class ChewieController extends ChangeNotifier {
     this.controlsSafeAreaMinimum = EdgeInsets.zero,
     this.allowQualityChanging = false,
     this.qualities = const {},
+    this.onVideoControllerChanged,
   }) : assert(
           playbackSpeeds.every((speed) => speed > 0),
           'The playbackSpeeds values must all be greater than 0',
@@ -368,6 +369,7 @@ class ChewieController extends ChangeNotifier {
     )? routePageBuilder,
     bool? allowQualityChanging,
     Map<String, String>? qualities,
+    void Function(VideoPlayerController)? onVideoControllerChanged,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -420,8 +422,8 @@ class ChewieController extends ChangeNotifier {
           this.deviceOrientationsAfterFullScreen,
       routePageBuilder: routePageBuilder ?? this.routePageBuilder,
       hideControlsTimer: hideControlsTimer ?? this.hideControlsTimer,
-      progressIndicatorDelay:
-          progressIndicatorDelay ?? this.progressIndicatorDelay,
+      progressIndicatorDelay: progressIndicatorDelay ?? this.progressIndicatorDelay,
+      onVideoControllerChanged: onVideoControllerChanged ?? this.onVideoControllerChanged,
     );
   }
 
@@ -587,6 +589,9 @@ class ChewieController extends ChangeNotifier {
   /// the value is a url of the video with this resolution
   final Map<String, String> qualities;
 
+  /// Called when the video controller changes
+  final void Function(VideoPlayerController)? onVideoControllerChanged;
+
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider =
         context.dependOnInheritedWidgetOfExactType<ChewieControllerProvider>()!;
@@ -605,6 +610,8 @@ class ChewieController extends ChangeNotifier {
   String get quality => _quality;
 
   Future<dynamic> _initialize() async {
+    _quality = qualities.keys.last;
+
     await videoPlayerController.setLooping(looping);
 
     if ((autoInitialize || autoPlay) &&
@@ -627,8 +634,6 @@ class ChewieController extends ChangeNotifier {
     if (fullScreenByDefault) {
       videoPlayerController.addListener(_fullScreenListener);
     }
-
-    _quality = qualities.keys.last;
   }
 
   Future<void> _fullScreenListener() async {
@@ -684,6 +689,7 @@ class ChewieController extends ChangeNotifier {
 
   Future<void> setQuality(String quality) async {
     final currentPosition = await videoPlayerController.position;
+    final speed = videoPlayerController.value.playbackSpeed;
 
     videoPlayerController.dispose();
 
@@ -716,6 +722,7 @@ class ChewieController extends ChangeNotifier {
 
     await videoPlayerController.initialize();
     await videoPlayerController.seekTo(currentPosition!);
+    await videoPlayerController.setPlaybackSpeed(speed);
     await videoPlayerController.play();
 
     _quality = quality;

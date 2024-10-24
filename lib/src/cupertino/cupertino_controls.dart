@@ -163,10 +163,7 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
     super.didChangeDependencies();
   }
 
-  GestureDetector _buildOptionsButton(
-    Color iconColor,
-    double barHeight,
-  ) {
+  List<OptionItem> _buildOptions(BuildContext context) {
     final options = <OptionItem>[];
 
     if (chewieController.allowQualityChanging) {
@@ -187,19 +184,26 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
       options.addAll(chewieController.additionalOptions!(context));
     }
 
+    return options;
+  }
+
+  GestureDetector _buildOptionsButton(
+    Color iconColor,
+    double barHeight,
+  ) {
     return GestureDetector(
       onTap: () async {
         _hideTimer?.cancel();
 
         if (chewieController.optionsBuilder != null) {
-          await chewieController.optionsBuilder!(context, options);
+          await chewieController.optionsBuilder!(context, _buildOptions(context));
         } else {
           await showCupertinoModalPopup<OptionItem>(
             context: context,
             semanticsDismissible: true,
             useRootNavigator: chewieController.useRootNavigator,
             builder: (context) => CupertinoOptionsDialog(
-              options: options,
+              options: _buildOptions(context),
               cancelButtonText: chewieController.optionsTranslation?.cancelButtonText,
             ),
           );
@@ -305,7 +309,8 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
                           if (chewieController.allowPlaybackSpeedChanging)
                             _buildSpeedButton(controller, iconColor, barHeight),
                           if (chewieController.additionalOptions != null &&
-                              chewieController.additionalOptions!(context).isNotEmpty)
+                                  chewieController.additionalOptions!(context).isNotEmpty ||
+                              chewieController.allowQualityChanging)
                             _buildOptionsButton(iconColor, barHeight),
                         ],
                       ),
@@ -652,14 +657,14 @@ class _CupertinoControlsState extends State<CupertinoControls> with SingleTicker
     _hideTimer?.cancel();
 
     final chosenQuality = await showCupertinoModalPopup<String>(
-          context: context,
-          semanticsDismissible: true,
-          useRootNavigator: chewieController.useRootNavigator,
-          builder: (context) => _QualityDialog(
-            qualities: chewieController.qualities.keys.toList(),
-            selected: chewieController.quality,
-          ),
-        );
+      context: context,
+      semanticsDismissible: true,
+      useRootNavigator: chewieController.useRootNavigator,
+      builder: (context) => _QualityDialog(
+        qualities: chewieController.qualities.keys.toList(),
+        selected: chewieController.quality,
+      ),
+    );
 
     if (chosenQuality != null && chosenQuality != chewieController.quality) {
       _chewieController!.setQuality(chosenQuality);
