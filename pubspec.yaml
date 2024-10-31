@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
   provider: ^6.0.1
   video_player: ^2.2.7
-  wakelock_plus: ^1.2.8
+  wakelock_plus: ^1.0.0
   very_good_analysis: ^2.4.0
 
 dev_dependencies:
