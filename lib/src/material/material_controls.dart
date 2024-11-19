@@ -161,7 +161,7 @@ class _MaterialControlsState extends State<MaterialControls>
     );
   }
 
-  Widget _buildOptionsButton() {
+  List<OptionItem> _buildOptions(BuildContext context) {
     final options = <OptionItem>[
       OptionItem(
         onTap: (context) async {
@@ -178,7 +178,10 @@ class _MaterialControlsState extends State<MaterialControls>
         chewieController.additionalOptions!(context).isNotEmpty) {
       options.addAll(chewieController.additionalOptions!(context));
     }
+    return options;
+  }
 
+  Widget _buildOptionsButton() {
     return AnimatedOpacity(
       opacity: notifier.hideStuff ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 250),
@@ -187,14 +190,14 @@ class _MaterialControlsState extends State<MaterialControls>
           _hideTimer?.cancel();
 
           if (chewieController.optionsBuilder != null) {
-            await chewieController.optionsBuilder!(context, options);
+            await chewieController.optionsBuilder!(context, _buildOptions(context));
           } else {
             await showModalBottomSheet<OptionItem>(
               context: context,
               isScrollControlled: true,
               useRootNavigator: chewieController.useRootNavigator,
               builder: (context) => OptionsDialog(
-                options: options,
+                options: _buildOptions(context),
                 cancelButtonText:
                     chewieController.optionsTranslation?.cancelButtonText,
               ),
