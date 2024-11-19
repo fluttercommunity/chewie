@@ -8,13 +8,13 @@ class OptionItem {
     this.subtitle,
   });
 
-  Function()? onTap;
+  Function(BuildContext context)? onTap;
   IconData iconData;
   String title;
   String? subtitle;
 
   OptionItem copyWith({
-    Function()? onTap,
+    Function(BuildContext context)? onTap,
     IconData? iconData,
     String? title,
     String? subtitle,
