@@ -288,6 +288,7 @@ class ChewieController extends ChangeNotifier {
     this.zoomAndPan = false,
     this.maxScale = 2.5,
     this.subtitle,
+    this.showSubtitlesPerDefault = false,
     this.subtitleBuilder,
     this.customControls,
     this.errorBuilder,
@@ -339,6 +340,7 @@ class ChewieController extends ChangeNotifier {
     bool? zoomAndPan,
     double? maxScale,
     Subtitles? subtitle,
+    bool? showSubtitlesPerDefault,
     Widget Function(BuildContext, dynamic)? subtitleBuilder,
     Widget? customControls,
     WidgetBuilder? bufferingBuilder,
@@ -391,6 +393,8 @@ class ChewieController extends ChangeNotifier {
       optionsBuilder: optionsBuilder ?? this.optionsBuilder,
       additionalOptions: additionalOptions ?? this.additionalOptions,
       showControls: showControls ?? this.showControls,
+      showSubtitlesPerDefault:
+          showSubtitlesPerDefault ?? this.showSubtitlesPerDefault,
       subtitle: subtitle ?? this.subtitle,
       subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
       customControls: customControls ?? this.customControls,
@@ -453,6 +457,13 @@ class ChewieController extends ChangeNotifier {
 
   /// Add a List of Subtitles here in `Subtitles.subtitle`
   Subtitles? subtitle;
+
+  /// Determines whether subtitles should be shown by default when the video starts.
+  ///
+  /// If set to `true`, subtitles will be displayed automatically when the video
+  /// begins playing. If set to `false`, subtitles will be hidden by default.
+  ///
+  bool showSubtitlesPerDefault;
 
   /// The controller for the video you want to play
   final VideoPlayerController videoPlayerController;
