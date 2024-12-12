@@ -685,6 +685,8 @@ class _MaterialControlsState extends State<MaterialControls>
               backgroundColor: Theme.of(context).disabledColor.withOpacity(.5),
             ),
         draggableProgressBar: chewieController.draggableProgressBar,
+        barHeight: chewieController.materialProgressBarHeight,
+        handleHeight: chewieController.materialProgressHandleHeight,
       ),
     );
   }

@@ -275,6 +275,8 @@ class ChewieController extends ChangeNotifier {
     this.fullScreenByDefault = false,
     this.cupertinoProgressColors,
     this.materialProgressColors,
+    this.materialProgressBarHeight = 10,
+    this.materialProgressHandleHeight = 6,
     this.materialSeekButtonFadeDuration = const Duration(milliseconds: 300),
     this.materialSeekButtonSize = 26,
     this.placeholder,
@@ -512,6 +514,12 @@ class ChewieController extends ChangeNotifier {
   /// The colors to use for the Material Progress Bar. By default, the Material
   /// player uses the colors from your Theme.
   final ChewieProgressColors? materialProgressColors;
+
+  // The height of the Material ProgressBar
+  final double materialProgressBarHeight;
+
+  // The height of the Material ProgressBar handle
+  final double materialProgressHandleHeight;
 
   // The duration of the fade animation for the seek button (Material Player only)
   final Duration materialSeekButtonFadeDuration;
