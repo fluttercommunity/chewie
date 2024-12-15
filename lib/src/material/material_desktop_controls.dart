@@ -12,6 +12,7 @@ import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -49,6 +50,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
   late VideoPlayerController controller;
   ChewieController? _chewieController;
+  late final FocusNode _focusNode;
 
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
@@ -75,39 +77,55 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
           );
     }
 
-    return MouseRegion(
-      onHover: (_) {
-        _cancelAndRestartTimer();
+    return KeyboardListener(
+      focusNode: _focusNode,
+      onKeyEvent: (event) {
+        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.space) {
+          _playPause();
+        } else if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.arrowRight) {
+          _seekForward();
+        } else if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+          _seekBackward();
+        } else if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
+          if (chewieController.isFullScreen) {
+            _onExpandCollapse();
+          }
+        }
       },
-      child: GestureDetector(
-        onTap: () => _cancelAndRestartTimer(),
-        child: AbsorbPointer(
-          absorbing: notifier.hideStuff,
-          child: Stack(
-            children: [
-              if (_displayBufferingIndicator)
-                _chewieController?.bufferingBuilder?.call(context) ??
-                    const Center(
-                      child: CircularProgressIndicator(),
-                    )
-              else
-                _buildHitArea(),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  if (_subtitleOn)
-                    Transform.translate(
-                      offset: Offset(
-                        0.0,
-                        notifier.hideStuff ? barHeight * 0.8 : 0.0,
+      child: MouseRegion(
+        onHover: (_) {
+          _cancelAndRestartTimer();
+        },
+        child: GestureDetector(
+          onTap: () => _cancelAndRestartTimer(),
+          child: AbsorbPointer(
+            absorbing: notifier.hideStuff,
+            child: Stack(
+              children: [
+                if (_displayBufferingIndicator)
+                  _chewieController?.bufferingBuilder?.call(context) ??
+                      const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                else
+                  _buildHitArea(),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    if (_subtitleOn)
+                      Transform.translate(
+                        offset: Offset(
+                          0.0,
+                          notifier.hideStuff ? barHeight * 0.8 : 0.0,
+                        ),
+                        child:
+                            _buildSubtitles(context, chewieController.subtitle!),
                       ),
-                      child:
-                          _buildSubtitles(context, chewieController.subtitle!),
-                    ),
-                  _buildBottomBar(context),
-                ],
-              ),
-            ],
+                    _buildBottomBar(context),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -563,6 +581,36 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
       _latestValue = controller.value;
       _subtitlesPosition = controller.value.position;
     });
+  }
+
+  void _seekBackward() {
+    _seekRelative(
+      const Duration(
+        seconds: -10,
+      ),
+    );
+  }
+
+  void _seekForward() {
+    _seekRelative(
+      const Duration(
+        seconds: 10,
+      ),
+    );
+  }
+
+  void _seekRelative(Duration relativeSeek) {
+    _cancelAndRestartTimer();
+    final position = _latestValue.position + relativeSeek;
+    final duration = _latestValue.duration;
+
+    if (position < Duration.zero) {
+      controller.seekTo(Duration.zero);
+    } else if (position > duration) {
+      controller.seekTo(duration);
+    } else {
+      controller.seekTo(position);
+    }
   }
 
   Widget _buildProgressBar() {
