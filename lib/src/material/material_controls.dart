@@ -260,6 +260,7 @@ class _MaterialControlsState extends State<MaterialControls>
         height: barHeight + (chewieController.isFullScreen ? 10.0 : 0),
         padding: EdgeInsets.only(
           left: 20,
+          right: 20,
           bottom: !chewieController.isFullScreen ? 10.0 : 0,
         ),
         child: SafeArea(
@@ -291,7 +292,7 @@ class _MaterialControlsState extends State<MaterialControls>
               if (!chewieController.isLive)
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.only(right: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
                         _buildProgressBar(),
