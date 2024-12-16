@@ -59,7 +59,25 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   void initState() {
     super.initState();
     _focusNode = FocusNode();
+    _focusNode.requestFocus();
     notifier = Provider.of<PlayerNotifier>(context, listen: false);
+  }
+
+  void _handleKeyPress(event) {
+    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.space) {
+      _playPause();
+    } else if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.arrowRight) {
+      _seekForward();
+    } else if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+      _seekBackward();
+    } else if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.escape) {
+      if (chewieController.isFullScreen) {
+        _onExpandCollapse();
+      }
+    }
   }
 
   @override
@@ -78,23 +96,13 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
           );
     }
 
+
     return KeyboardListener(
       focusNode: _focusNode,
-      onKeyEvent: (event) {
-        if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.space) {
-          _playPause();
-        } else if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.arrowRight) {
-          _seekForward();
-        } else if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-          _seekBackward();
-        } else if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.escape) {
-          if (chewieController.isFullScreen) {
-            _onExpandCollapse();
-          }
-        }
-      },
+      onKeyEvent: _handleKeyPress,
       child: MouseRegion(
         onHover: (_) {
+          _focusNode.requestFocus();
           _cancelAndRestartTimer();
         },
         child: GestureDetector(
@@ -119,8 +127,8 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
                           0.0,
                           notifier.hideStuff ? barHeight * 0.8 : 0.0,
                         ),
-                        child:
-                            _buildSubtitles(context, chewieController.subtitle!),
+                        child: _buildSubtitles(
+                            context, chewieController.subtitle!),
                       ),
                     _buildBottomBar(context),
                   ],
@@ -136,11 +144,11 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   @override
   void dispose() {
     _dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
   void _dispose() {
-    _focusNode.dispose();
     controller.removeListener(_updateState);
     _hideTimer?.cancel();
     _initTimer?.cancel();
