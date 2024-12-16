@@ -58,6 +58,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   @override
   void initState() {
     super.initState();
+    _focusNode = FocusNode();
     notifier = Provider.of<PlayerNotifier>(context, listen: false);
   }
 
@@ -139,6 +140,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   }
 
   void _dispose() {
+    _focusNode.dispose();
     controller.removeListener(_updateState);
     _hideTimer?.cancel();
     _initTimer?.cancel();
