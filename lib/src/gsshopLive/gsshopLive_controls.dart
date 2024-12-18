@@ -1,7 +1,8 @@
 import 'dart:async';
 
-import 'package:chewie/src/animated_play_pause.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:chewie/src/center_play_button.dart';
+import '../../src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
@@ -13,10 +14,11 @@ import 'package:chewie/src/notifiers/index.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
-import '../../src/chewie_player.dart';
 
-class MaterialDesktopControls extends StatefulWidget {
-  const MaterialDesktopControls({
+import 'widgets/product_live_player_timer.dart';
+
+class GsshopLiveControls extends StatefulWidget {
+  const GsshopLiveControls({
     this.showPlayButton = true,
     Key? key,
   }) : super(key: key);
@@ -25,11 +27,11 @@ class MaterialDesktopControls extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _MaterialDesktopControlsState();
+    return _MaterialControlsState();
   }
 }
 
-class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
+class _MaterialControlsState extends State<GsshopLiveControls>
     with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
   late VideoPlayerValue _latestValue;
@@ -75,42 +77,39 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
           );
     }
 
-    return MouseRegion(
-      onHover: (_) {
-        _cancelAndRestartTimer();
-      },
-      child: GestureDetector(
-        onTap: () => _cancelAndRestartTimer(),
-        child: AbsorbPointer(
-          absorbing: notifier.hideStuff,
-          child: Stack(
-            children: [
-              if (_displayBufferingIndicator)
-                const Center(
-                  child: CircularProgressIndicator(),
-                )
-              else
-                _buildHitArea(),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  if (_subtitleOn)
-                    Transform.translate(
-                      offset: Offset(
-                        0.0,
-                        notifier.hideStuff ? barHeight * 0.8 : 0.0,
+    return ValueListenableBuilder(
+        valueListenable: chewieController.miniPlayerNotifier!,
+        builder: (context, value, _) {
+          return value
+              ? Container()
+              : MouseRegion(
+                  onHover: (_) {
+                    _cancelAndRestartTimer();
+                  },
+                  child: GestureDetector(
+                    onTap: () => _cancelAndRestartTimer(),
+                    child: AbsorbPointer(
+                      absorbing: notifier.hideStuff,
+                      child: Stack(
+                        children: [
+                          // if (_displayBufferingIndicator)
+                          //   const Center(
+                          //     child: CircularProgressIndicator(),
+                          //   )
+                          // else
+                          _buildHitArea(),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              _buildBottomBar(context),
+                            ],
+                          ),
+                        ],
                       ),
-                      child:
-                          _buildSubtitles(context, chewieController.subtitle!),
                     ),
-                  _buildBottomBar(context),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+                  ),
+                );
+        });
   }
 
   @override
@@ -140,18 +139,26 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     super.didChangeDependencies();
   }
 
-  Widget _buildSubtitleToggle({IconData? icon, bool isPadded = false}) {
-    return IconButton(
-      padding: isPadded ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
-      icon: Icon(icon, color: _subtitleOn ? Colors.white : Colors.grey[700]),
-      onPressed: _onSubtitleTap,
+  Widget _buildActionBar() {
+    return Positioned(
+      top: 0,
+      right: 0,
+      child: SafeArea(
+        child: AnimatedOpacity(
+          opacity: notifier.hideStuff ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 250),
+          child: Row(
+            children: [
+              _buildSubtitleToggle(),
+              if (chewieController.showOptions) _buildOptionsButton(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildOptionsButton({
-    IconData? icon,
-    bool isPadded = false,
-  }) {
+  Widget _buildOptionsButton() {
     final options = <OptionItem>[
       OptionItem(
         onTap: () async {
@@ -173,7 +180,6 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
       opacity: notifier.hideStuff ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 250),
       child: IconButton(
-        padding: isPadded ? const EdgeInsets.all(8.0) : EdgeInsets.zero,
         onPressed: () async {
           _hideTimer?.cancel();
 
@@ -196,8 +202,8 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
             _startHideTimer();
           }
         },
-        icon: Icon(
-          icon ?? Icons.more_vert,
+        icon: const Icon(
+          Icons.more_vert,
           color: Colors.white,
         ),
       ),
@@ -247,53 +253,100 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     return AnimatedOpacity(
       opacity: notifier.hideStuff ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 300),
-      child: Container(
-        height: barHeight + (chewieController.isFullScreen ? 20.0 : 0),
-        padding:
-            EdgeInsets.only(bottom: chewieController.isFullScreen ? 10.0 : 15),
-        child: SafeArea(
-          bottom: chewieController.isFullScreen,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            verticalDirection: VerticalDirection.up,
-            children: [
-              Flexible(
-                child: Row(
-                  children: <Widget>[
-                    _buildPlayPause(controller),
-                    _buildMuteButton(controller),
-                    if (chewieController.isLive)
-                      const Expanded(child: Text('LIVE'))
-                    else
-                      _buildPosition(iconColor),
-                    const Spacer(),
-                    if (chewieController.showControls &&
-                        chewieController.subtitle != null &&
-                        chewieController.subtitle!.isNotEmpty)
-                      _buildSubtitleToggle(icon: Icons.subtitles),
-                    if (chewieController.showOptions)
-                      _buildOptionsButton(icon: Icons.settings),
-                    if (chewieController.allowFullScreen) _buildExpandButton(),
+      child: SafeArea(
+        bottom: chewieController.isFullScreen,
+        minimum: chewieController.controlsSafeAreaMinimum,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Flexible(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  if (chewieController.leftTime == null ||
+                      chewieController.leftTime == '') ...[
+                    const SizedBox(
+                      width: 12,
+                    ),
+                    _buildPosition(iconColor),
                   ],
-                ),
-              ),
-              if (!chewieController.isLive)
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.only(
-                      right: 20,
-                      left: 20,
-                      bottom: chewieController.isFullScreen ? 5.0 : 0,
-                    ),
-                    child: Row(
-                      children: [
-                        _buildProgressBar(),
-                      ],
-                    ),
+                  const Spacer(),
+                  // if (chewieController.isLive)
+                  //   const Expanded(child: Text('LIVE'))
+                  // else
+                  //   _buildPosition(iconColor),
+                  if (chewieController.allowMuting)
+                    _buildMuteButton(controller),
+
+                  if (chewieController.allowFullScreen) _buildExpandButton(),
+                  Container(
+                    width: 12.0,
                   ),
-                ),
-            ],
+                ],
+              ),
+            ),
+            SizedBox(
+              height: chewieController.isFullScreen ? 20.0 : 10.0,
+            ),
+            // if (!chewieController.isLive)
+            //   Expanded(
+            //     child: Container(
+            //       padding: const EdgeInsets.only(right: 20),
+            //       child: Row(
+            //         children: [
+            //           _buildProgressBar(),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector _buildMuteButton(
+    VideoPlayerController controller,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        _cancelAndRestartTimer();
+        print('live button _latestValue.volume ${_latestValue.volume}');
+        if (_latestValue.volume == 0) {
+          _latestVolume == 1.0;
+          controller.setVolume(1.0);
+          chewieController.volumeOnFunction();
+        } else {
+          _latestVolume = controller.value.volume;
+          chewieController.volumeOffFunction();
+
+          controller.setVolume(0.0);
+        }
+      },
+      child: AnimatedOpacity(
+        opacity: notifier.hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: Container(
+          height: 36,
+          width: 36,
+          color: const Color.fromARGB(0, 255, 255, 255),
+          child: Center(
+            child: _latestValue.volume > 0.0
+                ? SvgPicture.asset(
+                    'assets/svg/icon/player/volume_up.svg',
+                    colorFilter:
+                        const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    width: 20,
+                    height: 20,
+                  )
+                : SvgPicture.asset(
+                    'assets/svg/icon/player/volume_down.svg',
+                    colorFilter:
+                        const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    width: 20,
+                    height: 20,
+                  ),
           ),
         ),
       ),
@@ -307,19 +360,25 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
         opacity: notifier.hideStuff ? 0.0 : 1.0,
         duration: const Duration(milliseconds: 300),
         child: Container(
-          height: barHeight + (chewieController.isFullScreen ? 15.0 : 0),
-          margin: const EdgeInsets.only(right: 12.0),
-          padding: const EdgeInsets.only(
-            left: 8.0,
-            right: 8.0,
-          ),
+          width: 36.0,
+          height: 36.0,
+          color: const Color.fromARGB(0, 255, 255, 255),
           child: Center(
-            child: Icon(
-              chewieController.isFullScreen
-                  ? Icons.fullscreen_exit
-                  : Icons.fullscreen,
-              color: Colors.white,
-            ),
+            child: chewieController.isFullScreen
+                ? SvgPicture.asset(
+                    'assets/svg/icon/player/zoom_out.svg',
+                    colorFilter:
+                        const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    width: 20,
+                    height: 20,
+                  )
+                : SvgPicture.asset(
+                    'assets/svg/icon/player/zoom_in.svg',
+                    colorFilter:
+                        const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    width: 20,
+                    height: 20,
+                  ),
           ),
         ),
       ),
@@ -342,20 +401,41 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
             _cancelAndRestartTimer();
           }
         } else {
-          _playPause();
-
           setState(() {
             notifier.hideStuff = true;
           });
         }
       },
-      child: CenterPlayButton(
-        backgroundColor: Colors.black54,
-        iconColor: Colors.white,
-        isFinished: isFinished,
-        isPlaying: controller.value.isPlaying,
-        show: showPlayButton,
-        onPressed: _playPause,
+      child: AnimatedOpacity(
+        opacity: showPlayButton ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 300),
+        child: Container(
+          color: Colors.black.withAlpha(38),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                height: 48.0,
+              ),
+              CenterPlayButton(
+                backgroundColor: const Color(0xff191923).withOpacity(0.38),
+                iconColor: Colors.white,
+                isFinished: false,
+                isPlaying: controller.value.isPlaying,
+                show: showPlayButton,
+                onPressed: _playPause,
+              ),
+              const SizedBox(
+                height: 8.0,
+              ),
+              if (chewieController.leftTime != null)
+                ProductLivePlayerTimer(
+                  leftTime: chewieController.leftTime!,
+                  show: showPlayButton,
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -382,67 +462,52 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     }
   }
 
-  GestureDetector _buildMuteButton(
-    VideoPlayerController controller,
-  ) {
-    return GestureDetector(
-      onTap: () {
-        _cancelAndRestartTimer();
-
-        if (_latestValue.volume == 0) {
-          controller.setVolume(_latestVolume ?? 0.5);
-        } else {
-          _latestVolume = controller.value.volume;
-          controller.setVolume(0.0);
-        }
-      },
-      child: AnimatedOpacity(
-        opacity: notifier.hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
-        child: ClipRect(
-          child: Container(
-            height: barHeight,
-            padding: const EdgeInsets.only(
-              right: 15.0,
-            ),
-            child: Icon(
-              _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  GestureDetector _buildPlayPause(VideoPlayerController controller) {
-    return GestureDetector(
-      onTap: _playPause,
-      child: Container(
-        height: barHeight,
-        color: Colors.transparent,
-        margin: const EdgeInsets.only(left: 8.0, right: 4.0),
-        padding: const EdgeInsets.only(
-          left: 12.0,
-          right: 12.0,
-        ),
-        child: AnimatedPlayPause(
-          playing: controller.value.isPlaying,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-
   Widget _buildPosition(Color? iconColor) {
     final position = _latestValue.position;
     final duration = _latestValue.duration;
 
-    return Text(
-      '${formatDuration(position)} / ${formatDuration(duration)}',
-      style: const TextStyle(
-        fontSize: 14.0,
-        color: Colors.white,
+    return RichText(
+      text: TextSpan(
+        text: '${formatDuration(position)} ',
+        children: <InlineSpan>[
+          TextSpan(
+            text: '/ ${formatDuration(duration)}',
+            style: TextStyle(
+              fontSize: 14.0,
+              color: Colors.white.withOpacity(.75),
+              fontWeight: FontWeight.normal,
+            ),
+          )
+        ],
+        style: const TextStyle(
+          fontSize: 14.0,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubtitleToggle() {
+    //if don't have subtitle hiden button
+    if (chewieController.subtitle?.isEmpty ?? true) {
+      return const SizedBox();
+    }
+    return GestureDetector(
+      onTap: _onSubtitleTap,
+      child: Container(
+        height: barHeight,
+        color: Colors.transparent,
+        padding: const EdgeInsets.only(
+          left: 12.0,
+          right: 12.0,
+        ),
+        child: Icon(
+          _subtitleOn
+              ? Icons.closed_caption
+              : Icons.closed_caption_off_outlined,
+          color: _subtitleOn ? Colors.white : Colors.grey[700],
+        ),
       ),
     );
   }
@@ -485,39 +550,46 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   void _onExpandCollapse() {
     setState(() {
       notifier.hideStuff = true;
-    });
+      var isChange = chewieController.toggleFullScreenFunction();
+      if (isChange) {
+        chewieController.toggleFullScreen();
 
-    chewieController.toggleFullScreen();
-
-    _showAfterExpandCollapseTimer =
-        Timer(const Duration(milliseconds: 300), () {
-      setState(() {
-        _cancelAndRestartTimer();
-      });
+        _showAfterExpandCollapseTimer =
+            Timer(const Duration(milliseconds: 300), () {
+          setState(() {
+            _cancelAndRestartTimer();
+          });
+        });
+      }
     });
   }
 
   void _playPause() {
-    if (controller.value.isPlaying) {
-      setState(() {
+    final isFinished = _latestValue.position >= _latestValue.duration;
+
+    setState(() {
+      if (controller.value.isPlaying) {
         notifier.hideStuff = false;
-      });
-
-      _hideTimer?.cancel();
-      controller.pause();
-    } else {
-      _cancelAndRestartTimer();
-
-      if (!controller.value.isInitialized) {
-        controller.initialize().then((_) {
-          //[VideoPlayerController.play] If the video is at the end, this method starts playing from the beginning
-          controller.play();
-        });
+        _hideTimer?.cancel();
+        controller.pause();
+        chewieController.pauseFunction();
       } else {
-        //[VideoPlayerController.play] If the video is at the end, this method starts playing from the beginning
-        controller.play();
+        _cancelAndRestartTimer();
+
+        if (!controller.value.isInitialized) {
+          controller.initialize().then((_) {
+            controller.play();
+            chewieController.playFunction();
+          });
+        } else {
+          if (isFinished) {
+            controller.seekTo(Duration.zero);
+          }
+          chewieController.playFunction();
+          controller.play();
+        }
       }
-    }
+    });
   }
 
   void _startHideTimer() {

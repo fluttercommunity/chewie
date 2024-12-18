@@ -3,8 +3,8 @@ import 'package:chewie/src/progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-class MaterialVideoProgressBar extends StatelessWidget {
-  MaterialVideoProgressBar(
+class GsshopLiveProgressBar extends StatelessWidget {
+  GsshopLiveProgressBar(
     this.controller, {
     this.height = kToolbarHeight,
     ChewieProgressColors? colors,
@@ -26,8 +26,8 @@ class MaterialVideoProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return VideoProgressBar(
       controller,
-      barHeight: 5,
-      handleHeight: 5,
+      barHeight: 10,
+      handleHeight: 6,
       drawShadow: true,
       colors: colors,
       onDragEnd: onDragEnd,
