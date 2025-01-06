@@ -460,7 +460,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final position = _latestValue.duration - _latestValue.position;
 
     return Padding(
-      padding: const EdgeInsets.only(right: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Text(
         '-${formatDuration(position)}',
         style: TextStyle(color: iconColor, fontSize: 12.0),
