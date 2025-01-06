@@ -96,7 +96,6 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
           );
     }
 
-
     return KeyboardListener(
       focusNode: _focusNode,
       onKeyEvent: _handleKeyPress,
