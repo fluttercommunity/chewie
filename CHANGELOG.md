@@ -1,3 +1,6 @@
+## [1.8.7]
+* ⬆️ [#876](https://github.com/fluttercommunity/chewie/pull/876): Add keyboard controls seek forward and backward and fullscreen escape on desktop. Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.8.6]
 * ⬆️ [#874](https://github.com/fluttercommunity/chewie/pull/874): Add `devtools_options.yaml` configuration files. Thanks [MoRmdn](https://github.com/MoRmdn).
 
