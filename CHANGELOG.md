@@ -1,3 +1,6 @@
+## [1.9.0]
+* **BREAKING CHANGE**: Library now requires at least Flutter version `3.27.0`.
+
 ## [1.8.7]
 * ⬆️ [#876](https://github.com/fluttercommunity/chewie/pull/876): Add keyboard controls seek forward and backward and fullscreen escape on desktop. Thanks [Ortes](https://github.com/Ortes).
 
