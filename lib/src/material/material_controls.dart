@@ -8,6 +8,7 @@ import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
+import 'package:chewie/src/material/widgets/quality_dialog.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
@@ -132,6 +133,15 @@ class _MaterialControlsState extends State<MaterialControls>
   void didChangeDependencies() {
     final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
+    _chewieController?.addListener(() {
+      if (mounted) {
+        setState(() {
+          controller = chewieController.videoPlayerController;
+        });
+        _dispose();
+        _initialize();
+      }
+    });
     controller = chewieController.videoPlayerController;
 
     if (oldController != chewieController) {
@@ -161,7 +171,7 @@ class _MaterialControlsState extends State<MaterialControls>
     );
   }
 
-  Widget _buildOptionsButton() {
+  List<OptionItem> _buildOptions(BuildContext context) {
     final options = <OptionItem>[
       OptionItem(
         onTap: () async {
@@ -169,16 +179,26 @@ class _MaterialControlsState extends State<MaterialControls>
           _onSpeedButtonTap();
         },
         iconData: Icons.speed,
-        title: chewieController.optionsTranslation?.playbackSpeedButtonText ??
-            'Playback speed',
-      )
+        title: chewieController.optionsTranslation?.playbackSpeedButtonText ?? 'Playback speed',
+      ),
+      if (chewieController.allowQualityChanging)
+        OptionItem(
+          onTap: () async {
+            Navigator.pop(context);
+            _onQualityButtonTap();
+          },
+          iconData: Icons.settings,
+          title: chewieController.optionsTranslation?.qualityButtonText ?? 'Quality',
+        ),
     ];
-
     if (chewieController.additionalOptions != null &&
         chewieController.additionalOptions!(context).isNotEmpty) {
       options.addAll(chewieController.additionalOptions!(context));
     }
+    return options;
+  }
 
+  Widget _buildOptionsButton() {
     return AnimatedOpacity(
       opacity: notifier.hideStuff ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 250),
@@ -187,16 +207,15 @@ class _MaterialControlsState extends State<MaterialControls>
           _hideTimer?.cancel();
 
           if (chewieController.optionsBuilder != null) {
-            await chewieController.optionsBuilder!(context, options);
+            await chewieController.optionsBuilder!(context, _buildOptions(context));
           } else {
             await showModalBottomSheet<OptionItem>(
               context: context,
               isScrollControlled: true,
               useRootNavigator: chewieController.useRootNavigator,
               builder: (context) => OptionsDialog(
-                options: options,
-                cancelButtonText:
-                    chewieController.optionsTranslation?.cancelButtonText,
+                options: _buildOptions(context),
+                cancelButtonText: chewieController.optionsTranslation?.cancelButtonText,
               ),
             );
           }
@@ -451,6 +470,28 @@ class _MaterialControlsState extends State<MaterialControls>
 
     if (chosenSpeed != null) {
       controller.setPlaybackSpeed(chosenSpeed);
+    }
+
+    if (_latestValue.isPlaying) {
+      _startHideTimer();
+    }
+  }
+
+  Future<void> _onQualityButtonTap() async {
+    _hideTimer?.cancel();
+
+    final chosenQuality = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: chewieController.useRootNavigator,
+      builder: (context) => QualityDialog(
+        qualities: chewieController.qualities.keys.toList(),
+        selected: chewieController.quality,
+      ),
+    );
+
+    if (chosenQuality != null && chosenQuality != chewieController.quality) {
+      _chewieController!.setQuality(chosenQuality);
     }
 
     if (_latestValue.isPlaying) {

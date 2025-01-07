@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/models/option_item.dart';
@@ -74,7 +75,7 @@ class ChewieState extends State<Chewie> {
     if (isControllerFullScreen && !_isFullScreen) {
       _isFullScreen = isControllerFullScreen;
       await _pushFullScreenWidget(context);
-    } else if (_isFullScreen) {
+    } else if (!isControllerFullScreen && _isFullScreen) {
       Navigator.of(
         context,
         rootNavigator: widget.controller.useRootNavigator,
@@ -307,6 +308,9 @@ class ChewieController extends ChangeNotifier {
     this.progressIndicatorDelay,
     this.hideControlsTimer = defaultHideControlsTimer,
     this.controlsSafeAreaMinimum = EdgeInsets.zero,
+    this.allowQualityChanging = false,
+    this.qualities = const {},
+    this.onVideoControllerChanged,
   }) : assert(
           playbackSpeeds.every((speed) => speed > 0),
           'The playbackSpeeds values must all be greater than 0',
@@ -363,6 +367,9 @@ class ChewieController extends ChangeNotifier {
       Animation<double>,
       ChewieControllerProvider,
     )? routePageBuilder,
+    bool? allowQualityChanging,
+    Map<String, String>? qualities,
+    void Function(VideoPlayerController)? onVideoControllerChanged,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -415,8 +422,8 @@ class ChewieController extends ChangeNotifier {
           this.deviceOrientationsAfterFullScreen,
       routePageBuilder: routePageBuilder ?? this.routePageBuilder,
       hideControlsTimer: hideControlsTimer ?? this.hideControlsTimer,
-      progressIndicatorDelay:
-          progressIndicatorDelay ?? this.progressIndicatorDelay,
+      progressIndicatorDelay: progressIndicatorDelay ?? this.progressIndicatorDelay,
+      onVideoControllerChanged: onVideoControllerChanged ?? this.onVideoControllerChanged,
     );
   }
 
@@ -455,7 +462,7 @@ class ChewieController extends ChangeNotifier {
   Subtitles? subtitle;
 
   /// The controller for the video you want to play
-  final VideoPlayerController videoPlayerController;
+  VideoPlayerController videoPlayerController;
 
   /// Initialize the Video on Startup. This will prep the video for playback.
   final bool autoInitialize;
@@ -575,6 +582,16 @@ class ChewieController extends ChangeNotifier {
   /// Defaults to [EdgeInsets.zero].
   final EdgeInsets controlsSafeAreaMinimum;
 
+  /// Defines if the quality control should be shown
+  final bool allowQualityChanging;
+
+  /// Defines the map of qualities user can change, where the key is the name of the resolution,
+  /// the value is a url of the video with this resolution
+  final Map<String, String> qualities;
+
+  /// Called when the video controller changes
+  final void Function(VideoPlayerController)? onVideoControllerChanged;
+
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider =
         context.dependOnInheritedWidgetOfExactType<ChewieControllerProvider>()!;
@@ -584,11 +601,17 @@ class ChewieController extends ChangeNotifier {
 
   bool _isFullScreen = false;
 
+  late String _quality;
+
   bool get isFullScreen => _isFullScreen;
 
   bool get isPlaying => videoPlayerController.value.isPlaying;
 
+  String get quality => _quality;
+
   Future<dynamic> _initialize() async {
+    _quality = qualities.keys.last;
+
     await videoPlayerController.setLooping(looping);
 
     if ((autoInitialize || autoPlay) &&
@@ -662,6 +685,48 @@ class ChewieController extends ChangeNotifier {
 
   void setSubtitle(List<Subtitle> newSubtitle) {
     subtitle = Subtitles(newSubtitle);
+  }
+
+  Future<void> setQuality(String quality) async {
+    final currentPosition = await videoPlayerController.position;
+    final speed = videoPlayerController.value.playbackSpeed;
+
+    videoPlayerController.dispose();
+
+    final dataSource = qualities[quality]!;
+    videoPlayerController = switch (videoPlayerController.dataSourceType) {
+      DataSourceType.asset => VideoPlayerController.asset(
+          dataSource,
+          closedCaptionFile: videoPlayerController.closedCaptionFile,
+          package: videoPlayerController.package,
+          videoPlayerOptions: videoPlayerController.videoPlayerOptions,
+        ),
+      DataSourceType.contentUri => VideoPlayerController.contentUri(
+          Uri.parse(dataSource),
+          closedCaptionFile: videoPlayerController.closedCaptionFile,
+          videoPlayerOptions: videoPlayerController.videoPlayerOptions,
+        ),
+      DataSourceType.file => VideoPlayerController.file(
+          File(dataSource),
+          closedCaptionFile: videoPlayerController.closedCaptionFile,
+          videoPlayerOptions: videoPlayerController.videoPlayerOptions,
+          httpHeaders: videoPlayerController.httpHeaders,
+        ),
+      DataSourceType.network => VideoPlayerController.networkUrl(
+          Uri.parse(dataSource),
+          closedCaptionFile: videoPlayerController.closedCaptionFile,
+          videoPlayerOptions: videoPlayerController.videoPlayerOptions,
+          httpHeaders: videoPlayerController.httpHeaders,
+        ),
+    };
+
+    await videoPlayerController.initialize();
+    await videoPlayerController.seekTo(currentPosition!);
+    await videoPlayerController.setPlaybackSpeed(speed);
+    await videoPlayerController.play();
+
+    _quality = quality;
+    notifyListeners();
   }
 }
 
