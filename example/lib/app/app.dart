@@ -119,7 +119,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       additionalOptions: (context) {
         return <OptionItem>[
           OptionItem(
-            onTap: toggleVideo,
+            onTap: (context) => toggleVideo(),
             iconData: Icons.live_tv_sharp,
             title: 'Toggle Video Src',
           ),
@@ -158,7 +158,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
 
   int currPlayIndex = 0;
 
-  Future<void> toggleVideo(BuildContext context) async {
+  Future<void> toggleVideo() async {
     await _videoPlayerController1.pause();
     currPlayIndex += 1;
     if (currPlayIndex >= srcs.length) {
