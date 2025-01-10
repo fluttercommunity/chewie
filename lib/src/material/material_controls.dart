@@ -470,7 +470,7 @@ class _MaterialControlsState extends State<MaterialControls>
             text: '/ ${formatDuration(duration)}',
             style: TextStyle(
               fontSize: 14.0,
-              color: Colors.white.withValues(alpha: .75),
+              color: Colors.white.withOpacity(0.75),
               fontWeight: FontWeight.normal,
             ),
           )
@@ -682,7 +682,7 @@ class _MaterialControlsState extends State<MaterialControls>
               playedColor: Theme.of(context).colorScheme.secondary,
               handleColor: Theme.of(context).colorScheme.secondary,
               bufferedColor:
-                  Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+                  Theme.of(context).colorScheme.surface.withOpacity(0.5),
               backgroundColor:
                   Theme.of(context).disabledColor.withValues(alpha: .5),
             ),
