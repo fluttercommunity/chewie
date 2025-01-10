@@ -684,7 +684,7 @@ class _MaterialControlsState extends State<MaterialControls>
               bufferedColor:
                   Theme.of(context).colorScheme.surface.withOpacity(0.5),
               backgroundColor:
-                  Theme.of(context).disabledColor.withValues(alpha: .5),
+                  Theme.of(context).disabledColor.withOpacity(0.5),
             ),
         draggableProgressBar: chewieController.draggableProgressBar,
       ),
