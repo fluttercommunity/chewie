@@ -260,6 +260,7 @@ class _MaterialControlsState extends State<MaterialControls>
         height: barHeight + (chewieController.isFullScreen ? 10.0 : 0),
         padding: EdgeInsets.only(
           left: 20,
+          right: 20,
           bottom: !chewieController.isFullScreen ? 10.0 : 0,
         ),
         child: SafeArea(
@@ -291,7 +292,7 @@ class _MaterialControlsState extends State<MaterialControls>
               if (!chewieController.isLive)
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.only(right: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
                         _buildProgressBar(),
@@ -469,7 +470,7 @@ class _MaterialControlsState extends State<MaterialControls>
             text: '/ ${formatDuration(duration)}',
             style: TextStyle(
               fontSize: 14.0,
-              color: Colors.white.withOpacity(.75),
+              color: Colors.white.withValues(alpha: .75),
               fontWeight: FontWeight.normal,
             ),
           )
@@ -682,8 +683,9 @@ class _MaterialControlsState extends State<MaterialControls>
               playedColor: Theme.of(context).colorScheme.secondary,
               handleColor: Theme.of(context).colorScheme.secondary,
               bufferedColor:
-                  Theme.of(context).colorScheme.surface.withOpacity(0.5),
-              backgroundColor: Theme.of(context).disabledColor.withOpacity(.5),
+                  Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
+              backgroundColor:
+                  Theme.of(context).disabledColor.withValues(alpha: .5),
             ),
         draggableProgressBar: chewieController.draggableProgressBar,
       ),

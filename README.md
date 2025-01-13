@@ -33,6 +33,8 @@ dependencies:
 
 ```dart
 import 'package:chewie/chewie.dart';
+import 'package:video_player/video_player.dart';
+
 final videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(
     'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'));
 
