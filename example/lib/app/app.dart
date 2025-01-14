@@ -126,7 +126,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
         ];
       },
       subtitle: Subtitles(subtitles),
-      showSubtitlesPerDefault: true,
+      showSubtitles: true,
       subtitleBuilder: (context, dynamic subtitle) => Container(
         padding: const EdgeInsets.all(10.0),
         child: subtitle is InlineSpan

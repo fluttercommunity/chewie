@@ -641,7 +641,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
   }
 
   Future<void> _initialize() async {
-    chewieController.showSubtitlesPerDefault &&
+    chewieController.showSubtitles &&
         (chewieController.subtitle?.isNotEmpty ?? false);
     controller.addListener(_updateState);
 

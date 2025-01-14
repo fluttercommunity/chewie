@@ -135,7 +135,7 @@ Chewie allows you to enhance the video playback experience with text overlays. Y
 
 ### Showing Subtitles by Default
 
-Chewie provides the `showSubtitlesPerDefault` flag, allowing you to control whether subtitles are displayed automatically when the video starts. By default, this flag is set to `false`.
+Chewie provides the `showSubtitles` flag, allowing you to control whether subtitles are displayed automatically when the video starts. By default, this flag is set to `false`.
 
 ### Adding Subtitles
 
@@ -160,7 +160,7 @@ ChewieController(
       text: 'What’s up? :)',
     ),
   ]),
-  showSubtitlesPerDefault: true, // Automatically display subtitles
+  showSubtitles: true, // Automatically display subtitles
   subtitleBuilder: (context, subtitle) => Container(
     padding: const EdgeInsets.all(10.0),
     child: Text(
