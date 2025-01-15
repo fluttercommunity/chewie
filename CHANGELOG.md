@@ -1,3 +1,6 @@
+## [1.9.1+1]
+* Fixed broken Table of Contents links in `README.md`.
+
 ## [1.9.1]
 * [#872](https://github.com/fluttercommunity/chewie/pull/872): feat: Add showSubtitles flag to control subtitles (#648). Thanks [floodoo](https://github.com/floodoo).
 * [#890](https://github.com/fluttercommunity/chewie/pull/890): Fix issue 888. Thanks [diegotori](https://github.com/diegotori).
