@@ -1,3 +1,6 @@
+## [1.9.2]
+* Fixed broken Table of Contents links in `README.md`, take two.
+
 ## [1.9.1+1]
 * Fixed broken Table of Contents links in `README.md`.
 
