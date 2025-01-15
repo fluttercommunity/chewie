@@ -14,17 +14,17 @@ access to video playback.
 Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
 
 ## Table of Contents
-1.  🚨 [IMPORTANT!!! (READ THIS FIRST)](#-important-read-this-first)
-2.  🔀 [Flutter Version Compatibility](#-flutter-version-compatibility)
-3.  🖼️ [Preview](#-preview)
-4.  ⬇️ [Installation](#-installation)
-5.  🕹️ [Using it](#-using-it)
-6.  ⚙️ [Options](#-options)
-7.  🔡 [Subtitles](#-subtitles)
-8.  🧪 [Example](#-example)
-9.  ⏪ [Migrating from Chewie < 0.9.0](#-migrating-from-chewie--090)
-10. 🗺️ [Roadmap](#-roadmap)
-11. 📱 [iOS warning](#-ios-warning-)
+1.  🚨 [IMPORTANT!!! (READ THIS FIRST)](#%EF%B8%8F-important-read-this-first)
+2.  🔀 [Flutter Version Compatibility](#%EF%B8%8F-flutter-version-compatibility)
+3.  🖼️ [Preview](#%EF%B8%8F-preview)
+4.  ⬇️ [Installation](#%EF%B8%8F-installation)
+5.  🕹️ [Using it](#%EF%B8%8F-using-it)
+6.  ⚙️ [Options](#%EF%B8%8F-options)
+7.  🔡 [Subtitles](#%EF%B8%8F-subtitles)
+8.  🧪 [Example](#%EF%B8%8F-example)
+9.  ⏪ [Migrating from Chewie < 0.9.0](#%EF%B8%8F-migrating-from-chewie--090)
+10. 🗺️ [Roadmap](#%EF%B8%8F-roadmap)
+11. 📱 [iOS warning](#%EF%B8%8F-ios-warning-)
 
 
 ## 🚨 IMPORTANT!!! (READ THIS FIRST)
