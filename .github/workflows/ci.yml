@@ -10,19 +10,6 @@ on:
     paths-ignore:
       - '**.md'
   workflow_dispatch:
-    inputs:
-      flutter_n_minus_one_version:
-        description: The N-1 version of Flutter.
-        required: false
-        # The version of Flutter to use should use the minimum Dart SDK version supported by the package,
-        # refer to https://docs.flutter.dev/development/tools/sdk/releases.
-        # Note: The version below should be manually updated to the latest second most recent version
-        # after a new stable version comes out.
-        default: "3.24.5"
-      flutter_current_version:
-        description: The current version of Flutter.
-        required: false
-        default: "3.x"
 
 jobs:
   # Does a sanity check that packages at least pass analysis on the N-1
@@ -31,13 +18,17 @@ jobs:
   # (which we don't commit to supporting, but don't want to actively break)
   # without updating the constraints.
   lint_and_build:
-    name: Flutter version ${{ matrix.flutter-version }} Lint and Build.
+    name: Flutter Version ${{ matrix.flutter-version }} Lint and Build.
     runs-on: ubuntu-latest
     strategy:
       matrix:
         flutter-version:
-          - ${{ inputs.flutter_n_minus_one_version }}
-          - ${{ inputs.flutter_current_version }}
+          # The version of Flutter to use should use the minimum Dart SDK version supported by the package,
+          # refer to https://docs.flutter.dev/development/tools/sdk/releases.
+          # Note: The version below should be manually updated to the latest second most recent version
+          # after a new stable version comes out.
+          - "3.24.5"
+          - "3.x"
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v4
@@ -45,7 +36,7 @@ jobs:
       - name: 🐦 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{matrix.flutter-version}}
+          flutter-version: ${{ matrix.flutter-version }}
           channel: stable
           cache: true
           cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
