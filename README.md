@@ -129,11 +129,17 @@ optionsTranslation: OptionsTranslation(
 
 ## Subtitles
 
-> Since version 1.1.0 chewie supports subtitles. Here you can see how to use them.
+> Since version 1.1.0, Chewie supports subtitles.
 
-You can provide an `List<Subtitle>` and customize your subtitles with the `subtitleBuilder` function.
+Chewie allows you to enhance the video playback experience with text overlays. You can add a `List<Subtitle>` to your `ChewieController` and fully customize their appearance using the `subtitleBuilder` function.
 
-Add subtitles to your `ChewieController` like the following example:
+### Showing Subtitles by Default
+
+Chewie provides the `showSubtitles` flag, allowing you to control whether subtitles are displayed automatically when the video starts. By default, this flag is set to `false`.
+
+### Adding Subtitles
+
+Here’s an example of how to add subtitles to your `ChewieController`:
 
 ```dart
 ChewieController(
@@ -151,9 +157,10 @@ ChewieController(
       index: 1,
       start: const Duration(seconds: 10),
       end: const Duration(seconds: 20),
-      text: 'Whats up? :)',
+      text: 'What’s up? :)',
     ),
   ]),
+  showSubtitles: true, // Automatically display subtitles
   subtitleBuilder: (context, subtitle) => Container(
     padding: const EdgeInsets.all(10.0),
     child: Text(
@@ -164,9 +171,16 @@ ChewieController(
 );
 ```
 
-The `index` attribute is for if you want to structure your subtitles in your database and provide your indexes here. `end` and `text` are the key attributes. 
+### Subtitle Structure
 
-The Duration defines which part of your video your subtitles should start and end. For example, if your video is 10 minutes long and you want to add a subtitle between: `00:00` and `00:10`'th of a second:
+The `Subtitle` model contains the following key attributes:
+
+- **`index`**: A unique identifier for the subtitle, useful for database integration.
+- **`start`**: The starting point of the subtitle, defined as a `Duration`.
+- **`end`**: The ending point of the subtitle, defined as a `Duration`.
+- **`text`**: The subtitle text that will be displayed.
+
+For example, if your video is 10 minutes long and you want to add a subtitle that appears between `00:00` and `00:10`, you can define it like this:
 
 ```dart
 Subtitle(
@@ -176,6 +190,10 @@ Subtitle(
   text: 'Hello from subtitles',
 ),
 ```
+
+### Customizing Subtitles
+
+Use the `subtitleBuilder` function to customize how subtitles are rendered, allowing you to modify text styles, add padding, or apply other customizations to your subtitles.
 
 ## Example
 

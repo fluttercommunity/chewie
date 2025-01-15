@@ -493,7 +493,8 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   }
 
   Future<void> _initialize() async {
-    _subtitleOn = chewieController.subtitle?.isNotEmpty ?? false;
+    _subtitleOn = chewieController.showSubtitles &&
+        (chewieController.subtitle?.isNotEmpty ?? false);
     controller.addListener(_updateState);
 
     _updateState();
