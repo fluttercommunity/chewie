@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+//ignore_for_file: deprecated_member_use
 extension ColorCompatExtensions on Color {
   /// Returns a new color that matches this color with the given opacity.
   ///
@@ -24,7 +25,6 @@ extension ColorCompatExtensions on Color {
     // Once it's removed from a future update, we'll have to replace uses of
     // this method with withValues(alpha: opacity).
     // TODO: Replace this bridge method once the above holds true.
-    //ignore: deprecated_member_use
     return withOpacity(opacity);
   }
 }
