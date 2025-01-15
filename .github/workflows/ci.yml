@@ -1,10 +1,5 @@
 name: CI
 
-env:
-  # Note: The version below should be manually updated to the latest second most recent version
-  # after a new stable version comes out.
-  flutter_n_minus_one_version: "3.24.5"
-
 on:
   pull_request:
     paths-ignore:
@@ -14,10 +9,20 @@ on:
       - master
     paths-ignore:
       - '**.md'
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_dispatch:
+    inputs:
+      flutter_n_minus_one_version:
+        description: The N-1 version of Flutter.
+        required: false
+        # The version of Flutter to use should use the minimum Dart SDK version supported by the package,
+        # refer to https://docs.flutter.dev/development/tools/sdk/releases.
+        # Note: The version below should be manually updated to the latest second most recent version
+        # after a new stable version comes out.
+        default: "3.24.5"
+      flutter_current_version:
+        description: The current version of Flutter.
+        required: false
+        default: "3.x"
 
 jobs:
   # Does a sanity check that packages at least pass analysis on the N-1
@@ -29,10 +34,8 @@ jobs:
     strategy:
       matrix:
         flutter-version:
-          # The version of Flutter to use should use the minimum Dart SDK version supported by the package,
-          # refer to https://docs.flutter.dev/development/tools/sdk/releases.
-          - ${{ env.flutter_n_minus_one_version }}
-          - "3.x"
+          - ${{ inputs.flutter_n_minus_one_version }}
+          - ${{ inputs.flutter_current_version }}
     name: Checks formatting, lints, and tests this library against a specific Flutter version.
     runs-on: ubuntu-latest
     steps:
