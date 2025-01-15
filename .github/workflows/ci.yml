@@ -36,7 +36,7 @@ jobs:
         flutter-version:
           - ${{ inputs.flutter_n_minus_one_version }}
           - ${{ inputs.flutter_current_version }}
-    name: Checks formatting, lints, and tests this library against a specific Flutter version.
+    name: Flutter version ${{matrix.flutter-version}} Lint and Build.
     runs-on: ubuntu-latest
     steps:
       - name: 📚 Git Checkout
