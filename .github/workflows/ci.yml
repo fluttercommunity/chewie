@@ -31,13 +31,13 @@ jobs:
   # (which we don't commit to supporting, but don't want to actively break)
   # without updating the constraints.
   lint_and_build:
+    name: Flutter version ${{ matrix.flutter-version }} Lint and Build.
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         flutter-version:
           - ${{ inputs.flutter_n_minus_one_version }}
           - ${{ inputs.flutter_current_version }}
-    name: Flutter version ${{matrix.flutter-version}} Lint and Build.
-    runs-on: ubuntu-latest
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v4
