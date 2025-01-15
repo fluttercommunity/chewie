@@ -1,3 +1,9 @@
+## [1.9.1]
+* [#872](https://github.com/fluttercommunity/chewie/pull/872): feat: Add showSubtitles flag to control subtitles (#648). Thanks [floodoo](https://github.com/floodoo).
+* [#890](https://github.com/fluttercommunity/chewie/pull/890): Fix issue 888. Thanks [diegotori](https://github.com/diegotori).
+* **IMPORTANT**: Relaxed the minimum supported Flutter version to `3.24`. 
+  From now on, this library will make a best effort to support the latest `N-1` Flutter version at the minimum.
+
 ## [1.9.0]
 * **BREAKING CHANGE**: Library now requires at least Flutter version `3.27.0`.
 
