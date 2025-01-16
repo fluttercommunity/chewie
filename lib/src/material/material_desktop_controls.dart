@@ -183,7 +183,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   }) {
     final options = <OptionItem>[
       OptionItem(
-        onTap: () async {
+        onTap: (context) async {
           Navigator.pop(context);
           _onSpeedButtonTap();
         },
