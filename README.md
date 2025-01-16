@@ -8,18 +8,53 @@
 
 The video player for Flutter with a heart of gold. 
 
-The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level access to video playback. Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
+The [`video_player`](https://pub.dartlang.org/packages/video_player) plugin provides low-level 
+access to video playback. 
 
-## Preview
+Chewie uses the `video_player` under the hood and wraps it in a friendly Material or Cupertino UI!
 
-| MaterialControls | MaterialDesktopControls |
-| :--------------: | :---------------------: |
-|     ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialControls.png)     |    ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialDesktopControls.png)     |
+## Table of Contents
+1.  🚨 [IMPORTANT!!! (READ THIS FIRST)](#-important-read-this-first)
+2.  🔀 [Flutter Version Compatibility](#-flutter-version-compatibility)
+3.  🖼️ [Preview](#%EF%B8%8F-preview)
+4.  ⬇️ [Installation](#%EF%B8%8F-installation)
+5.  🕹️ [Using it](#%EF%B8%8F-using-it)
+6.  ⚙️ [Options](#%EF%B8%8F-options)
+7.  🔡 [Subtitles](#-subtitles)
+8.  🧪 [Example](#-example)
+9.  ⏪ [Migrating from Chewie < 0.9.0](#-migrating-from-chewie--090)
+10. 🗺️ [Roadmap](#%EF%B8%8F-roadmap)
+11. 📱 [iOS warning](#-ios-warning-)
+
+
+## 🚨 IMPORTANT!!! (READ THIS FIRST)
+This library is __NOT__ responsible for any issues caused by `video_player`, since it's merely a UI 
+layer on top of it. 
+
+In other words, if you see any `PlatformException`s being thrown in your app due to video playback,
+they are exclusive to the `video_player` library. 
+
+Instead, please raise an issue related to it with the [Flutter Team](https://github.com/flutter/flutter/issues/new/choose).
+
+## 🔀 Flutter Version Compatibility
+
+This library will at the very least make a solid effort to support the second most recent version 
+of Flutter released. In other words, it will adopt `N-1` version support at
+the bare minimum.
+
+However, this cannot be guaranteed due to major changes between Flutter versions. Should that occur,
+future updates will be released as major or minor versions as needed.
+
+## 🖼️ Preview
+
+|                                MaterialControls                                 |                                MaterialDesktopControls                                 |
+|:-------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------:|
+| ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialControls.png) | ![](https://github.com/brianegan/chewie/raw/master/assets/MaterialDesktopControls.png) |
 
 ### CupertinoControls
 ![](https://github.com/brianegan/chewie/raw/master/assets/CupertinoControls.png)
 
-## Installation
+## ⬇️ Installation
 
 In your `pubspec.yaml` file within your Flutter Project add `chewie` and `video_player` under dependencies:
 
@@ -29,10 +64,12 @@ dependencies:
   video_player: <latest_version>
 ```
 
-## Using it
+## 🕹️ Using it
 
 ```dart
 import 'package:chewie/chewie.dart';
+import 'package:video_player/video_player.dart';
+
 final videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(
     'https://flutter.github.io/assets-for-api-docs/assets/videos/butterfly.mp4'));
 
@@ -59,7 +96,7 @@ void dispose() {
 }
 ```
 
-## Options
+## ⚙️ Options
 
 ![](https://github.com/brianegan/chewie/raw/master/assets/Options.png)
 
@@ -125,13 +162,19 @@ optionsTranslation: OptionsTranslation(
 ),
 ```
 
-## Subtitles
+## 🔡 Subtitles
 
-> Since version 1.1.0 chewie supports subtitles. Here you can see how to use them.
+> Since version 1.1.0, Chewie supports subtitles.
 
-You can provide an `List<Subtitle>` and customize your subtitles with the `subtitleBuilder` function.
+Chewie allows you to enhance the video playback experience with text overlays. You can add a `List<Subtitle>` to your `ChewieController` and fully customize their appearance using the `subtitleBuilder` function.
 
-Add subtitles to your `ChewieController` like the following example:
+### Showing Subtitles by Default
+
+Chewie provides the `showSubtitles` flag, allowing you to control whether subtitles are displayed automatically when the video starts. By default, this flag is set to `false`.
+
+### Adding Subtitles
+
+Here’s an example of how to add subtitles to your `ChewieController`:
 
 ```dart
 ChewieController(
@@ -149,9 +192,10 @@ ChewieController(
       index: 1,
       start: const Duration(seconds: 10),
       end: const Duration(seconds: 20),
-      text: 'Whats up? :)',
+      text: 'What’s up? :)',
     ),
   ]),
+  showSubtitles: true, // Automatically display subtitles
   subtitleBuilder: (context, subtitle) => Container(
     padding: const EdgeInsets.all(10.0),
     child: Text(
@@ -162,9 +206,16 @@ ChewieController(
 );
 ```
 
-The `index` attribute is for if you want to structure your subtitles in your database and provide your indexes here. `end` and `text` are the key attributes. 
+### Subtitle Structure
 
-The Duration defines which part of your video your subtitles should start and end. For example, if your video is 10 minutes long and you want to add a subtitle between: `00:00` and `00:10`'th of a second:
+The `Subtitle` model contains the following key attributes:
+
+- **`index`**: A unique identifier for the subtitle, useful for database integration.
+- **`start`**: The starting point of the subtitle, defined as a `Duration`.
+- **`end`**: The ending point of the subtitle, defined as a `Duration`.
+- **`text`**: The subtitle text that will be displayed.
+
+For example, if your video is 10 minutes long and you want to add a subtitle that appears between `00:00` and `00:10`, you can define it like this:
 
 ```dart
 Subtitle(
@@ -175,11 +226,15 @@ Subtitle(
 ),
 ```
 
-## Example
+### Customizing Subtitles
+
+Use the `subtitleBuilder` function to customize how subtitles are rendered, allowing you to modify text styles, add padding, or apply other customizations to your subtitles.
+
+## 🧪 Example
 
 Please run the app in the [`example/`](https://github.com/brianegan/chewie/tree/master/example) folder to start playing!
 
-## Migrating from Chewie < 0.9.0
+## ⏪ Migrating from Chewie < 0.9.0
 
 Instead of passing the `VideoPlayerController` and your options to the `Chewie` widget you now pass them to the `ChewieController` and pass that later to the `Chewie` widget.
 
@@ -205,7 +260,7 @@ final playerWidget = Chewie(
 );
 ```
 
-## Roadmap
+## 🗺️ Roadmap
 
 - [x] MaterialUI
 - [x] MaterialDesktopUI
@@ -231,7 +286,7 @@ final playerWidget = Chewie(
 - [ ] Screen-Mirroring / Casting (Google Chromecast)
 
 
-## iOS warning 
+## 📱 iOS warning 
 
 The video_player plugin used by chewie will only work in iOS simulators if you are on flutter 1.26.0 or above. You may need to switch to the beta channel `flutter channel beta`
 Please refer to this [issue](https://github.com/flutter/flutter/issues/14647).
