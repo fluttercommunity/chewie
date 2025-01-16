@@ -190,7 +190,8 @@ class _MaterialControlsState extends State<MaterialControls>
           _hideTimer?.cancel();
 
           if (chewieController.optionsBuilder != null) {
-            await chewieController.optionsBuilder!(context, _buildOptions(context));
+            await chewieController.optionsBuilder!(
+                context, _buildOptions(context));
           } else {
             await showModalBottomSheet<OptionItem>(
               context: context,
