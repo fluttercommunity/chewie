@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Does a sanity check that packages at least pass analysis on the N-1
+  # versions of Flutter stable if the package claims to support that version.
+  # This is to minimize accidentally making changes that break old versions
+  # (which we don't commit to supporting, but don't want to actively break)
+  # without updating the constraints.
+  lint_and_build:
+    name: Flutter Version ${{ matrix.flutter-version }} Lint and Build.
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        flutter-version:
+          # The version of Flutter to use should use the minimum Dart SDK version supported by the package,
+          # refer to https://docs.flutter.dev/development/tools/sdk/releases.
+          # Note: The version below should be manually updated to the latest second most recent version
+          # after a new stable version comes out.
+          - "3.24.5"
+          - "3.x"
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
+          channel: stable
+          cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
+
+      - name: 📦 Install Dependencies
+        run: flutter packages get
+
+      - name: ✨ Check Formatting
+        run: dart format --set-exit-if-changed lib
+
+      - name: 🕵️ Analyze
+        run: flutter analyze lib
+
+      - name: 🧪 Run Tests
+        run: flutter test --no-pub --coverage --test-randomize-ordering-seed random
+
+      - name: 📁 Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
