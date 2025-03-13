@@ -31,7 +31,7 @@ jobs:
           # refer to https://docs.flutter.dev/development/tools/sdk/releases.
           # Note: The version below should be manually updated to the latest second most recent version
           # after a new stable version comes out.
-          - "3.24.5"
+          - "3.27.4"
           - "3.x"
     steps:
       - name: 📚 Git Checkout

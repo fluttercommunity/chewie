@@ -6,10 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class ChewieDemo extends StatefulWidget {
-  const ChewieDemo({
-    super.key,
-    this.title = 'Chewie Demo',
-  });
+  const ChewieDemo({super.key, this.title = 'Chewie Demo'});
 
   final String title;
 
@@ -47,13 +44,15 @@ class _ChewieDemoState extends State<ChewieDemo> {
   ];
 
   Future<void> initializePlayer() async {
-    _videoPlayerController1 =
-        VideoPlayerController.networkUrl(Uri.parse(srcs[currPlayIndex]));
-    _videoPlayerController2 =
-        VideoPlayerController.networkUrl(Uri.parse(srcs[currPlayIndex]));
+    _videoPlayerController1 = VideoPlayerController.networkUrl(
+      Uri.parse(srcs[currPlayIndex]),
+    );
+    _videoPlayerController2 = VideoPlayerController.networkUrl(
+      Uri.parse(srcs[currPlayIndex]),
+    );
     await Future.wait([
       _videoPlayerController1.initialize(),
-      _videoPlayerController2.initialize()
+      _videoPlayerController2.initialize(),
     ]);
     _createChewieController();
     setState(() {});
@@ -93,7 +92,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
             TextSpan(
               text: 'subtitles',
               style: TextStyle(color: Colors.blue, fontSize: 18),
-            )
+            ),
           ],
         ),
       ),
@@ -127,17 +126,17 @@ class _ChewieDemoState extends State<ChewieDemo> {
       },
       subtitle: Subtitles(subtitles),
       showSubtitles: true,
-      subtitleBuilder: (context, dynamic subtitle) => Container(
-        padding: const EdgeInsets.all(10.0),
-        child: subtitle is InlineSpan
-            ? RichText(
-                text: subtitle,
-              )
-            : Text(
-                subtitle.toString(),
-                style: const TextStyle(color: Colors.black),
-              ),
-      ),
+      subtitleBuilder:
+          (context, dynamic subtitle) => Container(
+            padding: const EdgeInsets.all(10.0),
+            child:
+                subtitle is InlineSpan
+                    ? RichText(text: subtitle)
+                    : Text(
+                      subtitle.toString(),
+                      style: const TextStyle(color: Colors.black),
+                    ),
+          ),
 
       hideControlsTimer: const Duration(seconds: 1),
 
@@ -176,27 +175,26 @@ class _ChewieDemoState extends State<ChewieDemo> {
         platform: _platform ?? Theme.of(context).platform,
       ),
       home: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
+        appBar: AppBar(title: Text(widget.title)),
         body: Column(
           children: <Widget>[
             Expanded(
               child: Center(
-                child: _chewieController != null &&
-                        _chewieController!
-                            .videoPlayerController.value.isInitialized
-                    ? Chewie(
-                        controller: _chewieController!,
-                      )
-                    : const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 20),
-                          Text('Loading'),
-                        ],
-                      ),
+                child:
+                    _chewieController != null &&
+                            _chewieController!
+                                .videoPlayerController
+                                .value
+                                .isInitialized
+                        ? Chewie(controller: _chewieController!)
+                        : const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 20),
+                            Text('Loading'),
+                          ],
+                        ),
               ),
             ),
             TextButton(
@@ -261,7 +259,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       child: Text("Portrait Video"),
                     ),
                   ),
-                )
+                ),
               ],
             ),
             Row(
@@ -291,7 +289,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                       child: Text("iOS controls"),
                     ),
                   ),
-                )
+                ),
               ],
             ),
             Row(
@@ -324,7 +322,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
                     }
                   },
                 ),
-              )
+              ),
           ],
         ),
       ),
@@ -369,14 +367,15 @@ class _DelaySliderState extends State<DelaySlider> {
       ),
       trailing: IconButton(
         icon: const Icon(Icons.save),
-        onPressed: saved
-            ? null
-            : () {
-                widget.onSave(delay);
-                setState(() {
-                  saved = true;
-                });
-              },
+        onPressed:
+            saved
+                ? null
+                : () {
+                  widget.onSave(delay);
+                  setState(() {
+                    saved = true;
+                  });
+                },
       ),
     );
   }
