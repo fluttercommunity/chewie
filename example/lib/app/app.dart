@@ -126,17 +126,15 @@ class _ChewieDemoState extends State<ChewieDemo> {
       },
       subtitle: Subtitles(subtitles),
       showSubtitles: true,
-      subtitleBuilder:
-          (context, dynamic subtitle) => Container(
-            padding: const EdgeInsets.all(10.0),
-            child:
-                subtitle is InlineSpan
-                    ? RichText(text: subtitle)
-                    : Text(
-                      subtitle.toString(),
-                      style: const TextStyle(color: Colors.black),
-                    ),
-          ),
+      subtitleBuilder: (context, dynamic subtitle) => Container(
+        padding: const EdgeInsets.all(10.0),
+        child: subtitle is InlineSpan
+            ? RichText(text: subtitle)
+            : Text(
+                subtitle.toString(),
+                style: const TextStyle(color: Colors.black),
+              ),
+      ),
 
       hideControlsTimer: const Duration(seconds: 1),
 
@@ -180,21 +178,18 @@ class _ChewieDemoState extends State<ChewieDemo> {
           children: <Widget>[
             Expanded(
               child: Center(
-                child:
-                    _chewieController != null &&
-                            _chewieController!
-                                .videoPlayerController
-                                .value
-                                .isInitialized
-                        ? Chewie(controller: _chewieController!)
-                        : const Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 20),
-                            Text('Loading'),
-                          ],
-                        ),
+                child: _chewieController != null &&
+                        _chewieController!
+                            .videoPlayerController.value.isInitialized
+                    ? Chewie(controller: _chewieController!)
+                    : const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 20),
+                          Text('Loading'),
+                        ],
+                      ),
               ),
             ),
             TextButton(
@@ -367,15 +362,14 @@ class _DelaySliderState extends State<DelaySlider> {
       ),
       trailing: IconButton(
         icon: const Icon(Icons.save),
-        onPressed:
-            saved
-                ? null
-                : () {
-                  widget.onSave(delay);
-                  setState(() {
-                    saved = true;
-                  });
-                },
+        onPressed: saved
+            ? null
+            : () {
+                widget.onSave(delay);
+                setState(() {
+                  saved = true;
+                });
+              },
       ),
     );
   }
