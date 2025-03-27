@@ -291,7 +291,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
                 child: Row(
                   children: <Widget>[
                     _buildPlayPause(controller),
-                    if (chewieController.allowMuting) 
+                    if (chewieController.allowMuting)
                       _buildMuteButton(controller),
                     if (chewieController.isLive)
                       const Expanded(child: Text('LIVE'))
