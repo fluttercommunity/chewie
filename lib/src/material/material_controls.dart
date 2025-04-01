@@ -380,12 +380,17 @@ class _MaterialControlsState extends State<MaterialControls>
     return GestureDetector(
       onTap: () {
         if (_latestValue.isPlaying) {
-          if (_displayTapped) {
-            setState(() {
-              notifier.hideStuff = true;
-            });
-          } else {
+          if (_chewieController?.pauseOnBackgroundTap ?? false) {
+            _playPause();
             _cancelAndRestartTimer();
+          } else {
+            if (_displayTapped) {
+              setState(() {
+                notifier.hideStuff = true;
+              });
+            } else {
+              _cancelAndRestartTimer();
+            }
           }
         } else {
           _playPause();

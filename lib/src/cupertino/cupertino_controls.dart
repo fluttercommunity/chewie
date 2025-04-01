@@ -354,7 +354,15 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
     return GestureDetector(
       onTap: _latestValue.isPlaying
-          ? _cancelAndRestartTimer
+          ? _chewieController?.pauseOnBackgroundTap ?? false
+              ? () {
+                  _playPause();
+
+                  setState(() {
+                    notifier.hideStuff = true;
+                  });
+                }
+              : _cancelAndRestartTimer
           : () {
               _hideTimer?.cancel();
 
