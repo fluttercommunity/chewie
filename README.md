@@ -148,6 +148,21 @@ optionsBuilder: (context, defaultOptions) async {
 
 Your `additionalOptions` are already included here (if you provided `additionalOptions`)!
 
+### `pauseOnBackgroundTap` (Tap Anywhere to Pause/Play)
+
+The `pauseOnBackgroundTap` feature allows the video to be paused or played by tapping anywhere on the video player area.
+This eliminates the need for users to tap the play/pause icon in the center of the video.
+
+This feature can be enabled by setting the `pauseOnBackgroundTap` property in the ChewieController.
+When enabled, tapping anywhere on the video will toggle between play and pause states.
+
+```dart
+final chewieController = ChewieController(
+  videoPlayerController: videoPlayerController,
+  pauseOnBackgroundTap: true, // Allow tapping anywhere on the video to pause/play
+);
+```
+
 ### Translations
 
 What is an option without proper translation? 
