@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:chewie/src/animated_play_pause.dart';
 import 'package:chewie/src/center_play_button.dart';
@@ -581,9 +582,28 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   void _updateState() {
     if (!mounted) return;
 
+    late final bool buffering;
+
+    if (Platform.isAndroid) {
+      if (controller.value.isBuffering) {
+        // -> Check if we actually buffer, as android has a bug preventing to
+        //    get the correct buffering state from this single bool.
+        final VideoPlayerValue value = controller.value;
+        final int buffer = value.buffered.lastOrNull?.end.inMilliseconds ?? -1;
+        final int position = value.position.inMilliseconds;
+
+        buffering = position >= buffer;
+      } else {
+        // -> No buffering
+        buffering = false;
+      }
+    } else {
+      buffering = controller.value.isBuffering;
+    }
+
     // display the progress bar indicator only after the buffering delay if it has been set
     if (chewieController.progressIndicatorDelay != null) {
-      if (controller.value.isBuffering) {
+      if (buffering) {
         _bufferingDisplayTimer ??= Timer(
           chewieController.progressIndicatorDelay!,
           _bufferingTimerTimeout,
@@ -594,7 +614,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
         _displayBufferingIndicator = false;
       }
     } else {
-      _displayBufferingIndicator = controller.value.isBuffering;
+      _displayBufferingIndicator = buffering;
     }
 
     setState(() {
