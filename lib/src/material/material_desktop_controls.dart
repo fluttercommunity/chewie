@@ -589,10 +589,19 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
         // -> Check if we actually buffer, as android has a bug preventing to
         //    get the correct buffering state from this single bool.
         final VideoPlayerValue value = controller.value;
-        final int buffer = value.buffered.lastOrNull?.end.inMilliseconds ?? -1;
+
         final int position = value.position.inMilliseconds;
 
-        buffering = position >= buffer;
+        // Special case, if the video is finished, we don't want to show the
+        // buffering indicator anymore
+        if (position >= value.duration.inMilliseconds) {
+          buffering = false;
+        } else {
+          final int buffer =
+              value.buffered.lastOrNull?.end.inMilliseconds ?? -1;
+
+          buffering = position >= buffer;
+        }
       } else {
         // -> No buffering
         buffering = false;
