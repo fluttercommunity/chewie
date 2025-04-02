@@ -1,3 +1,8 @@
+## [1.11.1]
+* ⬆️ [#875](https://github.com/fluttercommunity/chewie/pull/875): Add background tap to pause video feature. Thanks [Ortes](https://github.com/Ortes).
+* 🛠️ [#896](https://github.com/fluttercommunity/chewie/pull/896): Fixed allowMute being ignored on Desktop. Thanks [mpoimer](https://github.com/mpoimer).
+* 🛠️ [#910](https://github.com/fluttercommunity/chewie/pull/910): Fix example on web. Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.11.0]
 * ⬆️ [#900](https://github.com/fluttercommunity/chewie/pull/900): Flutter `3.29` upgrade. Thanks [diegotori](https://github.com/diegotori).
 * **BREAKING CHANGE**: Library now requires at least Flutter version `3.27.0`, for real this time.
