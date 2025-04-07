@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:video_player/video_player.dart';
 
 String formatDuration(Duration position) {
@@ -38,7 +37,7 @@ String formatDuration(Duration position) {
 bool getIsBuffering(VideoPlayerController controller) {
   final VideoPlayerValue value = controller.value;
 
-  if (Platform.isAndroid) {
+  if (defaultTargetPlatform == TargetPlatform.android) {
     if (value.isBuffering) {
       // -> Check if we actually buffer, as android has a bug preventing to
       //    get the correct buffering state from this single bool.
