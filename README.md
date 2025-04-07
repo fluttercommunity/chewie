@@ -24,8 +24,8 @@ Chewie uses the `video_player` under the hood and wraps it in a friendly Materia
 8.  🧪 [Example](#-example)
 9.  ⏪ [Migrating from Chewie < 0.9.0](#-migrating-from-chewie--090)
 10. 🗺️ [Roadmap](#%EF%B8%8F-roadmap)
-11. ⚠️ [Android warning](#-android-warning-)
-12. 📱 [iOS warning](#-ios-warning-)
+11. ⚠️ [Android warning](#%EF%B8%8F-android-warning)
+12. 📱 [iOS warning](#-ios-warning)
 
 
 ## 🚨 IMPORTANT!!! (READ THIS FIRST)
