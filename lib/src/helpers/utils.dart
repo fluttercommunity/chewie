@@ -34,6 +34,11 @@ String formatDuration(Duration position) {
   return formattedTime;
 }
 
+/// Get the current buffering state of the video player. Will invoke a
+/// Workaround for Android, as a bug in the video_player plugin prevents to get
+/// the actual buffering state, always returning true and breaking ui elements.
+/// For this, the actual buffer position is used to determine if the video is
+/// buffering or not. See #912 for more details.
 bool getIsBuffering(VideoPlayerController controller) {
   final VideoPlayerValue value = controller.value;
 
