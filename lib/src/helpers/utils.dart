@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:video_player/video_player.dart';
+
 String formatDuration(Duration position) {
   final ms = position.inMilliseconds;
 
@@ -29,4 +33,31 @@ String formatDuration(Duration position) {
       '${hoursString == '00' ? '' : '$hoursString:'}$minutesString:$secondsString';
 
   return formattedTime;
+}
+
+bool getIsBuffering(VideoPlayerController controller) {
+  final VideoPlayerValue value = controller.value;
+
+  if (Platform.isAndroid) {
+    if (value.isBuffering) {
+      // -> Check if we actually buffer, as android has a bug preventing to
+      //    get the correct buffering state from this single bool.
+      final int position = value.position.inMilliseconds;
+
+      // Special case, if the video is finished, we don't want to show the
+      // buffering indicator anymore
+      if (position >= value.duration.inMilliseconds) {
+        return false;
+      } else {
+        final int buffer = value.buffered.lastOrNull?.end.inMilliseconds ?? -1;
+
+        return position >= buffer;
+      }
+    } else {
+      // -> No buffering
+      return false;
+    }
+  }
+
+  return value.isBuffering;
 }

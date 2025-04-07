@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/center_seek_button.dart';
@@ -646,33 +645,7 @@ class _MaterialControlsState extends State<MaterialControls>
   void _updateState() {
     if (!mounted) return;
 
-    late final bool buffering;
-
-    if (Platform.isAndroid) {
-      if (controller.value.isBuffering) {
-        // -> Check if we actually buffer, as android has a bug preventing to
-        //    get the correct buffering state from this single bool.
-        final VideoPlayerValue value = controller.value;
-
-        final int position = value.position.inMilliseconds;
-
-        // Special case, if the video is finished, we don't want to show the
-        // buffering indicator anymore
-        if (position >= value.duration.inMilliseconds) {
-          buffering = false;
-        } else {
-          final int buffer =
-              value.buffered.lastOrNull?.end.inMilliseconds ?? -1;
-
-          buffering = position >= buffer;
-        }
-      } else {
-        // -> No buffering
-        buffering = false;
-      }
-    } else {
-      buffering = controller.value.isBuffering;
-    }
+    final bool buffering = getIsBuffering(controller);
 
     // display the progress bar indicator only after the buffering delay if it has been set
     if (chewieController.progressIndicatorDelay != null) {
