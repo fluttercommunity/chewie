@@ -314,6 +314,15 @@ Add the following to partly fix this behavior:
   }
 ```
 
+You can also disable the loading spinner entirely to fix this problem in a more _complete_ way, however will remove the loading indicator if a video is buffering.
+
+```dart
+_chewieController = ChewieController(
+  videoPlayerController: _videoPlayerController,
+  progressIndicatorDelay: Platform.isAndroid ? const Duration(days: 1) : null,
+);
+```
+
 ## 📱 iOS warning 
 
 The video_player plugin used by chewie will only work in iOS simulators if you are on flutter 1.26.0 or above. You may need to switch to the beta channel `flutter channel beta`
