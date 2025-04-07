@@ -24,7 +24,8 @@ Chewie uses the `video_player` under the hood and wraps it in a friendly Materia
 8.  🧪 [Example](#-example)
 9.  ⏪ [Migrating from Chewie < 0.9.0](#-migrating-from-chewie--090)
 10. 🗺️ [Roadmap](#%EF%B8%8F-roadmap)
-11. 📱 [iOS warning](#-ios-warning-)
+11. ⚠️ [Android warning](#-android-warning-)
+12. 📱 [iOS warning](#-ios-warning-)
 
 
 ## 🚨 IMPORTANT!!! (READ THIS FIRST)
@@ -285,6 +286,33 @@ final playerWidget = Chewie(
 - [ ] Re-design State-Manager with Provider
 - [ ] Screen-Mirroring / Casting (Google Chromecast)
 
+
+## ⚠️ Android warning
+
+There is an open [issue](https://github.com/flutter/flutter/issues/165149) that the buffering state of a video is not reported correctly. With this, the loading state is always triggered, hiding controls to play, pause or seek the video. A workaround was implemented until this is fixed, however it can't be perfect and still hides controls if seeking backwards while the video is paused, as a result of lack of correct buffering information (see #912).
+
+Add the following to partly fix this behavior:
+
+```dart
+  // Your init code can be above
+  videoController.addListener(yourListeningMethod);
+
+  // ...
+
+  bool wasPlayingBefore = false;
+  void yourListeningMethod() {
+    if (!videoController.value.isPlaying && !wasPlayingBefore) {
+      // -> Workaround if seekTo another position while it was paused before.
+      //    On Android this might lead to infinite loading, so just play the
+      //    video again.
+      videoController.play();
+    }
+
+    wasPlayingBefore = videoController.value.isPlaying;
+
+  // ...
+  }
+```
 
 ## 📱 iOS warning 
 
