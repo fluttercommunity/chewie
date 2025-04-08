@@ -34,11 +34,15 @@ String formatDuration(Duration position) {
   return formattedTime;
 }
 
-/// Get the current buffering state of the video player. Will invoke a
-/// Workaround for Android, as a bug in the video_player plugin prevents to get
-/// the actual buffering state, always returning true and breaking ui elements.
+/// Gets the current buffering state of the video player.
+///
+/// For Android, it will use a workaround due to a [bug](https://github.com/flutter/flutter/issues/165149)
+/// affecting the `video_player` plugin, preventing it from getting the
+/// actual buffering state. This currently results in the `VideoPlayerController` always buffering,
+/// thus breaking UI elements.
+///
 /// For this, the actual buffer position is used to determine if the video is
-/// buffering or not. See #912 for more details.
+/// buffering or not. See Issue [#912](https://github.com/fluttercommunity/chewie/pull/912) for more details.
 bool getIsBuffering(VideoPlayerController controller) {
   final VideoPlayerValue value = controller.value;
 
