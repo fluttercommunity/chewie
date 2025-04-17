@@ -1,3 +1,6 @@
+## [1.11.2]
+* 🛠️ [#912](https://github.com/fluttercommunity/chewie/pull/912): Add workaround for invalid buffering info on android. Thanks [timoxd7](https://github.com/timoxd7).
+
 ## [1.11.1]
 * ⬆️ [#875](https://github.com/fluttercommunity/chewie/pull/875): Add background tap to pause video feature. Thanks [Ortes](https://github.com/Ortes).
 * 🛠️ [#896](https://github.com/fluttercommunity/chewie/pull/896): Fixed allowMute being ignored on Desktop. Thanks [mpoimer](https://github.com/mpoimer).
