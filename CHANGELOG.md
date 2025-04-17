@@ -1,3 +1,6 @@
+## [1.11.3]
+* 🛠️ [#917](https://github.com/fluttercommunity/chewie/pull/917): Resolve issue where 'subtitleOn' doesn't enable subtitles by default on iOS. Thanks [alideep5](https://github.com/alideep5).
+
 ## [1.11.2]
 * 🛠️ [#912](https://github.com/fluttercommunity/chewie/pull/912): Add workaround for invalid buffering info on android. Thanks [timoxd7](https://github.com/timoxd7).
 
