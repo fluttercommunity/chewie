@@ -19,10 +19,12 @@ import 'package:video_player/video_player.dart';
 class MaterialControls extends StatefulWidget {
   const MaterialControls({
     this.showPlayButton = true,
+    this.hideControlsWithoutPlayButton = false,
     super.key,
   });
 
   final bool showPlayButton;
+  final bool hideControlsWithoutPlayButton;
 
   @override
   State<StatefulWidget> createState() {
@@ -93,22 +95,24 @@ class _MaterialControlsState extends State<MaterialControls>
                     )
               else
                 _buildHitArea(),
-              _buildActionBar(),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  if (_subtitleOn)
-                    Transform.translate(
-                      offset: Offset(
-                        0.0,
-                        notifier.hideStuff ? barHeight * 0.8 : 0.0,
-                      ),
-                      child:
+              if (widget.hideControlsWithoutPlayButton == false) ...[
+                _buildActionBar(),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    if (_subtitleOn)
+                      Transform.translate(
+                        offset: Offset(
+                          0.0,
+                          notifier.hideStuff ? barHeight * 0.8 : 0.0,
+                        ),
+                        child:
                           _buildSubtitles(context, chewieController.subtitle!),
-                    ),
-                  _buildBottomBar(context),
-                ],
-              ),
+                      ),
+                      _buildBottomBar(context),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
