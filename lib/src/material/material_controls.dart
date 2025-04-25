@@ -384,12 +384,17 @@ class _MaterialControlsState extends State<MaterialControls>
     return GestureDetector(
       onTap: () {
         if (_latestValue.isPlaying) {
-          if (_displayTapped) {
-            setState(() {
-              notifier.hideStuff = true;
-            });
-          } else {
+          if (_chewieController?.pauseOnBackgroundTap ?? false) {
+            _playPause();
             _cancelAndRestartTimer();
+          } else {
+            if (_displayTapped) {
+              setState(() {
+                notifier.hideStuff = true;
+              });
+            } else {
+              _cancelAndRestartTimer();
+            }
           }
         } else {
           _playPause();
@@ -648,9 +653,11 @@ class _MaterialControlsState extends State<MaterialControls>
   void _updateState() {
     if (!mounted) return;
 
+    final bool buffering = getIsBuffering(controller);
+
     // display the progress bar indicator only after the buffering delay if it has been set
     if (chewieController.progressIndicatorDelay != null) {
-      if (controller.value.isBuffering) {
+      if (buffering) {
         _bufferingDisplayTimer ??= Timer(
           chewieController.progressIndicatorDelay!,
           _bufferingTimerTimeout,
@@ -661,7 +668,7 @@ class _MaterialControlsState extends State<MaterialControls>
         _displayBufferingIndicator = false;
       }
     } else {
-      _displayBufferingIndicator = controller.value.isBuffering;
+      _displayBufferingIndicator = buffering;
     }
 
     setState(() {

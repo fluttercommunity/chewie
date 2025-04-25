@@ -106,7 +106,10 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
           _cancelAndRestartTimer();
         },
         child: GestureDetector(
-          onTap: () => _cancelAndRestartTimer(),
+          onTap: () {
+            _playPause();
+            _cancelAndRestartTimer();
+          },
           child: AbsorbPointer(
             absorbing: notifier.hideStuff,
             child: Stack(
@@ -291,7 +294,8 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
                 child: Row(
                   children: <Widget>[
                     _buildPlayPause(controller),
-                    _buildMuteButton(controller),
+                    if (chewieController.allowMuting)
+                      _buildMuteButton(controller),
                     if (chewieController.isLive)
                       const Expanded(child: Text('LIVE'))
                     else
@@ -364,12 +368,17 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     return GestureDetector(
       onTap: () {
         if (_latestValue.isPlaying) {
-          if (_displayTapped) {
-            setState(() {
-              notifier.hideStuff = true;
-            });
-          } else {
+          if (_chewieController?.pauseOnBackgroundTap ?? false) {
+            _playPause();
             _cancelAndRestartTimer();
+          } else {
+            if (_displayTapped) {
+              setState(() {
+                notifier.hideStuff = true;
+              });
+            } else {
+              _cancelAndRestartTimer();
+            }
           }
         } else {
           _playPause();
@@ -572,9 +581,11 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   void _updateState() {
     if (!mounted) return;
 
+    final bool buffering = getIsBuffering(controller);
+
     // display the progress bar indicator only after the buffering delay if it has been set
     if (chewieController.progressIndicatorDelay != null) {
-      if (controller.value.isBuffering) {
+      if (buffering) {
         _bufferingDisplayTimer ??= Timer(
           chewieController.progressIndicatorDelay!,
           _bufferingTimerTimeout,
@@ -585,7 +596,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
         _displayBufferingIndicator = false;
       }
     } else {
-      _displayBufferingIndicator = controller.value.isBuffering;
+      _displayBufferingIndicator = buffering;
     }
 
     setState(() {

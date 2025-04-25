@@ -354,7 +354,15 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
     return GestureDetector(
       onTap: _latestValue.isPlaying
-          ? _cancelAndRestartTimer
+          ? _chewieController?.pauseOnBackgroundTap ?? false
+              ? () {
+                  _playPause();
+
+                  setState(() {
+                    notifier.hideStuff = true;
+                  });
+                }
+              : _cancelAndRestartTimer
           : () {
               _hideTimer?.cancel();
 
@@ -641,7 +649,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
   }
 
   Future<void> _initialize() async {
-    chewieController.showSubtitles &&
+    _subtitleOn = chewieController.showSubtitles &&
         (chewieController.subtitle?.isNotEmpty ?? false);
     controller.addListener(_updateState);
 
@@ -802,9 +810,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
   void _updateState() {
     if (!mounted) return;
 
+    final bool buffering = getIsBuffering(controller);
+
     // display the progress bar indicator only after the buffering delay if it has been set
     if (chewieController.progressIndicatorDelay != null) {
-      if (controller.value.isBuffering) {
+      if (buffering) {
         _bufferingDisplayTimer ??= Timer(
           chewieController.progressIndicatorDelay!,
           _bufferingTimerTimeout,
@@ -815,7 +825,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         _displayBufferingIndicator = false;
       }
     } else {
-      _displayBufferingIndicator = controller.value.isBuffering;
+      _displayBufferingIndicator = buffering;
     }
 
     setState(() {

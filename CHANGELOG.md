@@ -1,5 +1,20 @@
+## [1.11.3]
+* 🛠️ [#917](https://github.com/fluttercommunity/chewie/pull/917): Resolve issue where 'subtitleOn' doesn't enable subtitles by default on iOS. Thanks [alideep5](https://github.com/alideep5).
+
+## [1.11.2]
+* 🛠️ [#912](https://github.com/fluttercommunity/chewie/pull/912): Add workaround for invalid buffering info on android. Thanks [timoxd7](https://github.com/timoxd7).
+
+## [1.11.1]
+* ⬆️ [#875](https://github.com/fluttercommunity/chewie/pull/875): Add background tap to pause video feature. Thanks [Ortes](https://github.com/Ortes).
+* 🛠️ [#896](https://github.com/fluttercommunity/chewie/pull/896): Fixed allowMute being ignored on Desktop. Thanks [mpoimer](https://github.com/mpoimer).
+* 🛠️ [#910](https://github.com/fluttercommunity/chewie/pull/910): Fix example on web. Thanks [Ortes](https://github.com/Ortes).
+
+## [1.11.0]
+* ⬆️ [#900](https://github.com/fluttercommunity/chewie/pull/900): Flutter `3.29` upgrade. Thanks [diegotori](https://github.com/diegotori).
+* **BREAKING CHANGE**: Library now requires at least Flutter version `3.27.0`, for real this time.
+
 ## [1.10.0]
-* [#871](https://github.com/fluttercommunity/chewie/pull/871): Fixed pop the wrong page when changing the speed. Thanks [akmalova](https://github.com/akmalova).
+* 🛠️ [#871](https://github.com/fluttercommunity/chewie/pull/871): Fixed pop the wrong page when changing the speed. Thanks [akmalova](https://github.com/akmalova).
 * **BREAKING CHANGES**: 
   * `OptionItem.onTap` now takes in a `BuildContext`.
   * `OptionItem`'s properties are now marked as `final`. Use `copyWith` to mutate its properties into
