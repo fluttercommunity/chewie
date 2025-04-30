@@ -383,6 +383,12 @@ class ChewieController extends ChangeNotifier {
           cupertinoProgressColors ?? this.cupertinoProgressColors,
       materialProgressColors:
           materialProgressColors ?? this.materialProgressColors,
+      zoomAndPan: zoomAndPan ?? this.zoomAndPan,
+      maxScale: maxScale ?? this.maxScale,
+      controlsSafeAreaMinimum:
+          controlsSafeAreaMinimum ?? this.controlsSafeAreaMinimum,
+      transformationController:
+          transformationController ?? this.transformationController,
       materialSeekButtonFadeDuration:
           materialSeekButtonFadeDuration ?? this.materialSeekButtonFadeDuration,
       materialSeekButtonSize:
