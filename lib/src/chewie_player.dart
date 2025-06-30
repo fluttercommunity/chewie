@@ -496,10 +496,14 @@ class ChewieController extends ChangeNotifier {
   /// Whether or not to show the controls at all
   final bool showControls;
 
-  /// Controller to pass into the [InteractiveViewer] component
+  /// Controller to pass into the [InteractiveViewer] component.
+  /// If it is required to control the transformation only via the controller,
+  /// `zoomAndPan` should be set to false.
   final TransformationController? transformationController;
 
-  /// Whether or not to allow zooming and panning
+  /// Whether or not to allow zooming and panning.
+  /// This can still be false, and the `transformationController` can be used to control the
+  /// transformation.
   final bool zoomAndPan;
 
   /// Max scale when zooming
