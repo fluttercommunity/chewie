@@ -47,24 +47,22 @@ class PlayerWithControls extends StatelessWidget {
           if (chewieController.overlay != null) chewieController.overlay!,
           if (Theme.of(context).platform != TargetPlatform.iOS)
             Consumer<PlayerNotifier>(
-              builder: (
-                BuildContext context,
-                PlayerNotifier notifier,
-                Widget? widget,
-              ) =>
-                  Visibility(
-                visible: !notifier.hideStuff,
-                child: AnimatedOpacity(
-                  opacity: notifier.hideStuff ? 0.0 : 0.8,
-                  duration: const Duration(
-                    milliseconds: 250,
+              builder:
+                  (
+                    BuildContext context,
+                    PlayerNotifier notifier,
+                    Widget? widget,
+                  ) => Visibility(
+                    visible: !notifier.hideStuff,
+                    child: AnimatedOpacity(
+                      opacity: notifier.hideStuff ? 0.0 : 0.8,
+                      duration: const Duration(milliseconds: 250),
+                      child: const DecoratedBox(
+                        decoration: BoxDecoration(color: Colors.black54),
+                        child: SizedBox.expand(),
+                      ),
+                    ),
                   ),
-                  child: const DecoratedBox(
-                    decoration: BoxDecoration(color: Colors.black54),
-                    child: SizedBox.expand(),
-                  ),
-                ),
-              ),
             ),
           if (!chewieController.isFullScreen)
             buildControls(context, chewieController)
@@ -94,17 +92,18 @@ class PlayerWithControls extends StatelessWidget {
     }
 
     return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      return Center(
-        child: SizedBox(
-          height: constraints.maxHeight,
-          width: constraints.maxWidth,
-          child: AspectRatio(
-            aspectRatio: calculateAspectRatio(context),
-            child: buildPlayerWithControls(chewieController, context),
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return Center(
+          child: SizedBox(
+            height: constraints.maxHeight,
+            width: constraints.maxWidth,
+            child: AspectRatio(
+              aspectRatio: calculateAspectRatio(context),
+              child: buildPlayerWithControls(chewieController, context),
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 }

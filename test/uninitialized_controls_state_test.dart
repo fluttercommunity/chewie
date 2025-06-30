@@ -7,10 +7,10 @@ import 'package:video_player/video_player.dart';
 List<String> srcs = [
   "https://assets.mixkit.co/videos/preview/mixkit-spinning-around-the-earth-29351-large.mp4",
   "https://assets.mixkit.co/videos/preview/mixkit-daytime-city-traffic-aerial-view-56-large.mp4",
-  "https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4"
+  "https://assets.mixkit.co/videos/preview/mixkit-a-girl-blowing-a-bubble-gum-at-an-amusement-park-1226-large.mp4",
 ];
 
-main() {
+void main() {
   testWidgets("MaterialControls state test", (WidgetTester tester) async {
     // Build our app and trigger a frame.
     var videoPlayerController = VideoPlayerController.networkUrl(
@@ -21,18 +21,10 @@ main() {
       videoPlayerController: videoPlayerController,
       autoPlay: false,
       looping: false,
-      customControls: MaterialControls(
-        key: materialControlsKey,
-      ),
+      customControls: MaterialControls(key: materialControlsKey),
     );
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Chewie(
-            controller: chewieController,
-          ),
-        ),
-      ),
+      MaterialApp(home: Scaffold(body: Chewie(controller: chewieController))),
     );
 
     await tester.pump();
@@ -61,13 +53,7 @@ main() {
       ),
     );
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Chewie(
-            controller: chewieController,
-          ),
-        ),
-      ),
+      MaterialApp(home: Scaffold(body: Chewie(controller: chewieController))),
     );
 
     await tester.pump();
@@ -79,8 +65,9 @@ main() {
     expect(playButtonWidget.isFinished, false);
   });
 
-  testWidgets("MaterialDesktopControls state test",
-      (WidgetTester tester) async {
+  testWidgets("MaterialDesktopControls state test", (
+    WidgetTester tester,
+  ) async {
     // Build our app and trigger a frame.
     var videoPlayerController = VideoPlayerController.networkUrl(
       Uri.parse(srcs[0]),
@@ -90,18 +77,10 @@ main() {
       videoPlayerController: videoPlayerController,
       autoPlay: false,
       looping: false,
-      customControls: MaterialDesktopControls(
-        key: materialControlsKey,
-      ),
+      customControls: MaterialDesktopControls(key: materialControlsKey),
     );
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Chewie(
-            controller: chewieController,
-          ),
-        ),
-      ),
+      MaterialApp(home: Scaffold(body: Chewie(controller: chewieController))),
     );
 
     await tester.pump();

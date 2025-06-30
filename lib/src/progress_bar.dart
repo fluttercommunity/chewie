@@ -59,10 +59,9 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   }
 
   void _seekToRelativePosition(Offset globalPosition) {
-    controller.seekTo(context.calcRelativePosition(
-      controller.value.duration,
-      globalPosition,
-    ));
+    controller.seekTo(
+      context.calcRelativePosition(controller.value.duration, globalPosition),
+    );
   }
 
   @override
@@ -80,46 +79,46 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
     return widget.draggableProgressBar
         ? GestureDetector(
-            onHorizontalDragStart: (DragStartDetails details) {
-              if (!controller.value.isInitialized) {
-                return;
-              }
-              _controllerWasPlaying = controller.value.isPlaying;
-              if (_controllerWasPlaying) {
-                controller.pause();
-              }
+          onHorizontalDragStart: (DragStartDetails details) {
+            if (!controller.value.isInitialized) {
+              return;
+            }
+            _controllerWasPlaying = controller.value.isPlaying;
+            if (_controllerWasPlaying) {
+              controller.pause();
+            }
 
-              widget.onDragStart?.call();
-            },
-            onHorizontalDragUpdate: (DragUpdateDetails details) {
-              if (!controller.value.isInitialized) {
-                return;
-              }
-              _latestDraggableOffset = details.globalPosition;
-              listener();
+            widget.onDragStart?.call();
+          },
+          onHorizontalDragUpdate: (DragUpdateDetails details) {
+            if (!controller.value.isInitialized) {
+              return;
+            }
+            _latestDraggableOffset = details.globalPosition;
+            listener();
 
-              widget.onDragUpdate?.call();
-            },
-            onHorizontalDragEnd: (DragEndDetails details) {
-              if (_controllerWasPlaying) {
-                controller.play();
-              }
+            widget.onDragUpdate?.call();
+          },
+          onHorizontalDragEnd: (DragEndDetails details) {
+            if (_controllerWasPlaying) {
+              controller.play();
+            }
 
-              if (_latestDraggableOffset != null) {
-                _seekToRelativePosition(_latestDraggableOffset!);
-                _latestDraggableOffset = null;
-              }
+            if (_latestDraggableOffset != null) {
+              _seekToRelativePosition(_latestDraggableOffset!);
+              _latestDraggableOffset = null;
+            }
 
-              widget.onDragEnd?.call();
-            },
-            onTapDown: (TapDownDetails details) {
-              if (!controller.value.isInitialized) {
-                return;
-              }
-              _seekToRelativePosition(details.globalPosition);
-            },
-            child: child,
-          )
+            widget.onDragEnd?.call();
+          },
+          onTapDown: (TapDownDetails details) {
+            if (!controller.value.isInitialized) {
+              return;
+            }
+            _seekToRelativePosition(details.globalPosition);
+          },
+          child: child,
+        )
         : child;
   }
 }
@@ -152,12 +151,13 @@ class StaticProgressBar extends StatelessWidget {
       child: CustomPaint(
         painter: _ProgressBarPainter(
           value: value,
-          draggableValue: latestDraggableOffset != null
-              ? context.calcRelativePosition(
-                  value.duration,
-                  latestDraggableOffset!,
-                )
-              : null,
+          draggableValue:
+              latestDraggableOffset != null
+                  ? context.calcRelativePosition(
+                    value.duration,
+                    latestDraggableOffset!,
+                  )
+                  : null,
           colors: colors,
           barHeight: barHeight,
           handleHeight: handleHeight,
@@ -211,7 +211,8 @@ class _ProgressBarPainter extends CustomPainter {
     if (!value.isInitialized) {
       return;
     }
-    final double playedPartPercent = (draggableValue != null
+    final double playedPartPercent =
+        (draggableValue != null
             ? draggableValue!.inMilliseconds
             : value.position.inMilliseconds) /
         value.duration.inMilliseconds;
@@ -243,13 +244,13 @@ class _ProgressBarPainter extends CustomPainter {
     );
 
     if (drawShadow) {
-      final Path shadowPath = Path()
-        ..addOval(
-          Rect.fromCircle(
-            center: Offset(playedPart, baseOffset + barHeight / 2),
-            radius: handleHeight,
-          ),
-        );
+      final Path shadowPath =
+          Path()..addOval(
+            Rect.fromCircle(
+              center: Offset(playedPart, baseOffset + barHeight / 2),
+              radius: handleHeight,
+            ),
+          );
 
       canvas.drawShadow(shadowPath, Colors.black, 0.2, false);
     }
@@ -263,10 +264,7 @@ class _ProgressBarPainter extends CustomPainter {
 }
 
 extension RelativePositionExtensions on BuildContext {
-  Duration calcRelativePosition(
-    Duration videoDuration,
-    Offset globalPosition,
-  ) {
+  Duration calcRelativePosition(Duration videoDuration, Offset globalPosition) {
     final box = findRenderObject()! as RenderBox;
     final Offset tapPos = box.globalToLocal(globalPosition);
     final double relative = (tapPos.dx / box.size.width).clamp(0, 1);
