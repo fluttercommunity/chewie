@@ -1,3 +1,7 @@
+## [1.12.0]
+* 🛠️ [#923](https://github.com/fluttercommunity/chewie/pull/923): Flutter 3.29 minimum version. Thanks [diegotori](https://github.com/diegotori).
+* **BREAKING CHANGE**: Library now requires at least Flutter version `3.29.0` or higher.
+
 ## [1.11.3]
 * 🛠️ [#917](https://github.com/fluttercommunity/chewie/pull/917): Resolve issue where 'subtitleOn' doesn't enable subtitles by default on iOS. Thanks [alideep5](https://github.com/alideep5).
 
