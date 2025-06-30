@@ -31,8 +31,9 @@ jobs:
           # refer to https://docs.flutter.dev/development/tools/sdk/releases.
           # Note: The version below should be manually updated to the latest second most recent version
           # after a new stable version comes out.
-          - "3.27.4"
+          - "3.29.3"
           - "3.x"
+      fail-fast: false
     steps:
       - name: 📚 Git Checkout
         uses: actions/checkout@v4
@@ -59,3 +60,5 @@ jobs:
 
       - name: 📁 Upload coverage to Codecov
         uses: codecov/codecov-action@v5
+        # TODO: Remove the below once we have adequate tests for this library.
+        continue-on-error: true

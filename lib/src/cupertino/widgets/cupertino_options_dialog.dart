@@ -21,14 +21,15 @@ class _CupertinoOptionsDialogState extends State<CupertinoOptionsDialog> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: CupertinoActionSheet(
-        actions: widget.options
-            .map(
-              (option) => CupertinoActionSheetAction(
-                onPressed: () => option.onTap(context),
-                child: Text(option.title),
-              ),
-            )
-            .toList(),
+        actions:
+            widget.options
+                .map(
+                  (option) => CupertinoActionSheetAction(
+                    onPressed: () => option.onTap(context),
+                    child: Text(option.title),
+                  ),
+                )
+                .toList(),
         cancelButton: CupertinoActionSheetAction(
           onPressed: () => Navigator.pop(context),
           isDestructiveAction: true,
