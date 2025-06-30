@@ -36,7 +36,7 @@ class PlayerWithControls extends StatelessWidget {
       return Stack(
         children: <Widget>[
           if (chewieController.placeholder != null)
-            chewieController.placeholder!,
+            _buildPlaceholder(chewieController, context) ?? Container(),
           InteractiveViewer(
             transformationController: chewieController.transformationController,
             maxScale: chewieController.maxScale,
@@ -96,5 +96,22 @@ class PlayerWithControls extends StatelessWidget {
         );
       },
     );
+  }
+
+  Widget? _buildPlaceholder(
+      ChewieController chewieController, BuildContext context) {
+    if (chewieController.placeholder == null) return null;
+    const aspectRatio = chewieController.videoPlayerController.value.aspectRatio;
+    final size = MediaQuery.of(context).size;
+    double width;
+    if (size.width < size.height) {
+      return chewieController.placeholder;
+    }
+    width = size.height * aspectRatio;
+
+    return Positioned.fill(
+        left: (size.width - width) / 2,
+        right: (size.width - width) / 2,
+        child: chewieController.placeholder!);
   }
 }
