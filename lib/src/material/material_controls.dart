@@ -5,7 +5,6 @@ import 'package:chewie/src/center_seek_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/helpers/utils.dart';
-import 'package:chewie/src/material/color_compat_extensions.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
@@ -456,7 +455,7 @@ class _MaterialControlsState extends State<MaterialControls>
             text: '/ ${formatDuration(duration)}',
             style: TextStyle(
               fontSize: 14.0,
-              color: Colors.white.withOpacityCompat(.75),
+              color: Colors.white.withValues(alpha: .75),
               fontWeight: FontWeight.normal,
             ),
           ),
@@ -667,10 +666,10 @@ class _MaterialControlsState extends State<MaterialControls>
               handleColor: Theme.of(context).colorScheme.secondary,
               bufferedColor: Theme.of(
                 context,
-              ).colorScheme.surface.withOpacityCompat(0.5),
+              ).colorScheme.surface.withValues(alpha: 0.5),
               backgroundColor: Theme.of(
                 context,
-              ).disabledColor.withOpacityCompat(.5),
+              ).disabledColor.withValues(alpha: .5),
             ),
         draggableProgressBar: chewieController.draggableProgressBar,
       ),

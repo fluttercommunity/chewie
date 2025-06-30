@@ -10,8 +10,9 @@ class Subtitles {
   List<Subtitle?> getByPosition(Duration position) {
     final found =
         subtitle.where((item) {
-          if (item != null)
+          if (item != null) {
             return position >= item.start && position <= item.end;
+          }
           return false;
         }).toList();
 
