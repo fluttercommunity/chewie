@@ -33,7 +33,7 @@ class PlayerWithControls extends StatelessWidget {
       ChewieController chewieController,
       BuildContext context,
     ) {
-      final playerNotifier = Provider.of<PlayerNotifier>(context, listen: false);
+      final playerNotifier = context.read<PlayerNotifier>();
       final child = Stack(
         children: [
           if (chewieController.placeholder != null) chewieController.placeholder!,
@@ -93,7 +93,8 @@ class PlayerWithControls extends StatelessWidget {
       return child;
     }
 
-    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
       return Center(
         child: SizedBox(
           height: constraints.maxHeight,
