@@ -1,3 +1,6 @@
+## [1.12.1]
+* 🛠️ [#920](https://github.com/fluttercommunity/chewie/pull/920): Fix zoomAndPan not having an effect. Thanks [abalmagd](https://github.com/abalmagd).
+
 ## [1.12.0]
 * 🛠️ [#923](https://github.com/fluttercommunity/chewie/pull/923): Flutter 3.29 minimum version. Thanks [diegotori](https://github.com/diegotori).
 * **BREAKING CHANGE**: Library now requires at least Flutter version `3.29.0` or higher.
