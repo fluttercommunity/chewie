@@ -31,7 +31,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.example.example"
-    compileSdk 34
+    compileSdk 35
 
      compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
