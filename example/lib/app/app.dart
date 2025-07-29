@@ -161,6 +161,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
     if (currPlayIndex >= srcs.length) {
       currPlayIndex = 0;
     }
+    _videoPlayerController1.dispose();
+    _videoPlayerController2.dispose();
+    _chewieController?.dispose();
     await initializePlayer();
   }
 
