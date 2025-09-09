@@ -1,6 +1,3 @@
-## [Unreleased]
-* 🛠️ Fix web fullscreen playback on enter/exit: preserve play/pause state and resume stream on web. Avoids stall requiring manual pause/play.
-
 ## [1.12.1]
 * 🛠️ [#920](https://github.com/fluttercommunity/chewie/pull/920): Fix zoomAndPan not having an effect. Thanks [abalmagd](https://github.com/abalmagd).
 
