@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Define global environment variables for the workflow
+  # The version of Flutter to use should use the minimum Dart SDK version supported by the package,
+  # refer to https://docs.flutter.dev/development/tools/sdk/releases.
+  # Note: The version below should be manually updated to the latest second most recent version
+  # after a new stable version comes out.
+  # Current minimum is set to Flutter 3.32. Make the next version the new minimum once the next
+  # stable version is released
+  FLUTTER_VERSION_MINIMUM_DEFAULT: "3.32.8"
+  FLUTTER_VERSION_LATEST_STABLE_CHANNEL_DEFAULT: "3.x"
+
+jobs:
+  setup_matrix:
+    name: Determine Flutter Test Versions # Name for the setup_matrix job
+    runs-on: ubuntu-latest
+    outputs:
+      flutter_versions_json: ${{ steps.set_versions.outputs.versions_json }}
+      flutter_version_minimum: ${{ steps.set_versions.outputs.version_min }}
+    steps:
+      - name: Determine Flutter versions
+        id: set_versions
+        run: |
+          MIN_VERSION_VALUE="${{ env.FLUTTER_VERSION_MINIMUM_DEFAULT }}"
+          LATEST_VERSION_VALUE="${{ env.FLUTTER_VERSION_LATEST_STABLE_CHANNEL_DEFAULT }}"
+          
+          echo "version_min=$MIN_VERSION_VALUE" >> $GITHUB_OUTPUT
+          echo "version_latest=$LATEST_VERSION_VALUE" >> $GITHUB_OUTPUT
+          
+          VERSIONS_JSON=$(jq -c --null-input '$ARGS.positional' --args "$MIN_VERSION_VALUE" "$LATEST_VERSION_VALUE")
+          echo "versions_json=$VERSIONS_JSON" >> $GITHUB_OUTPUT
+
+          echo "Determined Min Version: $MIN_VERSION_VALUE"
+          echo "Determined Latest Version: $LATEST_VERSION_VALUE"
+          echo "Determined JSON: $VERSIONS_JSON"
+
+  # Does a sanity check that packages at least pass analysis on the N-1
+  # versions of Flutter stable if the package claims to support that version.
+  # This is to minimize accidentally making changes that break old versions
+  # (which we don't commit to supporting, but don't want to actively break)
+  # without updating the constraints.
+  lint_and_build:
+    name: Flutter Version ${{ matrix.flutter-version }} Lint and Build.
+    needs: setup_matrix # Ensures this job runs after setup_matrix completes
+    runs-on: ubuntu-latest
+    env:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      FLUTTER_VERSION_MINIMUM: ${{ needs.setup_matrix.outputs.flutter_version_minimum }}
+    strategy:
+      matrix:
+        flutter-version: ${{ fromJSON(needs.setup_matrix.outputs.flutter_versions_json) }}
+      fail-fast: false
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ matrix.flutter-version }}
+          channel: stable
+          cache: true
+          cache-key: flutter-:os:-:channel:-:version:-:arch:-:hash:-${{ hashFiles('**/pubspec.lock') }}
+
+      - name: 📦 Install Dependencies
+        run: flutter packages get
+
+      - name: ✨ Check Formatting
+        run: dart format --set-exit-if-changed lib
+        # Only continue on error if this is the job for the MINIMUM Flutter version
+        # This allows formatting issues to be warnings on older supported versions
+        # but enforces them on the latest stable or primary development version.
+        continue-on-error: "${{ matrix.flutter-version == env.FLUTTER_VERSION_MINIMUM }}"
+
+      - name: 🕵️ Analyze
+        run: flutter analyze lib
+
+      - name: 🧪 Run Tests
+        run: flutter test --no-pub --coverage --test-randomize-ordering-seed random
+
+      - name: 📁 Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        # TODO: Remove the below once we have adequate tests for this library.
+        continue-on-error: true
