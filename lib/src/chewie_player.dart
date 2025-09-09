@@ -39,6 +39,8 @@ class Chewie extends StatefulWidget {
 
 class ChewieState extends State<Chewie> {
   bool _isFullScreen = false;
+  bool _wasPlayingBeforeFullScreen = false;
+  bool _resumeAppliedInFullScreen = false;
 
   bool get isControllerFullScreen => widget.controller.isFullScreen;
   late PlayerNotifier notifier;
@@ -70,6 +72,9 @@ class ChewieState extends State<Chewie> {
 
   Future<void> listener() async {
     if (isControllerFullScreen && !_isFullScreen) {
+      _wasPlayingBeforeFullScreen =
+          widget.controller.videoPlayerController.value.isPlaying;
+      _resumeAppliedInFullScreen = false;
       _isFullScreen = isControllerFullScreen;
       await _pushFullScreenWidget(context);
     } else if (_isFullScreen) {
@@ -133,6 +138,22 @@ class ChewieState extends State<Chewie> {
         builder: (context, w) => const PlayerWithControls(),
       ),
     );
+    
+    if (kIsWeb && !_resumeAppliedInFullScreen) {
+      _resumeAppliedInFullScreen = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        final vpc = widget.controller.videoPlayerController;
+        await vpc.pause();
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        if (_wasPlayingBeforeFullScreen) {
+          await vpc.play();
+        } else {
+          await vpc.play();
+          await vpc.pause();
+        }
+      });
+    }
 
     if (widget.controller.routePageBuilder == null) {
       return _defaultRoutePageBuilder(
@@ -166,8 +187,11 @@ class ChewieState extends State<Chewie> {
       rootNavigator: widget.controller.useRootNavigator,
     ).push(route);
 
+    final wasPlaying =
+        widget.controller.videoPlayerController.value.isPlaying;
+
     if (kIsWeb) {
-      _reInitializeControllers();
+      await _reInitializeControllers(wasPlaying);
     }
 
     _isFullScreen = false;
@@ -235,16 +259,23 @@ class ChewieState extends State<Chewie> {
     }
   }
 
-  ///When viewing full screen on web, returning from full screen causes original video to lose the picture.
-  ///We re initialise controllers for web only when returning from full screen
-  void _reInitializeControllers() {
+  /// When viewing full screen on web, returning from full screen could cause
+  /// the original video element to lose the picture. We re-initialize the
+  /// controllers for web only when returning from full screen and preserve
+  /// the previous play/pause state.
+  Future<void> _reInitializeControllers(bool wasPlaying) async {
     final prevPosition = widget.controller.videoPlayerController.value.position;
-    widget.controller.videoPlayerController.initialize().then((_) async {
-      widget.controller._initialize();
-      widget.controller.videoPlayerController.seekTo(prevPosition);
+
+    await widget.controller.videoPlayerController.initialize();
+    widget.controller._initialize();
+    await widget.controller.videoPlayerController.seekTo(prevPosition);
+
+    if (wasPlaying) {
       await widget.controller.videoPlayerController.play();
-      widget.controller.videoPlayerController.pause();
-    });
+    } else {
+      await widget.controller.videoPlayerController.play();
+      await widget.controller.videoPlayerController.pause();
+    }
   }
 }
 

@@ -1,3 +1,6 @@
+## [Unreleased]
+* 🛠️ Fix web fullscreen playback on enter/exit: preserve play/pause state and resume stream on web. Avoids stall requiring manual pause/play.
+
 ## [1.12.1]
 * 🛠️ [#920](https://github.com/fluttercommunity/chewie/pull/920): Fix zoomAndPan not having an effect. Thanks [abalmagd](https://github.com/abalmagd).
 
@@ -388,4 +391,3 @@ Initial version of Chewie, the video player with a heart of gold.
   * Includes Material Player Controls
   * Includes Cupertino Player Controls
   * Spike version: Focus on good looking UI. Internal code is sloppy, needs a refactor and tests
-
