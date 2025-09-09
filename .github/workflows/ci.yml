@@ -93,4 +93,4 @@ jobs:
       - name: 📁 Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         # TODO: Remove the below once we have adequate tests for this library.
-        continue-on-error: "true"
+        continue-on-error: true
