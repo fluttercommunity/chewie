@@ -631,8 +631,8 @@ class ChewieController extends ChangeNotifier {
   final bool pauseOnBackgroundTap;
 
   static ChewieController of(BuildContext context) {
-    final chewieControllerProvider =
-        context.dependOnInheritedWidgetOfExactType<ChewieControllerProvider>()!;
+    final chewieControllerProvider = context
+        .dependOnInheritedWidgetOfExactType<ChewieControllerProvider>()!;
 
     return chewieControllerProvider.controller;
   }

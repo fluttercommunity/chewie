@@ -17,9 +17,9 @@ env:
   # refer to https://docs.flutter.dev/development/tools/sdk/releases.
   # Note: The version below should be manually updated to the latest second most recent version
   # after a new stable version comes out.
-  # Current minimum is set to Flutter 3.29. Make this the new minimum once the next
+  # Current minimum is set to Flutter 3.32. Make the next version the new minimum once the next
   # stable version is released
-  FLUTTER_VERSION_MINIMUM_DEFAULT: "3.29.3"
+  FLUTTER_VERSION_MINIMUM_DEFAULT: "3.32.8"
   FLUTTER_VERSION_LATEST_STABLE_CHANNEL_DEFAULT: "3.x"
 
 jobs:
@@ -82,7 +82,7 @@ jobs:
         # Only continue on error if this is the job for the MINIMUM Flutter version
         # This allows formatting issues to be warnings on older supported versions
         # but enforces them on the latest stable or primary development version.
-        continue-on-error: ${{ matrix.flutter-version == env.FLUTTER_VERSION_MINIMUM }}
+        continue-on-error: "${{ matrix.flutter-version == env.FLUTTER_VERSION_MINIMUM }}"
 
       - name: 🕵️ Analyze
         run: flutter analyze lib
@@ -93,4 +93,4 @@ jobs:
       - name: 📁 Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         # TODO: Remove the below once we have adequate tests for this library.
-        continue-on-error: true
+        continue-on-error: "true"

@@ -204,12 +204,11 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
               context: context,
               isScrollControlled: true,
               useRootNavigator: chewieController.useRootNavigator,
-              builder:
-                  (context) => OptionsDialog(
-                    options: options,
-                    cancelButtonText:
-                        chewieController.optionsTranslation?.cancelButtonText,
-                  ),
+              builder: (context) => OptionsDialog(
+                options: options,
+                cancelButtonText:
+                    chewieController.optionsTranslation?.cancelButtonText,
+              ),
             );
           }
 
@@ -383,11 +382,10 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
       context: context,
       isScrollControlled: true,
       useRootNavigator: chewieController.useRootNavigator,
-      builder:
-          (context) => PlaybackSpeedDialog(
-            speeds: chewieController.playbackSpeeds,
-            selected: _latestValue.playbackSpeed,
-          ),
+      builder: (context) => PlaybackSpeedDialog(
+        speeds: chewieController.playbackSpeeds,
+        selected: _latestValue.playbackSpeed,
+      ),
     );
 
     if (chosenSpeed != null) {
@@ -532,10 +530,9 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   }
 
   void _startHideTimer() {
-    final hideControlsTimer =
-        chewieController.hideControlsTimer.isNegative
-            ? ChewieController.defaultHideControlsTimer
-            : chewieController.hideControlsTimer;
+    final hideControlsTimer = chewieController.hideControlsTimer.isNegative
+        ? ChewieController.defaultHideControlsTimer
+        : chewieController.hideControlsTimer;
     _hideTimer = Timer(hideControlsTimer, () {
       setState(() {
         notifier.hideStuff = true;

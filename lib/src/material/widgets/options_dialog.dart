@@ -31,10 +31,9 @@ class _OptionsDialogState extends State<OptionsDialog> {
                 onTap: () => widget.options[i].onTap(context),
                 leading: Icon(widget.options[i].iconData),
                 title: Text(widget.options[i].title),
-                subtitle:
-                    widget.options[i].subtitle != null
-                        ? Text(widget.options[i].subtitle!)
-                        : null,
+                subtitle: widget.options[i].subtitle != null
+                    ? Text(widget.options[i].subtitle!)
+                    : null,
               );
             },
           ),
