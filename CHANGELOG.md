@@ -1,3 +1,7 @@
+## [1.13.0]
+* 🛠️ [#927](https://github.com/fluttercommunity/chewie/pull/927): Fix(web): Keep playback when entering/exiting fullscreen on web. Thanks [victorspringer](https://github.com/victorspringer).
+* **BREAKING CHANGE**: Library now requires at least Flutter version `3.32.0` or higher.
+
 ## [1.12.1]
 * 🛠️ [#920](https://github.com/fluttercommunity/chewie/pull/920): Fix zoomAndPan not having an effect. Thanks [abalmagd](https://github.com/abalmagd).
 
