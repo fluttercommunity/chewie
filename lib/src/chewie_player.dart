@@ -138,7 +138,7 @@ class ChewieState extends State<Chewie> {
         builder: (context, w) => const PlayerWithControls(),
       ),
     );
-    
+
     if (kIsWeb && !_resumeAppliedInFullScreen) {
       _resumeAppliedInFullScreen = true;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -187,8 +187,7 @@ class ChewieState extends State<Chewie> {
       rootNavigator: widget.controller.useRootNavigator,
     ).push(route);
 
-    final wasPlaying =
-        widget.controller.videoPlayerController.value.isPlaying;
+    final wasPlaying = widget.controller.videoPlayerController.value.isPlaying;
 
     if (kIsWeb) {
       await _reInitializeControllers(wasPlaying);
