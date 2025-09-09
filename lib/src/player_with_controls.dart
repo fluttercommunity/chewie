@@ -83,14 +83,12 @@ class PlayerWithControls extends StatelessWidget {
           maxScale: chewieController.maxScale,
           panEnabled: chewieController.zoomAndPan,
           scaleEnabled: chewieController.zoomAndPan,
-          onInteractionUpdate:
-              chewieController.zoomAndPan
-                  ? (_) => playerNotifier.hideStuff = true
-                  : null,
-          onInteractionEnd:
-              chewieController.zoomAndPan
-                  ? (_) => playerNotifier.hideStuff = false
-                  : null,
+          onInteractionUpdate: chewieController.zoomAndPan
+              ? (_) => playerNotifier.hideStuff = true
+              : null,
+          onInteractionEnd: chewieController.zoomAndPan
+              ? (_) => playerNotifier.hideStuff = false
+              : null,
           child: child,
         );
       }

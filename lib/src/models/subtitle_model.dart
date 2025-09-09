@@ -8,13 +8,12 @@ class Subtitles {
   bool get isNotEmpty => !isEmpty;
 
   List<Subtitle?> getByPosition(Duration position) {
-    final found =
-        subtitle.where((item) {
-          if (item != null) {
-            return position >= item.start && position <= item.end;
-          }
-          return false;
-        }).toList();
+    final found = subtitle.where((item) {
+      if (item != null) {
+        return position >= item.start && position <= item.end;
+      }
+      return false;
+    }).toList();
 
     return found;
   }

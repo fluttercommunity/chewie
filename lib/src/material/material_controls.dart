@@ -191,12 +191,11 @@ class _MaterialControlsState extends State<MaterialControls>
               context: context,
               isScrollControlled: true,
               useRootNavigator: chewieController.useRootNavigator,
-              builder:
-                  (context) => OptionsDialog(
-                    options: _buildOptions(context),
-                    cancelButtonText:
-                        chewieController.optionsTranslation?.cancelButtonText,
-                  ),
+              builder: (context) => OptionsDialog(
+                options: _buildOptions(context),
+                cancelButtonText:
+                    chewieController.optionsTranslation?.cancelButtonText,
+              ),
             );
           }
 
@@ -377,9 +376,8 @@ class _MaterialControlsState extends State<MaterialControls>
       },
       child: Container(
         alignment: Alignment.center,
-        color:
-            Colors
-                .transparent, // The Gesture Detector doesn't expand to the full size of the container without this; Not sure why!
+        color: Colors
+            .transparent, // The Gesture Detector doesn't expand to the full size of the container without this; Not sure why!
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -427,11 +425,10 @@ class _MaterialControlsState extends State<MaterialControls>
       context: context,
       isScrollControlled: true,
       useRootNavigator: chewieController.useRootNavigator,
-      builder:
-          (context) => PlaybackSpeedDialog(
-            speeds: chewieController.playbackSpeeds,
-            selected: _latestValue.playbackSpeed,
-          ),
+      builder: (context) => PlaybackSpeedDialog(
+        speeds: chewieController.playbackSpeeds,
+        selected: _latestValue.playbackSpeed,
+      ),
     );
 
     if (chosenSpeed != null) {
@@ -593,10 +590,9 @@ class _MaterialControlsState extends State<MaterialControls>
   }
 
   void _startHideTimer() {
-    final hideControlsTimer =
-        chewieController.hideControlsTimer.isNegative
-            ? ChewieController.defaultHideControlsTimer
-            : chewieController.hideControlsTimer;
+    final hideControlsTimer = chewieController.hideControlsTimer.isNegative
+        ? ChewieController.defaultHideControlsTimer
+        : chewieController.hideControlsTimer;
     _hideTimer = Timer(hideControlsTimer, () {
       setState(() {
         notifier.hideStuff = true;

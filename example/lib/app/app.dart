@@ -111,8 +111,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
       autoPlay: true,
       zoomAndPan: true,
       looping: true,
-      progressIndicatorDelay:
-          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
+      progressIndicatorDelay: bufferDelay != null
+          ? Duration(milliseconds: bufferDelay!)
+          : null,
 
       additionalOptions: (context) {
         return <OptionItem>[
@@ -177,9 +178,12 @@ class _ChewieDemoState extends State<ChewieDemo> {
           children: <Widget>[
             Expanded(
               child: Center(
-                child: _chewieController != null &&
+                child:
+                    _chewieController != null &&
                         _chewieController!
-                            .videoPlayerController.value.isInitialized
+                            .videoPlayerController
+                            .value
+                            .isInitialized
                     ? Chewie(controller: _chewieController!)
                     : const Column(
                         mainAxisAlignment: MainAxisAlignment.center,

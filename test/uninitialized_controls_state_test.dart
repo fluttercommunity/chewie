@@ -24,7 +24,9 @@ void main() {
       customControls: MaterialControls(key: materialControlsKey),
     );
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: Chewie(controller: chewieController))),
+      MaterialApp(
+        home: Scaffold(body: Chewie(controller: chewieController)),
+      ),
     );
 
     await tester.pump();
@@ -53,7 +55,9 @@ void main() {
       ),
     );
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: Chewie(controller: chewieController))),
+      MaterialApp(
+        home: Scaffold(body: Chewie(controller: chewieController)),
+      ),
     );
 
     await tester.pump();
@@ -80,7 +84,9 @@ void main() {
       customControls: MaterialDesktopControls(key: materialControlsKey),
     );
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: Chewie(controller: chewieController))),
+      MaterialApp(
+        home: Scaffold(body: Chewie(controller: chewieController)),
+      ),
     );
 
     await tester.pump();
