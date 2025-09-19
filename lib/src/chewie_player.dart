@@ -104,10 +104,19 @@ class ChewieState extends State<Chewie> {
   ) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Container(
-        alignment: Alignment.center,
-        color: Colors.black,
-        child: controllerProvider,
+      body: GestureDetector(
+        onVerticalDragEnd: (DragEndDetails details) {
+          // A positive dy indicates a downward swipe. Use a threshold to avoid accidental triggers.
+          final double dy = details.primaryVelocity ?? 0;
+          if (dy > 300) {
+            widget.controller.exitFullScreen();
+          }
+        },
+        child: Container(
+          alignment: Alignment.center,
+          color: Colors.black,
+          child: controllerProvider,
+        ),
       ),
     );
   }
