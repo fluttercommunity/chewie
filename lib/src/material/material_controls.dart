@@ -364,6 +364,9 @@ class _MaterialControlsState extends State<MaterialControls>
           });
         }
       },
+      onDoubleTap: () {
+        _onExpandCollapse();
+      },
       child: Container(
         alignment: Alignment.center,
         color: Colors
