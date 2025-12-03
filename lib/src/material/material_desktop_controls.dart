@@ -247,10 +247,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
         ),
         child: Text(
           currentSubtitle.first!.text.toString(),
-          style: const TextStyle(
-            fontSize: 18,
-            color: Colors.white,
-          ),
+          style: const TextStyle(fontSize: 18, color: Colors.white),
           textAlign: TextAlign.center,
         ),
       ),
