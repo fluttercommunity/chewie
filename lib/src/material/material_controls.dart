@@ -234,7 +234,10 @@ class _MaterialControlsState extends State<MaterialControls>
         ),
         child: Text(
           currentSubtitle.first!.text.toString(),
-          style: const TextStyle(fontSize: 18),
+          style: const TextStyle(
+            fontSize: 18,
+            color: Colors.white,
+          ),
           textAlign: TextAlign.center,
         ),
       ),
