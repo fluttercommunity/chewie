@@ -222,7 +222,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         ),
         child: Text(
           currentSubtitle.first!.text.toString(),
-          style: const TextStyle(fontSize: 18),
+          style: const TextStyle(fontSize: 18, color: Colors.white),
           textAlign: TextAlign.center,
         ),
       ),
