@@ -1,1 +1,1 @@
-export 'fullscreen_controller_unsupported.dart' if (dart.library.html) 'fullscreen_controller_web.dart';
+export 'fullscreen_controller_unsupported.dart' if (dart.library.js_interop) 'fullscreen_controller_web.dart';
