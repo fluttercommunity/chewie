@@ -335,6 +335,7 @@ class ChewieController extends ChangeNotifier {
     this.hideControlsTimer = defaultHideControlsTimer,
     this.controlsSafeAreaMinimum = EdgeInsets.zero,
     this.pauseOnBackgroundTap = false,
+    this.allowDoubleTapToggleFullScreen = true,
   }) : assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
@@ -394,6 +395,7 @@ class ChewieController extends ChangeNotifier {
     )?
     routePageBuilder,
     bool? pauseOnBackgroundTap,
+    bool? allowDoubleTapToggleFullScreen,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -458,6 +460,8 @@ class ChewieController extends ChangeNotifier {
       progressIndicatorDelay:
           progressIndicatorDelay ?? this.progressIndicatorDelay,
       pauseOnBackgroundTap: pauseOnBackgroundTap ?? this.pauseOnBackgroundTap,
+      allowDoubleTapToggleFullScreen:
+          allowDoubleTapToggleFullScreen ?? this.allowDoubleTapToggleFullScreen,
     );
   }
 
@@ -629,6 +633,9 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines if the player should pause when the background is tapped
   final bool pauseOnBackgroundTap;
+
+  /// Defines if double tap should toggle fullscreen mode
+  final bool allowDoubleTapToggleFullScreen;
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider = context
