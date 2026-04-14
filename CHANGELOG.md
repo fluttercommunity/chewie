@@ -1,3 +1,6 @@
+## [1.13.1]
+* 🛠️ [#940](https://github.com/fluttercommunity/chewie/pull/940): fix: add mounted check in _startHideTimer to prevent setState after dispose. Thanks [Cleparr](https://github.com/Cleparr).
+
 ## [1.13.0]
 * 🛠️ [#927](https://github.com/fluttercommunity/chewie/pull/927): Fix(web): Keep playback when entering/exiting fullscreen on web. Thanks [victorspringer](https://github.com/victorspringer).
 * **BREAKING CHANGE**: Library now requires at least Flutter version `3.32.0` or higher.
