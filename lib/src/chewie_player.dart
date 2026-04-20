@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:chewie/src/helpers/fullscreen_controller.dart';
 
 typedef ChewieRoutePageBuilder =
     Widget Function(
@@ -139,7 +140,7 @@ class ChewieState extends State<Chewie> {
       ),
     );
 
-    if (kIsWeb && !_resumeAppliedInFullScreen) {
+    if (kIsWeb && !_resumeAppliedInFullScreen && !widget.controller.useNativeWebFullscreen) {
       _resumeAppliedInFullScreen = true;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
@@ -189,7 +190,7 @@ class ChewieState extends State<Chewie> {
 
     final wasPlaying = widget.controller.videoPlayerController.value.isPlaying;
 
-    if (kIsWeb) {
+    if (kIsWeb && !widget.controller.useNativeWebFullscreen) {
       await _reInitializeControllers(wasPlaying);
     }
 
@@ -335,12 +336,16 @@ class ChewieController extends ChangeNotifier {
     this.hideControlsTimer = defaultHideControlsTimer,
     this.controlsSafeAreaMinimum = EdgeInsets.zero,
     this.pauseOnBackgroundTap = false,
+    this.useNativeWebFullscreen = true,
   }) : assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
-       ) {
+       ),
+      textureId = _textureCounter++ {
     _initialize();
   }
+
+  static int _textureCounter = 1;
 
   ChewieController copyWith({
     VideoPlayerController? videoPlayerController,
@@ -394,6 +399,7 @@ class ChewieController extends ChangeNotifier {
     )?
     routePageBuilder,
     bool? pauseOnBackgroundTap,
+    bool? useNativeWebFullscreen,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -458,6 +464,7 @@ class ChewieController extends ChangeNotifier {
       progressIndicatorDelay:
           progressIndicatorDelay ?? this.progressIndicatorDelay,
       pauseOnBackgroundTap: pauseOnBackgroundTap ?? this.pauseOnBackgroundTap,
+      useNativeWebFullscreen: useNativeWebFullscreen ?? this.useNativeWebFullscreen,
     );
   }
 
@@ -630,6 +637,16 @@ class ChewieController extends ChangeNotifier {
   /// Defines if the player should pause when the background is tapped
   final bool pauseOnBackgroundTap;
 
+  // The texture ID of the video player.
+  final int textureId;
+
+  /// Defines if native fullscreen should be used on web
+  /// Default: true
+  final bool useNativeWebFullscreen;
+
+  // Internal Fullscreen Controller for native web fullscreen handling
+  final FullscreenController _fullscreenController = FullscreenController();
+
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider = context
         .dependOnInheritedWidgetOfExactType<ChewieControllerProvider>()!;
@@ -686,6 +703,10 @@ class ChewieController extends ChangeNotifier {
   }
 
   void toggleFullScreen() {
+     if (kIsWeb && useNativeWebFullscreen) {
+      _fullscreenController.toggleFullscreen(textureId);
+      return;
+    }
     _isFullScreen = !_isFullScreen;
     notifyListeners();
   }
