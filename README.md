@@ -43,8 +43,9 @@ This library will at the very least make a solid effort to support the second mo
 of Flutter released. In other words, it will adopt `N-1` version support at
 the bare minimum.
 
-However, this cannot be guaranteed due to major changes between Flutter versions. Should that occur,
-future updates will be released as major or minor versions as needed.
+However, this cannot be guaranteed either due to major changes between Flutter versions or 
+this library's dependencies. Should that occur, future updates will be released as major or minor 
+versions as needed.
 
 ## 🖼️ Preview
 

@@ -1,3 +1,8 @@
+## [1.14.0]
+* 🛠️ [#944](https://github.com/fluttercommunity/chewie/pull/944): Flutter 3.41 Upgrade. Thanks [diegotori](https://github.com/diegotori).
+* **BREAKING CHANGE**: Library now requires at least Flutter version `3.41.0` or higher due to 
+  `wakelock_plus`'s upgrade to version `1.6.0`, which now requires this minimum Flutter version.
+
 ## [1.13.1]
 * 🛠️ [#940](https://github.com/fluttercommunity/chewie/pull/940): fix: add mounted check in _startHideTimer to prevent setState after dispose. Thanks [Cleparr](https://github.com/Cleparr).
 
