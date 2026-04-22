@@ -17,9 +17,9 @@ env:
   # refer to https://docs.flutter.dev/development/tools/sdk/releases.
   # Note: The version below should be manually updated to the latest second most recent version
   # after a new stable version comes out.
-  # Current minimum is set to Flutter 3.32. Make the next version the new minimum once the next
+  # Current minimum is set to Flutter 3.41. Make the next version the new minimum once the next
   # stable version is released
-  FLUTTER_VERSION_MINIMUM_DEFAULT: "3.32.8"
+  FLUTTER_VERSION_MINIMUM_DEFAULT: "3.41.6"
   FLUTTER_VERSION_LATEST_STABLE_CHANNEL_DEFAULT: "3.x"
 
 jobs:
@@ -64,7 +64,7 @@ jobs:
       fail-fast: false
     steps:
       - name: 📚 Git Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 🐦 Setup Flutter
         uses: subosito/flutter-action@v2
@@ -91,6 +91,6 @@ jobs:
         run: flutter test --no-pub --coverage --test-randomize-ordering-seed random
 
       - name: 📁 Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         # TODO: Remove the below once we have adequate tests for this library.
         continue-on-error: true
