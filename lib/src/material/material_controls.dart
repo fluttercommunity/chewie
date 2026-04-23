@@ -374,6 +374,9 @@ class _MaterialControlsState extends State<MaterialControls>
           });
         }
       },
+      onDoubleTap: chewieController.allowDoubleTapToggleFullScreen
+          ? _onExpandCollapse
+          : null,
       child: Container(
         alignment: Alignment.center,
         color: Colors
