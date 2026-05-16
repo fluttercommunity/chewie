@@ -1,0 +1,12 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  language:
+    strict-raw-types: true
+  exclude:
+    - lib/generated_plugin_registrant.dart
+
+linter:
+  rules:
+    close_sinks: true
+    sort_constructors_first: true
