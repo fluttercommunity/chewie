@@ -1,3 +1,7 @@
+## [1.14.1]
+* 🛠️ [#945](https://github.com/fluttercommunity/chewie/pull/945): Flutter 3.38 downgrade. Thanks [diegotori](https://github.com/diegotori).
+* Library now supports Flutter and Dart versions `3.38.0` and `3.10` or higher respectively, restoring previous compatibility.
+
 ## [1.14.0]
 * 🛠️ [#944](https://github.com/fluttercommunity/chewie/pull/944): Flutter 3.41 Upgrade. Thanks [diegotori](https://github.com/diegotori).
 * **BREAKING CHANGE**: Library now requires at least Flutter version `3.41.0` or higher due to 
