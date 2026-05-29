@@ -6,6 +6,7 @@ import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/options_translation.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/models/subtitle_style.dart';
+import 'package:chewie/src/models/subtitle_track.dart';
 import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/foundation.dart';
@@ -344,6 +345,9 @@ class ChewieController extends ChangeNotifier {
     this.showSubtitles = false,
     this.subtitleBuilder,
     this.subtitleStyle = const SubtitleStyle(),
+    this.subtitleTracks = const <SubtitleTrack>[],
+    this.activeSubtitleTrackId,
+    this.onSubtitleTrackChanged,
     this.customControls,
     this.errorBuilder,
     this.bufferingBuilder,
@@ -399,6 +403,9 @@ class ChewieController extends ChangeNotifier {
     bool? showSubtitles,
     Widget Function(BuildContext, dynamic)? subtitleBuilder,
     SubtitleStyle? subtitleStyle,
+    List<SubtitleTrack>? subtitleTracks,
+    Object? activeSubtitleTrackId,
+    void Function(SubtitleTrack? track)? onSubtitleTrackChanged,
     Widget? customControls,
     WidgetBuilder? bufferingBuilder,
     Widget Function(BuildContext, String)? errorBuilder,
@@ -463,6 +470,10 @@ class ChewieController extends ChangeNotifier {
       subtitle: subtitle ?? this.subtitle,
       subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
       subtitleStyle: subtitleStyle ?? this.subtitleStyle,
+      subtitleTracks: subtitleTracks ?? this.subtitleTracks,
+      activeSubtitleTrackId: activeSubtitleTrackId ?? this.activeSubtitleTrackId,
+      onSubtitleTrackChanged:
+          onSubtitleTrackChanged ?? this.onSubtitleTrackChanged,
       customControls: customControls ?? this.customControls,
       errorBuilder: errorBuilder ?? this.errorBuilder,
       bufferingBuilder: bufferingBuilder ?? this.bufferingBuilder,
@@ -548,6 +559,28 @@ class ChewieController extends ChangeNotifier {
   /// If set to `true`, subtitles will be displayed automatically when the video
   /// begins playing. If set to `false`, subtitles will be hidden by default.
   bool showSubtitles;
+
+  /// Selectable subtitle tracks shown in the options menu.
+  ///
+  /// Source-agnostic: the host populates this (e.g. from an HLS manifest) and
+  /// reacts to selection via [onSubtitleTrackChanged]. May change after the
+  /// video loads — use [setSubtitleTracks] so the controls rebuild.
+  List<SubtitleTrack> subtitleTracks;
+
+  /// Id of the currently selected track in [subtitleTracks], or `null` when
+  /// subtitles are off.
+  Object? activeSubtitleTrackId;
+
+  /// Called when the user picks a track from the menu (or `null` for "Off").
+  final void Function(SubtitleTrack? track)? onSubtitleTrackChanged;
+
+  /// The text of the cue currently on screen, for streaming sources that emit
+  /// cues over time (e.g. HLS) rather than as a static [subtitle] list. Push
+  /// updates with [setLiveSubtitle]; the controls render it when non-null.
+  final ValueNotifier<String?> liveSubtitle = ValueNotifier<String?>(null);
+
+  /// Whether any selectable subtitle tracks are available.
+  bool get hasSubtitleTracks => subtitleTracks.isNotEmpty;
 
   /// The controller for the video you want to play
   final VideoPlayerController videoPlayerController;
@@ -772,6 +805,39 @@ class ChewieController extends ChangeNotifier {
 
   void setSubtitle(List<Subtitle> newSubtitle) {
     subtitle = Subtitles(newSubtitle);
+  }
+
+  /// Replaces the selectable [subtitleTracks] and rebuilds the controls.
+  ///
+  /// Use when tracks become known only after the media loads (e.g. once an
+  /// HLS manifest is parsed).
+  void setSubtitleTracks(List<SubtitleTrack> tracks) {
+    subtitleTracks = tracks;
+    notifyListeners();
+  }
+
+  /// Selects [track] (or `null` to turn subtitles off), updating
+  /// [activeSubtitleTrackId], notifying [onSubtitleTrackChanged] and clearing
+  /// any on-screen [liveSubtitle] when turned off.
+  void selectSubtitleTrack(SubtitleTrack? track) {
+    activeSubtitleTrackId = track?.id;
+    if (track == null) {
+      liveSubtitle.value = null;
+    }
+    onSubtitleTrackChanged?.call(track);
+    notifyListeners();
+  }
+
+  /// Pushes the current cue text for streaming subtitle sources. Pass `null`
+  /// when no cue is showing.
+  void setLiveSubtitle(String? text) {
+    liveSubtitle.value = text;
+  }
+
+  @override
+  void dispose() {
+    liveSubtitle.dispose();
+    super.dispose();
   }
 }
 
