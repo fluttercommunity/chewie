@@ -6,8 +6,10 @@ import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
+import 'package:chewie/src/material/widgets/audio_track_dialog.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
+import 'package:chewie/src/models/audio_track.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
@@ -183,6 +185,15 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
             chewieController.optionsTranslation?.playbackSpeedButtonText ??
             'Playback speed',
       ),
+      if (chewieController.hasAudioTracks)
+        OptionItem(
+          onTap: (context) async {
+            Navigator.pop(context);
+            await _onAudioTrackButtonTap();
+          },
+          iconData: Icons.audiotrack_outlined,
+          title: 'Audio',
+        ),
     ];
 
     if (chewieController.additionalOptions != null &&
@@ -449,6 +460,28 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     setState(() {
       _subtitleOn = !_subtitleOn;
     });
+  }
+
+  Future<void> _onAudioTrackButtonTap() async {
+    _hideTimer?.cancel();
+
+    final track = await showModalBottomSheet<AudioTrack>(
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: chewieController.useRootNavigator,
+      builder: (context) => AudioTrackDialog(
+        tracks: chewieController.audioTracks,
+        selectedId: chewieController.activeAudioTrackId,
+      ),
+    );
+
+    if (track != null) {
+      chewieController.selectAudioTrack(track);
+    }
+
+    if (_latestValue.isPlaying) {
+      _startHideTimer();
+    }
   }
 
   void _cancelAndRestartTimer() {
