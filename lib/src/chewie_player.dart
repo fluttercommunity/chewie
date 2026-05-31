@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:chewie/src/chewie_progress_colors.dart';
+// ignore: uri_does_not_exist
+import 'web_fullscreen_stub.dart' if (dart.library.html) 'web_fullscreen.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/options_translation.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
@@ -44,16 +46,26 @@ class ChewieState extends State<Chewie> {
 
   bool get isControllerFullScreen => widget.controller.isFullScreen;
   late PlayerNotifier notifier;
+  late final void Function() _browserFsExitHandler;
 
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(listener);
     notifier = PlayerNotifier.init();
+    // When the user presses Escape, the browser exits its native fullscreen
+    // without Chewie knowing. Detect this and collapse the fullscreen route.
+    _browserFsExitHandler = () {
+      if (!browserInFullscreen && _isFullScreen) {
+        widget.controller.exitFullScreen();
+      }
+    };
+    addBrowserFullscreenChangeListener(_browserFsExitHandler);
   }
 
   @override
   void dispose() {
+    removeBrowserFullscreenChangeListener(_browserFsExitHandler);
     widget.controller.removeListener(listener);
     notifier.dispose();
     super.dispose();
@@ -182,6 +194,10 @@ class ChewieState extends State<Chewie> {
       WakelockPlus.enable();
     }
 
+    // Ask the browser to enter its native fullscreen. Must be called before the
+    // first await so we are still inside the user-gesture event handler.
+    requestBrowserFullscreen();
+
     await Navigator.of(
       context,
       rootNavigator: widget.controller.useRootNavigator,
@@ -191,6 +207,9 @@ class ChewieState extends State<Chewie> {
 
     if (kIsWeb) {
       await _reInitializeControllers(wasPlaying);
+      // Exit native browser fullscreen when the Chewie route pops (e.g. user
+      // clicked the fullscreen button again). No-op if Escape was already used.
+      exitBrowserFullscreen();
     }
 
     _isFullScreen = false;
