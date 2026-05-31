@@ -1,6 +1,18 @@
 ## [Unreleased]
 * ✨ Web: enter the browser's native (OS-level) fullscreen via the Fullscreen API instead of only expanding the Flutter view inside the browser window. Pressing Escape to leave browser fullscreen also exits Chewie's fullscreen. Controlled by the new `ChewieController.useNativeFullScreenOnWeb` flag (defaults to `true`; no effect on non-web platforms).
 
+## [1.14.1]
+* 🛠️ [#945](https://github.com/fluttercommunity/chewie/pull/945): Flutter 3.38 downgrade. Thanks [diegotori](https://github.com/diegotori).
+* Library now supports Flutter and Dart versions `3.38.0` and `3.10` or higher respectively, restoring previous compatibility.
+
+## [1.14.0]
+* 🛠️ [#944](https://github.com/fluttercommunity/chewie/pull/944): Flutter 3.41 Upgrade. Thanks [diegotori](https://github.com/diegotori).
+* **BREAKING CHANGE**: Library now requires at least Flutter version `3.41.0` or higher due to 
+  `wakelock_plus`'s upgrade to version `1.6.0`, which now requires this minimum Flutter version.
+
+## [1.13.1]
+* 🛠️ [#940](https://github.com/fluttercommunity/chewie/pull/940): fix: add mounted check in _startHideTimer to prevent setState after dispose. Thanks [Cleparr](https://github.com/Cleparr).
+
 ## [1.13.0]
 * 🛠️ [#927](https://github.com/fluttercommunity/chewie/pull/927): Fix(web): Keep playback when entering/exiting fullscreen on web. Thanks [victorspringer](https://github.com/victorspringer).
 * **BREAKING CHANGE**: Library now requires at least Flutter version `3.32.0` or higher.
