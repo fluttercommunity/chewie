@@ -1,3 +1,6 @@
+## [Unreleased]
+* ✨ Web: enter the browser's native (OS-level) fullscreen via the Fullscreen API instead of only expanding the Flutter view inside the browser window. Pressing Escape to leave browser fullscreen also exits Chewie's fullscreen. Controlled by the new `ChewieController.useNativeFullScreenOnWeb` flag (defaults to `true`; no effect on non-web platforms).
+
 ## [1.13.0]
 * 🛠️ [#927](https://github.com/fluttercommunity/chewie/pull/927): Fix(web): Keep playback when entering/exiting fullscreen on web. Thanks [victorspringer](https://github.com/victorspringer).
 * **BREAKING CHANGE**: Library now requires at least Flutter version `3.32.0` or higher.

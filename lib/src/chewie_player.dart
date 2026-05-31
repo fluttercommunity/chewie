@@ -60,12 +60,16 @@ class ChewieState extends State<Chewie> {
         widget.controller.exitFullScreen();
       }
     };
-    addBrowserFullscreenChangeListener(_browserFsExitHandler);
+    if (widget.controller.useNativeFullScreenOnWeb) {
+      addBrowserFullscreenChangeListener(_browserFsExitHandler);
+    }
   }
 
   @override
   void dispose() {
-    removeBrowserFullscreenChangeListener(_browserFsExitHandler);
+    if (widget.controller.useNativeFullScreenOnWeb) {
+      removeBrowserFullscreenChangeListener(_browserFsExitHandler);
+    }
     widget.controller.removeListener(listener);
     notifier.dispose();
     super.dispose();
@@ -196,7 +200,9 @@ class ChewieState extends State<Chewie> {
 
     // Ask the browser to enter its native fullscreen. Must be called before the
     // first await so we are still inside the user-gesture event handler.
-    requestBrowserFullscreen();
+    if (widget.controller.useNativeFullScreenOnWeb) {
+      requestBrowserFullscreen();
+    }
 
     await Navigator.of(
       context,
@@ -209,7 +215,9 @@ class ChewieState extends State<Chewie> {
       await _reInitializeControllers(wasPlaying);
       // Exit native browser fullscreen when the Chewie route pops (e.g. user
       // clicked the fullscreen button again). No-op if Escape was already used.
-      exitBrowserFullscreen();
+      if (widget.controller.useNativeFullScreenOnWeb) {
+        exitBrowserFullscreen();
+      }
     }
 
     _isFullScreen = false;
@@ -344,6 +352,7 @@ class ChewieController extends ChangeNotifier {
     this.allowMuting = true,
     this.allowPlaybackSpeedChanging = true,
     this.useRootNavigator = true,
+    this.useNativeFullScreenOnWeb = true,
     this.playbackSpeeds = const [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
     this.systemOverlaysOnEnterFullScreen,
     this.deviceOrientationsOnEnterFullScreen,
@@ -397,6 +406,7 @@ class ChewieController extends ChangeNotifier {
     bool? allowMuting,
     bool? allowPlaybackSpeedChanging,
     bool? useRootNavigator,
+    bool? useNativeFullScreenOnWeb,
     Duration? hideControlsTimer,
     EdgeInsets? controlsSafeAreaMinimum,
     List<double>? playbackSpeeds,
@@ -460,6 +470,8 @@ class ChewieController extends ChangeNotifier {
       allowPlaybackSpeedChanging:
           allowPlaybackSpeedChanging ?? this.allowPlaybackSpeedChanging,
       useRootNavigator: useRootNavigator ?? this.useRootNavigator,
+      useNativeFullScreenOnWeb:
+          useNativeFullScreenOnWeb ?? this.useNativeFullScreenOnWeb,
       playbackSpeeds: playbackSpeeds ?? this.playbackSpeeds,
       systemOverlaysOnEnterFullScreen:
           systemOverlaysOnEnterFullScreen ??
@@ -617,6 +629,14 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines if push/pop navigations use the rootNavigator
   final bool useRootNavigator;
+
+  /// On Flutter Web, also enter the browser's native fullscreen (via the
+  /// Fullscreen API) when going fullscreen, instead of only expanding the
+  /// Flutter view inside the browser window. Pressing Escape to leave the
+  /// browser fullscreen also exits Chewie's fullscreen.
+  ///
+  /// Has no effect on non-web platforms.
+  final bool useNativeFullScreenOnWeb;
 
   /// Defines the [Duration] before the video controls are hidden. By default, this is set to three seconds.
   final Duration hideControlsTimer;
