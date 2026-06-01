@@ -474,7 +474,8 @@ class ChewieController extends ChangeNotifier {
       subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
       subtitleStyle: subtitleStyle ?? this.subtitleStyle,
       subtitleTracks: subtitleTracks ?? this.subtitleTracks,
-      activeSubtitleTrackId: activeSubtitleTrackId ?? this.activeSubtitleTrackId,
+      activeSubtitleTrackId:
+          activeSubtitleTrackId ?? this.activeSubtitleTrackId,
       onSubtitleTrackChanged:
           onSubtitleTrackChanged ?? this.onSubtitleTrackChanged,
       customControls: customControls ?? this.customControls,

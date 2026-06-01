@@ -7,11 +7,7 @@
 /// streaming source, or via [ChewieController.setSubtitle] for a parsed cue
 /// list) is left to the host.
 class SubtitleTrack {
-  const SubtitleTrack({
-    required this.id,
-    required this.label,
-    this.language,
-  });
+  const SubtitleTrack({required this.id, required this.label, this.language});
 
   /// Opaque identifier the host uses to recognise the track on selection.
   final Object id;
