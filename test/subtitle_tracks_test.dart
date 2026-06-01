@@ -251,12 +251,9 @@ void main() {
         await tester.tap(find.text('Captions'));
         await tester.pumpAndSettle();
 
-        // Material threads the translated label into the picker's "off" entry;
-        // the desktop variant always uses the default "Off".
-        expect(
-          find.text(isMaterial ? 'Captions — off' : 'Off'),
-          findsOneWidget,
-        );
+        // Both variants thread the translated label into the picker's "off"
+        // entry.
+        expect(find.text('Captions — off'), findsOneWidget);
       });
 
       testWidgets('renders a static subtitle cue when no tracks exist', (
