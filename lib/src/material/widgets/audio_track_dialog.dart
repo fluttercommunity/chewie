@@ -9,8 +9,8 @@ class AudioTrackDialog extends StatelessWidget {
     super.key,
     required List<AudioTrack> tracks,
     required Object? selectedId,
-  })  : _tracks = tracks,
-        _selectedId = selectedId;
+  }) : _tracks = tracks,
+       _selectedId = selectedId;
 
   final List<AudioTrack> _tracks;
   final Object? _selectedId;
