@@ -6,11 +6,7 @@
 /// playing rendition is left to the host. Unlike subtitles, audio is never
 /// "off": one track is always active.
 class AudioTrack {
-  const AudioTrack({
-    required this.id,
-    required this.label,
-    this.language,
-  });
+  const AudioTrack({required this.id, required this.label, this.language});
 
   /// Opaque identifier the host uses to recognise the track on selection.
   final Object id;
@@ -32,5 +28,6 @@ class AudioTrack {
   int get hashCode => Object.hash(id, label, language);
 
   @override
-  String toString() => 'AudioTrack(id: $id, label: $label, language: $language)';
+  String toString() =>
+      'AudioTrack(id: $id, label: $label, language: $language)';
 }
