@@ -50,10 +50,7 @@ class SubtitleTrackDialog extends StatelessWidget {
             const SizedBox(width: 16.0),
             Expanded(child: Text(label)),
             if (trailing != null)
-              Text(
-                trailing,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              Text(trailing, style: Theme.of(context).textTheme.bodySmall),
           ],
         ),
       );
@@ -74,8 +71,7 @@ class SubtitleTrackDialog extends StatelessWidget {
             selected: track.id == _selectedId,
             label: track.label,
             trailing: track.language,
-            onTap: () =>
-                Navigator.of(context).pop(SubtitleTrackChoice(track)),
+            onTap: () => Navigator.of(context).pop(SubtitleTrackChoice(track)),
           ),
       ],
     );
