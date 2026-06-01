@@ -518,6 +518,10 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
       builder: (context) => SubtitleTrackDialog(
         tracks: chewieController.subtitleTracks,
         selectedId: chewieController.activeSubtitleTrackId,
+        offLabel:
+            chewieController.optionsTranslation?.subtitlesButtonText != null
+            ? '${chewieController.optionsTranslation!.subtitlesButtonText} — off'
+            : 'Off',
       ),
     );
 
