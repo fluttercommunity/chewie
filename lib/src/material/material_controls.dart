@@ -83,6 +83,14 @@ class _MaterialControlsState extends State<MaterialControls>
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
 
+  // Hides the mouse cursor along with the controls while idle in fullscreen.
+  MouseCursor get _idleCursor =>
+      chewieController.hideCursorInFullScreen &&
+          chewieController.isFullScreen &&
+          notifier.hideStuff
+      ? SystemMouseCursors.none
+      : MouseCursor.defer;
+
   @override
   void initState() {
     super.initState();
@@ -100,6 +108,7 @@ class _MaterialControlsState extends State<MaterialControls>
     }
 
     return MouseRegion(
+      cursor: _idleCursor,
       onHover: (_) {
         _cancelAndRestartTimer();
       },
