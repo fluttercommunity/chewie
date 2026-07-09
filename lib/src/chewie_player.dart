@@ -442,6 +442,7 @@ class ChewieController extends ChangeNotifier {
     this.hideCursorInFullScreen = true,
     this.swipeToExitFullscreen = true,
     this.swipeThreshold = 300,
+    this.showSeekIndicator = true,
   }) : assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
@@ -525,6 +526,7 @@ class ChewieController extends ChangeNotifier {
     bool? hideCursorInFullScreen,
     bool? swipeToExitFullscreen,
     double? swipeThreshold,
+    bool? showSeekIndicator,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -608,6 +610,7 @@ class ChewieController extends ChangeNotifier {
       swipeToExitFullscreen:
           swipeToExitFullscreen ?? this.swipeToExitFullscreen,
       swipeThreshold: swipeThreshold ?? this.swipeThreshold,
+      showSeekIndicator: showSeekIndicator ?? this.showSeekIndicator,
     );
   }
 
@@ -902,6 +905,10 @@ class ChewieController extends ChangeNotifier {
   ///   takes its size, tint, padding and chrome from there matches the buttons
   ///   beside it on all three.
   final List<Widget> Function(BuildContext context)? additionalControls;
+  /// Whether to flash a YouTube-style indicator showing the seeked amount when
+  /// seeking with the keyboard arrows on desktop. Repeated presses in the same
+  /// direction accumulate (e.g. 10s → 20s → 30s). Defaults to `true`.
+  final bool showSeekIndicator;
 
   /// Defines if the player allows swipe to exit fullscreen
   final bool swipeToExitFullscreen;
