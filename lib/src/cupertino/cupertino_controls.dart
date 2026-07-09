@@ -57,6 +57,14 @@ class _CupertinoControlsState extends State<CupertinoControls>
   ChewieController get chewieController => _chewieController!;
   ChewieController? _chewieController;
 
+  // Hides the mouse cursor along with the controls while idle in fullscreen.
+  MouseCursor get _idleCursor =>
+      chewieController.hideCursorInFullScreen &&
+          chewieController.isFullScreen &&
+          notifier.hideStuff
+      ? SystemMouseCursors.none
+      : MouseCursor.defer;
+
   @override
   void initState() {
     super.initState();
@@ -87,6 +95,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final buttonPadding = orientation == Orientation.portrait ? 16.0 : 24.0;
 
     return MouseRegion(
+      cursor: _idleCursor,
       onHover: (_) => _cancelAndRestartTimer(),
       child: GestureDetector(
         onTap: () => _cancelAndRestartTimer(),
