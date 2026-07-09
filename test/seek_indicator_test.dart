@@ -8,12 +8,16 @@ import 'package:video_player/video_player.dart';
 const _src =
     'https://assets.mixkit.co/videos/preview/mixkit-spinning-around-the-earth-29351-large.mp4';
 
-ChewieController _controller({bool showSeekIndicator = true}) {
+ChewieController _controller({
+  bool showSeekIndicator = true,
+  Duration keyboardSeekDuration = const Duration(seconds: 10),
+}) {
   return ChewieController(
     videoPlayerController: VideoPlayerController.networkUrl(Uri.parse(_src)),
     autoPlay: false,
     looping: false,
     showSeekIndicator: showSeekIndicator,
+    keyboardSeekDuration: keyboardSeekDuration,
     customControls: const MaterialDesktopControls(),
   );
 }
@@ -67,6 +71,22 @@ void main() {
     expect(indicator.seconds, 10);
   });
 
+  testWidgets('accumulates the configured keyboardSeekDuration', (
+    tester,
+  ) async {
+    await _pumpPlayer(
+      tester,
+      _controller(keyboardSeekDuration: const Duration(seconds: 5)),
+    );
+
+    for (var i = 0; i < 3; i++) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+    }
+
+    expect(_indicator(tester).seconds, 15);
+  });
+
   testWidgets('fades out shortly after the last keypress', (tester) async {
     await _pumpPlayer(tester, _controller());
 
@@ -95,6 +115,19 @@ void main() {
     expect(
       controller.copyWith(showSeekIndicator: false).showSeekIndicator,
       isFalse,
+    );
+  });
+
+  test('keyboardSeekDuration defaults to 10s and survives copyWith', () {
+    final controller = ChewieController(
+      videoPlayerController: VideoPlayerController.networkUrl(Uri.parse(_src)),
+    );
+    expect(controller.keyboardSeekDuration, const Duration(seconds: 10));
+    expect(
+      controller
+          .copyWith(keyboardSeekDuration: const Duration(seconds: 30))
+          .keyboardSeekDuration,
+      const Duration(seconds: 30),
     );
   });
 }
