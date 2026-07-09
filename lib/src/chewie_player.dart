@@ -365,6 +365,7 @@ class ChewieController extends ChangeNotifier {
     this.hideControlsTimer = defaultHideControlsTimer,
     this.controlsSafeAreaMinimum = EdgeInsets.zero,
     this.pauseOnBackgroundTap = false,
+    this.showSeekIndicator = true,
   }) : assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
@@ -427,6 +428,7 @@ class ChewieController extends ChangeNotifier {
     )?
     routePageBuilder,
     bool? pauseOnBackgroundTap,
+    bool? showSeekIndicator,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -495,6 +497,7 @@ class ChewieController extends ChangeNotifier {
       progressIndicatorDelay:
           progressIndicatorDelay ?? this.progressIndicatorDelay,
       pauseOnBackgroundTap: pauseOnBackgroundTap ?? this.pauseOnBackgroundTap,
+      showSeekIndicator: showSeekIndicator ?? this.showSeekIndicator,
     );
   }
 
@@ -691,6 +694,11 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines if the player should pause when the background is tapped
   final bool pauseOnBackgroundTap;
+
+  /// Whether to flash a YouTube-style indicator showing the seeked amount when
+  /// seeking with the keyboard arrows on desktop. Repeated presses in the same
+  /// direction accumulate (e.g. 10s → 20s → 30s). Defaults to `true`.
+  final bool showSeekIndicator;
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider = context
