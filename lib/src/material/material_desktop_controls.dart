@@ -107,6 +107,11 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
       if (chewieController.isFullScreen) {
         _onExpandCollapse();
       }
+    } else if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.keyF) {
+      if (chewieController.allowFullScreen) {
+        _onExpandCollapse();
+      }
     }
   }
 
