@@ -144,10 +144,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         },
         child: Stack(
           clipBehavior: Clip.none,
-          children: [
-            child,
-            _buildHoverTimeIndicator(context),
-          ],
+          children: [child, _buildHoverTimeIndicator(context)],
         ),
       ),
     );
@@ -174,8 +171,10 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
     }
 
     final double relative =
-        (renderObject.globalToLocal(offset).dx / renderObject.size.width)
-            .clamp(0.0, 1.0);
+        (renderObject.globalToLocal(offset).dx / renderObject.size.width).clamp(
+          0.0,
+          1.0,
+        );
     final String label = formatDuration(duration * relative);
 
     return Positioned.fill(
