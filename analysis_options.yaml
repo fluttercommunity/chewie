@@ -5,13 +5,6 @@ analyzer:
     strict-raw-types: true
   exclude:
     - lib/generated_plugin_registrant.dart
-    - build/**
-    - android/**
-    - ios/**
-    - web/**
-    - windows/**
-    - macos/**
-    - linux/**
   errors:
     # allow self-reference to deprecated members (we do this because otherwise we have
     # to annotate every member in every test, assert, etc, when we deprecate something)

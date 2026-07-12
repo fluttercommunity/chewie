@@ -5,13 +5,6 @@ analyzer:
     strict-raw-types: true
   exclude:
     - lib/generated_plugin_registrant.dart
-    - build/**
-    - android/**
-    - ios/**
-    - web/**
-    - windows/**
-    - macos/**
-    - linux/**
 
 linter:
   rules:
