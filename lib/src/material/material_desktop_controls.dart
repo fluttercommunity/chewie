@@ -43,6 +43,10 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   Timer? _bufferingDisplayTimer;
   bool _displayBufferingIndicator = false;
 
+  // Last seen playing state, to catch play/pause coming from outside these
+  // controls (hardware media keys handled by the browser, MediaSession).
+  bool? _wasPlaying;
+
   final barHeight = 48.0 * 1.5;
   final marginSize = 5.0;
 
@@ -560,6 +564,17 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     } else {
       _displayBufferingIndicator = buffering;
     }
+
+    final bool isPlaying = controller.value.isPlaying;
+    if (_wasPlaying != null && _wasPlaying != isPlaying) {
+      if (isPlaying) {
+        _cancelAndRestartTimer();
+      } else {
+        _hideTimer?.cancel();
+        notifier.hideStuff = false;
+      }
+    }
+    _wasPlaying = isPlaying;
 
     setState(() {
       _latestValue = controller.value;
