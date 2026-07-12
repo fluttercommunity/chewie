@@ -31,7 +31,7 @@ class MaterialDesktopControls extends StatefulWidget {
 class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
-  late VideoPlayerValue _latestValue;
+  late VideoPlayerValue _latestValue = controller.value;
   double? _latestVolume;
   Timer? _hideTimer;
   Timer? _initTimer;
@@ -42,10 +42,6 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   bool _displayTapped = false;
   Timer? _bufferingDisplayTimer;
   bool _displayBufferingIndicator = false;
-
-  // Last seen playing state, to catch play/pause coming from outside these
-  // controls (hardware media keys handled by the browser, MediaSession).
-  bool? _wasPlaying;
 
   final barHeight = 48.0 * 1.5;
   final marginSize = 5.0;
@@ -565,16 +561,12 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
       _displayBufferingIndicator = buffering;
     }
 
-    final bool isPlaying = controller.value.isPlaying;
-    if (_wasPlaying != null && _wasPlaying != isPlaying) {
-      if (isPlaying) {
-        _cancelAndRestartTimer();
-      } else {
-        _hideTimer?.cancel();
-        notifier.hideStuff = false;
-      }
+    // Play/pause can also come from outside these controls (hardware media
+    // keys handled by the browser, MediaSession): reveal the controls so the
+    // state change is visible.
+    if (_latestValue.isPlaying != controller.value.isPlaying) {
+      _cancelAndRestartTimer();
     }
-    _wasPlaying = isPlaying;
 
     setState(() {
       _latestValue = controller.value;

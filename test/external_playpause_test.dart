@@ -63,7 +63,7 @@ void main() {
     expect(_controlsVisible(tester), isFalse);
   });
 
-  testWidgets('reveals and keeps the controls on an external pause', (
+  testWidgets('reveals the controls and auto-hides on an external pause', (
     tester,
   ) async {
     final videoController = _FakeVideoPlayerController();
@@ -78,8 +78,8 @@ void main() {
     await tester.pump();
     expect(_controlsVisible(tester), isTrue);
 
-    await tester.pump(const Duration(seconds: 5));
-    expect(_controlsVisible(tester), isTrue);
+    await tester.pump(const Duration(seconds: 4));
+    expect(_controlsVisible(tester), isFalse);
   });
 
   testWidgets('leaves hidden controls hidden when only the position changes', (
