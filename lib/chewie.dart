@@ -7,3 +7,4 @@ export 'src/material/material_controls.dart';
 export 'src/material/material_desktop_controls.dart';
 export 'src/material/material_progress_bar.dart';
 export 'src/models/index.dart';
+export 'src/subtitle_markup.dart';

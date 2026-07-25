@@ -168,7 +168,7 @@ optionsTranslation: OptionsTranslation(
 
 > Since version 1.1.0, Chewie supports subtitles.
 
-Chewie allows you to enhance the video playback experience with text overlays. You can add a `List<Subtitle>` to your `ChewieController` and fully customize their appearance using the `subtitleBuilder` function.
+Chewie allows you to enhance the video playback experience with text overlays. You can add a `List<Subtitle>` to your `ChewieController`, restyle the default subtitle box with `subtitleStyle`, or replace it entirely with the `subtitleBuilder` function.
 
 ### Showing Subtitles by Default
 
@@ -228,9 +228,58 @@ Subtitle(
 ),
 ```
 
+### Markup in Subtitle Text
+
+Cue text extracted from WebVTT or SubRip files often carries inline markup, and Chewie renders it for you:
+
+```dart
+Subtitle(
+  index: 0,
+  start: Duration.zero,
+  end: const Duration(seconds: 10),
+  text: '<i>The law is the law, Mr. Hancock.</i>',
+),
+```
+
+`<b>`, `<i>`, `<u>` and `<font color="#rrggbb">` are applied on top of your text style. The other WebVTT cue tags — `<c.class>`, `<v Speaker>`, `<lang xx>`, `<ruby>`/`<rt>` and timestamp tags — are dropped while their text is kept, and escapes such as `&amp;` are decoded. A tag that opens on one line and closes on the next works too.
+
+Parsing is lenient, so cue text is never mangled: `5 < 10` and `<3` are shown as written, an unclosed tag simply runs to the end of the cue, and a stray closing tag is ignored. If you would rather show cue text exactly as it arrives, set `subtitleStyle: SubtitleStyle(renderMarkup: false)`.
+
+### Styling Subtitles
+
+`subtitleStyle` changes how the default subtitle box looks without giving up markup rendering:
+
+```dart
+ChewieController(
+  videoPlayerController: _videoPlayerController,
+  subtitleStyle: const SubtitleStyle(
+    textStyle: TextStyle(fontSize: 22, color: Colors.amber),
+    textAlign: TextAlign.center,
+    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    decoration: BoxDecoration(color: Colors.black54),
+  ),
+);
+```
+
+Leaving `textStyle.color` unset inherits the colour from the surrounding `DefaultTextStyle`, which is what Chewie does by default.
+
 ### Customizing Subtitles
 
-Use the `subtitleBuilder` function to customize how subtitles are rendered, allowing you to modify text styles, add padding, or apply other customizations to your subtitles.
+Reach for `subtitleBuilder` when you need to build the whole widget yourself. It receives the cue exactly as you supplied it — markup and all — and Chewie's own rendering, including `subtitleStyle`, is skipped. Run the cue through `parseSubtitleMarkup` to keep markup working:
+
+```dart
+subtitleBuilder: (context, subtitle) => Container(
+  padding: const EdgeInsets.all(10.0),
+  child: Text.rich(
+    subtitle is String
+        ? parseSubtitleMarkup(
+            subtitle,
+            style: const TextStyle(color: Colors.white),
+          )
+        : TextSpan(text: subtitle.toString()),
+  ),
+),
+```
 
 ## 🧪 Example
 
