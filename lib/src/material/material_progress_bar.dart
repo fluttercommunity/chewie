@@ -1,4 +1,5 @@
 import 'package:chewie/src/chewie_progress_colors.dart';
+import 'package:chewie/src/models/chewie_chapter.dart';
 import 'package:chewie/src/progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -15,8 +16,10 @@ class MaterialVideoProgressBar extends StatelessWidget {
     this.onDragUpdate,
     super.key,
     this.draggableProgressBar = true,
+    this.chapters = const [],
   }) : colors = colors ?? ChewieProgressColors();
 
+  final List<ChewieChapter> chapters;
   final double height;
   final double barHeight;
   final double handleHeight;
@@ -39,6 +42,7 @@ class MaterialVideoProgressBar extends StatelessWidget {
       onDragStart: onDragStart,
       onDragUpdate: onDragUpdate,
       draggableProgressBar: draggableProgressBar,
+      chapters: chapters,
     );
   }
 }
