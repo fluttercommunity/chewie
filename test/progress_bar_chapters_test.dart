@@ -49,9 +49,6 @@ class _FakeVideoPlayerController extends VideoPlayerController {
 
   @override
   Future<void> initialize() async {}
-
-  @override
-  Future<void> dispose() async {}
 }
 
 Widget _wrapBar(VideoProgressBar bar) {
