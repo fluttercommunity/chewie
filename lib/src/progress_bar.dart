@@ -167,10 +167,15 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         : child;
 
     if (widget.chapters.isEmpty) {
-      return interactive;
+      return widget.draggableProgressBar
+          ? MouseRegion(cursor: SystemMouseCursors.click, child: interactive)
+          : interactive;
     }
 
     return MouseRegion(
+      cursor: widget.draggableProgressBar
+          ? SystemMouseCursors.click
+          : MouseCursor.defer,
       onHover: (event) => setState(() => _hoverPosition = event.localPosition),
       onExit: (_) => setState(() => _hoverPosition = null),
       child: LayoutBuilder(
