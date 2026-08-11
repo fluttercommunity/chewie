@@ -91,6 +91,9 @@ jobs:
         run: flutter test --no-pub --coverage --test-randomize-ordering-seed random
 
       - name: 📁 Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
+        with:
+          fail_ci_if_error: false
+          handle_no_reports_found: true
         # TODO: Remove the below once we have adequate tests for this library.
-        continue-on-error: true
+        continue-on-error: "true"
