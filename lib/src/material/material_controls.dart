@@ -30,7 +30,7 @@ class MaterialControls extends StatefulWidget {
 class _MaterialControlsState extends State<MaterialControls>
     with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
-  late VideoPlayerValue _latestValue;
+  VideoPlayerValue? _latestVideoPlayerValue;
   double? _latestVolume;
   Timer? _hideTimer;
   Timer? _initTimer;
@@ -50,6 +50,9 @@ class _MaterialControlsState extends State<MaterialControls>
 
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
+
+  // We know that _latestVideoPlayerValue is set in didChangeDependencies
+  VideoPlayerValue get _latestValue => _latestVideoPlayerValue!;
 
   @override
   void initState() {
@@ -125,6 +128,7 @@ class _MaterialControlsState extends State<MaterialControls>
     final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
+    _latestVideoPlayerValue = controller.value;
 
     if (oldController != chewieController) {
       _dispose();
@@ -622,8 +626,22 @@ class _MaterialControlsState extends State<MaterialControls>
       _displayBufferingIndicator = buffering;
     }
 
+    // Play/pause can also come from outside these controls (headset buttons,
+    // notification controls, MediaSession): reveal the controls the same way
+    // _playPause does, so the state change is visible either way.
+    if (_latestValue.isPlaying != controller.value.isPlaying) {
+      if (controller.value.isPlaying) {
+        _cancelAndRestartTimer();
+      } else {
+        setState(() {
+          notifier.hideStuff = false;
+        });
+        _hideTimer?.cancel();
+      }
+    }
+
     setState(() {
-      _latestValue = controller.value;
+      _latestVideoPlayerValue = controller.value;
       _subtitlesPosition = controller.value.position;
     });
   }

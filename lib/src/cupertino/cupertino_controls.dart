@@ -39,7 +39,7 @@ class CupertinoControls extends StatefulWidget {
 class _CupertinoControlsState extends State<CupertinoControls>
     with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
-  late VideoPlayerValue _latestValue;
+  VideoPlayerValue? _latestVideoPlayerValue;
   double? _latestVolume;
   Timer? _hideTimer;
   final marginSize = 5.0;
@@ -56,6 +56,9 @@ class _CupertinoControlsState extends State<CupertinoControls>
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
   ChewieController? _chewieController;
+
+  // We know that _latestVideoPlayerValue is set in didChangeDependencies
+  VideoPlayerValue get _latestValue => _latestVideoPlayerValue!;
 
   @override
   void initState() {
@@ -145,6 +148,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
+    _latestVideoPlayerValue = controller.value;
 
     if (oldController != chewieController) {
       _dispose();
@@ -746,8 +750,22 @@ class _CupertinoControlsState extends State<CupertinoControls>
       _displayBufferingIndicator = buffering;
     }
 
+    // Play/pause can also come from outside these controls (Control Center,
+    // the lock screen, headset buttons): reveal the controls the same way
+    // _playPause does, so the state change is visible either way.
+    if (_latestValue.isPlaying != controller.value.isPlaying) {
+      if (controller.value.isPlaying) {
+        _cancelAndRestartTimer();
+      } else {
+        setState(() {
+          notifier.hideStuff = false;
+        });
+        _hideTimer?.cancel();
+      }
+    }
+
     setState(() {
-      _latestValue = controller.value;
+      _latestVideoPlayerValue = controller.value;
       _subtitlesPosition = controller.value.position;
     });
   }
