@@ -7,22 +7,22 @@ import 'package:video_player/video_player.dart';
 const _src =
     'https://assets.mixkit.co/videos/preview/mixkit-spinning-around-the-earth-29351-large.mp4';
 
-/// Lets tests flip the playing state the way an external actor would
-/// (hardware media keys handled by the browser, MediaSession): the value
-/// changes without going through the controls' own play/pause path.
-class _FakeVideoPlayerController extends VideoPlayerController {
-  _FakeVideoPlayerController() : super.networkUrl(Uri.parse(_src));
+// Long enough for the hide timer started by _cancelAndRestartTimer to fire.
+final _afterHideControlsTimer =
+    ChewieController.defaultHideControlsTimer + const Duration(seconds: 1);
 
-  void setPlaying(bool playing) {
-    value = value.copyWith(isPlaying: playing);
-  }
-
-  void setPosition(Duration position) {
-    value = value.copyWith(position: position);
-  }
+/// Flips the playing state the way an external actor would (hardware media
+/// keys handled by the browser, MediaSession, the embedder driving the
+/// controller): the value changes without going through the controls' own
+/// play/pause path.
+void _setPlayingExternally(
+  VideoPlayerController controller, {
+  required bool playing,
+}) {
+  controller.value = controller.value.copyWith(isPlaying: playing);
 }
 
-ChewieController _controller(_FakeVideoPlayerController videoController) {
+ChewieController _chewieController(VideoPlayerController videoController) {
   return ChewieController(
     videoPlayerController: videoController,
     autoPlay: false,
@@ -32,16 +32,17 @@ ChewieController _controller(_FakeVideoPlayerController videoController) {
   );
 }
 
-Future<void> _pumpPlayer(
-  WidgetTester tester,
-  ChewieController controller,
-) async {
+Future<VideoPlayerController> _pumpPlayer(WidgetTester tester) async {
+  final videoController = VideoPlayerController.networkUrl(Uri.parse(_src));
   await tester.pumpWidget(
     MaterialApp(
-      home: Scaffold(body: Chewie(controller: controller)),
+      home: Scaffold(
+        body: Chewie(controller: _chewieController(videoController)),
+      ),
     ),
   );
   await tester.pump();
+  return videoController;
 }
 
 bool _controlsVisible(WidgetTester tester) =>
@@ -51,49 +52,48 @@ void main() {
   testWidgets('reveals the controls and auto-hides on an external play', (
     tester,
   ) async {
-    final videoController = _FakeVideoPlayerController();
-    await _pumpPlayer(tester, _controller(videoController));
+    final videoController = await _pumpPlayer(tester);
     expect(_controlsVisible(tester), isFalse);
 
-    videoController.setPlaying(true);
+    _setPlayingExternally(videoController, playing: true);
     await tester.pump();
     expect(_controlsVisible(tester), isTrue);
 
-    await tester.pump(const Duration(seconds: 4));
+    await tester.pump(_afterHideControlsTimer);
     expect(_controlsVisible(tester), isFalse);
   });
 
   testWidgets('reveals the controls and auto-hides on an external pause', (
     tester,
   ) async {
-    final videoController = _FakeVideoPlayerController();
-    await _pumpPlayer(tester, _controller(videoController));
+    final videoController = await _pumpPlayer(tester);
 
-    videoController.setPlaying(true);
+    _setPlayingExternally(videoController, playing: true);
     await tester.pump();
-    await tester.pump(const Duration(seconds: 4));
+    await tester.pump(_afterHideControlsTimer);
     expect(_controlsVisible(tester), isFalse);
 
-    videoController.setPlaying(false);
+    _setPlayingExternally(videoController, playing: false);
     await tester.pump();
     expect(_controlsVisible(tester), isTrue);
 
-    await tester.pump(const Duration(seconds: 4));
+    await tester.pump(_afterHideControlsTimer);
     expect(_controlsVisible(tester), isFalse);
   });
 
   testWidgets('leaves hidden controls hidden when only the position changes', (
     tester,
   ) async {
-    final videoController = _FakeVideoPlayerController();
-    await _pumpPlayer(tester, _controller(videoController));
+    final videoController = await _pumpPlayer(tester);
 
-    videoController.setPlaying(true);
+    _setPlayingExternally(videoController, playing: true);
     await tester.pump();
-    await tester.pump(const Duration(seconds: 4));
+    await tester.pump(_afterHideControlsTimer);
     expect(_controlsVisible(tester), isFalse);
 
-    videoController.setPosition(const Duration(seconds: 42));
+    videoController.value = videoController.value.copyWith(
+      position: const Duration(seconds: 42),
+    );
     await tester.pump();
     expect(_controlsVisible(tester), isFalse);
   });
