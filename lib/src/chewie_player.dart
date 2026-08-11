@@ -5,6 +5,7 @@ import 'web_fullscreen.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/options_translation.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
+import 'package:chewie/src/models/subtitle_style.dart';
 import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/foundation.dart';
@@ -342,6 +343,7 @@ class ChewieController extends ChangeNotifier {
     this.subtitle,
     this.showSubtitles = false,
     this.subtitleBuilder,
+    this.subtitleStyle = const SubtitleStyle(),
     this.customControls,
     this.errorBuilder,
     this.bufferingBuilder,
@@ -396,6 +398,7 @@ class ChewieController extends ChangeNotifier {
     Subtitles? subtitle,
     bool? showSubtitles,
     Widget Function(BuildContext, dynamic)? subtitleBuilder,
+    SubtitleStyle? subtitleStyle,
     Widget? customControls,
     WidgetBuilder? bufferingBuilder,
     Widget Function(BuildContext, String)? errorBuilder,
@@ -459,6 +462,7 @@ class ChewieController extends ChangeNotifier {
       showSubtitles: showSubtitles ?? this.showSubtitles,
       subtitle: subtitle ?? this.subtitle,
       subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
+      subtitleStyle: subtitleStyle ?? this.subtitleStyle,
       customControls: customControls ?? this.customControls,
       errorBuilder: errorBuilder ?? this.errorBuilder,
       bufferingBuilder: bufferingBuilder ?? this.bufferingBuilder,
@@ -521,10 +525,23 @@ class ChewieController extends ChangeNotifier {
   final List<OptionItem> Function(BuildContext context)? additionalOptions;
 
   /// Define here your own Widget on how your n'th subtitle will look like
+  ///
+  /// Receives the cue exactly as it was supplied, markup and all. Chewie's own
+  /// rendering — including [SubtitleStyle] and markup parsing — is skipped
+  /// entirely. To keep markup while building your own widget, run the cue
+  /// through `parseSubtitleMarkup` yourself.
   Widget Function(BuildContext context, dynamic subtitle)? subtitleBuilder;
 
   /// Add a List of Subtitles here in `Subtitles.subtitle`
   Subtitles? subtitle;
+
+  /// How the default subtitle box looks: text style, alignment, padding and
+  /// the box behind the text.
+  ///
+  /// Cue markup such as `<i>` is rendered whatever this is set to, so styling
+  /// subtitles does not cost you italics. Ignored when [subtitleBuilder] is
+  /// set.
+  SubtitleStyle subtitleStyle;
 
   /// Determines whether subtitles should be shown by default when the video starts.
   ///

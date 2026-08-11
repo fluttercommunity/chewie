@@ -104,6 +104,16 @@ class _ChewieDemoState extends State<ChewieDemo> {
         //   style: TextStyle(color: Colors.amber, fontSize: 22, fontStyle: FontStyle.italic),
         // ),
       ),
+      Subtitle(
+        index: 0,
+        start: const Duration(seconds: 20),
+        end: const Duration(seconds: 30),
+        // Markup like this turns up in real WebVTT and SubRip files, and is
+        // rendered without any help from a subtitleBuilder.
+        text:
+            'Cue text can be <i>italic</i>, <b>bold</b> or '
+            '<font color="#ffc107">coloured</font>.',
+      ),
     ];
 
     _chewieController = ChewieController(
@@ -126,15 +136,24 @@ class _ChewieDemoState extends State<ChewieDemo> {
       },
       subtitle: Subtitles(subtitles),
       showSubtitles: true,
-      subtitleBuilder: (context, dynamic subtitle) => Container(
-        padding: const EdgeInsets.all(10.0),
-        child: subtitle is InlineSpan
-            ? RichText(text: subtitle)
-            : Text(
-                subtitle.toString(),
-                style: const TextStyle(color: Colors.black),
-              ),
+      subtitleStyle: const SubtitleStyle(
+        textStyle: TextStyle(fontSize: 20, color: Colors.white),
       ),
+      // subtitleBuilder replaces the default box entirely, so subtitleStyle no
+      // longer applies and cue markup is yours to handle — parseSubtitleMarkup
+      // is the same parser chewie uses:
+      //
+      // subtitleBuilder: (context, dynamic subtitle) => Container(
+      //   padding: const EdgeInsets.all(10.0),
+      //   child: Text.rich(
+      //     subtitle is InlineSpan
+      //         ? subtitle
+      //         : parseSubtitleMarkup(
+      //             subtitle.toString(),
+      //             style: const TextStyle(color: Colors.white),
+      //           ),
+      //   ),
+      // ),
 
       hideControlsTimer: const Duration(seconds: 1),
 
