@@ -96,4 +96,4 @@ jobs:
           fail_ci_if_error: false
           handle_no_reports_found: true
         # TODO: Remove the below once we have adequate tests for this library.
-        continue-on-error: "true"
+        continue-on-error: true
