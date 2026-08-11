@@ -31,7 +31,7 @@ class MaterialDesktopControls extends StatefulWidget {
 class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
-  late VideoPlayerValue _latestValue = controller.value;
+  VideoPlayerValue? _latestVideoPlayerValue;
   double? _latestVolume;
   Timer? _hideTimer;
   Timer? _initTimer;
@@ -52,6 +52,9 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
+
+  // We know that _latestVideoPlayerValue is set in didChangeDependencies
+  VideoPlayerValue get _latestValue => _latestVideoPlayerValue!;
 
   @override
   void initState() {
@@ -154,6 +157,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
+    _latestVideoPlayerValue = controller.value;
 
     if (oldController != chewieController) {
       _dispose();
@@ -569,7 +573,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     }
 
     setState(() {
-      _latestValue = controller.value;
+      _latestVideoPlayerValue = controller.value;
       _subtitlesPosition = controller.value.position;
     });
   }
