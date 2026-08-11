@@ -38,6 +38,46 @@ void main() {
       expect(plainText(parseSubtitleMarkup('')), '');
     });
 
+    group('cues carrying no markup at all', () {
+      const plainCues = <String>[
+        'Tu comprends ce qu\'ils disent ?',
+        'Deux lignes bien\nséparées par un retour',
+        '  les espaces sont conservés  ',
+        'Tom & Jerry',
+        'AT&T; le point-virgule reste',
+        'M&Ms;',
+        '5 < 10 et 10 > 5',
+        'C\'est vrai ? Oui — vraiment…',
+        '日本語のテスト',
+        'مرحبا بالعالم',
+        'Party 🎉 time',
+      ];
+
+      for (final cue in plainCues) {
+        test('"${cue.replaceAll('\n', r'\n')}" comes out as one plain run', () {
+          final span = parseSubtitleMarkup(cue, style: base);
+
+          expect(plainText(span), cue);
+          expect(span.style, base);
+          expect(span.children, hasLength(1));
+          expect(
+            span.children!.single,
+            isA<TextSpan>()
+                .having((leaf) => leaf.text, 'text', cue)
+                .having((leaf) => leaf.style, 'style', base)
+                .having((leaf) => leaf.children, 'children', isNull),
+          );
+        });
+      }
+
+      test('adds no style of its own when the caller supplies none', () {
+        final span = parseSubtitleMarkup('sans style');
+
+        expect(span.style, const TextStyle());
+        expect(span.children!.single.style, const TextStyle());
+      });
+    });
+
     test('applies <i>', () {
       final span = parseSubtitleMarkup(
         '<i>La loi est la loi, M. Hancock.</i>',
@@ -201,6 +241,11 @@ void main() {
       test('drops an unknown tag but keeps its content', () {
         expect(plainText(parseSubtitleMarkup('<blink>x</blink>')), 'x');
       });
+
+      test('drops a sound effect written as a tag, as other players do', () {
+        expect(plainText(parseSubtitleMarkup('<Sighs> he said')), ' he said');
+        expect(plainText(parseSubtitleMarkup('<SNORING>')), '');
+      });
     });
 
     group('character escapes', () {
@@ -231,6 +276,31 @@ void main() {
 
       test('leaves a bare ampersand alone', () {
         expect(plainText(parseSubtitleMarkup('Smith & Sons')), 'Smith & Sons');
+      });
+
+      test('decodes an astral escape into a surrogate pair', () {
+        expect(plainText(parseSubtitleMarkup('&#x1F600;')), '😀');
+      });
+
+      test('decodes one level only, so an escaped escape stays literal', () {
+        expect(plainText(parseSubtitleMarkup('&amp;lt;')), '&lt;');
+      });
+
+      test('leaves an escape beyond the Unicode range literal', () {
+        expect(plainText(parseSubtitleMarkup('x&#1114112;y')), 'x&#1114112;y');
+      });
+
+      test('leaves an escape too large to parse literal', () {
+        const cue = 'x&#99999999999999999999;y';
+
+        expect(plainText(parseSubtitleMarkup(cue)), cue);
+      });
+
+      test('keeps the cue intact around an unpaired surrogate escape', () {
+        final text = plainText(parseSubtitleMarkup('x&#55296;y'));
+
+        expect(text, startsWith('x'));
+        expect(text, endsWith('y'));
       });
     });
 
@@ -275,6 +345,68 @@ void main() {
         expect(styleOf(span, 'both').fontWeight, FontWeight.bold);
         expect(styleOf(span, 'both').fontStyle, FontStyle.italic);
         expect(styleOf(span, 'tail').fontWeight, isNull);
+      });
+
+      test('closes a tag whatever the case of the closing tag', () {
+        final span = parseSubtitleMarkup('<i>mixed</I> after', style: base);
+
+        expect(styleOf(span, 'mixed').fontStyle, FontStyle.italic);
+        expect(styleOf(span, 'after').fontStyle, isNull);
+      });
+
+      test('tolerates whitespace inside a closing tag', () {
+        final span = parseSubtitleMarkup('<i>spaced</i > after', style: base);
+
+        expect(plainText(span), 'spaced after');
+        expect(styleOf(span, 'after').fontStyle, isNull);
+      });
+
+      test('keeps a greater-than sign that never opened a tag', () {
+        expect(plainText(parseSubtitleMarkup('<v Roger>a>b</v>')), 'a>b');
+      });
+
+      test('leaves a tag straddling a line break alone', () {
+        const cue = '<v Roger\nBird>hello';
+
+        expect(plainText(parseSubtitleMarkup(cue)), cue);
+      });
+
+      test('keeps the outer tag open when an inner twin closes', () {
+        final span = parseSubtitleMarkup('<i>a<i>b</i>c</i>', style: base);
+
+        expect(plainText(span), 'abc');
+        expect(styleOf(span, 'c').fontStyle, FontStyle.italic);
+      });
+
+      test('renders a cue made of nothing but tags as empty', () {
+        final span = parseSubtitleMarkup('<i></i>', style: base);
+
+        expect(plainText(span), '');
+        expect(span.children, isEmpty);
+      });
+    });
+
+    group('hostile cue text', () {
+      test('parses a run of unmatched brackets verbatim', () {
+        const cue = '<<<<<<<<<< 5 < 10 >>>>>>>>>>';
+
+        expect(plainText(parseSubtitleMarkup(cue)), cue);
+      });
+
+      test('parses thousands of nested tags without overflowing', () {
+        final span = parseSubtitleMarkup(
+          '${'<b>' * 5000}deep${'</b>' * 5000}',
+          style: base,
+        );
+
+        expect(plainText(span), 'deep');
+        expect(styleOf(span, 'deep').fontWeight, FontWeight.bold);
+      });
+
+      test('parses a cue of unterminated tags without backtracking away', () {
+        final cue = '${'<' * 20000}${'a' * 20000}';
+
+        expect(plainText(parseSubtitleMarkup(cue)), hasLength(40000));
       });
     });
   });
