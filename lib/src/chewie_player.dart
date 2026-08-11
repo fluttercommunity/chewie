@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chewie/src/chewie_progress_colors.dart';
+import 'web_fullscreen.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/options_translation.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
@@ -44,16 +45,30 @@ class ChewieState extends State<Chewie> {
 
   bool get isControllerFullScreen => widget.controller.isFullScreen;
   late PlayerNotifier notifier;
+  late final void Function() _browserFsExitHandler;
 
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(listener);
     notifier = PlayerNotifier.init();
+    // When the user presses Escape, the browser exits its native fullscreen
+    // without Chewie knowing. Detect this and collapse the fullscreen route.
+    _browserFsExitHandler = () {
+      if (!browserInFullscreen && _isFullScreen) {
+        widget.controller.exitFullScreen();
+      }
+    };
+    if (widget.controller.useNativeFullScreenOnWeb) {
+      addBrowserFullscreenChangeListener(_browserFsExitHandler);
+    }
   }
 
   @override
   void dispose() {
+    if (widget.controller.useNativeFullScreenOnWeb) {
+      removeBrowserFullscreenChangeListener(_browserFsExitHandler);
+    }
     widget.controller.removeListener(listener);
     notifier.dispose();
     super.dispose();
@@ -182,6 +197,12 @@ class ChewieState extends State<Chewie> {
       WakelockPlus.enable();
     }
 
+    // Ask the browser to enter its native fullscreen. Must be called before the
+    // first await so we are still inside the user-gesture event handler.
+    if (widget.controller.useNativeFullScreenOnWeb) {
+      requestBrowserFullscreen();
+    }
+
     await Navigator.of(
       context,
       rootNavigator: widget.controller.useRootNavigator,
@@ -191,6 +212,11 @@ class ChewieState extends State<Chewie> {
 
     if (kIsWeb) {
       await _reInitializeControllers(wasPlaying);
+      // Exit native browser fullscreen when the Chewie route pops (e.g. user
+      // clicked the fullscreen button again). No-op if Escape was already used.
+      if (widget.controller.useNativeFullScreenOnWeb) {
+        exitBrowserFullscreen();
+      }
     }
 
     _isFullScreen = false;
@@ -325,6 +351,7 @@ class ChewieController extends ChangeNotifier {
     this.allowMuting = true,
     this.allowPlaybackSpeedChanging = true,
     this.useRootNavigator = true,
+    this.useNativeFullScreenOnWeb = true,
     this.playbackSpeeds = const [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
     this.systemOverlaysOnEnterFullScreen,
     this.deviceOrientationsOnEnterFullScreen,
@@ -378,6 +405,7 @@ class ChewieController extends ChangeNotifier {
     bool? allowMuting,
     bool? allowPlaybackSpeedChanging,
     bool? useRootNavigator,
+    bool? useNativeFullScreenOnWeb,
     Duration? hideControlsTimer,
     EdgeInsets? controlsSafeAreaMinimum,
     List<double>? playbackSpeeds,
@@ -441,6 +469,8 @@ class ChewieController extends ChangeNotifier {
       allowPlaybackSpeedChanging:
           allowPlaybackSpeedChanging ?? this.allowPlaybackSpeedChanging,
       useRootNavigator: useRootNavigator ?? this.useRootNavigator,
+      useNativeFullScreenOnWeb:
+          useNativeFullScreenOnWeb ?? this.useNativeFullScreenOnWeb,
       playbackSpeeds: playbackSpeeds ?? this.playbackSpeeds,
       systemOverlaysOnEnterFullScreen:
           systemOverlaysOnEnterFullScreen ??
@@ -598,6 +628,14 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines if push/pop navigations use the rootNavigator
   final bool useRootNavigator;
+
+  /// On Flutter Web, also enter the browser's native fullscreen (via the
+  /// Fullscreen API) when going fullscreen, instead of only expanding the
+  /// Flutter view inside the browser window. Pressing Escape to leave the
+  /// browser fullscreen also exits Chewie's fullscreen.
+  ///
+  /// Has no effect on non-web platforms.
+  final bool useNativeFullScreenOnWeb;
 
   /// Defines the [Duration] before the video controls are hidden. By default, this is set to three seconds.
   final Duration hideControlsTimer;

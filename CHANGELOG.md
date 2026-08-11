@@ -1,3 +1,6 @@
+## [Unreleased]
+* ✨ Web: enter the browser's native (OS-level) fullscreen via the Fullscreen API instead of only expanding the Flutter view inside the browser window. Pressing Escape to leave browser fullscreen also exits Chewie's fullscreen. Controlled by the new `ChewieController.useNativeFullScreenOnWeb` flag (defaults to `true`; no effect on non-web platforms).
+
 ## [1.14.1]
 * 🛠️ [#945](https://github.com/fluttercommunity/chewie/pull/945): Flutter 3.38 downgrade. Thanks [diegotori](https://github.com/diegotori).
 * Library now supports Flutter and Dart versions `3.38.0` and `3.10` or higher respectively, restoring previous compatibility.
