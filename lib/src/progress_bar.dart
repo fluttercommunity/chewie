@@ -117,7 +117,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
               }
               _seekToRelativePosition(details.globalPosition);
             },
-            child: child,
+            child: MouseRegion(cursor: SystemMouseCursors.click, child: child),
           )
         : child;
   }

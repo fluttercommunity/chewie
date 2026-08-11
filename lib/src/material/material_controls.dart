@@ -304,16 +304,19 @@ class _MaterialControlsState extends State<MaterialControls>
           controller.setVolume(0.0);
         }
       },
-      child: AnimatedOpacity(
-        opacity: notifier.hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
-        child: ClipRect(
-          child: Container(
-            height: barHeight,
-            padding: const EdgeInsets.only(left: 6.0),
-            child: Icon(
-              _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
-              color: Colors.white,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: AnimatedOpacity(
+          opacity: notifier.hideStuff ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 300),
+          child: ClipRect(
+            child: Container(
+              height: barHeight,
+              padding: const EdgeInsets.only(left: 6.0),
+              child: Icon(
+                _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
@@ -324,19 +327,22 @@ class _MaterialControlsState extends State<MaterialControls>
   GestureDetector _buildExpandButton() {
     return GestureDetector(
       onTap: _onExpandCollapse,
-      child: AnimatedOpacity(
-        opacity: notifier.hideStuff ? 0.0 : 1.0,
-        duration: const Duration(milliseconds: 300),
-        child: Container(
-          height: barHeight + (chewieController.isFullScreen ? 15.0 : 0),
-          margin: const EdgeInsets.only(right: 12.0),
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-          child: Center(
-            child: Icon(
-              chewieController.isFullScreen
-                  ? Icons.fullscreen_exit
-                  : Icons.fullscreen,
-              color: Colors.white,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: AnimatedOpacity(
+          opacity: notifier.hideStuff ? 0.0 : 1.0,
+          duration: const Duration(milliseconds: 300),
+          child: Container(
+            height: barHeight + (chewieController.isFullScreen ? 15.0 : 0),
+            margin: const EdgeInsets.only(right: 12.0),
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Center(
+              child: Icon(
+                chewieController.isFullScreen
+                    ? Icons.fullscreen_exit
+                    : Icons.fullscreen,
+                color: Colors.white,
+              ),
             ),
           ),
         ),
@@ -473,15 +479,18 @@ class _MaterialControlsState extends State<MaterialControls>
     }
     return GestureDetector(
       onTap: _onSubtitleTap,
-      child: Container(
-        height: barHeight,
-        color: Colors.transparent,
-        padding: const EdgeInsets.only(left: 12.0, right: 12.0),
-        child: Icon(
-          _subtitleOn
-              ? Icons.closed_caption
-              : Icons.closed_caption_off_outlined,
-          color: _subtitleOn ? Colors.white : Colors.grey[700],
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          height: barHeight,
+          color: Colors.transparent,
+          padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+          child: Icon(
+            _subtitleOn
+                ? Icons.closed_caption
+                : Icons.closed_caption_off_outlined,
+            color: _subtitleOn ? Colors.white : Colors.grey[700],
+          ),
         ),
       ),
     );
