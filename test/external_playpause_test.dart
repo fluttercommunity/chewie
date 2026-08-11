@@ -1,6 +1,7 @@
 import 'package:chewie/chewie.dart';
 import 'package:chewie/src/center_play_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_player/video_player.dart';
 
@@ -63,7 +64,7 @@ void main() {
     expect(_controlsVisible(tester), isFalse);
   });
 
-  testWidgets('reveals the controls and auto-hides on an external pause', (
+  testWidgets('reveals the controls and keeps them up on an external pause', (
     tester,
   ) async {
     final videoController = await _pumpPlayer(tester);
@@ -78,7 +79,30 @@ void main() {
     expect(_controlsVisible(tester), isTrue);
 
     await tester.pump(_afterHideControlsTimer);
+    expect(
+      _controlsVisible(tester),
+      isTrue,
+      reason: 'a paused video keeps its controls up, as when paused from them',
+    );
+  });
+
+  testWidgets('keeps the controls up after a pause from the controls', (
+    tester,
+  ) async {
+    final videoController = await _pumpPlayer(tester);
+
+    _setPlayingExternally(videoController, playing: true);
+    await tester.pump();
+    await tester.pump(_afterHideControlsTimer);
     expect(_controlsVisible(tester), isFalse);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.pump();
+    expect(videoController.value.isPlaying, isFalse);
+    expect(_controlsVisible(tester), isTrue);
+
+    await tester.pump(_afterHideControlsTimer);
+    expect(_controlsVisible(tester), isTrue);
   });
 
   testWidgets('leaves hidden controls hidden when only the position changes', (

@@ -566,10 +566,17 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     }
 
     // Play/pause can also come from outside these controls (hardware media
-    // keys handled by the browser, MediaSession): reveal the controls so the
-    // state change is visible.
+    // keys handled by the browser, MediaSession): reveal the controls the same
+    // way _playPause does, so the state change is visible either way.
     if (_latestValue.isPlaying != controller.value.isPlaying) {
-      _cancelAndRestartTimer();
+      if (controller.value.isPlaying) {
+        _cancelAndRestartTimer();
+      } else {
+        setState(() {
+          notifier.hideStuff = false;
+        });
+        _hideTimer?.cancel();
+      }
     }
 
     setState(() {
