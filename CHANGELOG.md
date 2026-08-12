@@ -1,3 +1,6 @@
+## [Unreleased]
+* ⬆️ [#955](https://github.com/fluttercommunity/chewie/pull/955): Add an `F` keyboard shortcut to toggle fullscreen on the desktop controls (respects `allowFullScreen`), complementing the existing `Esc`-to-exit shortcut. Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.16.1]
 * ✨ [#962](https://github.com/fluttercommunity/chewie/pull/962): Expose `showPlayButton` on `ChewieController` to allow showing or hiding the center play button. Thanks [ibrahim-iqbal](https://github.com/ibrahim-iqbal).
 
