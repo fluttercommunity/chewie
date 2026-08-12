@@ -48,3 +48,11 @@ build/
 .settings
 
 coverage/*
+
+# AI Agents
+.artifacts/
+.agent/
+.cursor/
+.windsurf/
+.aide/
+*.artifact.md
