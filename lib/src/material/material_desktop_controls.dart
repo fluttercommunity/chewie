@@ -142,6 +142,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
   void _dispose() {
     controller.removeListener(_updateState);
+    chewieController.removeListener(_onChewieControllerChanged);
     _hideTimer?.cancel();
     _initTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
@@ -551,6 +552,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
             (chewieController.subtitle?.isNotEmpty ?? false)) ||
         chewieController.activeSubtitleTrackId != null;
     controller.addListener(_updateState);
+    chewieController.addListener(_onChewieControllerChanged);
 
     _updateState();
 
@@ -650,6 +652,17 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
       _latestValue = controller.value;
       _subtitlesPosition = controller.value.position;
     });
+  }
+
+  // Keeps the subtitle toggle in sync when the host drives track selection
+  // programmatically (e.g. selectSubtitleTrack / setSubtitleTracks) rather than
+  // through the UI: those notify [chewieController], not the video controller.
+  void _onChewieControllerChanged() {
+    if (!mounted || !chewieController.hasSubtitleTracks) return;
+    final bool shouldBeOn = chewieController.activeSubtitleTrackId != null;
+    if (shouldBeOn != _subtitleOn) {
+      setState(() => _subtitleOn = shouldBeOn);
+    }
   }
 
   void _seekBackward() {

@@ -201,6 +201,35 @@ void main() {
         expect(selections.last, _tracks[0]);
       });
 
+      testWidgets('programmatic selection keeps the toggle in sync', (
+        tester,
+      ) async {
+        final controller = _controller(
+          tracks: _tracks,
+          activeSubtitleTrackId: 'en',
+          customControls: controls(),
+        );
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(body: Chewie(controller: controller)),
+          ),
+        );
+        await reveal(tester);
+
+        // Starts on (an active track was provided).
+        expect(find.byIcon(toggleOnIcon), findsOneWidget);
+
+        // Host turns subtitles off without touching the UI.
+        controller.selectSubtitleTrack(null);
+        await tester.pump();
+        expect(find.byIcon(toggleOffIcon), findsOneWidget);
+
+        // Host selects a track again -> the toggle reflects it.
+        controller.selectSubtitleTrack(_tracks[1]);
+        await tester.pump();
+        expect(find.byIcon(toggleOnIcon), findsOneWidget);
+      });
+
       testWidgets('the options menu opens the track picker', (tester) async {
         final selections = <SubtitleTrack?>[];
         final controller = _controller(
