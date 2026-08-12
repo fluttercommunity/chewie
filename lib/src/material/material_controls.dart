@@ -149,6 +149,7 @@ class _MaterialControlsState extends State<MaterialControls>
     _subscribedCast = null;
     _subscribedExternalPlayback?.removeListener(_updateState);
     _subscribedExternalPlayback = null;
+    chewieController.removeListener(_onChewieControllerChanged);
     _hideTimer?.cancel();
     _initTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
@@ -663,6 +664,7 @@ class _MaterialControlsState extends State<MaterialControls>
     // drawing over a surface the viewer is not watching.
     _subscribedExternalPlayback = chewieController.externalPlayback
       ?..addListener(_updateState);
+    chewieController.addListener(_onChewieControllerChanged);
 
     _updateState();
 
@@ -827,6 +829,17 @@ class _MaterialControlsState extends State<MaterialControls>
       _latestValue = playback.value;
       _subtitlesPosition = playback.value.position;
     });
+  }
+
+  // Keeps the subtitle toggle in sync when the host drives track selection
+  // programmatically (e.g. selectSubtitleTrack / setSubtitleTracks) rather than
+  // through the UI: those notify [chewieController], not the video controller.
+  void _onChewieControllerChanged() {
+    if (!mounted || !chewieController.hasSubtitleTracks) return;
+    final bool shouldBeOn = chewieController.activeSubtitleTrackId != null;
+    if (shouldBeOn != _subtitleOn) {
+      setState(() => _subtitleOn = shouldBeOn);
+    }
   }
 
   Widget _buildProgressBar() {
