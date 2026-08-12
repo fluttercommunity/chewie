@@ -28,6 +28,12 @@ class VideoProgressBar extends StatefulWidget {
   final double handleHeight;
   final bool drawShadow;
   final bool draggableProgressBar;
+
+  /// The chapters of the video, sorted by ascending start time.
+  ///
+  /// When non-empty, the bar is painted as one segment per chapter and the
+  /// pointed chapter's title is shown above the bar while hovering or
+  /// scrubbing.
   final List<ChewieChapter> chapters;
 
   @override
@@ -128,15 +134,10 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         : child;
 
     if (widget.chapters.isEmpty) {
-      return widget.draggableProgressBar
-          ? MouseRegion(cursor: SystemMouseCursors.click, child: interactive)
-          : interactive;
+      return interactive;
     }
 
     return MouseRegion(
-      cursor: widget.draggableProgressBar
-          ? SystemMouseCursors.click
-          : MouseCursor.defer,
       onHover: (event) => setState(() => _hoverPosition = event.localPosition),
       onExit: (_) => setState(() => _hoverPosition = null),
       child: LayoutBuilder(
@@ -231,6 +232,10 @@ class StaticProgressBar extends StatelessWidget {
   final double barHeight;
   final double handleHeight;
   final bool drawShadow;
+
+  /// The chapters of the video, sorted by ascending start time.
+  ///
+  /// When non-empty, the bar is painted as one segment per chapter.
   final List<ChewieChapter> chapters;
 
   @override
