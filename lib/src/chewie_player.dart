@@ -664,6 +664,7 @@ class ChewieController extends ChangeNotifier {
   ///
   /// Has no effect on non-web platforms.
   final bool useNativeFullScreenOnWeb;
+
   /// When true, toggling fullscreen does NOT push/pop Chewie's own fullscreen
   /// route. The controller's [isFullScreen] still flips (so the control icon
   /// updates), but the player widget stays mounted in place and the host app is

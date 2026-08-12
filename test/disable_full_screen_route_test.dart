@@ -72,9 +72,7 @@ void main() {
     final videoPlayerController = VideoPlayerController.networkUrl(
       Uri.parse(src),
     );
-    final base = ChewieController(
-      videoPlayerController: videoPlayerController,
-    );
+    final base = ChewieController(videoPlayerController: videoPlayerController);
     expect(base.disableFullScreenRoute, isFalse);
 
     final enabled = base.copyWith(disableFullScreenRoute: true);
