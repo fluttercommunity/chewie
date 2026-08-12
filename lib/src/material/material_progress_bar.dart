@@ -19,7 +19,13 @@ class MaterialVideoProgressBar extends StatelessWidget {
     this.chapters = const [],
   }) : colors = colors ?? ChewieProgressColors();
 
+  /// The chapters of the video, sorted by ascending start time.
+  ///
+  /// When non-empty, the bar is painted as one segment per chapter and the
+  /// pointed chapter's title is shown above the bar while hovering or
+  /// scrubbing.
   final List<ChewieChapter> chapters;
+
   final double height;
   final double barHeight;
   final double handleHeight;
