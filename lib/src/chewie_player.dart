@@ -370,6 +370,10 @@ class ChewieController extends ChangeNotifier {
   }) : assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
+       ),
+       assert(
+         _chaptersAreSortedByStart(chapters),
+         'The chapters must be sorted by ascending start time',
        ) {
     _initialize();
   }
@@ -700,6 +704,15 @@ class ChewieController extends ChangeNotifier {
   /// When non-empty, the progress bar is split into chapter segments and the
   /// hovered/scrubbed chapter title is displayed above the bar.
   final List<ChewieChapter> chapters;
+
+  static bool _chaptersAreSortedByStart(List<ChewieChapter> chapters) {
+    for (var i = 1; i < chapters.length; i++) {
+      if (chapters[i].start < chapters[i - 1].start) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider = context
