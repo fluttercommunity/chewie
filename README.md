@@ -21,11 +21,12 @@ Chewie uses the `video_player` under the hood and wraps it in a friendly Materia
 5.  🕹️ [Using it](#%EF%B8%8F-using-it)
 6.  ⚙️ [Options](#%EF%B8%8F-options)
 7.  🔡 [Subtitles](#-subtitles)
-8.  🧪 [Example](#-example)
-9.  ⏪ [Migrating from Chewie < 0.9.0](#-migrating-from-chewie--090)
-10. 🗺️ [Roadmap](#%EF%B8%8F-roadmap)
-11. ⚠️ [Android warning](#%EF%B8%8F-android-warning)
-12. 📱 [iOS warning](#-ios-warning)
+8.  🔖 [Chapters](#-chapters)
+9.  🧪 [Example](#-example)
+10. ⏪ [Migrating from Chewie < 0.9.0](#-migrating-from-chewie--090)
+11. 🗺️ [Roadmap](#%EF%B8%8F-roadmap)
+12. ⚠️ [Android warning](#%EF%B8%8F-android-warning)
+13. 📱 [iOS warning](#-ios-warning)
 
 
 ## 🚨 IMPORTANT!!! (READ THIS FIRST)
@@ -280,6 +281,23 @@ subtitleBuilder: (context, subtitle) => Container(
   ),
 ),
 ```
+
+## 🔖 Chapters
+
+Pass a list of `ChewieChapter`s, sorted by ascending start time, to draw the progress bar as YouTube-style chapter segments. Hovering or scrubbing the bar shows the pointed chapter's title above it:
+
+```dart
+final chewieController = ChewieController(
+  videoPlayerController: videoPlayerController,
+  chapters: const [
+    ChewieChapter(title: 'Intro', start: Duration.zero),
+    ChewieChapter(title: 'First topic', start: Duration(minutes: 1)),
+    ChewieChapter(title: 'Conclusion', start: Duration(minutes: 4)),
+  ],
+);
+```
+
+When `chapters` is empty (the default), the progress bar is rendered as a single continuous segment, as before.
 
 ## 🧪 Example
 
