@@ -39,7 +39,7 @@ class CupertinoControls extends StatefulWidget {
 class _CupertinoControlsState extends State<CupertinoControls>
     with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
-  VideoPlayerValue? _latestVideoPlayerValue;
+  late VideoPlayerValue _latestValue;
   double? _latestVolume;
   Timer? _hideTimer;
   final marginSize = 5.0;
@@ -56,9 +56,6 @@ class _CupertinoControlsState extends State<CupertinoControls>
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
   ChewieController? _chewieController;
-
-  // We know that _latestVideoPlayerValue is set in didChangeDependencies
-  VideoPlayerValue get _latestValue => _latestVideoPlayerValue!;
 
   @override
   void initState() {
@@ -148,7 +145,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
-    _latestVideoPlayerValue = controller.value;
+    _latestValue = controller.value;
 
     if (oldController != chewieController) {
       _dispose();
@@ -765,7 +762,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     }
 
     setState(() {
-      _latestVideoPlayerValue = controller.value;
+      _latestValue = controller.value;
       _subtitlesPosition = controller.value.position;
     });
   }

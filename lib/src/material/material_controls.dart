@@ -30,7 +30,7 @@ class MaterialControls extends StatefulWidget {
 class _MaterialControlsState extends State<MaterialControls>
     with SingleTickerProviderStateMixin {
   late PlayerNotifier notifier;
-  VideoPlayerValue? _latestVideoPlayerValue;
+  late VideoPlayerValue _latestValue;
   double? _latestVolume;
   Timer? _hideTimer;
   Timer? _initTimer;
@@ -50,9 +50,6 @@ class _MaterialControlsState extends State<MaterialControls>
 
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
-
-  // We know that _latestVideoPlayerValue is set in didChangeDependencies
-  VideoPlayerValue get _latestValue => _latestVideoPlayerValue!;
 
   @override
   void initState() {
@@ -128,7 +125,7 @@ class _MaterialControlsState extends State<MaterialControls>
     final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
-    _latestVideoPlayerValue = controller.value;
+    _latestValue = controller.value;
 
     if (oldController != chewieController) {
       _dispose();
@@ -641,7 +638,7 @@ class _MaterialControlsState extends State<MaterialControls>
     }
 
     setState(() {
-      _latestVideoPlayerValue = controller.value;
+      _latestValue = controller.value;
       _subtitlesPosition = controller.value.position;
     });
   }
