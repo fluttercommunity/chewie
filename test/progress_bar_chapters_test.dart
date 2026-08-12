@@ -262,6 +262,19 @@ void main() {
     expect(chapter.start, const Duration(seconds: 5));
   });
 
+  test('ChewieController rejects chapters not sorted by start time', () {
+    expect(
+      () => ChewieController(
+        videoPlayerController: _FakeVideoPlayerController(),
+        chapters: const [
+          ChewieChapter(title: 'Second', start: Duration(minutes: 1)),
+          ChewieChapter(title: 'First', start: Duration.zero),
+        ],
+      ),
+      throwsAssertionError,
+    );
+  });
+
   test('ChewieController exposes chapters and copyWith carries them over', () {
     final controller = ChewieController(
       videoPlayerController: _FakeVideoPlayerController(),
