@@ -87,6 +87,13 @@ class ChewieState extends State<Chewie> {
   }
 
   Future<void> listener() async {
+    if (widget.controller.disableFullScreenRoute) {
+      // The host app owns the fullscreen presentation; never push/pop a route
+      // (which on web reparents the <video> element and forces an HLS reload on
+      // exit). Just mirror the controller's flag so the control icon updates.
+      _isFullScreen = isControllerFullScreen;
+      return;
+    }
     if (isControllerFullScreen && !_isFullScreen) {
       _wasPlayingBeforeFullScreen =
           widget.controller.videoPlayerController.value.isPlaying;
@@ -354,6 +361,7 @@ class ChewieController extends ChangeNotifier {
     this.allowPlaybackSpeedChanging = true,
     this.useRootNavigator = true,
     this.useNativeFullScreenOnWeb = true,
+    this.disableFullScreenRoute = false,
     this.playbackSpeeds = const [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
     this.systemOverlaysOnEnterFullScreen,
     this.deviceOrientationsOnEnterFullScreen,
@@ -409,6 +417,7 @@ class ChewieController extends ChangeNotifier {
     bool? allowPlaybackSpeedChanging,
     bool? useRootNavigator,
     bool? useNativeFullScreenOnWeb,
+    bool? disableFullScreenRoute,
     Duration? hideControlsTimer,
     EdgeInsets? controlsSafeAreaMinimum,
     List<double>? playbackSpeeds,
@@ -475,6 +484,8 @@ class ChewieController extends ChangeNotifier {
       useRootNavigator: useRootNavigator ?? this.useRootNavigator,
       useNativeFullScreenOnWeb:
           useNativeFullScreenOnWeb ?? this.useNativeFullScreenOnWeb,
+      disableFullScreenRoute:
+          disableFullScreenRoute ?? this.disableFullScreenRoute,
       playbackSpeeds: playbackSpeeds ?? this.playbackSpeeds,
       systemOverlaysOnEnterFullScreen:
           systemOverlaysOnEnterFullScreen ??
@@ -653,6 +664,19 @@ class ChewieController extends ChangeNotifier {
   ///
   /// Has no effect on non-web platforms.
   final bool useNativeFullScreenOnWeb;
+
+  /// When true, toggling fullscreen does NOT push/pop Chewie's own fullscreen
+  /// route. The controller's [isFullScreen] still flips (so the control icon
+  /// updates), but the player widget stays mounted in place and the host app is
+  /// responsible for the fullscreen presentation (e.g. driving the browser
+  /// Fullscreen API and expanding its own layout).
+  ///
+  /// On web, Chewie's route-based fullscreen reparents the platform-view
+  /// `<video>` element; on exit the original view goes blank and the fork works
+  /// around it by re-initializing the controller — which for an HLS source
+  /// means a full manifest reload + rebuffer. Setting this avoids that entirely
+  /// by never moving the element.
+  final bool disableFullScreenRoute;
 
   /// Defines the [Duration] before the video controls are hidden. By default, this is set to three seconds.
   final Duration hideControlsTimer;
