@@ -1,3 +1,6 @@
+## [Unreleased]
+* ⏯️ [#957](https://github.com/fluttercommunity/chewie/pull/957): Reveal the controls whenever playback is toggled from outside them — hardware media keys, headset/notification controls, the MediaSession API, or the host app driving the `VideoPlayerController` — and restart the auto-hide timer. Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.15.0]
 * 🌐 [#946](https://github.com/fluttercommunity/chewie/pull/946): Web: enter the browser's native (OS-level) fullscreen via the Fullscreen API instead of only expanding the Flutter view inside the browser window. Pressing Escape to leave browser fullscreen also exits Chewie's fullscreen. Controlled by the new `ChewieController.useNativeFullScreenOnWeb` flag (defaults to `true`; no effect on non-web platforms). Thanks [Ortes](https://github.com/Ortes).
 * 🖱️ [#950](https://github.com/fluttercommunity/chewie/pull/950): Show click cursor on hover over Material controls and progress bar. Thanks [Ortes](https://github.com/Ortes).
