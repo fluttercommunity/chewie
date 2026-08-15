@@ -364,6 +364,7 @@ class ChewieController extends ChangeNotifier {
     this.hideControlsTimer = defaultHideControlsTimer,
     this.controlsSafeAreaMinimum = EdgeInsets.zero,
     this.pauseOnBackgroundTap = false,
+    this.hideCursorInFullScreen = true,
   }) : assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
@@ -425,6 +426,7 @@ class ChewieController extends ChangeNotifier {
     )?
     routePageBuilder,
     bool? pauseOnBackgroundTap,
+    bool? hideCursorInFullScreen,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -492,6 +494,8 @@ class ChewieController extends ChangeNotifier {
       progressIndicatorDelay:
           progressIndicatorDelay ?? this.progressIndicatorDelay,
       pauseOnBackgroundTap: pauseOnBackgroundTap ?? this.pauseOnBackgroundTap,
+      hideCursorInFullScreen:
+          hideCursorInFullScreen ?? this.hideCursorInFullScreen,
     );
   }
 
@@ -684,6 +688,12 @@ class ChewieController extends ChangeNotifier {
 
   /// Defines if the player should pause when the background is tapped
   final bool pauseOnBackgroundTap;
+
+  /// Whether the mouse cursor auto-hides together with the controls while in
+  /// fullscreen (and reappears on mouse movement), like most video players.
+  /// Has no effect outside fullscreen or on devices without a pointer.
+  /// Defaults to `true`.
+  final bool hideCursorInFullScreen;
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider = context
