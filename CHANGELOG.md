@@ -1,3 +1,6 @@
+## [Unreleased]
+* ⏩ [#953](https://github.com/fluttercommunity/chewie/pull/953): Add a YouTube-style seek indicator that flashes the seeked amount when seeking with the keyboard arrows on desktop, accumulating on repeated presses in the same direction (e.g. `10s` → `20s` → `30s`). Configurable via `ChewieController.showSeekIndicator` (default `true`), with the per-press amount set by `ChewieController.keyboardSeekDuration` (default 10 seconds). Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.16.1]
 * ✨ [#962](https://github.com/fluttercommunity/chewie/pull/962): Expose `showPlayButton` on `ChewieController` to allow showing or hiding the center play button. Thanks [ibrahim-iqbal](https://github.com/ibrahim-iqbal).
 
