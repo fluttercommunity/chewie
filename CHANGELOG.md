@@ -1,3 +1,6 @@
+## [Unreleased]
+* ⏩ [#953](https://github.com/fluttercommunity/chewie/pull/953): Add a YouTube-style seek indicator that flashes the seeked amount when seeking with the keyboard arrows on desktop, accumulating on repeated presses in the same direction (e.g. `10s` → `20s` → `30s`). Configurable via `ChewieController.showSeekIndicator` (default `true`), with the per-press amount set by `ChewieController.keyboardSeekDuration` (default 10 seconds). Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.15.0]
 * 🌐 [#946](https://github.com/fluttercommunity/chewie/pull/946): Web: enter the browser's native (OS-level) fullscreen via the Fullscreen API instead of only expanding the Flutter view inside the browser window. Pressing Escape to leave browser fullscreen also exits Chewie's fullscreen. Controlled by the new `ChewieController.useNativeFullScreenOnWeb` flag (defaults to `true`; no effect on non-web platforms). Thanks [Ortes](https://github.com/Ortes).
 * 🖱️ [#950](https://github.com/fluttercommunity/chewie/pull/950): Show click cursor on hover over Material controls and progress bar. Thanks [Ortes](https://github.com/Ortes).

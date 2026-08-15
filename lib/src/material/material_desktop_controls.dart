@@ -11,6 +11,7 @@ import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
+import 'package:chewie/src/seek_indicator.dart';
 import 'package:chewie/src/subtitle_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,6 +43,12 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   bool _displayTapped = false;
   Timer? _bufferingDisplayTimer;
   bool _displayBufferingIndicator = false;
+
+  // YouTube-style keyboard seek indicator state.
+  Timer? _seekIndicatorTimer;
+  bool _showSeekIndicator = false;
+  bool _seekIndicatorForward = true;
+  int _seekIndicatorSeconds = 0;
 
   final barHeight = 48.0 * 1.5;
   final marginSize = 5.0;
@@ -127,6 +134,12 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
                     _buildBottomBar(context),
                   ],
                 ),
+                if (chewieController.showSeekIndicator)
+                  SeekIndicator(
+                    show: _showSeekIndicator,
+                    forward: _seekIndicatorForward,
+                    seconds: _seekIndicatorSeconds,
+                  ),
               ],
             ),
           ),
@@ -147,6 +160,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     _hideTimer?.cancel();
     _initTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
+    _seekIndicatorTimer?.cancel();
   }
 
   @override
@@ -568,11 +582,37 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   }
 
   void _seekBackward() {
-    _seekRelative(const Duration(seconds: -10));
+    _seekRelative(-chewieController.keyboardSeekDuration);
+    _bumpSeekIndicator(forward: false);
   }
 
   void _seekForward() {
-    _seekRelative(const Duration(seconds: 10));
+    _seekRelative(chewieController.keyboardSeekDuration);
+    _bumpSeekIndicator(forward: true);
+  }
+
+  /// Shows the YouTube-style seek indicator and accumulates the seeked amount
+  /// while the user keeps pressing in the same direction. Pressing the opposite
+  /// direction (or after it has faded out) resets the counter.
+  void _bumpSeekIndicator({required bool forward}) {
+    if (!chewieController.showSeekIndicator) return;
+
+    final step = chewieController.keyboardSeekDuration.inSeconds;
+    setState(() {
+      if (_showSeekIndicator && _seekIndicatorForward == forward) {
+        _seekIndicatorSeconds += step;
+      } else {
+        _seekIndicatorForward = forward;
+        _seekIndicatorSeconds = step;
+      }
+      _showSeekIndicator = true;
+    });
+
+    _seekIndicatorTimer?.cancel();
+    _seekIndicatorTimer = Timer(const Duration(milliseconds: 900), () {
+      if (!mounted) return;
+      setState(() => _showSeekIndicator = false);
+    });
   }
 
   void _seekRelative(Duration relativeSeek) {
