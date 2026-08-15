@@ -125,6 +125,7 @@ class _MaterialControlsState extends State<MaterialControls>
     final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
+    _latestValue = controller.value;
 
     if (oldController != chewieController) {
       _dispose();
@@ -620,6 +621,20 @@ class _MaterialControlsState extends State<MaterialControls>
       }
     } else {
       _displayBufferingIndicator = buffering;
+    }
+
+    // Play/pause can also come from outside these controls (headset buttons,
+    // notification controls, MediaSession): reveal the controls the same way
+    // _playPause does, so the state change is visible either way.
+    if (_latestValue.isPlaying != controller.value.isPlaying) {
+      if (controller.value.isPlaying) {
+        _cancelAndRestartTimer();
+      } else {
+        setState(() {
+          notifier.hideStuff = false;
+        });
+        _hideTimer?.cancel();
+      }
     }
 
     setState(() {
