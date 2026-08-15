@@ -1,3 +1,6 @@
+## [Unreleased]
+* ⏱️ [#956](https://github.com/fluttercommunity/chewie/pull/956): Show a hover-time indicator on the Material progress bar: while the pointer hovers or drags the bar, a pill displays the timecode at that position, so it is clear where a click will seek to. Driven by hover events, so touch behaviour is unchanged. Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.15.0]
 * 🌐 [#946](https://github.com/fluttercommunity/chewie/pull/946): Web: enter the browser's native (OS-level) fullscreen via the Fullscreen API instead of only expanding the Flutter view inside the browser window. Pressing Escape to leave browser fullscreen also exits Chewie's fullscreen. Controlled by the new `ChewieController.useNativeFullScreenOnWeb` flag (defaults to `true`; no effect on non-web platforms). Thanks [Ortes](https://github.com/Ortes).
 * 🖱️ [#950](https://github.com/fluttercommunity/chewie/pull/950): Show click cursor on hover over Material controls and progress bar. Thanks [Ortes](https://github.com/Ortes).
