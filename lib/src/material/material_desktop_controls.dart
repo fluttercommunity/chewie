@@ -283,6 +283,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
                     else
                       _buildPosition(iconColor),
                     const Spacer(),
+                    ...?chewieController.additionalControls?.call(context),
                     if (_castController != null &&
                         chewieController.allowCasting)
                       SizedBox(
