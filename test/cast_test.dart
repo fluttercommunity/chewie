@@ -172,6 +172,77 @@ void main() {
     });
   });
 
+  group('control bar styling', () {
+    /// Stands in for a supplied control that styles itself from the bar, the
+    /// way `chewie_cast`'s AirPlay button does.
+    Widget styledIcon() {
+      return Builder(
+        builder: (context) {
+          final style = ChewieControlStyle.maybeOf(context);
+          final child = Padding(
+            padding: style?.padding ?? EdgeInsets.zero,
+            child: Icon(Icons.airplay, size: style?.iconSize ?? 24),
+          );
+          return style?.decorate(child) ?? child;
+        },
+      );
+    }
+
+    Future<void> pumpStyled(WidgetTester tester, Widget skin) async {
+      await _pumpPlayer(
+        tester,
+        ChewieController(
+          videoPlayerController: VideoPlayerController.networkUrl(
+            Uri.parse(_src),
+          ),
+          autoPlay: false,
+          additionalControls: (_) => [styledIcon()],
+          customControls: skin,
+        ),
+      );
+    }
+
+    /// A control bar is shorter than its nominal height once the progress bar
+    /// has taken its share — the desktop bar leaves its buttons about 28
+    /// logical pixels. Padding the bar does not itself use eats into that and
+    /// crushes the glyph's box below the glyph; the glyph is still drawn at
+    /// full size, so it paints outside its own bounds and sits low among its
+    /// neighbours instead of centred like them.
+    ///
+    /// A box larger than the glyph is fine — Cupertino stretches it to the bar
+    /// height and centres the glyph inside. Smaller is the bug.
+    void expectRoomForGlyph(WidgetTester tester, double iconSize) {
+      final box = tester.getSize(find.byIcon(Icons.airplay));
+
+      expect(box.height, greaterThanOrEqualTo(iconSize));
+      expect(box.width, greaterThanOrEqualTo(iconSize));
+    }
+
+    testWidgets('the Material bar leaves room for its glyph', (tester) async {
+      await pumpStyled(tester, const MaterialControls());
+
+      expectRoomForGlyph(tester, 24);
+    });
+
+    testWidgets('the desktop bar leaves room for its glyph', (tester) async {
+      await pumpStyled(tester, const MaterialDesktopControls());
+
+      expectRoomForGlyph(tester, 24);
+    });
+
+    testWidgets('the Cupertino bar leaves room for its glyph', (tester) async {
+      await pumpStyled(
+        tester,
+        const CupertinoControls(
+          backgroundColor: Colors.black,
+          iconColor: Colors.white,
+        ),
+      );
+
+      expectRoomForGlyph(tester, 16);
+    });
+  });
+
   group('device picker', () {
     testWidgets('scans only while the picker is open', (tester) async {
       final cast = FakeCastController(devices: const [_livingRoom]);

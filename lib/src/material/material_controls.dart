@@ -11,6 +11,7 @@ import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
+import 'package:chewie/src/models/chewie_control_style.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
@@ -160,7 +161,17 @@ class _MaterialControlsState extends State<MaterialControls>
           duration: const Duration(milliseconds: 250),
           child: Row(
             children: [
-              ...?chewieController.additionalControls?.call(context),
+              if (chewieController.additionalControls != null)
+                ChewieControlStyle(
+                  iconSize: 24,
+                  iconColor: Colors.white,
+                  padding: const EdgeInsets.all(12),
+                  decorate: (child) => child,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: chewieController.additionalControls!(context),
+                  ),
+                ),
               if (_castController != null && chewieController.allowCasting)
                 CastButton(
                   castController: _castController!,
