@@ -1,5 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:chewie_example/app/demo_cast_controller.dart';
+import 'package:chewie_example/app/demo_control.dart';
 import 'package:chewie_example/app/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -146,6 +147,10 @@ class _ChewieDemoState extends State<ChewieDemo> {
       progressIndicatorDelay: bufferDelay != null
           ? Duration(milliseconds: bufferDelay!)
           : null,
+
+      // A control the app supplies, sitting in the bar beside Chewie's own.
+      // See [DemoBookmarkButton] for how it matches whichever skin it is in.
+      additionalControls: (_) => const [DemoBookmarkButton()],
 
       additionalOptions: (context) {
         return <OptionItem>[
