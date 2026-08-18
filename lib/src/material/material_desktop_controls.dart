@@ -11,6 +11,7 @@ import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
+import 'package:chewie/src/models/chewie_control_style.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
@@ -281,9 +282,28 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
                     if (chewieController.isLive)
                       const Expanded(child: Text('LIVE'))
                     else
-                      _buildPosition(iconColor),
+                      // Flexible so the bar can absorb extra controls instead
+                      // of overflowing: nothing else here yields, so one more
+                      // button was enough to push it over on a narrow window.
+                      Flexible(child: _buildPosition(iconColor)),
                     const Spacer(),
-                    ...?chewieController.additionalControls?.call(context),
+                    if (chewieController.additionalControls != null)
+                      ChewieControlStyle(
+                        iconSize: 24,
+                        iconColor: Colors.white,
+                        padding: EdgeInsets.zero,
+                        decorate: (child) => SizedBox(
+                          width: kMinInteractiveDimension,
+                          height: kMinInteractiveDimension,
+                          child: Center(child: child),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: chewieController.additionalControls!(
+                            context,
+                          ),
+                        ),
+                      ),
                     if (_castController != null &&
                         chewieController.allowCasting)
                       SizedBox(
