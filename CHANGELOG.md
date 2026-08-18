@@ -1,3 +1,7 @@
+## [Unreleased]
+* 📺 [#961](https://github.com/fluttercommunity/chewie/pull/961): Casting / screen-mirroring support. Chewie now ships the cast UI — a cast button in the Material, Material desktop and Cupertino skins, a device picker, and an overlay in place of the video while a session is live — plus the local↔remote handover in both directions. The sender itself is supplied by the app through the new `ChewieCastController` abstraction, so a pure-Flutter package does not pull the Google Cast SDK and its native dependencies into every consumer. New `ChewieController` options: `castController`, `castMedia`, `allowCasting`, `castTranslations` and `castOverlayBuilder`. See the [Casting](README.md#-casting) section. Thanks [a1rwulf](https://github.com/a1rwulf).
+* 🛠️ [#961](https://github.com/fluttercommunity/chewie/pull/961): Progress bar: draw only the empty track when a source reports itself initialized before it knows its duration, instead of asserting on a NaN inside `drawRRect`. Thanks [a1rwulf](https://github.com/a1rwulf).
+
 ## [1.16.3]
 * 🐛 [#970](https://github.com/fluttercommunity/chewie/pull/970): fix(web): fullscreen pops the host route on iPhone Safari (no Fullscreen API). Thanks [Ortes](https://github.com/Ortes).
 
