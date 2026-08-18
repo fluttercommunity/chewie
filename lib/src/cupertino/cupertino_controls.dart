@@ -19,6 +19,7 @@ import 'package:chewie/src/notifiers/index.dart';
 import 'package:chewie/src/subtitle_overlay.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -840,6 +841,25 @@ class _CupertinoControlsState extends State<CupertinoControls>
     }
   }
 
+  /// Shows the controls without marking widgets dirty in the middle of a build.
+  ///
+  /// [_updateState] runs from `didChangeDependencies` as well as from player
+  /// notifications, and the [PlayerNotifier] lives above this widget: setting
+  /// it during a build marks an ancestor dirty, which the framework rejects.
+  /// Reachable whenever a cast session is already live when this widget is
+  /// built, which happens because senders outlive the screens that make them.
+  void _revealControls() {
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) notifier.hideStuff = false;
+      });
+      return;
+    }
+
+    notifier.hideStuff = false;
+  }
+
   void _updateState() {
     if (!mounted) return;
 
@@ -847,7 +867,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     // A session starting must not leave the controls hidden behind an
     // AbsorbPointer that swallows the next tap.
     if (playback.isRemote && notifier.hideStuff) {
-      notifier.hideStuff = false;
+      _revealControls();
     }
 
     // The Android buffering workaround in getIsBuffering only applies to the

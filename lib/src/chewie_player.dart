@@ -791,6 +791,10 @@ class ChewieController extends ChangeNotifier {
   /// Whether a cast session is currently carrying playback.
   bool get isCasting => castController?.isConnected ?? false;
 
+  /// Guards the deferred work in [_initialize] against a controller that was
+  /// disposed before the frame it was waiting for.
+  bool _disposed = false;
+
   /// Where the session currently is, or [CastConnectionState.disconnected]
   /// when casting is not configured at all.
   CastConnectionState get castConnectionState =>
@@ -846,6 +850,21 @@ class ChewieController extends ChangeNotifier {
     if (fullScreenByDefault) {
       videoPlayerController.addListener(_fullScreenListener);
     }
+
+    // A session can already be live when this controller is built: senders are
+    // owned by the app, so they outlive the screen that created them, and the
+    // Cast SDKs keep a session running until it is ended. A listener only
+    // fires on a change, so without adopting the state that is already there,
+    // opening a second video would play it on the device while the receiver
+    // still held the first one.
+    //
+    // Deferred by a frame because this runs from the constructor, and apps
+    // build a ChewieController inside build(): handing over notifies the cast
+    // controller, and its listeners would be marked dirty during that build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_disposed) return;
+      _onCastStateChanged();
+    });
   }
 
   Future<void> _fullScreenListener() async {
@@ -922,6 +941,7 @@ class ChewieController extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     // The app owns the cast controller — unsubscribe, but never dispose it.
     castController?.removeListener(_onCastStateChanged);
     super.dispose();
