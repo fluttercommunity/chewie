@@ -361,6 +361,27 @@ Chromecast on the desk.
 | `allowCasting` | Hides the cast button without tearing the backend out. Defaults to `true`. |
 | `castTranslations` | Strings for the button, picker and overlay. |
 | `castOverlayBuilder` | Replaces the default "Casting to …" overlay. |
+| `additionalControls` | Extra widgets for the control bar itself, for controls that cannot be an options-sheet row. |
+
+### Extra control-bar buttons
+
+`additionalOptions` adds rows to the options sheet. When a control has to be a
+*widget* rather than a menu entry — a platform view, say — put it in the bar
+itself:
+
+```dart
+ChewieController(
+  videoPlayerController: videoPlayerController,
+  additionalControls: (context) => const [AirPlayButton()],
+);
+```
+
+They sit alongside the built-in buttons and inherit the bar's show/hide
+behaviour, so they fade with the rest of the controls instead of floating over
+the video.
+
+The motivating case is AirPlay: Apple exposes no way to select a route
+programmatically, so the button must be UIKit's own `AVRoutePickerView`.
 
 ## 🧪 Example
 

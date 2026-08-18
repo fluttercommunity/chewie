@@ -376,6 +376,7 @@ class ChewieController extends ChangeNotifier {
     this.allowCasting = true,
     this.castTranslations = const CastTranslations(),
     this.castOverlayBuilder,
+    this.additionalControls,
   }) : assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
@@ -448,6 +449,7 @@ class ChewieController extends ChangeNotifier {
     bool? allowCasting,
     CastTranslations? castTranslations,
     Widget Function(BuildContext, CastDevice?)? castOverlayBuilder,
+    List<Widget> Function(BuildContext)? additionalControls,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -521,6 +523,7 @@ class ChewieController extends ChangeNotifier {
       allowCasting: allowCasting ?? this.allowCasting,
       castTranslations: castTranslations ?? this.castTranslations,
       castOverlayBuilder: castOverlayBuilder ?? this.castOverlayBuilder,
+      additionalControls: additionalControls ?? this.additionalControls,
     );
   }
 
@@ -746,6 +749,18 @@ class ChewieController extends ChangeNotifier {
   /// is null in the moment before a session settles.
   final Widget Function(BuildContext context, CastDevice? device)?
   castOverlayBuilder;
+
+  /// Extra widgets for the control bar, beside the built-in buttons.
+  ///
+  /// Unlike [additionalOptions], which adds rows to the options sheet, these go
+  /// into the bar itself — for controls that have to be a widget rather than a
+  /// menu entry. A platform view is the motivating case: an AirPlay button must
+  /// be UIKit's own `AVRoutePickerView`, because Apple exposes no way to select
+  /// a route programmatically.
+  ///
+  /// They inherit the bar's show/hide behaviour, so they fade with the rest of
+  /// the controls rather than sitting on top of the video.
+  final List<Widget> Function(BuildContext context)? additionalControls;
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider = context

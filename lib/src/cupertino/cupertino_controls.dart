@@ -618,6 +618,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
               buttonPadding,
             ),
           const Spacer(),
+          ...?chewieController.additionalControls?.call(context),
           if (_castController != null && chewieController.allowCasting) ...[
             _buildCastButton(
               backgroundColor,
