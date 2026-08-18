@@ -243,6 +243,54 @@ void main() {
     });
   });
 
+  group('multiple additional controls', () {
+    const first = Key('first-control');
+    const second = Key('second-control');
+
+    Future<void> pumpTwo(WidgetTester tester, Widget skin) async {
+      await _pumpPlayer(
+        tester,
+        ChewieController(
+          videoPlayerController: VideoPlayerController.networkUrl(
+            Uri.parse(_src),
+          ),
+          autoPlay: false,
+          additionalControls: (context) {
+            final style = ChewieControlStyle.maybeOf(context);
+            Widget dressed(Key key) {
+              const child = SizedBox(width: 24, height: 24);
+              return KeyedSubtree(
+                key: key,
+                child: style?.decorate(child) ?? child,
+              );
+            }
+
+            return [dressed(first), dressed(second)];
+          },
+          customControls: skin,
+        ),
+      );
+    }
+
+    testWidgets('the Cupertino bar keeps them apart', (tester) async {
+      // Cupertino gives each control its own frosted pill, so two of them
+      // butt up against each other unless the bar separates them the way it
+      // separates its own buttons.
+      await pumpTwo(
+        tester,
+        const CupertinoControls(
+          backgroundColor: Colors.black,
+          iconColor: Colors.white,
+        ),
+      );
+
+      final left = tester.getRect(find.byKey(first));
+      final right = tester.getRect(find.byKey(second));
+
+      expect(right.left, greaterThan(left.right));
+    });
+  });
+
   group('device picker', () {
     testWidgets('scans only while the picker is open', (tester) async {
       final cast = FakeCastController(devices: const [_livingRoom]);
