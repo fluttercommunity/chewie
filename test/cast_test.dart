@@ -620,6 +620,40 @@ void main() {
     });
   });
 
+  group('a session that is already live', () {
+    testWidgets('is adopted by a player built while it runs', (tester) async {
+      // Senders belong to the app, so one outlives the screen that made it and
+      // the receiver keeps playing. A player built afterwards only ever sees a
+      // listener fire on a *change*, so without adopting the state that is
+      // already there it would play locally while the TV showed something
+      // else.
+      final cast = FakeCastController();
+      await cast.connect(_livingRoom);
+      cast.completeConnection();
+
+      await _pumpPlayer(tester, _buildController(castController: cast));
+      await _settle(tester);
+
+      expect(cast.loadCalls, hasLength(1));
+      expect(cast.loadCalls.single.media, _media);
+    });
+
+    testWidgets('does not reload what the receiver already holds', (
+      tester,
+    ) async {
+      final cast = FakeCastController();
+      await cast.connect(_livingRoom);
+      cast.completeConnection();
+      await cast.load(_media);
+      cast.loadCalls.clear();
+
+      await _pumpPlayer(tester, _buildController(castController: cast));
+      await _settle(tester);
+
+      expect(cast.loadCalls, isEmpty);
+    });
+  });
+
   group('lifecycle', () {
     testWidgets('disposing Chewie leaves the app-owned cast controller alive', (
       tester,
