@@ -643,8 +643,12 @@ class _CupertinoControlsState extends State<CupertinoControls>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    ...chewieController.additionalControls!(context),
-                    SizedBox(width: marginSize),
+                    // Each supplied control wears its own frosted pill, so
+                    // they need the gap the bar's own buttons have between
+                    // them; without it two of them sit pill against pill.
+                    for (final control in chewieController.additionalControls!(
+                      context,
+                    )) ...[control, SizedBox(width: marginSize)],
                   ],
                 ),
               ),
