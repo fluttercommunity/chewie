@@ -1,3 +1,4 @@
+import 'package:chewie/src/cast/widgets/cast_overlay.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/helpers/adaptive_controls.dart';
 import 'package:chewie/src/notifiers/index.dart';
@@ -41,14 +42,7 @@ class PlayerWithControls extends StatelessWidget {
         children: [
           if (chewieController.placeholder != null)
             chewieController.placeholder!,
-          Center(
-            child: AspectRatio(
-              aspectRatio:
-                  chewieController.aspectRatio ??
-                  chewieController.videoPlayerController.value.aspectRatio,
-              child: VideoPlayer(chewieController.videoPlayerController),
-            ),
-          ),
+          _VideoSurface(chewieController: chewieController),
           if (chewieController.overlay != null) chewieController.overlay!,
           if (Theme.of(context).platform != TargetPlatform.iOS)
             Consumer<PlayerNotifier>(
@@ -112,6 +106,58 @@ class PlayerWithControls extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// The picture itself: the local video texture, or the casting overlay while a
+/// session has the video.
+///
+/// Split out and rebuilt off the cast controller because [ChewieController]
+/// deliberately does not notify on cast changes — notifying there means
+/// "fullscreen changed" and would pop the fullscreen route.
+class _VideoSurface extends StatelessWidget {
+  const _VideoSurface({required this.chewieController});
+
+  final ChewieController chewieController;
+
+  @override
+  Widget build(BuildContext context) {
+    final castController = chewieController.castController;
+
+    if (castController == null) {
+      return _buildLocal();
+    }
+
+    return AnimatedBuilder(
+      animation: castController,
+      builder: (context, _) {
+        // Only swap once playback has actually moved to the receiver. While a
+        // session is merely being set up the local player is still the one
+        // playing, and covering it up would hide a picture that is still
+        // running — the pulsing cast button is the feedback for that phase.
+        if (!chewieController.isCasting) {
+          return _buildLocal();
+        }
+
+        final device = chewieController.castDevice;
+        return chewieController.castOverlayBuilder?.call(context, device) ??
+            CastOverlay(
+              device: device,
+              translations: chewieController.castTranslations,
+            );
+      },
+    );
+  }
+
+  Widget _buildLocal() {
+    return Center(
+      child: AspectRatio(
+        aspectRatio:
+            chewieController.aspectRatio ??
+            chewieController.videoPlayerController.value.aspectRatio,
+        child: VideoPlayer(chewieController.videoPlayerController),
+      ),
     );
   }
 }

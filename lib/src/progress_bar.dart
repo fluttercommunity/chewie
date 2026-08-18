@@ -10,6 +10,7 @@ class VideoProgressBar extends StatefulWidget {
     this.onDragStart,
     this.onDragUpdate,
     this.draggableProgressBar = true,
+    this.playback,
     super.key,
     required this.barHeight,
     required this.handleHeight,
@@ -17,6 +18,14 @@ class VideoProgressBar extends StatefulWidget {
   }) : colors = colors ?? ChewieProgressColors();
 
   final VideoPlayerController controller;
+
+  /// What the bar should read and seek — the local player, or a cast receiver
+  /// while a session is live.
+  ///
+  /// Defaults to [controller], which keeps the bar behaving exactly as it did
+  /// before casting existed for anyone constructing it directly.
+  final ChewiePlaybackTarget? playback;
+
   final ChewieProgressColors colors;
   final Function()? onDragStart;
   final Function()? onDragEnd;
@@ -60,12 +69,28 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   /// position requested by a newer one.
   int _latestSeekRequestId = 0;
 
-  VideoPlayerController get controller => widget.controller;
+  ChewiePlaybackTarget get controller =>
+      widget.playback ?? LocalPlaybackTarget(widget.controller);
 
   @override
   void initState() {
     super.initState();
     controller.addListener(listener);
+  }
+
+  @override
+  void didUpdateWidget(VideoProgressBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Playback moves between the local player and a receiver mid-life; follow
+    // it, or the bar freezes on whichever one it first subscribed to.
+    final previous =
+        oldWidget.playback ?? LocalPlaybackTarget(oldWidget.controller);
+    final current = controller;
+    if (previous != current) {
+      previous.removeListener(listener);
+      current.addListener(listener);
+    }
   }
 
   @override
@@ -254,6 +279,14 @@ class _ProgressBarPainter extends CustomPainter {
       colors.backgroundPaint,
     );
     if (!value.isInitialized) {
+      return;
+    }
+    // A source can report itself initialized before it knows how long it is —
+    // a cast receiver does exactly this between accepting the media and
+    // reporting on it. Dividing by that zero produces a NaN that asserts its
+    // way out of drawRRect, so draw only the empty track until a duration
+    // arrives.
+    if (value.duration.inMilliseconds <= 0) {
       return;
     }
     final double playedPartPercent =

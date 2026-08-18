@@ -1,4 +1,5 @@
 import 'package:chewie/chewie.dart';
+import 'package:chewie_example/app/demo_cast_controller.dart';
 import 'package:chewie_example/app/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -21,6 +22,11 @@ class _ChewieDemoState extends State<ChewieDemo> {
   ChewieController? _chewieController;
   int? bufferDelay;
 
+  /// A simulated cast backend. Chewie ships no sender of its own, so the app
+  /// supplies one; see [DemoCastController] for what implementing it involves.
+  /// The app owns it, which is why it outlives the ChewieControllers below.
+  final DemoCastController _castController = DemoCastController();
+
   @override
   void initState() {
     super.initState();
@@ -32,13 +38,16 @@ class _ChewieDemoState extends State<ChewieDemo> {
     _videoPlayerController1.dispose();
     _videoPlayerController2.dispose();
     _chewieController?.dispose();
+    _castController.dispose();
     super.dispose();
   }
 
+  // The commondatastorage.googleapis.com samples this used to point at now
+  // return 403, which surfaces on iOS as the unhelpful "You do not have
+  // permission to access the requested resource" (OSStatus -12660).
   List<String> srcs = [
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+    "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
   ];
 
   Future<void> initializePlayer() async {
@@ -121,6 +130,19 @@ class _ChewieDemoState extends State<ChewieDemo> {
       autoPlay: true,
       zoomAndPan: true,
       looping: true,
+
+      // Casting. The receiver fetches the URL itself, so it has to be one the
+      // TV can reach — not the local data source — and served with CORS
+      // headers, which the Google Default Media Receiver requires.
+      castController: _castController,
+      castMedia: CastMedia(
+        url: srcs[currPlayIndex],
+        mimeType: srcs[currPlayIndex].endsWith('.m3u8')
+            ? 'application/x-mpegURL'
+            : 'video/mp4',
+        title: 'Chewie demo',
+        subtitle: 'Playing from the example app',
+      ),
       progressIndicatorDelay: bufferDelay != null
           ? Duration(milliseconds: bufferDelay!)
           : null,
@@ -139,6 +161,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       subtitleStyle: const SubtitleStyle(
         textStyle: TextStyle(fontSize: 20, color: Colors.white),
       ),
+
       // subtitleBuilder replaces the default box entirely, so subtitleStyle no
       // longer applies and cue markup is yours to handle — parseSubtitleMarkup
       // is the same parser chewie uses:
@@ -154,7 +177,6 @@ class _ChewieDemoState extends State<ChewieDemo> {
       //           ),
       //   ),
       // ),
-
       hideControlsTimer: const Duration(seconds: 1),
 
       // Try playing around with some of these other options:

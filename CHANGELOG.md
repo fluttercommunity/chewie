@@ -1,3 +1,7 @@
+## [Unreleased]
+* 📺 Casting / screen-mirroring support. Chewie now ships the cast UI — a cast button in the Material, Material desktop and Cupertino skins, a device picker, and an overlay in place of the video while a session is live — plus the local↔remote handover in both directions. The sender itself is supplied by the app through the new `ChewieCastController` abstraction, so a pure-Flutter package does not pull the Google Cast SDK and its native dependencies into every consumer. New `ChewieController` options: `castController`, `castMedia`, `allowCasting`, `castTranslations` and `castOverlayBuilder`. See the [Casting](README.md#-casting) section.
+* 🛠️ Progress bar: draw only the empty track when a source reports itself initialized before it knows its duration, instead of asserting on a NaN inside `drawRRect`.
+
 ## [1.16.1]
 * ✨ [#962](https://github.com/fluttercommunity/chewie/pull/962): Expose `showPlayButton` on `ChewieController` to allow showing or hiding the center play button. Thanks [ibrahim-iqbal](https://github.com/ibrahim-iqbal).
 
