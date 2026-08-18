@@ -128,6 +128,50 @@ void main() {
     });
   });
 
+  group('additionalControls', () {
+    const marker = Key('extra-control');
+
+    Future<void> expectSlotHonoured(WidgetTester tester, Widget skin) async {
+      await _pumpPlayer(
+        tester,
+        ChewieController(
+          videoPlayerController: VideoPlayerController.networkUrl(
+            Uri.parse(_src),
+          ),
+          autoPlay: false,
+          additionalControls: (_) => const [SizedBox(key: marker, width: 24)],
+          customControls: skin,
+        ),
+      );
+
+      expect(find.byKey(marker), findsOneWidget);
+    }
+
+    testWidgets('appears in the Material control bar', (tester) async {
+      await expectSlotHonoured(tester, const MaterialControls());
+    });
+
+    testWidgets('appears in the desktop control bar', (tester) async {
+      await expectSlotHonoured(tester, const MaterialDesktopControls());
+    });
+
+    testWidgets('appears in the Cupertino control bar', (tester) async {
+      await expectSlotHonoured(
+        tester,
+        const CupertinoControls(
+          backgroundColor: Colors.black,
+          iconColor: Colors.white,
+        ),
+      );
+    });
+
+    testWidgets('is absent when not supplied', (tester) async {
+      await _pumpPlayer(tester, _buildController());
+
+      expect(find.byKey(marker), findsNothing);
+    });
+  });
+
   group('device picker', () {
     testWidgets('scans only while the picker is open', (tester) async {
       final cast = FakeCastController(devices: const [_livingRoom]);

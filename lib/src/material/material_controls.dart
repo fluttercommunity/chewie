@@ -160,6 +160,7 @@ class _MaterialControlsState extends State<MaterialControls>
           duration: const Duration(milliseconds: 250),
           child: Row(
             children: [
+              ...?chewieController.additionalControls?.call(context),
               if (_castController != null && chewieController.allowCasting)
                 CastButton(
                   castController: _castController!,
