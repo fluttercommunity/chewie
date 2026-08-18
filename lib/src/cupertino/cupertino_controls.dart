@@ -3,6 +3,9 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:chewie/src/animated_play_pause.dart';
+import 'package:chewie/src/cast/chewie_cast_controller.dart';
+import 'package:chewie/src/cast/chewie_playback_target.dart';
+import 'package:chewie/src/cast/widgets/cast_button.dart';
 import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
@@ -52,6 +55,17 @@ class _CupertinoControlsState extends State<CupertinoControls>
   bool _displayBufferingIndicator = false;
   double selectedSpeed = 1.0;
   late VideoPlayerController controller;
+
+  /// The cast controller we are subscribed to, remembered separately so we
+  /// unsubscribe from the same object we subscribed to even when the
+  /// [ChewieController] is swapped out from under us.
+  ChewieCastController? _subscribedCast;
+
+  ChewieCastController? get _castController =>
+      _chewieController?.castController;
+
+  /// Local player or cast receiver, whichever currently has the video.
+  ChewiePlaybackTarget get _playback => chewieController.playback;
 
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
@@ -135,6 +149,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   void _dispose() {
     controller.removeListener(_updateState);
+    _subscribedCast?.removeListener(_updateState);
+    _subscribedCast = null;
     _hideTimer?.cancel();
     _expandCollapseTimer?.cancel();
     _initTimer?.cancel();
@@ -343,7 +359,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         backgroundColor: widget.backgroundColor,
         iconColor: widget.iconColor,
         isFinished: isFinished,
-        isPlaying: controller.value.isPlaying,
+        isPlaying: _latestValue.isPlaying,
         show: showPlayButton,
         onPressed: _playPause,
       ),
@@ -360,12 +376,13 @@ class _CupertinoControlsState extends State<CupertinoControls>
     return GestureDetector(
       onTap: () {
         _cancelAndRestartTimer();
+        final playback = _playback;
 
         if (_latestValue.volume == 0) {
-          controller.setVolume(_latestVolume ?? 0.5);
+          playback.setVolume(_latestVolume ?? 0.5);
         } else {
-          _latestVolume = controller.value.volume;
-          controller.setVolume(0.0);
+          _latestVolume = playback.value.volume;
+          playback.setVolume(0.0);
         }
       },
       child: AnimatedOpacity(
@@ -409,7 +426,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         padding: const EdgeInsets.only(left: 6.0, right: 6.0),
         child: AnimatedPlayPause(
           color: widget.iconColor,
-          playing: controller.value.isPlaying,
+          playing: _latestValue.isPlaying,
         ),
       ),
     );
@@ -512,7 +529,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         );
 
         if (chosenSpeed != null) {
-          controller.setPlaybackSpeed(chosenSpeed);
+          _playback.setPlaybackSpeed(chosenSpeed);
 
           selectedSpeed = chosenSpeed;
         }
@@ -532,6 +549,47 @@ class _CupertinoControlsState extends State<CupertinoControls>
             ..rotateX(math.pi)
             ..rotateZ(math.pi * 0.8),
           child: Icon(Icons.speed, color: iconColor, size: 18.0),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCastButton(
+    Color backgroundColor,
+    Color iconColor,
+    double barHeight,
+    double buttonPadding,
+  ) {
+    // Cupertino's top bar has no shared opacity wrapper — each button fades
+    // itself. Without this the cast icon stayed on screen after the rest of
+    // the controls had gone, looking like it was not part of them.
+    return AnimatedOpacity(
+      opacity: notifier.hideStuff ? 0.0 : 1.0,
+      duration: const Duration(milliseconds: 300),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10.0),
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 10.0),
+          child: ColoredBox(
+            color: backgroundColor,
+            child: SizedBox(
+              height: barHeight,
+              child: CastButton(
+                castController: _castController!,
+                translations: chewieController.castTranslations,
+                useRootNavigator: chewieController.useRootNavigator,
+                cancelButtonText:
+                    chewieController.optionsTranslation?.cancelButtonText,
+                iconColor: iconColor,
+                iconSize: 16,
+                padding: EdgeInsets.symmetric(horizontal: buttonPadding),
+                onMenuOpened: () => _hideTimer?.cancel(),
+                onMenuClosed: () {
+                  if (_latestValue.isPlaying) _startHideTimer();
+                },
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -560,6 +618,15 @@ class _CupertinoControlsState extends State<CupertinoControls>
               buttonPadding,
             ),
           const Spacer(),
+          if (_castController != null && chewieController.allowCasting) ...[
+            _buildCastButton(
+              backgroundColor,
+              iconColor,
+              barHeight,
+              buttonPadding,
+            ),
+            SizedBox(width: marginSize),
+          ],
           if (chewieController.allowMuting)
             _buildMuteButton(
               controller,
@@ -588,6 +655,10 @@ class _CupertinoControlsState extends State<CupertinoControls>
         chewieController.showSubtitles &&
         (chewieController.subtitle?.isNotEmpty ?? false);
     controller.addListener(_updateState);
+    // Follow the receiver too: while casting it, not the local player, is what
+    // reports position and play state.
+    _subscribedCast = chewieController.castController
+      ?..addListener(_updateState);
 
     _updateState();
 
@@ -623,6 +694,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         padding: const EdgeInsets.only(right: 12.0),
         child: CupertinoVideoProgressBar(
           controller,
+          playback: _playback,
           onDragStart: () {
             setState(() {
               _dragging = true;
@@ -659,23 +731,27 @@ class _CupertinoControlsState extends State<CupertinoControls>
         _latestValue.position >= _latestValue.duration &&
         _latestValue.duration.inSeconds > 0;
 
+    final playback = _playback;
+
     setState(() {
-      if (controller.value.isPlaying) {
+      if (playback.value.isPlaying) {
         notifier.hideStuff = false;
         _hideTimer?.cancel();
-        controller.pause();
+        playback.pause();
       } else {
         _cancelAndRestartTimer();
 
-        if (!controller.value.isInitialized) {
+        // Only the local player has an uninitialized state to recover from — a
+        // receiver is either loaded or there is no session.
+        if (!playback.isRemote && !controller.value.isInitialized) {
           controller.initialize().then((_) {
             controller.play();
           });
         } else {
           if (isFinished) {
-            controller.seekTo(Duration.zero);
+            playback.seekTo(Duration.zero);
           }
-          controller.play();
+          playback.play();
         }
       }
     });
@@ -686,11 +762,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final beginning = Duration.zero.inMilliseconds;
     final skip =
         (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
-    await controller.seekTo(Duration(milliseconds: math.max(skip, beginning)));
+    await _playback.seekTo(Duration(milliseconds: math.max(skip, beginning)));
     // Restoring the video speed to selected speed
     // A delay of 1 second is added to ensure a smooth transition of speed after reversing the video as reversing is an asynchronous function
     Future.delayed(const Duration(milliseconds: 1000), () {
-      controller.setPlaybackSpeed(selectedSpeed);
+      _playback.setPlaybackSpeed(selectedSpeed);
     });
   }
 
@@ -699,15 +775,19 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final end = _latestValue.duration.inMilliseconds;
     final skip =
         (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
-    await controller.seekTo(Duration(milliseconds: math.min(skip, end)));
+    await _playback.seekTo(Duration(milliseconds: math.min(skip, end)));
     // Restoring the video speed to selected speed
     // A delay of 1 second is added to ensure a smooth transition of speed after forwarding the video as forwaring is an asynchronous function
     Future.delayed(const Duration(milliseconds: 1000), () {
-      controller.setPlaybackSpeed(selectedSpeed);
+      _playback.setPlaybackSpeed(selectedSpeed);
     });
   }
 
   void _startHideTimer() {
+    // While casting the phone is a remote control, not a video surface: there
+    // is nothing behind the controls worth revealing, and hiding them costs the
+    // user a tap, because the first one only brings them back.
+    if (chewieController.isCasting) return;
     final hideControlsTimer = chewieController.hideControlsTimer.isNegative
         ? ChewieController.defaultHideControlsTimer
         : chewieController.hideControlsTimer;
@@ -728,7 +808,18 @@ class _CupertinoControlsState extends State<CupertinoControls>
   void _updateState() {
     if (!mounted) return;
 
-    final bool buffering = getIsBuffering(controller);
+    final playback = _playback;
+    // A session starting must not leave the controls hidden behind an
+    // AbsorbPointer that swallows the next tap.
+    if (playback.isRemote && notifier.hideStuff) {
+      notifier.hideStuff = false;
+    }
+
+    // The Android buffering workaround in getIsBuffering only applies to the
+    // local plugin; a receiver reports its own state honestly.
+    final bool buffering = playback.isRemote
+        ? playback.value.isBuffering
+        : getIsBuffering(controller);
 
     // display the progress bar indicator only after the buffering delay if it has been set
     if (chewieController.progressIndicatorDelay != null) {
@@ -747,8 +838,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
     }
 
     setState(() {
-      _latestValue = controller.value;
-      _subtitlesPosition = controller.value.position;
+      _latestValue = playback.value;
+      _subtitlesPosition = playback.value.position;
     });
   }
 }
