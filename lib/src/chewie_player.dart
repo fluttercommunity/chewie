@@ -747,12 +747,25 @@ class ChewieController extends ChangeNotifier {
   ///
   /// Unlike [additionalOptions], which adds rows to the options sheet, these go
   /// into the bar itself — for controls that have to be a widget rather than a
-  /// menu entry. A platform view is the motivating case: an AirPlay button must
-  /// be UIKit's own `AVRoutePickerView`, because Apple exposes no way to select
-  /// a route programmatically.
+  /// menu entry, such as an AirPlay button.
   ///
   /// They inherit the bar's show/hide behaviour, so they fade with the rest of
   /// the controls rather than sitting on top of the video.
+  ///
+  /// Two things are worth knowing before putting something here:
+  ///
+  /// * **Platform views do not work.** A `UiKitView` placed in the control bar
+  ///   lays out and receives taps but paints nothing — verified on iOS, where a
+  ///   real `AVRoutePickerView` is invisible here while the identical widget
+  ///   renders fine as a sibling of the [Chewie] widget. Draw the control in
+  ///   Flutter instead.
+  /// * **Read [ChewieControlStyle] rather than hard-coding a look.** The skins
+  ///   differ — the Cupertino bar is 30 logical pixels tall in portrait with
+  ///   16px glyphs on frosted pills, the Material bars are taller with 24px
+  ///   icons — so a widget sized for one sits wrong in another. Each skin
+  ///   installs its own values above whatever it is given; a control that
+  ///   takes its size, tint, padding and chrome from there matches the buttons
+  ///   beside it on all three.
   final List<Widget> Function(BuildContext context)? additionalControls;
 
   static ChewieController of(BuildContext context) {
