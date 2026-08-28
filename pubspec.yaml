@@ -20,6 +20,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  # Only used by the fake platform the tests install, so controllers can
+  # actually initialize under `flutter test`.
+  video_player_platform_interface: ^6.9.0
 
 flutter:
   uses-material-design: true
