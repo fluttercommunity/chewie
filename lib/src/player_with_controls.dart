@@ -25,7 +25,13 @@ class PlayerWithControls extends StatelessWidget {
       ChewieController chewieController,
     ) {
       return chewieController.showControls
-          ? chewieController.customControls ?? const AdaptiveControls()
+          // Keyed on the video controller so the controls are recreated (and
+          // re-attach their listeners) when swapVideoSource replaces it.
+          ? KeyedSubtree(
+              key: ObjectKey(chewieController.videoPlayerController),
+              child:
+                  chewieController.customControls ?? const AdaptiveControls(),
+            )
           : const SizedBox();
     }
 
@@ -96,17 +102,25 @@ class PlayerWithControls extends StatelessWidget {
       return child;
     }
 
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return Center(
-          child: SizedBox(
-            height: constraints.maxHeight,
-            width: constraints.maxWidth,
-            child: AspectRatio(
-              aspectRatio: calculateAspectRatio(context),
-              child: buildPlayerWithControls(chewieController, context),
-            ),
-          ),
+    // The provider only notifies dependents when the controller instance
+    // changes, so listen to the controller itself to rebuild on mutations
+    // such as swapVideoSource.
+    return ListenableBuilder(
+      listenable: chewieController,
+      builder: (BuildContext context, Widget? _) {
+        return LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return Center(
+              child: SizedBox(
+                height: constraints.maxHeight,
+                width: constraints.maxWidth,
+                child: AspectRatio(
+                  aspectRatio: calculateAspectRatio(context),
+                  child: buildPlayerWithControls(chewieController, context),
+                ),
+              ),
+            );
+          },
         );
       },
     );
