@@ -26,11 +26,18 @@ Future<void> _driveFrame() async {
 
 class _PopCountingObserver extends NavigatorObserver {
   int pops = 0;
+  int pushes = 0;
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     pops++;
     super.didPop(route, previousRoute);
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    pushes++;
+    super.didPush(route, previousRoute);
   }
 }
 
@@ -232,5 +239,47 @@ void main() {
       await tester.pump();
       chewieController.dispose();
     });
+
+    testWidgets(
+      're-targets its listener when rebuilt with a different controller',
+      (tester) async {
+        final vpcA = _network(_srcA);
+        await vpcA.initialize();
+        final vpcB = _network(_srcB);
+        await vpcB.initialize();
+        final controllerA = ChewieController(videoPlayerController: vpcA);
+        final controllerB = ChewieController(videoPlayerController: vpcB);
+        final observer = _PopCountingObserver();
+
+        Widget app(ChewieController controller) => MaterialApp(
+          navigatorObservers: [observer],
+          home: Scaffold(body: Chewie(controller: controller)),
+        );
+
+        await tester.pumpWidget(app(controllerA));
+        await tester.pumpWidget(app(controllerB));
+        final pushesAfterMount = observer.pushes;
+
+        // The old controller no longer drives this Chewie.
+        controllerA.enterFullScreen();
+        await tester.pumpAndSettle();
+        expect(observer.pushes, pushesAfterMount);
+
+        // The new one does.
+        controllerB.enterFullScreen();
+        await tester.pumpAndSettle();
+        expect(observer.pushes, pushesAfterMount + 1);
+
+        controllerB.exitFullScreen();
+        await tester.pumpAndSettle();
+
+        await tester.pumpWidget(const SizedBox());
+        unawaited(vpcA.dispose());
+        unawaited(vpcB.dispose());
+        await tester.pump();
+        controllerA.dispose();
+        controllerB.dispose();
+      },
+    );
   });
 }
