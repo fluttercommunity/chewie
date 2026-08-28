@@ -6,6 +6,7 @@ import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/options_translation.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/models/subtitle_style.dart';
+import 'package:chewie/src/models/video_quality.dart';
 import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/foundation.dart';
@@ -78,6 +79,7 @@ class ChewieState extends State<Chewie> {
   @override
   void didUpdateWidget(Chewie oldWidget) {
     if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(listener);
       widget.controller.addListener(listener);
     }
     super.didUpdateWidget(oldWidget);
@@ -93,7 +95,7 @@ class ChewieState extends State<Chewie> {
       _resumeAppliedInFullScreen = false;
       _isFullScreen = isControllerFullScreen;
       await _pushFullScreenWidget(context);
-    } else if (_isFullScreen) {
+    } else if (!isControllerFullScreen && _isFullScreen) {
       Navigator.of(
         context,
         rootNavigator: widget.controller.useRootNavigator,
@@ -317,7 +319,7 @@ class ChewieState extends State<Chewie> {
 /// `VideoPlayerController`.
 class ChewieController extends ChangeNotifier {
   ChewieController({
-    required this.videoPlayerController,
+    required VideoPlayerController videoPlayerController,
     this.optionsTranslation,
     this.aspectRatio,
     this.autoInitialize = false,
@@ -364,7 +366,11 @@ class ChewieController extends ChangeNotifier {
     this.hideControlsTimer = defaultHideControlsTimer,
     this.controlsSafeAreaMinimum = EdgeInsets.zero,
     this.pauseOnBackgroundTap = false,
-  }) : assert(
+    this.videoQualities = const <VideoQuality>[],
+    this.activeVideoQualityId,
+    this.onVideoQualityChanged,
+  }) : _videoPlayerController = videoPlayerController,
+       assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
        ) {
@@ -425,6 +431,9 @@ class ChewieController extends ChangeNotifier {
     )?
     routePageBuilder,
     bool? pauseOnBackgroundTap,
+    List<VideoQuality>? videoQualities,
+    Object? activeVideoQualityId,
+    void Function(VideoQuality quality)? onVideoQualityChanged,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -492,6 +501,10 @@ class ChewieController extends ChangeNotifier {
       progressIndicatorDelay:
           progressIndicatorDelay ?? this.progressIndicatorDelay,
       pauseOnBackgroundTap: pauseOnBackgroundTap ?? this.pauseOnBackgroundTap,
+      videoQualities: videoQualities ?? this.videoQualities,
+      activeVideoQualityId: activeVideoQualityId ?? this.activeVideoQualityId,
+      onVideoQualityChanged:
+          onVideoQualityChanged ?? this.onVideoQualityChanged,
     );
   }
 
@@ -549,8 +562,12 @@ class ChewieController extends ChangeNotifier {
   /// begins playing. If set to `false`, subtitles will be hidden by default.
   bool showSubtitles;
 
-  /// The controller for the video you want to play
-  final VideoPlayerController videoPlayerController;
+  /// The controller for the video you want to play.
+  ///
+  /// Replaced by [swapVideoSource]; hosts that swap sources should read this
+  /// getter (rather than keep their own reference) when disposing.
+  VideoPlayerController get videoPlayerController => _videoPlayerController;
+  VideoPlayerController _videoPlayerController;
 
   /// Initialize the Video on Startup. This will prep the video for playback.
   final bool autoInitialize;
@@ -685,6 +702,25 @@ class ChewieController extends ChangeNotifier {
   /// Defines if the player should pause when the background is tapped
   final bool pauseOnBackgroundTap;
 
+  /// Selectable video qualities shown in the options menu.
+  ///
+  /// Source-agnostic: the host populates this and reacts to selection via
+  /// [onVideoQualityChanged] — typically by calling [swapVideoSource] with a
+  /// controller for the chosen quality, or by switching the rendition of an
+  /// adaptive stream. May change after the video loads — use
+  /// [setVideoQualities] so the controls rebuild.
+  List<VideoQuality> videoQualities;
+
+  /// Id of the currently selected quality in [videoQualities].
+  Object? activeVideoQualityId;
+
+  /// Called when the user picks a video quality from the menu.
+  final void Function(VideoQuality quality)? onVideoQualityChanged;
+
+  /// Whether more than one selectable video quality is available (a single
+  /// quality offers nothing to choose, so the menu entry stays hidden).
+  bool get hasVideoQualities => videoQualities.length > 1;
+
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider = context
         .dependOnInheritedWidgetOfExactType<ChewieControllerProvider>()!;
@@ -728,6 +764,73 @@ class ChewieController extends ChangeNotifier {
       enterFullScreen();
       videoPlayerController.removeListener(_fullScreenListener);
     }
+  }
+
+  /// Replaces [videoPlayerController] with [newController], preserving the
+  /// playback position, speed, volume, looping and play/pause state of the
+  /// old controller.
+  ///
+  /// Use this to switch to another rendition of the current video (e.g. a
+  /// different quality) without rebuilding the [ChewieController].
+  ///
+  /// [newController] is initialized before the swap, so the player never
+  /// shows an unready source; if initialization fails, the error is rethrown
+  /// and the old controller stays in place. Chewie takes ownership of
+  /// [newController]: the old controller is disposed after the UI has
+  /// re-attached, and the host's own dispose should read
+  /// [videoPlayerController] rather than keep a reference to a controller
+  /// created earlier. Pass [disposeOldController] as `false` to keep the old
+  /// controller alive instead — for example when swapping between preloaded
+  /// controllers the host still owns.
+  Future<void> swapVideoSource(
+    VideoPlayerController newController, {
+    bool disposeOldController = true,
+  }) async {
+    final oldController = _videoPlayerController;
+    final oldValue = oldController.value;
+
+    if (!newController.value.isInitialized) {
+      await newController.initialize();
+    }
+    await newController.setLooping(looping);
+    if (oldValue.isInitialized && oldValue.position > Duration.zero) {
+      await newController.seekTo(oldValue.position);
+    }
+    await newController.setPlaybackSpeed(oldValue.playbackSpeed);
+    await newController.setVolume(oldValue.volume);
+    if (oldValue.isPlaying) {
+      await newController.play();
+    }
+
+    // No-op unless fullScreenByDefault attached it and it hasn't fired yet.
+    oldController.removeListener(_fullScreenListener);
+    _videoPlayerController = newController;
+    notifyListeners();
+
+    if (disposeOldController) {
+      // Wait for the frame triggered by notifyListeners(), so the rebuilt
+      // controls have detached their listeners from the old controller.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        oldController.dispose();
+      });
+    }
+  }
+
+  /// Replaces the selectable [videoQualities] and rebuilds the controls.
+  ///
+  /// Use when qualities become known only after the media loads (e.g. once a
+  /// manifest is parsed).
+  void setVideoQualities(List<VideoQuality> qualities) {
+    videoQualities = qualities;
+    notifyListeners();
+  }
+
+  /// Selects [quality] as the active one, updating [activeVideoQualityId]
+  /// and notifying [onVideoQualityChanged].
+  void selectVideoQuality(VideoQuality quality) {
+    activeVideoQualityId = quality.id;
+    onVideoQualityChanged?.call(quality);
+    notifyListeners();
   }
 
   void enterFullScreen() {

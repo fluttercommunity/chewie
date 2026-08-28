@@ -11,6 +11,7 @@ import 'package:chewie/src/cupertino/widgets/cupertino_options_dialog.dart';
 import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
+import 'package:chewie/src/models/video_quality.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:chewie/src/subtitle_overlay.dart';
 import 'package:flutter/cupertino.dart';
@@ -155,7 +156,19 @@ class _CupertinoControlsState extends State<CupertinoControls>
   }
 
   GestureDetector _buildOptionsButton(Color iconColor, double barHeight) {
-    final options = <OptionItem>[];
+    final options = <OptionItem>[
+      if (chewieController.hasVideoQualities)
+        OptionItem(
+          onTap: (context) async {
+            Navigator.pop(context);
+            _onQualityButtonTap();
+          },
+          iconData: Icons.high_quality_outlined,
+          title:
+              chewieController.optionsTranslation?.qualityButtonText ??
+              'Quality',
+        ),
+    ];
 
     if (chewieController.additionalOptions != null &&
         chewieController.additionalOptions!(context).isNotEmpty) {
@@ -254,10 +267,11 @@ class _CupertinoControlsState extends State<CupertinoControls>
                           _buildSubtitleToggle(iconColor, barHeight),
                           if (chewieController.allowPlaybackSpeedChanging)
                             _buildSpeedButton(controller, iconColor, barHeight),
-                          if (chewieController.additionalOptions != null &&
-                              chewieController
-                                  .additionalOptions!(context)
-                                  .isNotEmpty)
+                          if (chewieController.hasVideoQualities ||
+                              (chewieController.additionalOptions != null &&
+                                  chewieController
+                                      .additionalOptions!(context)
+                                      .isNotEmpty))
                             _buildOptionsButton(iconColor, barHeight),
                         ],
                       ),
@@ -750,6 +764,64 @@ class _CupertinoControlsState extends State<CupertinoControls>
       _latestValue = controller.value;
       _subtitlesPosition = controller.value.position;
     });
+  }
+
+  Future<void> _onQualityButtonTap() async {
+    _hideTimer?.cancel();
+
+    final chosenQuality = await showCupertinoModalPopup<VideoQuality>(
+      context: context,
+      semanticsDismissible: true,
+      useRootNavigator: chewieController.useRootNavigator,
+      builder: (context) => _VideoQualityDialog(
+        qualities: chewieController.videoQualities,
+        selectedId: chewieController.activeVideoQualityId,
+      ),
+    );
+
+    if (chosenQuality != null) {
+      chewieController.selectVideoQuality(chosenQuality);
+    }
+
+    if (_latestValue.isPlaying) {
+      _startHideTimer();
+    }
+  }
+}
+
+class _VideoQualityDialog extends StatelessWidget {
+  const _VideoQualityDialog({
+    required List<VideoQuality> qualities,
+    required Object? selectedId,
+  }) : _qualities = qualities,
+       _selectedId = selectedId;
+
+  final List<VideoQuality> _qualities;
+  final Object? _selectedId;
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedColor = CupertinoTheme.of(context).primaryColor;
+
+    return CupertinoActionSheet(
+      actions: _qualities
+          .map(
+            (quality) => CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.of(context).pop(quality);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (quality.id == _selectedId)
+                    Icon(Icons.check, size: 20.0, color: selectedColor),
+                  Text(quality.label),
+                ],
+              ),
+            ),
+          )
+          .toList(),
+    );
   }
 }
 

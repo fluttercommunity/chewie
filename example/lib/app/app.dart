@@ -31,6 +31,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
   void dispose() {
     _videoPlayerController1.dispose();
     _videoPlayerController2.dispose();
+    // After a quality change the active controller is the one chewie holds
+    // (dispose() is idempotent, so overlap with the lines above is fine).
+    _chewieController?.videoPlayerController.dispose();
     _chewieController?.dispose();
     super.dispose();
   }
@@ -124,6 +127,20 @@ class _ChewieDemoState extends State<ChewieDemo> {
       progressIndicatorDelay: bufferDelay != null
           ? Duration(milliseconds: bufferDelay!)
           : null,
+
+      // A real app would list renditions of the same video ('480p', '1080p',
+      // ...); the demo uses distinct videos so the switch is visible. The id
+      // is opaque to chewie — here it carries the URL of each rendition.
+      videoQualities: [
+        for (final (index, src) in srcs.indexed)
+          VideoQuality(id: src, label: 'Video ${index + 1}'),
+      ],
+      activeVideoQualityId: srcs[currPlayIndex],
+      onVideoQualityChanged: (quality) {
+        _chewieController?.swapVideoSource(
+          VideoPlayerController.networkUrl(Uri.parse(quality.id as String)),
+        );
+      },
 
       additionalOptions: (context) {
         return <OptionItem>[
