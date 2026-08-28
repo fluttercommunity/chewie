@@ -47,12 +47,27 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   Offset? _latestDraggableOffset;
   Offset? _latestHoverOffset;
 
+  final LayerLink _indicatorLink = LayerLink();
+  final OverlayPortalController _indicatorPortal = OverlayPortalController();
+
   VideoPlayerController get controller => widget.controller;
 
   /// The pointer position that drives the hover-time indicator. A drag in
   /// progress takes priority over a plain hover; `null` when the pointer is
   /// away from the bar.
   Offset? get _indicatorOffset => _latestDraggableOffset ?? _latestHoverOffset;
+
+  /// Shows or hides the overlay-based time indicator to match
+  /// [_indicatorOffset]. Must be called from event handlers, not from build.
+  void _syncIndicatorVisibility() {
+    final bool shouldShow =
+        _indicatorOffset != null && controller.value.isInitialized;
+    if (shouldShow && !_indicatorPortal.isShowing) {
+      _indicatorPortal.show();
+    } else if (!shouldShow && _indicatorPortal.isShowing) {
+      _indicatorPortal.hide();
+    }
+  }
 
   @override
   void initState() {
@@ -89,72 +104,82 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
       return child;
     }
 
-    return GestureDetector(
-      onHorizontalDragStart: (DragStartDetails details) {
-        if (!controller.value.isInitialized) {
-          return;
-        }
-        _controllerWasPlaying = controller.value.isPlaying;
-        if (_controllerWasPlaying) {
-          controller.pause();
-        }
+    return OverlayPortal(
+      controller: _indicatorPortal,
+      overlayChildBuilder: _buildHoverTimeIndicator,
+      child: CompositedTransformTarget(
+        link: _indicatorLink,
+        child: GestureDetector(
+          onHorizontalDragStart: (DragStartDetails details) {
+            if (!controller.value.isInitialized) {
+              return;
+            }
+            _controllerWasPlaying = controller.value.isPlaying;
+            if (_controllerWasPlaying) {
+              controller.pause();
+            }
 
-        widget.onDragStart?.call();
-      },
-      onHorizontalDragUpdate: (DragUpdateDetails details) {
-        if (!controller.value.isInitialized) {
-          return;
-        }
-        _latestDraggableOffset = details.globalPosition;
-        listener();
+            widget.onDragStart?.call();
+          },
+          onHorizontalDragUpdate: (DragUpdateDetails details) {
+            if (!controller.value.isInitialized) {
+              return;
+            }
+            _latestDraggableOffset = details.globalPosition;
+            _syncIndicatorVisibility();
+            listener();
 
-        widget.onDragUpdate?.call();
-      },
-      onHorizontalDragEnd: (DragEndDetails details) {
-        if (_controllerWasPlaying) {
-          controller.play();
-        }
+            widget.onDragUpdate?.call();
+          },
+          onHorizontalDragEnd: (DragEndDetails details) {
+            if (_controllerWasPlaying) {
+              controller.play();
+            }
 
-        if (_latestDraggableOffset != null) {
-          _seekToRelativePosition(_latestDraggableOffset!);
-          _latestDraggableOffset = null;
-        }
+            if (_latestDraggableOffset != null) {
+              _seekToRelativePosition(_latestDraggableOffset!);
+              _latestDraggableOffset = null;
+            }
+            _syncIndicatorVisibility();
 
-        widget.onDragEnd?.call();
-      },
-      onTapDown: (TapDownDetails details) {
-        if (!controller.value.isInitialized) {
-          return;
-        }
-        _seekToRelativePosition(details.globalPosition);
-      },
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onHover: (PointerHoverEvent event) {
-          if (!controller.value.isInitialized) {
-            return;
-          }
-          setState(() => _latestHoverOffset = event.position);
-        },
-        onExit: (PointerExitEvent event) {
-          if (_latestHoverOffset == null) {
-            return;
-          }
-          setState(() => _latestHoverOffset = null);
-        },
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [child, _buildHoverTimeIndicator(context)],
+            widget.onDragEnd?.call();
+          },
+          onTapDown: (TapDownDetails details) {
+            if (!controller.value.isInitialized) {
+              return;
+            }
+            _seekToRelativePosition(details.globalPosition);
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onHover: (PointerHoverEvent event) {
+              if (!controller.value.isInitialized) {
+                return;
+              }
+              setState(() => _latestHoverOffset = event.position);
+              _syncIndicatorVisibility();
+            },
+            onExit: (PointerExitEvent event) {
+              if (_latestHoverOffset == null) {
+                return;
+              }
+              setState(() => _latestHoverOffset = null);
+              _syncIndicatorVisibility();
+            },
+            child: child,
+          ),
         ),
       ),
     );
   }
 
   /// A floating pill that shows the timecode under the pointer while it hovers
-  /// (or drags) the bar. Renders nothing when the pointer is away, the video is
-  /// not ready yet, or the bar hasn't been laid out — so touch devices, which
-  /// never emit hover events, are unaffected.
-  Widget _buildHoverTimeIndicator(BuildContext context) {
+  /// (or drags) the bar. Rendered through an [OverlayPortal] so ancestor clips
+  /// (e.g. the rounded, blurred cupertino bottom bar) cannot cut it off; a
+  /// [CompositedTransformFollower] keeps it glued to the bar. Renders nothing
+  /// when the pointer is away, the video is not ready yet, or the bar hasn't
+  /// been laid out.
+  Widget _buildHoverTimeIndicator(BuildContext overlayContext) {
     final Offset? offset = _indicatorOffset;
     final Duration duration = controller.value.duration;
     if (offset == null ||
@@ -170,37 +195,26 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
       return const SizedBox.shrink();
     }
 
+    final Size barSize = renderObject.size;
     final double relative =
-        (renderObject.globalToLocal(offset).dx / renderObject.size.width).clamp(
-          0.0,
-          1.0,
-        );
+        (renderObject.globalToLocal(offset).dx / barSize.width).clamp(0.0, 1.0);
     final String label = formatDuration(duration * relative);
 
-    return Positioned.fill(
-      child: IgnorePointer(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final double width = constraints.maxWidth;
-            final double height = constraints.maxHeight;
-            if (!width.isFinite || !height.isFinite) {
-              return const SizedBox.shrink();
-            }
-            final double barTop = height / 2 - widget.barHeight / 2;
-            return Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Positioned(
-                  left: (relative * width).clamp(0.0, width),
-                  bottom: height - barTop + 6.0,
-                  child: FractionalTranslation(
-                    translation: const Offset(-0.5, 0.0),
-                    child: _HoverTimeLabel(text: label),
-                  ),
-                ),
-              ],
-            );
-          },
+    final double barTop = barSize.height / 2 - widget.barHeight / 2;
+
+    return IgnorePointer(
+      child: CompositedTransformFollower(
+        link: _indicatorLink,
+        showWhenUnlinked: false,
+        offset: Offset(relative * barSize.width, barTop - 6.0),
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: FractionalTranslation(
+            // Center the pill on the pointer and place its bottom edge just
+            // above the painted bar.
+            translation: const Offset(-0.5, -1.0),
+            child: _HoverTimeLabel(text: label),
+          ),
         ),
       ),
     );
