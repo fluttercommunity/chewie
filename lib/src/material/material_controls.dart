@@ -12,8 +12,10 @@ import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
 import 'package:chewie/src/models/chewie_control_style.dart';
+import 'package:chewie/src/material/widgets/video_quality_dialog.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
+import 'package:chewie/src/models/video_quality.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:chewie/src/subtitle_overlay.dart';
 import 'package:flutter/foundation.dart';
@@ -234,6 +236,17 @@ class _MaterialControlsState extends State<MaterialControls>
             chewieController.optionsTranslation?.playbackSpeedButtonText ??
             'Playback speed',
       ),
+      if (chewieController.hasVideoQualities)
+        OptionItem(
+          onTap: (context) async {
+            Navigator.pop(context);
+            _onQualityButtonTap();
+          },
+          iconData: Icons.high_quality_outlined,
+          title:
+              chewieController.optionsTranslation?.qualityButtonText ??
+              'Quality',
+        ),
     ];
 
     if (chewieController.additionalOptions != null &&
@@ -500,6 +513,28 @@ class _MaterialControlsState extends State<MaterialControls>
 
     if (chosenSpeed != null) {
       _playback.setPlaybackSpeed(chosenSpeed);
+    }
+
+    if (_latestValue.isPlaying) {
+      _startHideTimer();
+    }
+  }
+
+  Future<void> _onQualityButtonTap() async {
+    _hideTimer?.cancel();
+
+    final chosenQuality = await showModalBottomSheet<VideoQuality>(
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: chewieController.useRootNavigator,
+      builder: (context) => VideoQualityDialog(
+        qualities: chewieController.videoQualities,
+        selectedId: chewieController.activeVideoQualityId,
+      ),
+    );
+
+    if (chosenQuality != null) {
+      chewieController.selectVideoQuality(chosenQuality);
     }
 
     if (_latestValue.isPlaying) {
