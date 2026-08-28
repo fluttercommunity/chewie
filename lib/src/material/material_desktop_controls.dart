@@ -8,8 +8,10 @@ import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
+import 'package:chewie/src/material/widgets/video_quality_dialog.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
+import 'package:chewie/src/models/video_quality.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:chewie/src/subtitle_overlay.dart';
 import 'package:flutter/material.dart';
@@ -183,6 +185,17 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
             chewieController.optionsTranslation?.playbackSpeedButtonText ??
             'Playback speed',
       ),
+      if (chewieController.hasVideoQualities)
+        OptionItem(
+          onTap: (context) async {
+            Navigator.pop(context);
+            _onQualityButtonTap();
+          },
+          iconData: Icons.high_quality_outlined,
+          title:
+              chewieController.optionsTranslation?.qualityButtonText ??
+              'Quality',
+        ),
     ];
 
     if (chewieController.additionalOptions != null &&
@@ -377,6 +390,28 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
     if (chosenSpeed != null) {
       controller.setPlaybackSpeed(chosenSpeed);
+    }
+
+    if (_latestValue.isPlaying) {
+      _startHideTimer();
+    }
+  }
+
+  Future<void> _onQualityButtonTap() async {
+    _hideTimer?.cancel();
+
+    final chosenQuality = await showModalBottomSheet<VideoQuality>(
+      context: context,
+      isScrollControlled: true,
+      useRootNavigator: chewieController.useRootNavigator,
+      builder: (context) => VideoQualityDialog(
+        qualities: chewieController.videoQualities,
+        selectedId: chewieController.activeVideoQualityId,
+      ),
+    );
+
+    if (chosenQuality != null) {
+      chewieController.selectVideoQuality(chosenQuality);
     }
 
     if (_latestValue.isPlaying) {
