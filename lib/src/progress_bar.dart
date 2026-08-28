@@ -1,4 +1,6 @@
 import 'package:chewie/chewie.dart';
+import 'package:chewie/src/helpers/utils.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -43,8 +45,29 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   bool _controllerWasPlaying = false;
 
   Offset? _latestDraggableOffset;
+  Offset? _latestHoverOffset;
+
+  final LayerLink _indicatorLink = LayerLink();
+  final OverlayPortalController _indicatorPortal = OverlayPortalController();
 
   VideoPlayerController get controller => widget.controller;
+
+  /// The pointer position that drives the hover-time indicator. A drag in
+  /// progress takes priority over a plain hover; `null` when the pointer is
+  /// away from the bar.
+  Offset? get _indicatorOffset => _latestDraggableOffset ?? _latestHoverOffset;
+
+  /// Shows or hides the overlay-based time indicator to match
+  /// [_indicatorOffset]. Must be called from event handlers, not from build.
+  void _syncIndicatorVisibility() {
+    final bool shouldShow =
+        _indicatorOffset != null && controller.value.isInitialized;
+    if (shouldShow && !_indicatorPortal.isShowing) {
+      _indicatorPortal.show();
+    } else if (!shouldShow && _indicatorPortal.isShowing) {
+      _indicatorPortal.hide();
+    }
+  }
 
   @override
   void initState() {
@@ -77,50 +100,182 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
       ),
     );
 
-    return widget.draggableProgressBar
-        ? GestureDetector(
-            onHorizontalDragStart: (DragStartDetails details) {
+    if (!widget.draggableProgressBar) {
+      return child;
+    }
+
+    return OverlayPortal(
+      controller: _indicatorPortal,
+      overlayChildBuilder: _buildHoverTimeIndicator,
+      child: CompositedTransformTarget(
+        link: _indicatorLink,
+        child: GestureDetector(
+          onHorizontalDragStart: (DragStartDetails details) {
+            if (!controller.value.isInitialized) {
+              return;
+            }
+            _controllerWasPlaying = controller.value.isPlaying;
+            if (_controllerWasPlaying) {
+              controller.pause();
+            }
+
+            widget.onDragStart?.call();
+          },
+          onHorizontalDragUpdate: (DragUpdateDetails details) {
+            if (!controller.value.isInitialized) {
+              return;
+            }
+            _latestDraggableOffset = details.globalPosition;
+            _syncIndicatorVisibility();
+            listener();
+
+            widget.onDragUpdate?.call();
+          },
+          onHorizontalDragEnd: (DragEndDetails details) {
+            if (_controllerWasPlaying) {
+              controller.play();
+            }
+
+            if (_latestDraggableOffset != null) {
+              _seekToRelativePosition(_latestDraggableOffset!);
+              _latestDraggableOffset = null;
+            }
+            _syncIndicatorVisibility();
+
+            widget.onDragEnd?.call();
+          },
+          onTapDown: (TapDownDetails details) {
+            if (!controller.value.isInitialized) {
+              return;
+            }
+            _seekToRelativePosition(details.globalPosition);
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onHover: (PointerHoverEvent event) {
               if (!controller.value.isInitialized) {
                 return;
               }
-              _controllerWasPlaying = controller.value.isPlaying;
-              if (_controllerWasPlaying) {
-                controller.pause();
-              }
-
-              widget.onDragStart?.call();
+              setState(() => _latestHoverOffset = event.position);
+              _syncIndicatorVisibility();
             },
-            onHorizontalDragUpdate: (DragUpdateDetails details) {
-              if (!controller.value.isInitialized) {
+            onExit: (PointerExitEvent event) {
+              if (_latestHoverOffset == null) {
                 return;
               }
-              _latestDraggableOffset = details.globalPosition;
-              listener();
-
-              widget.onDragUpdate?.call();
+              setState(() => _latestHoverOffset = null);
+              _syncIndicatorVisibility();
             },
-            onHorizontalDragEnd: (DragEndDetails details) {
-              if (_controllerWasPlaying) {
-                controller.play();
-              }
-
-              if (_latestDraggableOffset != null) {
-                _seekToRelativePosition(_latestDraggableOffset!);
-                _latestDraggableOffset = null;
-              }
-
-              widget.onDragEnd?.call();
-            },
-            onTapDown: (TapDownDetails details) {
-              if (!controller.value.isInitialized) {
-                return;
-              }
-              _seekToRelativePosition(details.globalPosition);
-            },
-            child: MouseRegion(cursor: SystemMouseCursors.click, child: child),
-          )
-        : child;
+            child: child,
+          ),
+        ),
+      ),
+    );
   }
+
+  /// A floating pill that shows the timecode under the pointer while it hovers
+  /// (or drags) the bar. Rendered through an [OverlayPortal] so ancestor clips
+  /// (e.g. the rounded, blurred cupertino bottom bar) cannot cut it off; a
+  /// [CompositedTransformFollower] keeps it glued to the bar. Renders nothing
+  /// when the pointer is away, the video is not ready yet, or the bar hasn't
+  /// been laid out.
+  Widget _buildHoverTimeIndicator(BuildContext overlayContext) {
+    final Offset? offset = _indicatorOffset;
+    final Duration duration = controller.value.duration;
+    if (offset == null ||
+        !controller.value.isInitialized ||
+        duration.inMilliseconds <= 0) {
+      return const SizedBox.shrink();
+    }
+
+    final renderObject = context.findRenderObject();
+    if (renderObject is! RenderBox ||
+        !renderObject.hasSize ||
+        renderObject.size.width <= 0) {
+      return const SizedBox.shrink();
+    }
+
+    final Size barSize = renderObject.size;
+    final double relative =
+        (renderObject.globalToLocal(offset).dx / barSize.width).clamp(0.0, 1.0);
+    final String label = formatDuration(duration * relative);
+
+    final double barTop = barSize.height / 2 - widget.barHeight / 2;
+
+    return IgnorePointer(
+      child: CompositedTransformFollower(
+        link: _indicatorLink,
+        showWhenUnlinked: false,
+        offset: Offset(relative * barSize.width, barTop - 6.0),
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: FractionalTranslation(
+            // Center the pill on the pointer and place its bottom edge just
+            // above the painted bar.
+            translation: const Offset(-0.5, -1.0),
+            child: _HoverTimeLabel(text: label),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A small dark pill with a downward caret, showing the hovered timecode above
+/// the progress bar.
+class _HoverTimeLabel extends StatelessWidget {
+  const _HoverTimeLabel({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(6.0),
+          ),
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13.0,
+              fontWeight: FontWeight.w600,
+              fontFeatures: [FontFeature.tabularFigures()],
+            ),
+          ),
+        ),
+        CustomPaint(
+          size: const Size(10.0, 5.0),
+          painter: _CaretPainter(color: Colors.black.withValues(alpha: 0.8)),
+        ),
+      ],
+    );
+  }
+}
+
+/// Draws the downward-pointing caret beneath [_HoverTimeLabel].
+class _CaretPainter extends CustomPainter {
+  _CaretPainter({required this.color});
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Path path = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..close();
+    canvas.drawPath(path, Paint()..color = color);
+  }
+
+  @override
+  bool shouldRepaint(_CaretPainter oldDelegate) => oldDelegate.color != color;
 }
 
 class StaticProgressBar extends StatelessWidget {
