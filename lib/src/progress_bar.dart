@@ -44,6 +44,22 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
   Offset? _latestDraggableOffset;
 
+  /// The position the controller has been asked to seek to, kept around until
+  /// the seek actually completes.
+  ///
+  /// [VideoPlayerController.seekTo] only updates
+  /// [VideoPlayerValue.position] once the platform is done seeking, which can
+  /// take a noticeable amount of time (especially on iOS, where an exact seek
+  /// has to wait for `AVPlayer` to decode the target frame). Painting the
+  /// requested position in the meantime keeps the handle where the user
+  /// dropped it instead of letting it snap back to the stale position for a
+  /// few frames.
+  Duration? _pendingSeekPosition;
+
+  /// Identifies the latest seek request so a stale one cannot clear the
+  /// position requested by a newer one.
+  int _latestSeekRequestId = 0;
+
   VideoPlayerController get controller => widget.controller;
 
   @override
@@ -58,10 +74,30 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
     super.deactivate();
   }
 
-  void _seekToRelativePosition(Offset globalPosition) {
-    controller.seekTo(
+  Future<void> _seekToRelativePosition(Offset globalPosition) {
+    return _seekTo(
       context.calcRelativePosition(controller.value.duration, globalPosition),
     );
+  }
+
+  Future<void> _seekTo(Duration position) async {
+    final int requestId = ++_latestSeekRequestId;
+
+    setState(() {
+      _pendingSeekPosition = position;
+      _latestDraggableOffset = null;
+    });
+
+    try {
+      await controller.seekTo(position);
+    } finally {
+      // A newer seek is already driving the handle, leave it alone.
+      if (mounted && requestId == _latestSeekRequestId) {
+        setState(() {
+          _pendingSeekPosition = null;
+        });
+      }
+    }
   }
 
   @override
@@ -74,6 +110,7 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         handleHeight: widget.handleHeight,
         drawShadow: widget.drawShadow,
         latestDraggableOffset: _latestDraggableOffset,
+        pendingSeekPosition: _pendingSeekPosition,
       ),
     );
 
@@ -99,17 +136,19 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
 
               widget.onDragUpdate?.call();
             },
-            onHorizontalDragEnd: (DragEndDetails details) {
+            onHorizontalDragEnd: (DragEndDetails details) async {
+              widget.onDragEnd?.call();
+
+              final Offset? dragOffset = _latestDraggableOffset;
+              if (dragOffset != null) {
+                // Resume playback only once the seek landed, otherwise the
+                // player briefly plays from the position it was left at.
+                await _seekToRelativePosition(dragOffset);
+              }
+
               if (_controllerWasPlaying) {
                 controller.play();
               }
-
-              if (_latestDraggableOffset != null) {
-                _seekToRelativePosition(_latestDraggableOffset!);
-                _latestDraggableOffset = null;
-              }
-
-              widget.onDragEnd?.call();
             },
             onTapDown: (TapDownDetails details) {
               if (!controller.value.isInitialized) {
@@ -132,9 +171,15 @@ class StaticProgressBar extends StatelessWidget {
     required this.handleHeight,
     required this.drawShadow,
     this.latestDraggableOffset,
+    this.pendingSeekPosition,
   });
 
   final Offset? latestDraggableOffset;
+
+  /// Position of a seek that has been requested but has not been reported by
+  /// the controller yet. Painted while it is set, so the handle does not fall
+  /// back to the stale [VideoPlayerValue.position] mid-seek.
+  final Duration? pendingSeekPosition;
   final VideoPlayerValue value;
   final ChewieProgressColors colors;
 
@@ -156,7 +201,7 @@ class StaticProgressBar extends StatelessWidget {
                   value.duration,
                   latestDraggableOffset!,
                 )
-              : null,
+              : pendingSeekPosition,
           colors: colors,
           barHeight: barHeight,
           handleHeight: handleHeight,
@@ -184,8 +229,9 @@ class _ProgressBarPainter extends CustomPainter {
   final double handleHeight;
   final bool drawShadow;
 
-  /// The value of the draggable progress bar.
-  /// If null, the progress bar is not being dragged.
+  /// The position to paint instead of [VideoPlayerValue.position]: either the
+  /// one currently being dragged, or the one of a seek that is still in
+  /// flight. If null, neither is happening and the reported position is used.
   final Duration? draggableValue;
 
   @override
