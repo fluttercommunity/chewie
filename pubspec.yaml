@@ -4,16 +4,16 @@ version: 1.15.0
 homepage: https://github.com/fluttercommunity/chewie
 
 environment:
-  sdk: '>=3.10.0 <4.0.0'
-  flutter: ">=3.41.0"
+  sdk: '>=3.11.0 <4.0.0'
+  flutter: ">=3.44.0"
 
 dependencies:
   cupertino_icons: ^1.0.9
   flutter:
     sdk: flutter
   provider: ^6.1.5+1
-  video_player: ^2.11.1
-  wakelock_plus: ^1.7.0
+  video_player: ^2.14.0
+  wakelock_plus: ^1.8.0
   web: ^1.1.1
 
 dev_dependencies:
