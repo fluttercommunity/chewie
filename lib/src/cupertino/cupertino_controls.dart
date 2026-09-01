@@ -754,10 +754,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
 }
 
 class _PlaybackSpeedDialog extends StatelessWidget {
-  const _PlaybackSpeedDialog({
-    required this._speeds,
-    required this._selected,
-  });
+  const _PlaybackSpeedDialog({required this._speeds, required this._selected});
 
   final List<double> _speeds;
   final double _selected;
