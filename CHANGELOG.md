@@ -1,3 +1,6 @@
+## [1.16.1]
+* ✨ [#962](https://github.com/fluttercommunity/chewie/pull/962): Expose `showPlayButton` on `ChewieController` to allow showing or hiding the center play button. Thanks [ibrahim-iqbal](https://github.com/ibrahim-iqbal).
+
 ## [1.16.0+1]
 * Fixed lingering `dart lint` issues from previous release.
 
