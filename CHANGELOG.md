@@ -1,3 +1,6 @@
+## [Unreleased]
+* 🛠️ Fix the progress bar handle snapping back to the previous position for the duration of a seek (most visible on iOS, where an exact seek is slow to complete). The requested position is now painted until the controller reports it, and playback resumes only once the seek has landed.
+
 ## [1.15.0]
 * 🌐 [#946](https://github.com/fluttercommunity/chewie/pull/946): Web: enter the browser's native (OS-level) fullscreen via the Fullscreen API instead of only expanding the Flutter view inside the browser window. Pressing Escape to leave browser fullscreen also exits Chewie's fullscreen. Controlled by the new `ChewieController.useNativeFullScreenOnWeb` flag (defaults to `true`; no effect on non-web platforms). Thanks [Ortes](https://github.com/Ortes).
 * 🖱️ [#950](https://github.com/fluttercommunity/chewie/pull/950): Show click cursor on hover over Material controls and progress bar. Thanks [Ortes](https://github.com/Ortes).
