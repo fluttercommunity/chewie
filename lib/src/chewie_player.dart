@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'web_fullscreen.dart';
+import 'package:chewie/src/models/audio_track.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/options_translation.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
@@ -345,6 +346,9 @@ class ChewieController extends ChangeNotifier {
     this.showSubtitles = false,
     this.subtitleBuilder,
     this.subtitleStyle = const SubtitleStyle(),
+    this.audioTracks = const <AudioTrack>[],
+    this.activeAudioTrackId,
+    this.onAudioTrackChanged,
     this.customControls,
     this.errorBuilder,
     this.bufferingBuilder,
@@ -401,6 +405,9 @@ class ChewieController extends ChangeNotifier {
     bool? showSubtitles,
     Widget Function(BuildContext, dynamic)? subtitleBuilder,
     SubtitleStyle? subtitleStyle,
+    List<AudioTrack>? audioTracks,
+    Object? activeAudioTrackId,
+    void Function(AudioTrack track)? onAudioTrackChanged,
     Widget? customControls,
     WidgetBuilder? bufferingBuilder,
     Widget Function(BuildContext, String)? errorBuilder,
@@ -466,6 +473,9 @@ class ChewieController extends ChangeNotifier {
       subtitle: subtitle ?? this.subtitle,
       subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
       subtitleStyle: subtitleStyle ?? this.subtitleStyle,
+      audioTracks: audioTracks ?? this.audioTracks,
+      activeAudioTrackId: activeAudioTrackId ?? this.activeAudioTrackId,
+      onAudioTrackChanged: onAudioTrackChanged ?? this.onAudioTrackChanged,
       customControls: customControls ?? this.customControls,
       errorBuilder: errorBuilder ?? this.errorBuilder,
       bufferingBuilder: bufferingBuilder ?? this.bufferingBuilder,
@@ -551,6 +561,24 @@ class ChewieController extends ChangeNotifier {
   /// If set to `true`, subtitles will be displayed automatically when the video
   /// begins playing. If set to `false`, subtitles will be hidden by default.
   bool showSubtitles;
+
+  /// Selectable audio tracks shown in the options menu.
+  ///
+  /// Source-agnostic: the host populates this (e.g. from an HLS manifest) and
+  /// reacts to selection via [onAudioTrackChanged]. May change after the video
+  /// loads — use [setAudioTracks] so the controls rebuild. Unlike subtitles,
+  /// audio is never "off": one track is always active.
+  List<AudioTrack> audioTracks;
+
+  /// Id of the currently selected track in [audioTracks].
+  Object? activeAudioTrackId;
+
+  /// Called when the user picks an audio track from the menu.
+  final void Function(AudioTrack track)? onAudioTrackChanged;
+
+  /// Whether more than one selectable audio track is available (a single track
+  /// offers nothing to choose, so the menu entry stays hidden).
+  bool get hasAudioTracks => audioTracks.length > 1;
 
   /// The controller for the video you want to play
   final VideoPlayerController videoPlayerController;
@@ -779,6 +807,23 @@ class ChewieController extends ChangeNotifier {
 
   void setSubtitle(List<Subtitle> newSubtitle) {
     subtitle = Subtitles(newSubtitle);
+  }
+
+  /// Replaces the selectable [audioTracks] and rebuilds the controls.
+  ///
+  /// Use when tracks become known only after the media loads (e.g. once an
+  /// HLS manifest is parsed).
+  void setAudioTracks(List<AudioTrack> tracks) {
+    audioTracks = tracks;
+    notifyListeners();
+  }
+
+  /// Selects [track] as the active audio rendition, updating
+  /// [activeAudioTrackId] and notifying [onAudioTrackChanged].
+  void selectAudioTrack(AudioTrack track) {
+    activeAudioTrackId = track.id;
+    onAudioTrackChanged?.call(track);
+    notifyListeners();
   }
 }
 

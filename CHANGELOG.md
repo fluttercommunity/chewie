@@ -1,3 +1,6 @@
+## [Unreleased]
+* 🔊 [#949](https://github.com/fluttercommunity/chewie/pull/949): Add source-agnostic multi-track audio selection to the Material controls, via the new `AudioTrack` model and `ChewieController.audioTracks` / `activeAudioTrackId` / `onAudioTrackChanged`. The picker only appears when more than one track is provided. Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.16.1]
 * ✨ [#962](https://github.com/fluttercommunity/chewie/pull/962): Expose `showPlayButton` on `ChewieController` to allow showing or hiding the center play button. Thanks [ibrahim-iqbal](https://github.com/ibrahim-iqbal).
 
