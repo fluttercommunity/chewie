@@ -21,11 +21,12 @@ Chewie uses the `video_player` under the hood and wraps it in a friendly Materia
 5.  🕹️ [Using it](#%EF%B8%8F-using-it)
 6.  ⚙️ [Options](#%EF%B8%8F-options)
 7.  🔡 [Subtitles](#-subtitles)
-8.  🧪 [Example](#-example)
-9.  ⏪ [Migrating from Chewie < 0.9.0](#-migrating-from-chewie--090)
-10. 🗺️ [Roadmap](#%EF%B8%8F-roadmap)
-11. ⚠️ [Android warning](#%EF%B8%8F-android-warning)
-12. 📱 [iOS warning](#-ios-warning)
+8.  📺 [Casting](#-casting)
+9.  🧪 [Example](#-example)
+10. ⏪ [Migrating from Chewie < 0.9.0](#-migrating-from-chewie--090)
+11. 🗺️ [Roadmap](#%EF%B8%8F-roadmap)
+12. ⚠️ [Android warning](#%EF%B8%8F-android-warning)
+13. 📱 [iOS warning](#-ios-warning)
 
 
 ## 🚨 IMPORTANT!!! (READ THIS FIRST)
@@ -281,6 +282,107 @@ subtitleBuilder: (context, subtitle) => Container(
 ),
 ```
 
+## 📺 Casting
+
+Chewie can hand playback over to a cast receiver — a Chromecast, an Android TV,
+anything you can talk to — and drive it from the same controls.
+
+What Chewie provides is the UI and the handover: a cast button in every skin, a
+device picker, an overlay in place of the video while a session is live, and the
+local↔remote transitions in both directions. What it deliberately does **not**
+provide is a sender. A pure-Flutter video player package has no business
+dragging the Google Cast SDK, its native dependencies and its permission
+requirements into every app that just wants play controls — so you supply the
+backend, and Chewie stays agnostic about which one.
+
+### Wiring it up
+
+Implement `ChewieCastController` against the sender of your choice, then hand it
+to the `ChewieController` along with the media the receiver should fetch:
+
+```dart
+final castController = MyCastController(); // your ChewieCastController
+
+_chewieController = ChewieController(
+  videoPlayerController: _videoPlayerController,
+  castController: castController,
+  castMedia: const CastMedia(
+    url: 'https://example.com/video.mp4',
+    mimeType: 'video/mp4',
+    title: 'Big Buck Bunny',
+  ),
+);
+```
+
+`castMedia` is required whenever `castController` is set. Chewie cannot derive
+it from the `VideoPlayerController`: the receiver fetches the stream itself, so
+the URL has to be reachable **from the TV**, and a `file://` or asset source has
+no remote equivalent at all.
+
+### What happens on connect
+
+When your controller moves its `connectionState` to
+`CastConnectionState.connected`, Chewie:
+
+1. pauses the local player and notes where it was,
+2. calls `load(castMedia, startAt: <that position>, autoPlay: <was it playing>)`,
+3. replaces the video surface with the casting overlay,
+4. routes play, pause, seek, volume and the progress bar to the receiver.
+
+On `disconnected` it runs the same trip in reverse, seeking the local player to
+wherever the receiver got to and resuming if it was playing. Chewie listens to
+your controller but never disposes it, so one instance can serve many videos.
+
+### Implementing a backend
+
+`ChewieCastController` is a `ChangeNotifier` with three groups of members:
+discovery (`devices`, `isDiscovering`, `startDiscovery`, `stopDiscovery`),
+session (`connectionState`, `connectedDevice`, `connect`, `disconnect`) and
+remote playback (`value`, `load`, `play`, `pause`, `seekTo`, `setVolume`,
+`setPlaybackSpeed`). Call `notifyListeners()` whenever any of them change —
+every piece of cast UI rebuilds off those notifications.
+
+`value` is a `VideoPlayerValue`, the same type the local player reports, which is
+what lets one set of controls render a remote session identically to a local
+one. Only `duration`, `position`, `buffered`, `isPlaying`, `isBuffering`,
+`isInitialized`, `volume` and `playbackSpeed` are read; leave the rest at their
+defaults.
+
+The example app ships a `DemoCastController` that fakes discovery, a connection
+delay and a ticking receiver, so you can see the whole flow without a
+Chromecast on the desk.
+
+### Options
+
+| Option | Description |
+| --- | --- |
+| `castController` | Your backend. Casting is off entirely when this is null. |
+| `castMedia` | What the receiver should play. Required alongside `castController`. |
+| `allowCasting` | Hides the cast button without tearing the backend out. Defaults to `true`. |
+| `castTranslations` | Strings for the button, picker and overlay. |
+| `castOverlayBuilder` | Replaces the default "Casting to …" overlay. |
+| `additionalControls` | Extra widgets for the control bar itself, for controls that cannot be an options-sheet row. |
+
+### Extra control-bar buttons
+
+`additionalOptions` adds rows to the options sheet. When a control has to be a
+*widget* rather than a menu entry — a platform view, say — put it in the bar
+itself:
+
+```dart
+ChewieController(
+  videoPlayerController: videoPlayerController,
+  additionalControls: (context) => const [AirPlayButton()],
+);
+```
+
+They sit alongside the built-in buttons and inherit the bar's show/hide
+behaviour, so they fade with the rest of the controls instead of floating over
+the video.
+
+The motivating case is AirPlay: Apple exposes no way to select a route
+programmatically, so the button must be UIKit's own `AVRoutePickerView`.
+
 ## 🧪 Example
 
 Please run the app in the [`example/`](https://github.com/brianegan/chewie/tree/master/example) folder to start playing!
@@ -334,7 +436,7 @@ final playerWidget = Chewie(
 - [x] Custom ErrorBuilder
 - [ ] Support different resolutions of video
 - [ ] Re-design State-Manager with Provider
-- [ ] Screen-Mirroring / Casting (Google Chromecast)
+- [x] Screen-Mirroring / Casting (backend-agnostic; see [Casting](#-casting))
 
 
 ## ⚠️ Android warning
