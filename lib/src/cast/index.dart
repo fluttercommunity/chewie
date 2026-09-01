@@ -6,3 +6,4 @@ export 'chewie_playback_target.dart';
 export 'widgets/cast_button.dart';
 export 'widgets/cast_devices_dialog.dart';
 export 'widgets/cast_overlay.dart';
+export 'widgets/cupertino_cast_button.dart';
