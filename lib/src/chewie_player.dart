@@ -337,6 +337,7 @@ class ChewieController extends ChangeNotifier {
     this.optionsBuilder,
     this.additionalOptions,
     this.showControls = true,
+    this.showPlayButton = true,
     this.transformationController,
     this.zoomAndPan = false,
     this.maxScale = 2.5,
@@ -392,6 +393,7 @@ class ChewieController extends ChangeNotifier {
     Future<void> Function(BuildContext, List<OptionItem>)? optionsBuilder,
     List<OptionItem> Function(BuildContext)? additionalOptions,
     bool? showControls,
+    bool? showPlayButton,
     TransformationController? transformationController,
     bool? zoomAndPan,
     double? maxScale,
@@ -459,6 +461,7 @@ class ChewieController extends ChangeNotifier {
       optionsBuilder: optionsBuilder ?? this.optionsBuilder,
       additionalOptions: additionalOptions ?? this.additionalOptions,
       showControls: showControls ?? this.showControls,
+      showPlayButton: showPlayButton ?? this.showPlayButton,
       showSubtitles: showSubtitles ?? this.showSubtitles,
       subtitle: subtitle ?? this.subtitle,
       subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
@@ -572,6 +575,10 @@ class ChewieController extends ChangeNotifier {
 
   /// Whether or not to show the controls at all
   final bool showControls;
+
+  /// Whether or not to show the center play button.
+  /// Only used when [customControls] is not set.
+  final bool showPlayButton;
 
   /// Controller to pass into the [InteractiveViewer] component.
   /// If it is required to control the transformation only via the controller,
