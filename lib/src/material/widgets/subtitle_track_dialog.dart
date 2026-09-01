@@ -17,11 +17,10 @@ class SubtitleTrackChoice {
 class SubtitleTrackDialog extends StatelessWidget {
   const SubtitleTrackDialog({
     super.key,
-    required List<SubtitleTrack> tracks,
-    required Object? selectedId,
+    required this._tracks,
+    required this._selectedId,
     this.offLabel = 'Off',
-  }) : _tracks = tracks,
-       _selectedId = selectedId;
+  });
 
   final List<SubtitleTrack> _tracks;
   final Object? _selectedId;
