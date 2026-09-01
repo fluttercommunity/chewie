@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 import 'package:chewie/src/animated_play_pause.dart';
 import 'package:chewie/src/cast/chewie_cast_controller.dart';
 import 'package:chewie/src/cast/chewie_playback_target.dart';
-import 'package:chewie/src/cast/widgets/cast_button.dart';
+import 'package:chewie/src/cast/widgets/cupertino_cast_button.dart';
 import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
@@ -556,47 +556,6 @@ class _CupertinoControlsState extends State<CupertinoControls>
     );
   }
 
-  Widget _buildCastButton(
-    Color backgroundColor,
-    Color iconColor,
-    double barHeight,
-    double buttonPadding,
-  ) {
-    // Cupertino's top bar has no shared opacity wrapper — each button fades
-    // itself. Without this the cast icon stayed on screen after the rest of
-    // the controls had gone, looking like it was not part of them.
-    return AnimatedOpacity(
-      opacity: notifier.hideStuff ? 0.0 : 1.0,
-      duration: const Duration(milliseconds: 300),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10.0),
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 10.0),
-          child: ColoredBox(
-            color: backgroundColor,
-            child: SizedBox(
-              height: barHeight,
-              child: CastButton(
-                castController: _castController!,
-                translations: chewieController.castTranslations,
-                useRootNavigator: chewieController.useRootNavigator,
-                cancelButtonText:
-                    chewieController.optionsTranslation?.cancelButtonText,
-                iconColor: iconColor,
-                iconSize: 16,
-                padding: EdgeInsets.symmetric(horizontal: buttonPadding),
-                onMenuOpened: () => _hideTimer?.cancel(),
-                onMenuClosed: () {
-                  if (_latestValue.isPlaying) _startHideTimer();
-                },
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildTopBar(
     Color backgroundColor,
     Color iconColor,
@@ -655,11 +614,21 @@ class _CupertinoControlsState extends State<CupertinoControls>
               ),
             ),
           if (_castController != null && chewieController.allowCasting) ...[
-            _buildCastButton(
-              backgroundColor,
-              iconColor,
-              barHeight,
-              buttonPadding,
+            CupertinoCastButton(
+              castController: _castController!,
+              translations: chewieController.castTranslations,
+              backgroundColor: backgroundColor,
+              barHeight: barHeight,
+              buttonPadding: buttonPadding,
+              hidden: notifier.hideStuff,
+              iconColor: iconColor,
+              useRootNavigator: chewieController.useRootNavigator,
+              cancelButtonText:
+                  chewieController.optionsTranslation?.cancelButtonText,
+              onMenuOpened: () => _hideTimer?.cancel(),
+              onMenuClosed: () {
+                if (_latestValue.isPlaying) _startHideTimer();
+              },
             ),
             SizedBox(width: marginSize),
           ],
