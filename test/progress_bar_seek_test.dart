@@ -74,6 +74,7 @@ class _FakeVideoPlayerPlatform extends VideoPlayerPlatform {
   @override
   Future<void> setPlaybackSpeed(int playerId, double speed) async {}
 
+  @override
   Future<void> setPreventsDisplaySleepDuringVideoPlayback(
     int playerId,
     bool prevent,

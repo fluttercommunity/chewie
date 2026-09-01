@@ -1,3 +1,6 @@
+## [1.16.0+1]
+* Fixed lingering `dart lint` issues from previous release.
+
 ## [1.16.0]
 * 🛠️ [#966](https://github.com/fluttercommunity/chewie/pull/966): Fix the progress bar handle snapping back to the previous position for the duration of a seek (most visible on iOS, where an exact seek is slow to complete). The requested position is now painted until the controller reports it, and playback resumes only once the seek has landed. Thanks [Ortes](https://github.com/Ortes).
 * ⬆️ [#967](https://github.com/fluttercommunity/chewie/pull/967): Flutter 3.47 maintenance. Thanks [diegotori](https://github.com/diegotori).
