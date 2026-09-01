@@ -10,9 +10,9 @@ import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/cupertino/cupertino_progress_bar.dart';
+import 'package:chewie/src/cupertino/widgets/cupertino_additional_controls.dart';
 import 'package:chewie/src/cupertino/widgets/cupertino_options_dialog.dart';
 import 'package:chewie/src/helpers/utils.dart';
-import 'package:chewie/src/models/chewie_control_style.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
@@ -579,39 +579,15 @@ class _CupertinoControlsState extends State<CupertinoControls>
               buttonPadding,
             ),
           const Spacer(),
-          // This bar has no shared opacity wrapper — each button fades itself —
-          // so supplied controls need one too, or they stay put while
-          // everything around them fades.
           if (chewieController.additionalControls != null)
-            AnimatedOpacity(
-              opacity: notifier.hideStuff ? 0.0 : 1.0,
-              duration: const Duration(milliseconds: 300),
-              child: ChewieControlStyle(
-                iconSize: 16,
-                iconColor: iconColor,
-                padding: EdgeInsets.symmetric(horizontal: buttonPadding),
-                decorate: (child) => ClipRRect(
-                  borderRadius: BorderRadius.circular(10.0),
-                  child: BackdropFilter(
-                    filter: ui.ImageFilter.blur(sigmaX: 10.0),
-                    child: ColoredBox(
-                      color: backgroundColor,
-                      child: SizedBox(height: barHeight, child: child),
-                    ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Each supplied control wears its own frosted pill, so
-                    // they need the gap the bar's own buttons have between
-                    // them; without it two of them sit pill against pill.
-                    for (final control in chewieController.additionalControls!(
-                      context,
-                    )) ...[control, SizedBox(width: marginSize)],
-                  ],
-                ),
-              ),
+            CupertinoAdditionalControls(
+              additionalControls: chewieController.additionalControls!,
+              backgroundColor: backgroundColor,
+              barHeight: barHeight,
+              buttonPadding: buttonPadding,
+              marginSize: marginSize,
+              hidden: notifier.hideStuff,
+              iconColor: iconColor,
             ),
           if (_castController != null && chewieController.allowCasting) ...[
             CupertinoCastButton(

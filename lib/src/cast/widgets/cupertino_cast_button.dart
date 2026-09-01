@@ -1,7 +1,6 @@
-import 'dart:ui' as ui;
-
 import 'package:chewie/src/cast/chewie_cast_controller.dart';
 import 'package:chewie/src/cast/widgets/cast_button.dart';
+import 'package:chewie/src/cupertino/widgets/cupertino_frosted_pill.dart';
 import 'package:chewie/src/models/cast_translations.dart';
 import 'package:flutter/material.dart';
 
@@ -54,27 +53,19 @@ class CupertinoCastButton extends StatelessWidget {
     return AnimatedOpacity(
       opacity: hidden ? 0.0 : 1.0,
       duration: const Duration(milliseconds: 300),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10.0),
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 10.0),
-          child: ColoredBox(
-            color: backgroundColor,
-            child: SizedBox(
-              height: barHeight,
-              child: CastButton(
-                castController: castController,
-                translations: translations,
-                useRootNavigator: useRootNavigator,
-                cancelButtonText: cancelButtonText,
-                iconColor: iconColor,
-                iconSize: 16,
-                padding: EdgeInsets.symmetric(horizontal: buttonPadding),
-                onMenuOpened: onMenuOpened,
-                onMenuClosed: onMenuClosed,
-              ),
-            ),
-          ),
+      child: CupertinoFrostedPill(
+        backgroundColor: backgroundColor,
+        barHeight: barHeight,
+        child: CastButton(
+          castController: castController,
+          translations: translations,
+          useRootNavigator: useRootNavigator,
+          cancelButtonText: cancelButtonText,
+          iconColor: iconColor,
+          iconSize: 16,
+          padding: EdgeInsets.symmetric(horizontal: buttonPadding),
+          onMenuOpened: onMenuOpened,
+          onMenuClosed: onMenuClosed,
         ),
       ),
     );
