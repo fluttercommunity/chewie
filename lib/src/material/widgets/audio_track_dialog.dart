@@ -7,10 +7,9 @@ import 'package:flutter/material.dart';
 class AudioTrackDialog extends StatelessWidget {
   const AudioTrackDialog({
     super.key,
-    required List<AudioTrack> tracks,
-    required Object? selectedId,
-  }) : _tracks = tracks,
-       _selectedId = selectedId;
+    required this._tracks,
+    required this._selectedId,
+  });
 
   final List<AudioTrack> _tracks;
   final Object? _selectedId;
