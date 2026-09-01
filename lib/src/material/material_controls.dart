@@ -4,6 +4,7 @@ import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/center_seek_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
+import 'package:chewie/src/helpers/seek_indicator_mixin.dart';
 import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
@@ -11,6 +12,7 @@ import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
+import 'package:chewie/src/seek_indicator.dart';
 import 'package:chewie/src/subtitle_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +30,7 @@ class MaterialControls extends StatefulWidget {
 }
 
 class _MaterialControlsState extends State<MaterialControls>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, SeekIndicatorStateMixin {
   late PlayerNotifier notifier;
   late VideoPlayerValue _latestValue;
   double? _latestVolume;
@@ -41,6 +43,13 @@ class _MaterialControlsState extends State<MaterialControls>
   bool _displayTapped = false;
   Timer? _bufferingDisplayTimer;
   bool _displayBufferingIndicator = false;
+
+  /// Fraction of the hit area's width on each side that reacts to
+  /// double-tap-to-seek, YouTube-style. The middle band is a dead zone.
+  static const _doubleTapSeekZoneFraction = 0.4;
+
+  /// Where the last double tap landed, recorded by `onDoubleTapDown`.
+  double? _doubleTapDx;
 
   final barHeight = 48.0 * 1.5;
   final marginSize = 5.0;
@@ -100,6 +109,12 @@ class _MaterialControlsState extends State<MaterialControls>
                   _buildBottomBar(context),
                 ],
               ),
+              if (chewieController.showSeekIndicator)
+                SeekIndicator(
+                  show: seekIndicatorVisible,
+                  forward: seekIndicatorForward,
+                  seconds: seekIndicatorSeconds,
+                ),
             ],
           ),
         ),
@@ -118,6 +133,7 @@ class _MaterialControlsState extends State<MaterialControls>
     _hideTimer?.cancel();
     _initTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
+    disposeSeekIndicator();
   }
 
   @override
@@ -341,70 +357,65 @@ class _MaterialControlsState extends State<MaterialControls>
     final bool showPlayButton =
         widget.showPlayButton && !_dragging && !notifier.hideStuff;
 
-    return GestureDetector(
-      onTap: () {
-        if (_latestValue.isPlaying) {
-          if (_chewieController?.pauseOnBackgroundTap ?? false) {
-            _playPause();
-            _cancelAndRestartTimer();
-          } else {
-            if (_displayTapped) {
-              setState(() {
-                notifier.hideStuff = true;
-              });
-            } else {
-              _cancelAndRestartTimer();
-            }
-          }
-        } else {
-          _playPause();
+    final bool canDoubleTapSeek = _canDoubleTapSeek;
 
-          setState(() {
-            notifier.hideStuff = true;
-          });
-        }
-      },
-      child: Container(
-        alignment: Alignment.center,
-        color: Colors
-            .transparent, // The Gesture Detector doesn't expand to the full size of the container without this; Not sure why!
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (!isFinished && !chewieController.isLive)
-              CenterSeekButton(
-                iconData: Icons.replay_10,
-                backgroundColor: Colors.black54,
-                iconColor: Colors.white,
-                show: showPlayButton,
-                fadeDuration: chewieController.materialSeekButtonFadeDuration,
-                iconSize: chewieController.materialSeekButtonSize,
-                onPressed: _seekBackward,
-              ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: marginSize),
-              child: CenterPlayButton(
-                backgroundColor: Colors.black54,
-                iconColor: Colors.white,
-                isFinished: isFinished,
-                isPlaying: controller.value.isPlaying,
-                show: showPlayButton,
-                onPressed: _playPause,
-              ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+
+        return GestureDetector(
+          onTapUp: (details) => _onHitAreaTapUp(details, width),
+          onDoubleTapDown: canDoubleTapSeek
+              ? (details) => _doubleTapDx = details.localPosition.dx
+              : null,
+          onDoubleTap: canDoubleTapSeek
+              ? () => _onHitAreaDoubleTap(width)
+              : null,
+          child: Container(
+            alignment: Alignment.center,
+            color: Colors
+                .transparent, // The Gesture Detector doesn't expand to the full size of the container without this; Not sure why!
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (!isFinished && !chewieController.isLive)
+                  CenterSeekButton(
+                    iconData: Icons.replay_10,
+                    backgroundColor: Colors.black54,
+                    iconColor: Colors.white,
+                    show: showPlayButton,
+                    fadeDuration:
+                        chewieController.materialSeekButtonFadeDuration,
+                    iconSize: chewieController.materialSeekButtonSize,
+                    onPressed: _seekBackward,
+                  ),
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: marginSize),
+                  child: CenterPlayButton(
+                    backgroundColor: Colors.black54,
+                    iconColor: Colors.white,
+                    isFinished: isFinished,
+                    isPlaying: controller.value.isPlaying,
+                    show: showPlayButton,
+                    onPressed: _playPause,
+                  ),
+                ),
+                if (!isFinished && !chewieController.isLive)
+                  CenterSeekButton(
+                    iconData: Icons.forward_10,
+                    backgroundColor: Colors.black54,
+                    iconColor: Colors.white,
+                    show: showPlayButton,
+                    fadeDuration:
+                        chewieController.materialSeekButtonFadeDuration,
+                    iconSize: chewieController.materialSeekButtonSize,
+                    onPressed: _seekForward,
+                  ),
+              ],
             ),
-            if (!isFinished && !chewieController.isLive)
-              CenterSeekButton(
-                iconData: Icons.forward_10,
-                backgroundColor: Colors.black54,
-                iconColor: Colors.white,
-                show: showPlayButton,
-                fadeDuration: chewieController.materialSeekButtonFadeDuration,
-                iconSize: chewieController.materialSeekButtonSize,
-                onPressed: _seekForward,
-              ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -580,6 +591,75 @@ class _MaterialControlsState extends State<MaterialControls>
 
   void _seekForward() {
     _seekRelative(const Duration(seconds: 10));
+  }
+
+  bool get _canDoubleTapSeek {
+    final bool isFinished =
+        (_latestValue.position >= _latestValue.duration) &&
+        _latestValue.duration.inSeconds > 0;
+
+    return chewieController.allowDoubleTapSeek &&
+        !chewieController.isLive &&
+        !isFinished;
+  }
+
+  void _onHitAreaTapUp(TapUpDetails details, double width) {
+    // While the seek indicator is visible, single taps in the zone that
+    // started the seek keep seeking, YouTube-style (10s → 20s → 30s).
+    if (seekIndicatorVisible && _canDoubleTapSeek && width > 0) {
+      final fraction = details.localPosition.dx / width;
+      final inSameZone = seekIndicatorForward
+          ? fraction > 1 - _doubleTapSeekZoneFraction
+          : fraction < _doubleTapSeekZoneFraction;
+      if (inSameZone) {
+        _doubleTapSeek(forward: seekIndicatorForward);
+        return;
+      }
+    }
+
+    if (_latestValue.isPlaying) {
+      if (_chewieController?.pauseOnBackgroundTap ?? false) {
+        _playPause();
+        _cancelAndRestartTimer();
+      } else {
+        if (_displayTapped) {
+          setState(() {
+            notifier.hideStuff = true;
+          });
+        } else {
+          _cancelAndRestartTimer();
+        }
+      }
+    } else {
+      _playPause();
+
+      setState(() {
+        notifier.hideStuff = true;
+      });
+    }
+  }
+
+  void _onHitAreaDoubleTap(double width) {
+    final dx = _doubleTapDx;
+    _doubleTapDx = null;
+    if (dx == null || width <= 0 || !_canDoubleTapSeek) return;
+
+    final fraction = dx / width;
+    if (fraction < _doubleTapSeekZoneFraction) {
+      _doubleTapSeek(forward: false);
+    } else if (fraction > 1 - _doubleTapSeekZoneFraction) {
+      _doubleTapSeek(forward: true);
+    }
+    // The middle band is a dead zone, like YouTube.
+  }
+
+  void _doubleTapSeek({required bool forward}) {
+    final step = chewieController.doubleTapSeekDuration;
+    _seekRelative(forward ? step : -step);
+
+    if (chewieController.showSeekIndicator) {
+      bumpSeekIndicator(forward: forward, stepSeconds: step.inSeconds);
+    }
   }
 
   void _startHideTimer() {

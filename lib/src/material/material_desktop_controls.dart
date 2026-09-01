@@ -4,6 +4,7 @@ import 'package:chewie/src/animated_play_pause.dart';
 import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
+import 'package:chewie/src/helpers/seek_indicator_mixin.dart';
 import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
@@ -11,6 +12,7 @@ import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
+import 'package:chewie/src/seek_indicator.dart';
 import 'package:chewie/src/subtitle_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -29,7 +31,7 @@ class MaterialDesktopControls extends StatefulWidget {
 }
 
 class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, SeekIndicatorStateMixin {
   late PlayerNotifier notifier;
   late VideoPlayerValue _latestValue;
   double? _latestVolume;
@@ -127,6 +129,12 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
                     _buildBottomBar(context),
                   ],
                 ),
+                if (chewieController.showSeekIndicator)
+                  SeekIndicator(
+                    show: seekIndicatorVisible,
+                    forward: seekIndicatorForward,
+                    seconds: seekIndicatorSeconds,
+                  ),
               ],
             ),
           ),
@@ -147,6 +155,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     _hideTimer?.cancel();
     _initTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
+    disposeSeekIndicator();
   }
 
   @override
@@ -328,6 +337,12 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     final bool showPlayButton =
         widget.showPlayButton && !_dragging && !notifier.hideStuff;
 
+    // Double-clicking the video toggles fullscreen, like the YouTube
+    // desktop player.
+    final bool doubleTapToggleFullScreen =
+        chewieController.allowDoubleTapToggleFullScreen &&
+        chewieController.allowFullScreen;
+
     return GestureDetector(
       onTap: () {
         if (_latestValue.isPlaying) {
@@ -351,6 +366,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
           });
         }
       },
+      onDoubleTap: doubleTapToggleFullScreen ? _onExpandCollapse : null,
       child: CenterPlayButton(
         backgroundColor: Colors.black54,
         iconColor: Colors.white,
@@ -568,11 +584,25 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   }
 
   void _seekBackward() {
-    _seekRelative(const Duration(seconds: -10));
+    _seekRelative(-chewieController.keyboardSeekDuration);
+    _bumpSeekIndicator(forward: false);
   }
 
   void _seekForward() {
-    _seekRelative(const Duration(seconds: 10));
+    _seekRelative(chewieController.keyboardSeekDuration);
+    _bumpSeekIndicator(forward: true);
+  }
+
+  /// Shows the YouTube-style seek indicator and accumulates the seeked amount
+  /// while the user keeps pressing in the same direction. Pressing the opposite
+  /// direction (or after it has faded out) resets the counter.
+  void _bumpSeekIndicator({required bool forward}) {
+    if (!chewieController.showSeekIndicator) return;
+
+    bumpSeekIndicator(
+      forward: forward,
+      stepSeconds: chewieController.keyboardSeekDuration.inSeconds,
+    );
   }
 
   void _seekRelative(Duration relativeSeek) {

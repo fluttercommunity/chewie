@@ -1,3 +1,7 @@
+## [Unreleased]
+* 👆 [#964](https://github.com/fluttercommunity/chewie/pull/964): YouTube-style tap gestures. On the mobile Material controls, double-tapping the left/right side of the video seeks backward/forward (`ChewieController.allowDoubleTapSeek`, default `true`; amount set by `ChewieController.doubleTapSeekDuration`, default 10 seconds), flashing the seek indicator — and while it is visible, further single taps in the same zone keep seeking (`10s` → `20s` → `30s`). The middle of the video is a dead zone. On the desktop Material controls, double-clicking the video toggles fullscreen (`ChewieController.allowDoubleTapToggleFullScreen`, default `true`). Double-tap-to-seek was first explored by [punit1111](https://github.com/punit1111) in [#717](https://github.com/fluttercommunity/chewie/pull/717). Thanks [Ortes](https://github.com/Ortes).
+* ⏩ [#953](https://github.com/fluttercommunity/chewie/pull/953): Add a YouTube-style seek indicator that flashes the seeked amount when seeking with the keyboard arrows on desktop, accumulating on repeated presses in the same direction (e.g. `10s` → `20s` → `30s`). Configurable via `ChewieController.showSeekIndicator` (default `true`), with the per-press amount set by `ChewieController.keyboardSeekDuration` (default 10 seconds). Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.16.1]
 * ✨ [#962](https://github.com/fluttercommunity/chewie/pull/962): Expose `showPlayButton` on `ChewieController` to allow showing or hiding the center play button. Thanks [ibrahim-iqbal](https://github.com/ibrahim-iqbal).
 
