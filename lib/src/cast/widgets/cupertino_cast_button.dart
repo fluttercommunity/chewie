@@ -60,6 +60,7 @@ class CupertinoCastButton extends StatelessWidget {
           castController: castController,
           translations: translations,
           useRootNavigator: useRootNavigator,
+          pickerStyle: CastPickerStyle.cupertino,
           cancelButtonText: cancelButtonText,
           iconColor: iconColor,
           iconSize: 16,

@@ -1,4 +1,5 @@
 import 'package:chewie/chewie.dart';
+import 'package:flutter/cupertino.dart' show CupertinoActionSheet;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_player/video_player.dart';
@@ -292,6 +293,41 @@ void main() {
   });
 
   group('device picker', () {
+    testWidgets('the Material skin opens a modal bottom sheet', (tester) async {
+      await _pumpPlayer(
+        tester,
+        _buildController(castController: FakeCastController()),
+      );
+
+      await tester.tap(find.byType(CastButton));
+      await _settle(tester);
+
+      expect(find.byType(CastDevicesDialog), findsOneWidget);
+      expect(find.byType(CupertinoCastDevicesSheet), findsNothing);
+    });
+
+    testWidgets('the Cupertino skin opens an action sheet', (tester) async {
+      await _pumpPlayer(
+        tester,
+        _buildController(
+          castController: FakeCastController(),
+          customControls: const CupertinoControls(
+            backgroundColor: Colors.black,
+            iconColor: Colors.white,
+          ),
+        ),
+      );
+
+      await tester.tap(find.byType(CastButton));
+      await _settle(tester);
+
+      // A Material sheet from the Cupertino bar would look wrong, and was what
+      // this skin used to get.
+      expect(find.byType(CupertinoCastDevicesSheet), findsOneWidget);
+      expect(find.byType(CupertinoActionSheet), findsOneWidget);
+      expect(find.byType(CastDevicesDialog), findsNothing);
+    });
+
     testWidgets('scans only while the picker is open', (tester) async {
       final cast = FakeCastController(devices: const [_livingRoom]);
       await _pumpPlayer(tester, _buildController(castController: cast));

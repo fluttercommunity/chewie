@@ -1,8 +1,19 @@
 import 'package:chewie/src/cast/cast_connection_state.dart';
 import 'package:chewie/src/cast/chewie_cast_controller.dart';
 import 'package:chewie/src/cast/widgets/cast_devices_dialog.dart';
+import 'package:chewie/src/cast/widgets/cupertino_cast_devices_sheet.dart';
 import 'package:chewie/src/models/cast_translations.dart';
+import 'package:flutter/cupertino.dart' show showCupertinoModalPopup;
 import 'package:flutter/material.dart';
+
+/// How [CastButton] presents its device picker.
+enum CastPickerStyle {
+  /// A Material modal bottom sheet of `ListTile`s.
+  material,
+
+  /// A `CupertinoActionSheet`, as iOS presents a choice.
+  cupertino,
+}
 
 /// The cast button for Chewie's control bars.
 ///
@@ -18,6 +29,7 @@ class CastButton extends StatefulWidget {
     this.iconSize,
     this.padding,
     this.useRootNavigator = true,
+    this.pickerStyle = CastPickerStyle.material,
     this.cancelButtonText,
     this.onMenuOpened,
     this.onMenuClosed,
@@ -30,6 +42,9 @@ class CastButton extends StatefulWidget {
   final double? iconSize;
   final EdgeInsets? padding;
   final bool useRootNavigator;
+
+  /// Which picker the button opens; set by the skin that hosts it.
+  final CastPickerStyle pickerStyle;
   final String? cancelButtonText;
 
   /// Called as the picker opens, so the skin can hold its hide timer.
@@ -100,16 +115,29 @@ class _CastButtonState extends State<CastButton>
       await widget.castController.stopDiscovery();
       return;
     }
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useRootNavigator: widget.useRootNavigator,
-      builder: (_) => CastDevicesDialog(
-        castController: widget.castController,
-        translations: widget.translations,
-        cancelButtonText: widget.cancelButtonText,
-      ),
-    );
+    switch (widget.pickerStyle) {
+      case CastPickerStyle.material:
+        await showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          useRootNavigator: widget.useRootNavigator,
+          builder: (_) => CastDevicesDialog(
+            castController: widget.castController,
+            translations: widget.translations,
+            cancelButtonText: widget.cancelButtonText,
+          ),
+        );
+      case CastPickerStyle.cupertino:
+        await showCupertinoModalPopup<void>(
+          context: context,
+          useRootNavigator: widget.useRootNavigator,
+          builder: (_) => CupertinoCastDevicesSheet(
+            castController: widget.castController,
+            translations: widget.translations,
+            cancelButtonText: widget.cancelButtonText,
+          ),
+        );
+    }
 
     await widget.castController.stopDiscovery();
     widget.onMenuClosed?.call();

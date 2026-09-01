@@ -1,5 +1,8 @@
 ## [Unreleased]
 * 📺 Casting / screen-mirroring support. Chewie now ships the cast UI — a cast button in the Material, Material desktop and Cupertino skins, a device picker, and an overlay in place of the video while a session is live — plus the local↔remote handover in both directions. The sender itself is supplied by the app through the new `ChewieCastController` abstraction, so a pure-Flutter package does not pull the Google Cast SDK and its native dependencies into every consumer. New `ChewieController` options: `castController`, `castMedia`, `allowCasting`, `castTranslations` and `castOverlayBuilder`. See the [Casting](README.md#-casting) section.
+* 📱 The device picker follows the skin: the Cupertino controls open a
+  `CupertinoActionSheet` instead of a Material modal bottom sheet. Which one
+  `CastButton` opens is set by `CastPickerStyle`.
 * 🛠️ Progress bar: draw only the empty track when a source reports itself initialized before it knows its duration, instead of asserting on a NaN inside `drawRRect`.
 * ✨ `ChewieController.additionalControls` puts app-supplied widgets in the control bar, for controls that have to be a widget rather than an options-sheet row — an AirPlay button being the motivating case. They inherit the bar's show/hide behaviour.
 * ✨ `ChewieControlStyle` lets a bar tell those widgets how it dresses its own buttons — icon size, tint, padding and chrome — so one widget matches the Material, Material desktop and Cupertino skins instead of being sized for one and sitting wrong in the others. The example demonstrates it with a dependency-free control.
