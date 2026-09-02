@@ -1,5 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart' show CupertinoActionSheet;
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_player/video_player.dart';
@@ -23,12 +24,14 @@ ChewieController _buildController({
   ChewieCastController? castController,
   bool allowCasting = true,
   Widget? customControls,
+  ValueListenable<bool>? externalPlayback,
 }) {
   return ChewieController(
     videoPlayerController: VideoPlayerController.networkUrl(Uri.parse(_src)),
     autoPlay: false,
     looping: false,
     castController: castController,
+    externalPlayback: externalPlayback,
     castMedia: castController == null ? null : _media,
     allowCasting: allowCasting,
     customControls: customControls ?? const MaterialControls(),
@@ -66,7 +69,9 @@ Finder _castButtonIcon(IconData icon) =>
     find.descendant(of: find.byType(CastButton), matching: find.byIcon(icon));
 
 void main() {
-  setUp(FakeVideoPlayerPlatform.install);
+  late FakeVideoPlayerPlatform fakePlatform;
+
+  setUp(() => fakePlatform = FakeVideoPlayerPlatform.install());
 
   group('cast button visibility', () {
     testWidgets('is absent when no cast controller is configured', (
@@ -570,6 +575,60 @@ void main() {
       expect(cast.loadCalls, isEmpty);
       expect(controller.isCasting, isFalse);
       expect(controller.playback.isRemote, isFalse);
+    });
+  });
+
+  group('external playback', () {
+    testWidgets('suppresses the buffering spinner without a cast session', (
+      tester,
+    ) async {
+      final airplay = ValueNotifier<bool>(false);
+      addTearDown(airplay.dispose);
+      final controller = _buildController(externalPlayback: airplay);
+      // The spinner reflects the local player, which these tests otherwise
+      // never bring up: cast paths do not need it initialized.
+      await controller.videoPlayerController.initialize();
+      await _pumpPlayer(tester, controller);
+
+      // Buffering locally, with the video on this device: the spinner is the
+      // only thing telling the viewer anything is happening.
+      fakePlatform.setBuffering(true);
+      await _settle(tester);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      // Once a route takes the video, the television reports its own loading.
+      airplay.value = true;
+      await _settle(tester);
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+
+      airplay.value = false;
+      await _settle(tester);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    });
+
+    testWidgets('isPlaybackRemote covers both routes off the device', (
+      tester,
+    ) async {
+      final airplay = ValueNotifier<bool>(false);
+      addTearDown(airplay.dispose);
+      final cast = FakeCastController(devices: const [_livingRoom]);
+      final controller = _buildController(
+        castController: cast,
+        externalPlayback: airplay,
+      );
+      await _pumpPlayer(tester, controller);
+
+      expect(controller.isPlaybackRemote, isFalse);
+
+      airplay.value = true;
+      await _settle(tester);
+      expect(controller.isPlaybackRemote, isTrue);
+
+      airplay.value = false;
+      await cast.connect(_livingRoom);
+      cast.completeConnection();
+      await _settle(tester);
+      expect(controller.isPlaybackRemote, isTrue);
     });
   });
 

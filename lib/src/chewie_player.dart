@@ -372,6 +372,7 @@ class ChewieController extends ChangeNotifier {
     this.controlsSafeAreaMinimum = EdgeInsets.zero,
     this.pauseOnBackgroundTap = false,
     this.castController,
+    this.externalPlayback,
     this.castMedia,
     this.allowCasting = true,
     this.castTranslations = const CastTranslations(),
@@ -445,6 +446,7 @@ class ChewieController extends ChangeNotifier {
     routePageBuilder,
     bool? pauseOnBackgroundTap,
     ChewieCastController? castController,
+    ValueListenable<bool>? externalPlayback,
     CastMedia? castMedia,
     bool? allowCasting,
     CastTranslations? castTranslations,
@@ -519,6 +521,7 @@ class ChewieController extends ChangeNotifier {
           progressIndicatorDelay ?? this.progressIndicatorDelay,
       pauseOnBackgroundTap: pauseOnBackgroundTap ?? this.pauseOnBackgroundTap,
       castController: castController ?? this.castController,
+      externalPlayback: externalPlayback ?? this.externalPlayback,
       castMedia: castMedia ?? this.castMedia,
       allowCasting: allowCasting ?? this.allowCasting,
       castTranslations: castTranslations ?? this.castTranslations,
@@ -731,6 +734,23 @@ class ChewieController extends ChangeNotifier {
   /// lifetime, so a single instance can serve many videos in a row.
   final ChewieCastController? castController;
 
+  /// Whether playback has left this device by some means Chewie does not own.
+  ///
+  /// A cast session Chewie manages is already covered by [castController].
+  /// This is for everything else — AirPlay being the case it was added for,
+  /// where the platform routes the same player to a television and there is no
+  /// receiver to enumerate, connect to or hand over to, so it cannot be
+  /// modelled as a [ChewieCastController] at all.
+  ///
+  /// Chewie only reads it, to know that the local surface is not what the
+  /// viewer is looking at: while it reports true the buffering spinner is
+  /// suppressed, because whatever is showing the video reports its own loading
+  /// state on the screen the viewer is actually watching.
+  ///
+  /// Supply anything that can answer the question and say when the answer
+  /// changes; `chewie_cast`'s `AirPlayController` is one such thing.
+  final ValueListenable<bool>? externalPlayback;
+
   /// What to play on the receiver. Required whenever [castController] is set.
   ///
   /// The receiver fetches this URL itself, so it has to be reachable from the
@@ -798,6 +818,12 @@ class ChewieController extends ChangeNotifier {
   /// Whether a cast session is currently carrying playback.
   bool get isCasting => castController?.isConnected ?? false;
 
+  /// Whether the video is playing anywhere other than this device's screen.
+  ///
+  /// True for a cast session and for [externalPlayback] alike: the controls
+  /// care that the local surface is stale, not how it got that way.
+  bool get isPlaybackRemote => isCasting || (externalPlayback?.value ?? false);
+
   /// Guards the deferred work in [_initialize] against a controller that was
   /// disposed before the frame it was waiting for.
   bool _disposed = false;
@@ -834,6 +860,8 @@ class ChewieController extends ChangeNotifier {
     // texture, so make sure we never end up subscribed twice.
     castController?.removeListener(_onCastStateChanged);
     castController?.addListener(_onCastStateChanged);
+    externalPlayback?.removeListener(_onExternalPlaybackChanged);
+    externalPlayback?.addListener(_onExternalPlaybackChanged);
 
     await videoPlayerController.setLooping(looping);
 
@@ -887,6 +915,10 @@ class ChewieController extends ChangeNotifier {
   /// Deliberately does not call [notifyListeners]: on this controller that
   /// means "fullscreen changed" and would pop the fullscreen route. Cast UI
   /// rebuilds off [castController]'s own notifications instead.
+  /// Nothing to do but rebuild: Chewie does not drive external playback, it
+  /// only needs to stop drawing over a surface the viewer is not watching.
+  void _onExternalPlaybackChanged() => notifyListeners();
+
   void _onCastStateChanged() {
     final cast = castController;
     if (cast == null) return;
@@ -951,6 +983,7 @@ class ChewieController extends ChangeNotifier {
     _disposed = true;
     // The app owns the cast controller — unsubscribe, but never dispose it.
     castController?.removeListener(_onCastStateChanged);
+    externalPlayback?.removeListener(_onExternalPlaybackChanged);
     super.dispose();
   }
 

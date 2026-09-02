@@ -18,6 +18,7 @@ import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:chewie/src/subtitle_overlay.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
@@ -58,12 +59,14 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
   /// Whether to draw the buffering spinner.
   ///
-  /// Not while casting: the phone is a remote control rather than a video
-  /// surface, the receiver shows its own loading state on the TV the user is
-  /// actually watching, and a spinner drawn over the casting overlay is noise
-  /// on top of a picture nobody is looking at.
+  /// Not while playback is remote — a cast session, or AirPlay and anything
+  /// else reported through `externalPlayback`. The phone is a remote control
+  /// rather than a video surface then, whatever is showing the video reports
+  /// its own loading state on the screen the viewer is actually watching, and
+  /// a spinner over the overlay is noise on top of a picture nobody is
+  /// looking at.
   bool get _showBufferingIndicator =>
-      _displayBufferingIndicator && !chewieController.isCasting;
+      _displayBufferingIndicator && !chewieController.isPlaybackRemote;
   double selectedSpeed = 1.0;
   late VideoPlayerController controller;
 
@@ -71,6 +74,10 @@ class _CupertinoControlsState extends State<CupertinoControls>
   /// unsubscribe from the same object we subscribed to even when the
   /// [ChewieController] is swapped out from under us.
   ChewieCastController? _subscribedCast;
+
+  /// The external-playback signal we are subscribed to, remembered for the
+  /// same reason as [_subscribedCast].
+  ValueListenable<bool>? _subscribedExternalPlayback;
 
   ChewieCastController? get _castController =>
       _chewieController?.castController;
@@ -162,6 +169,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
     controller.removeListener(_updateState);
     _subscribedCast?.removeListener(_updateState);
     _subscribedCast = null;
+    _subscribedExternalPlayback?.removeListener(_updateState);
+    _subscribedExternalPlayback = null;
     _hideTimer?.cancel();
     _expandCollapseTimer?.cancel();
     _initTimer?.cancel();
@@ -648,6 +657,10 @@ class _CupertinoControlsState extends State<CupertinoControls>
     // Follow the receiver too: while casting it, not the local player, is what
     // reports position and play state.
     _subscribedCast = chewieController.castController
+      ?..addListener(_updateState);
+    // And whatever else took the video off this device, so the controls stop
+    // drawing over a surface the viewer is not watching.
+    _subscribedExternalPlayback = chewieController.externalPlayback
       ?..addListener(_updateState);
 
     _updateState();
