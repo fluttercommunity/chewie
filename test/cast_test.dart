@@ -592,6 +592,25 @@ void main() {
       expect(find.text('Casting to Living Room TV'), findsOneWidget);
     });
 
+    testWidgets('no buffering spinner is drawn over the overlay', (
+      tester,
+    ) async {
+      final cast = FakeCastController(devices: const [_livingRoom]);
+      await _pumpPlayer(tester, _buildController(castController: cast));
+
+      await cast.connect(_livingRoom);
+      cast.completeConnection();
+      await _settle(tester);
+
+      cast.reportBuffering();
+      await _settle(tester);
+
+      // The receiver shows its own loading state on the TV the user is
+      // actually watching; a spinner over the casting overlay is noise on top
+      // of a picture nobody is looking at.
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
     testWidgets('transport goes to the receiver, not the local player', (
       tester,
     ) async {

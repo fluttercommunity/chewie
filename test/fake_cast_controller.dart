@@ -46,6 +46,12 @@ class FakeCastController extends ChewieCastController {
   @override
   VideoPlayerValue get value => _value;
 
+  /// Reports the receiver as buffering, the way it does while it fetches.
+  void reportBuffering({bool buffering = true}) {
+    _value = _value.copyWith(isBuffering: buffering);
+    notifyListeners();
+  }
+
   @override
   CastMedia? get currentMedia => _currentMedia;
 
