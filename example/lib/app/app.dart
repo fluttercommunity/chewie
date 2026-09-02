@@ -51,7 +51,21 @@ class _ChewieDemoState extends State<ChewieDemo> {
     "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
   ];
 
+  bool _hasPlayers = false;
+
   Future<void> initializePlayer() async {
+    // Hold the outgoing players so they can be torn down once the new ones are
+    // on screen. Without this every source switch leaks two initialized
+    // AVPlayers, and with external playback enabled each one is a candidate
+    // for an AirPlay route - so picking a route can hand the TV a stale video
+    // rather than the one being watched.
+    final previous = _hasPlayers
+        ? <VideoPlayerController>[
+            _videoPlayerController1,
+            _videoPlayerController2,
+          ]
+        : const <VideoPlayerController>[];
+
     _videoPlayerController1 = VideoPlayerController.networkUrl(
       Uri.parse(srcs[currPlayIndex]),
     );
@@ -62,8 +76,13 @@ class _ChewieDemoState extends State<ChewieDemo> {
       _videoPlayerController1.initialize(),
       _videoPlayerController2.initialize(),
     ]);
+    _hasPlayers = true;
     _createChewieController();
     setState(() {});
+
+    for (final controller in previous) {
+      await controller.dispose();
+    }
   }
 
   void _createChewieController() {
