@@ -1,4 +1,5 @@
 import 'package:chewie/chewie.dart';
+import 'package:chewie/src/helpers/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -14,6 +15,7 @@ class VideoProgressBar extends StatefulWidget {
     required this.barHeight,
     required this.handleHeight,
     required this.drawShadow,
+    this.chapters = const [],
   }) : colors = colors ?? ChewieProgressColors();
 
   final VideoPlayerController controller;
@@ -26,6 +28,13 @@ class VideoProgressBar extends StatefulWidget {
   final double handleHeight;
   final bool drawShadow;
   final bool draggableProgressBar;
+
+  /// The chapters of the video, sorted by ascending start time.
+  ///
+  /// When non-empty, the bar is painted as one segment per chapter and the
+  /// pointed chapter's title is shown above the bar while hovering or
+  /// scrubbing.
+  final List<ChewieChapter> chapters;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -59,6 +68,8 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
   /// Identifies the latest seek request so a stale one cannot clear the
   /// position requested by a newer one.
   int _latestSeekRequestId = 0;
+
+  Offset? _hoverPosition;
 
   VideoPlayerController get controller => widget.controller;
 
@@ -111,10 +122,11 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         drawShadow: widget.drawShadow,
         latestDraggableOffset: _latestDraggableOffset,
         pendingSeekPosition: _pendingSeekPosition,
+        chapters: widget.chapters,
       ),
     );
 
-    return widget.draggableProgressBar
+    final interactive = widget.draggableProgressBar
         ? GestureDetector(
             onHorizontalDragStart: (DragStartDetails details) {
               if (!controller.value.isInitialized) {
@@ -159,6 +171,84 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
             child: MouseRegion(cursor: SystemMouseCursors.click, child: child),
           )
         : child;
+
+    if (widget.chapters.isEmpty) {
+      return interactive;
+    }
+
+    return MouseRegion(
+      onHover: (event) => setState(() => _hoverPosition = event.localPosition),
+      onExit: (_) => setState(() => _hoverPosition = null),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [interactive, ?_buildChapterLabel(constraints)],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget? _buildChapterLabel(BoxConstraints constraints) {
+    final value = controller.value;
+    if (!value.isInitialized || value.duration <= Duration.zero) {
+      return null;
+    }
+
+    double? pointedDx;
+    if (_latestDraggableOffset != null) {
+      final box = context.findRenderObject() as RenderBox?;
+      if (box != null && box.hasSize) {
+        pointedDx = box.globalToLocal(_latestDraggableOffset!).dx;
+      }
+    } else if (_hoverPosition != null) {
+      pointedDx = _hoverPosition!.dx;
+    }
+    if (pointedDx == null ||
+        !constraints.maxWidth.isFinite ||
+        constraints.maxWidth <= 0) {
+      return null;
+    }
+
+    final clampedDx = pointedDx.clamp(0.0, constraints.maxWidth);
+    final pointedPosition = value.duration * (clampedDx / constraints.maxWidth);
+
+    ChewieChapter? pointedChapter;
+    for (final chapter in widget.chapters) {
+      if (chapter.start > pointedPosition) break;
+      pointedChapter = chapter;
+    }
+    if (pointedChapter == null) {
+      return null;
+    }
+
+    final stackHeight = constraints.maxHeight.isFinite
+        ? constraints.maxHeight
+        : widget.barHeight * 2;
+
+    return Positioned(
+      left: clampedDx,
+      bottom: stackHeight / 2 + widget.barHeight / 2 + widget.handleHeight + 4,
+      child: FractionalTranslation(
+        translation: const Offset(-0.5, 0),
+        child: IgnorePointer(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.8),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              '${pointedChapter.title} · ${formatDuration(pointedPosition)}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -172,6 +262,7 @@ class StaticProgressBar extends StatelessWidget {
     required this.drawShadow,
     this.latestDraggableOffset,
     this.pendingSeekPosition,
+    this.chapters = const [],
   });
 
   final Offset? latestDraggableOffset;
@@ -186,6 +277,11 @@ class StaticProgressBar extends StatelessWidget {
   final double barHeight;
   final double handleHeight;
   final bool drawShadow;
+
+  /// The chapters of the video, sorted by ascending start time.
+  ///
+  /// When non-empty, the bar is painted as one segment per chapter.
+  final List<ChewieChapter> chapters;
 
   @override
   Widget build(BuildContext context) {
@@ -206,6 +302,7 @@ class StaticProgressBar extends StatelessWidget {
           barHeight: barHeight,
           handleHeight: handleHeight,
           drawShadow: drawShadow,
+          chapters: chapters,
         ),
       ),
     );
@@ -220,6 +317,7 @@ class _ProgressBarPainter extends CustomPainter {
     required this.handleHeight,
     required this.drawShadow,
     required this.draggableValue,
+    this.chapters = const [],
   });
 
   VideoPlayerValue value;
@@ -228,30 +326,87 @@ class _ProgressBarPainter extends CustomPainter {
   final double barHeight;
   final double handleHeight;
   final bool drawShadow;
+  final List<ChewieChapter> chapters;
 
   /// The position to paint instead of [VideoPlayerValue.position]: either the
   /// one currently being dragged, or the one of a seek that is still in
   /// flight. If null, neither is happening and the reported position is used.
   final Duration? draggableValue;
 
+  static const double _chapterGapWidth = 2.0;
+
   @override
   bool shouldRepaint(CustomPainter painter) {
     return true;
   }
 
+  List<double> _chapterBoundaries(Size size) {
+    final durationMs = value.duration.inMilliseconds;
+    if (durationMs <= 0 || chapters.isEmpty) {
+      return const [];
+    }
+    final boundaries = <double>[];
+    for (final chapter in chapters) {
+      final startMs = chapter.start.inMilliseconds;
+      if (startMs <= 0 || startMs >= durationMs) continue;
+      boundaries.add(startMs / durationMs * size.width);
+    }
+    return boundaries;
+  }
+
+  void _drawBar(
+    Canvas canvas,
+    double fromX,
+    double toX,
+    double baseOffset,
+    Paint paint,
+    List<double> boundaries,
+  ) {
+    if (toX <= fromX) return;
+    var segmentStart = fromX;
+    for (final boundary in boundaries) {
+      if (boundary <= fromX || boundary >= toX) continue;
+      final segmentEnd = boundary - _chapterGapWidth / 2;
+      if (segmentEnd > segmentStart) {
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(
+            Rect.fromPoints(
+              Offset(segmentStart, baseOffset),
+              Offset(segmentEnd, baseOffset + barHeight),
+            ),
+            const Radius.circular(4.0),
+          ),
+          paint,
+        );
+      }
+      segmentStart = boundary + _chapterGapWidth / 2;
+    }
+    if (toX > segmentStart) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromPoints(
+            Offset(segmentStart, baseOffset),
+            Offset(toX, baseOffset + barHeight),
+          ),
+          const Radius.circular(4.0),
+        ),
+        paint,
+      );
+    }
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     final baseOffset = size.height / 2 - barHeight / 2;
+    final boundaries = _chapterBoundaries(size);
 
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromPoints(
-          Offset(0.0, baseOffset),
-          Offset(size.width, baseOffset + barHeight),
-        ),
-        const Radius.circular(4.0),
-      ),
+    _drawBar(
+      canvas,
+      0.0,
+      size.width,
+      baseOffset,
       colors.backgroundPaint,
+      boundaries,
     );
     if (!value.isInitialized) {
       return;
@@ -267,26 +422,22 @@ class _ProgressBarPainter extends CustomPainter {
     for (final DurationRange range in value.buffered) {
       final double start = range.startFraction(value.duration) * size.width;
       final double end = range.endFraction(value.duration) * size.width;
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromPoints(
-            Offset(start, baseOffset),
-            Offset(end, baseOffset + barHeight),
-          ),
-          const Radius.circular(4.0),
-        ),
+      _drawBar(
+        canvas,
+        start,
+        end,
+        baseOffset,
         colors.bufferedPaint,
+        boundaries,
       );
     }
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromPoints(
-          Offset(0.0, baseOffset),
-          Offset(playedPart, baseOffset + barHeight),
-        ),
-        const Radius.circular(4.0),
-      ),
+    _drawBar(
+      canvas,
+      0.0,
+      playedPart,
+      baseOffset,
       colors.playedPaint,
+      boundaries,
     );
 
     if (drawShadow) {

@@ -623,6 +623,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         padding: const EdgeInsets.only(right: 12.0),
         child: CupertinoVideoProgressBar(
           controller,
+          chapters: chewieController.chapters,
           onDragStart: () {
             setState(() {
               _dragging = true;
