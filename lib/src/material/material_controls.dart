@@ -47,6 +47,15 @@ class _MaterialControlsState extends State<MaterialControls>
   Timer? _bufferingDisplayTimer;
   bool _displayBufferingIndicator = false;
 
+  /// Whether to draw the buffering spinner.
+  ///
+  /// Not while casting: the phone is a remote control rather than a video
+  /// surface, the receiver shows its own loading state on the TV the user is
+  /// actually watching, and a spinner drawn over the casting overlay is noise
+  /// on top of a picture nobody is looking at.
+  bool get _showBufferingIndicator =>
+      _displayBufferingIndicator && !chewieController.isCasting;
+
   final barHeight = 48.0 * 1.5;
   final marginSize = 5.0;
 
@@ -93,7 +102,7 @@ class _MaterialControlsState extends State<MaterialControls>
           absorbing: notifier.hideStuff,
           child: Stack(
             children: [
-              if (_displayBufferingIndicator)
+              if (_showBufferingIndicator)
                 _chewieController?.bufferingBuilder?.call(context) ??
                     const Center(child: CircularProgressIndicator())
               else
