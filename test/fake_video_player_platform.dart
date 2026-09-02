@@ -20,6 +20,22 @@ class FakeVideoPlayerPlatform extends VideoPlayerPlatform {
 
   int _nextPlayerId = 1;
 
+  /// Reports every live player as buffering, or done buffering.
+  ///
+  /// Chewie shows its spinner off VideoPlayerValue.isBuffering, which only the
+  /// platform can set.
+  void setBuffering(bool buffering) {
+    for (final events in _events.values) {
+      events.add(
+        VideoEvent(
+          eventType: buffering
+              ? VideoEventType.bufferingStart
+              : VideoEventType.bufferingEnd,
+        ),
+      );
+    }
+  }
+
   /// Installs this platform for the current test.
   static FakeVideoPlayerPlatform install({
     Duration duration = const Duration(minutes: 5),

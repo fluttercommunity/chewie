@@ -3,8 +3,14 @@
 * 📱 The device picker follows the skin: the Cupertino controls open a
   `CupertinoActionSheet` instead of a Material modal bottom sheet. Which one
   `CastButton` opens is set by `CastPickerStyle`.
-* 🛠️ No buffering spinner while casting. The receiver shows its own loading
-  state on the TV, so the spinner only drew over the casting overlay.
+* ✨ `ChewieController.externalPlayback` takes a `ValueListenable<bool>` saying
+  the video has left this device by some means Chewie does not own — AirPlay
+  being the case it was added for, where the platform routes the same player
+  and there is no receiver to hand over to. `isPlaybackRemote` answers the same
+  question for a cast session and this alike.
+* 🛠️ No buffering spinner while playback is remote. Whatever is showing the
+  video reports its own loading state on the screen the viewer is watching, so
+  the spinner only drew over the casting or AirPlay overlay.
 * 🛠️ Progress bar: draw only the empty track when a source reports itself initialized before it knows its duration, instead of asserting on a NaN inside `drawRRect`.
 * ✨ `ChewieController.additionalControls` puts app-supplied widgets in the control bar, for controls that have to be a widget rather than an options-sheet row — an AirPlay button being the motivating case. They inherit the bar's show/hide behaviour.
 * ✨ `ChewieControlStyle` lets a bar tell those widgets how it dresses its own buttons — icon size, tint, padding and chrome — so one widget matches the Material, Material desktop and Cupertino skins instead of being sized for one and sitting wrong in the others. The example demonstrates it with a dependency-free control.
