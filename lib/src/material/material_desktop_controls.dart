@@ -403,6 +403,13 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   }
 
   Widget _buildHitArea() {
+    // Nothing to sit on while playback is remote: the video surface is the
+    // casting or AirPlay overlay by then, and these buttons would cover it -
+    // invisibly still taking its taps if they were merely faded out. The
+    // control bar keeps play/pause and the progress bar for driving whatever
+    // is playing.
+    if (chewieController.isPlaybackRemote) return const SizedBox.expand();
+
     final bool isFinished =
         _latestValue.position >= _latestValue.duration &&
         _latestValue.duration.inSeconds > 0;

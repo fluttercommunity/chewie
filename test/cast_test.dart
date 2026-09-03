@@ -1,4 +1,5 @@
 import 'package:chewie/chewie.dart';
+import 'package:chewie/src/center_play_button.dart';
 import 'package:flutter/cupertino.dart' show CupertinoActionSheet;
 import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
@@ -668,6 +669,23 @@ void main() {
       // actually watching; a spinner over the casting overlay is noise on top
       // of a picture nobody is looking at.
       expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
+    testWidgets('no centre play button is drawn over the overlay', (
+      tester,
+    ) async {
+      final cast = FakeCastController(devices: const [_livingRoom]);
+      await _pumpPlayer(tester, _buildController(castController: cast));
+
+      expect(find.byType(CenterPlayButton), findsOneWidget);
+
+      await cast.connect(_livingRoom);
+      cast.completeConnection();
+      await _settle(tester);
+
+      // It sits on the video surface, which is the casting overlay now; the
+      // control bar still carries play/pause for driving the receiver.
+      expect(find.byType(CenterPlayButton), findsNothing);
     });
 
     testWidgets('transport goes to the receiver, not the local player', (
