@@ -8,6 +8,8 @@
   being the case it was added for, where the platform routes the same player
   and there is no receiver to hand over to. `isPlaybackRemote` answers the same
   question for a cast session and this alike.
+* 🛠️ No centre play or seek buttons while playback is remote. They sit on the
+  video surface, which is the casting or AirPlay overlay by then.
 * 🛠️ No buffering spinner while playback is remote. Whatever is showing the
   video reports its own loading state on the screen the viewer is watching, so
   the spinner only drew over the casting or AirPlay overlay.
