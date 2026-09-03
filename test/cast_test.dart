@@ -679,6 +679,39 @@ void main() {
       expect(find.text('Casting to Living Room TV'), findsOneWidget);
     });
 
+    testWidgets('nothing is drawn over the overlay while connecting', (
+      tester,
+    ) async {
+      final cast = FakeCastController(devices: const [_livingRoom]);
+      // Paused, which is when the centre play button is on screen and so the
+      // one case where it could end up on top of the overlay.
+      await _pumpPlayer(tester, _buildController(castController: cast));
+
+      expect(find.byType(CenterPlayButton), findsOneWidget);
+
+      unawaited(cast.connect(_livingRoom));
+      await _settle(tester);
+
+      expect(find.byType(CastOverlay), findsOneWidget);
+      expect(find.byType(CenterPlayButton), findsNothing);
+    });
+
+    testWidgets('the controls stay up while connecting', (tester) async {
+      final cast = FakeCastController(devices: const [_livingRoom]);
+      final controller = _buildController(castController: cast);
+      await _pumpPlayer(tester, controller);
+
+      unawaited(cast.connect(_livingRoom));
+      await _settle(tester);
+
+      // The pulsing cast button is the only thing saying which device was
+      // picked; fading the bar out on the usual timer hid it before it could
+      // be read.
+      await tester.pump(const Duration(seconds: 5));
+      expect(controller.isPlaybackRemote, isTrue);
+      expect(find.byType(CastButton), findsOneWidget);
+    });
+
     testWidgets('no buffering spinner is drawn over the overlay', (
       tester,
     ) async {
