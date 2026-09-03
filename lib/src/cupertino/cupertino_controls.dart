@@ -337,6 +337,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
 
               setState(() {
                 notifier.hideStuff = false;
+                _startHideTimer();
               });
             },
       child: CenterPlayButton(
@@ -665,6 +666,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
         notifier.hideStuff = false;
         _hideTimer?.cancel();
         controller.pause();
+        _cancelAndRestartTimer();
       } else {
         _cancelAndRestartTimer();
 
