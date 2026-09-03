@@ -1,3 +1,4 @@
+import 'package:chewie/src/cast/cast_connection_state.dart';
 import 'package:chewie/src/cast/widgets/cast_overlay.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/helpers/adaptive_controls.dart';
@@ -132,11 +133,14 @@ class _VideoSurface extends StatelessWidget {
     return AnimatedBuilder(
       animation: castController,
       builder: (context, _) {
-        // Only swap once playback has actually moved to the receiver. While a
-        // session is merely being set up the local player is still the one
-        // playing, and covering it up would hide a picture that is still
-        // running — the pulsing cast button is the feedback for that phase.
-        if (!chewieController.isCasting) {
+        // Swapped from the moment a device is picked, not once the receiver
+        // has the video. Setting a session up takes seconds, and this used to
+        // leave the local picture running with nothing to show for the tap:
+        // the pulsing cast button was meant to be the feedback for that phase,
+        // but the controls fade on their own timer while connecting, so it was
+        // not on screen to see.
+        final state = chewieController.castConnectionState;
+        if (!state.isConnected && !state.isTransitioning) {
           return _buildLocal();
         }
 
@@ -145,6 +149,7 @@ class _VideoSurface extends StatelessWidget {
             CastOverlay(
               device: device,
               translations: chewieController.castTranslations,
+              connecting: !state.isConnected,
             );
       },
     );

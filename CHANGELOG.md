@@ -8,6 +8,10 @@
   being the case it was added for, where the platform routes the same player
   and there is no receiver to hand over to. `isPlaybackRemote` answers the same
   question for a cast session and this alike.
+* 🛠️ The casting overlay appears when a device is picked, not when the receiver
+  finally has the video, so tapping one has a visible consequence right away.
+  It says "Connecting…" until the session is up. `CastOverlay` takes a
+  `connecting` flag for it.
 * 🛠️ No centre play or seek buttons while playback is remote. They sit on the
   video surface, which is the casting or AirPlay overlay by then.
 * 🛠️ No buffering spinner while playback is remote. Whatever is showing the

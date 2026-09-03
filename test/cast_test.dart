@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chewie/chewie.dart';
 import 'package:chewie/src/center_play_button.dart';
 import 'package:flutter/cupertino.dart' show CupertinoActionSheet;
@@ -649,6 +651,31 @@ void main() {
 
       expect(find.byType(VideoPlayer), findsNothing);
       expect(find.byType(CastOverlay), findsOneWidget);
+      expect(find.text('Casting to Living Room TV'), findsOneWidget);
+    });
+
+    testWidgets('the overlay appears as soon as a device is picked', (
+      tester,
+    ) async {
+      final cast = FakeCastController(devices: const [_livingRoom]);
+      await _pumpPlayer(tester, _buildController(castController: cast));
+
+      // Not awaited: the point is what is on screen while the session is
+      // still being set up.
+      unawaited(cast.connect(_livingRoom));
+      await _settle(tester);
+
+      // Setting a session up takes seconds. Leaving the local picture running
+      // gave the tap no visible consequence at all, because the controls -
+      // and the pulsing cast button meant to be the feedback - fade on their
+      // own timer while connecting.
+      expect(find.byType(CastOverlay), findsOneWidget);
+      expect(find.byType(VideoPlayer), findsNothing);
+      expect(find.textContaining('Connecting'), findsOneWidget);
+
+      cast.completeConnection();
+      await _settle(tester);
+
       expect(find.text('Casting to Living Room TV'), findsOneWidget);
     });
 
