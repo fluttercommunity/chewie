@@ -11,7 +11,8 @@
 * 🛠️ The casting overlay appears when a device is picked, not when the receiver
   finally has the video, so tapping one has a visible consequence right away.
   It says "Connecting…" until the session is up. `CastOverlay` takes a
-  `connecting` flag for it.
+  `connecting` flag for it, and `isPlaybackRemote` counts that phase, so the
+  controls stop decorating a surface the overlay has already replaced.
 * 🛠️ No centre play or seek buttons while playback is remote. They sit on the
   video surface, which is the casting or AirPlay overlay by then.
 * 🛠️ No buffering spinner while playback is remote. Whatever is showing the

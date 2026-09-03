@@ -627,7 +627,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     // While casting the phone is a remote control, not a video surface: there
     // is nothing behind the controls worth revealing, and hiding them costs the
     // user a tap, because the first one only brings them back.
-    if (chewieController.isCasting) return;
+    if (chewieController.isPlaybackRemote) return;
     final hideControlsTimer = chewieController.hideControlsTimer.isNegative
         ? ChewieController.defaultHideControlsTimer
         : chewieController.hideControlsTimer;

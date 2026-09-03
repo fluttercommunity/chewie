@@ -818,11 +818,22 @@ class ChewieController extends ChangeNotifier {
   /// Whether a cast session is currently carrying playback.
   bool get isCasting => castController?.isConnected ?? false;
 
-  /// Whether the video is playing anywhere other than this device's screen.
+  /// Whether the video has left this device's screen, or is in the act of
+  /// leaving it.
   ///
-  /// True for a cast session and for [externalPlayback] alike: the controls
-  /// care that the local surface is stale, not how it got that way.
-  bool get isPlaybackRemote => isCasting || (externalPlayback?.value ?? false);
+  /// True for a cast session, for the moments while one is being set up, and
+  /// for [externalPlayback] alike. The controls care about one thing here —
+  /// whether the local surface is what the viewer is looking at — and from the
+  /// instant a device is picked it is not: the casting overlay covers it.
+  ///
+  /// Connecting counts deliberately. Leaving it out let the controls decorate
+  /// a surface the overlay had already replaced: a centre play button drawn on
+  /// top of it, and the control bar fading out on its usual timer, taking the
+  /// pulsing cast button with it.
+  bool get isPlaybackRemote =>
+      isCasting ||
+      castConnectionState.isTransitioning ||
+      (externalPlayback?.value ?? false);
 
   /// Guards the deferred work in [_initialize] against a controller that was
   /// disposed before the frame it was waiting for.
