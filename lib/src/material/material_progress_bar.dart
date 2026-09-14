@@ -1,3 +1,4 @@
+import 'package:chewie/src/cast/chewie_playback_target.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/models/chewie_chapter.dart';
 import 'package:chewie/src/progress_bar.dart';
@@ -17,6 +18,7 @@ class MaterialVideoProgressBar extends StatelessWidget {
     super.key,
     this.draggableProgressBar = true,
     this.chapters = const [],
+    this.playback,
   }) : colors = colors ?? ChewieProgressColors();
 
   /// The chapters of the video, sorted by ascending start time.
@@ -30,6 +32,10 @@ class MaterialVideoProgressBar extends StatelessWidget {
   final double barHeight;
   final double handleHeight;
   final VideoPlayerController controller;
+
+  /// What to read and seek. Defaults to [controller]; Chewie passes the cast
+  /// receiver here while a session is live.
+  final ChewiePlaybackTarget? playback;
   final ChewieProgressColors colors;
   final Function()? onDragStart;
   final Function()? onDragEnd;
@@ -49,6 +55,7 @@ class MaterialVideoProgressBar extends StatelessWidget {
       onDragUpdate: onDragUpdate,
       draggableProgressBar: draggableProgressBar,
       chapters: chapters,
+      playback: playback,
     );
   }
 }

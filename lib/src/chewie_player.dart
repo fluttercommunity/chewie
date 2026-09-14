@@ -1,8 +1,14 @@
 import 'dart:async';
 
+import 'package:chewie/src/cast/cast_connection_state.dart';
+import 'package:chewie/src/cast/cast_device.dart';
+import 'package:chewie/src/cast/cast_media.dart';
+import 'package:chewie/src/cast/chewie_cast_controller.dart';
+import 'package:chewie/src/cast/chewie_playback_target.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
 import 'package:chewie/src/models/chewie_chapter.dart';
 import 'web_fullscreen.dart';
+import 'package:chewie/src/models/cast_translations.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/options_translation.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
@@ -403,6 +409,13 @@ class ChewieController extends ChangeNotifier {
     this.controlsSafeAreaMinimum = EdgeInsets.zero,
     this.pauseOnBackgroundTap = false,
     this.chapters = const [],
+    this.castController,
+    this.externalPlayback,
+    this.castMedia,
+    this.allowCasting = true,
+    this.castTranslations = const CastTranslations(),
+    this.castOverlayBuilder,
+    this.additionalControls,
   }) : assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
@@ -410,6 +423,11 @@ class ChewieController extends ChangeNotifier {
        assert(
          _chaptersAreSortedByStart(chapters),
          'The chapters must be sorted by ascending start time',
+       ),
+       assert(
+         castController == null || castMedia != null,
+         'A castMedia is required when a castController is set: Chewie cannot '
+         'derive a URL the receiver can reach from the local data source.',
        ) {
     _initialize();
   }
@@ -470,6 +488,13 @@ class ChewieController extends ChangeNotifier {
     routePageBuilder,
     bool? pauseOnBackgroundTap,
     List<ChewieChapter>? chapters,
+    ChewieCastController? castController,
+    ValueListenable<bool>? externalPlayback,
+    CastMedia? castMedia,
+    bool? allowCasting,
+    CastTranslations? castTranslations,
+    Widget Function(BuildContext, CastDevice?)? castOverlayBuilder,
+    List<Widget> Function(BuildContext)? additionalControls,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -539,6 +564,13 @@ class ChewieController extends ChangeNotifier {
           progressIndicatorDelay ?? this.progressIndicatorDelay,
       pauseOnBackgroundTap: pauseOnBackgroundTap ?? this.pauseOnBackgroundTap,
       chapters: chapters ?? this.chapters,
+      castController: castController ?? this.castController,
+      externalPlayback: externalPlayback ?? this.externalPlayback,
+      castMedia: castMedia ?? this.castMedia,
+      allowCasting: allowCasting ?? this.allowCasting,
+      castTranslations: castTranslations ?? this.castTranslations,
+      castOverlayBuilder: castOverlayBuilder ?? this.castOverlayBuilder,
+      additionalControls: additionalControls ?? this.additionalControls,
     );
   }
 
@@ -750,6 +782,77 @@ class ChewieController extends ChangeNotifier {
     return true;
   }
 
+  /// The cast backend to drive, or null to leave casting off entirely.
+  ///
+  /// Chewie ships no sender of its own — see [ChewieCastController] for what
+  /// implementing one involves. When this is set the control bars grow a cast
+  /// button, and connecting hands playback over to the receiver.
+  ///
+  /// Chewie listens to this controller but never disposes it; the app owns its
+  /// lifetime, so a single instance can serve many videos in a row.
+  final ChewieCastController? castController;
+
+  /// Whether playback has left this device by some means Chewie does not own.
+  ///
+  /// A cast session Chewie manages is already covered by [castController].
+  /// This is for everything else — AirPlay being the case it was added for,
+  /// where the platform routes the same player to a television and there is no
+  /// receiver to enumerate, connect to or hand over to, so it cannot be
+  /// modelled as a [ChewieCastController] at all.
+  ///
+  /// Chewie only reads it, to know that the local surface is not what the
+  /// viewer is looking at: while it reports true the buffering spinner is
+  /// suppressed, because whatever is showing the video reports its own loading
+  /// state on the screen the viewer is actually watching.
+  ///
+  /// Supply anything that can answer the question and say when the answer
+  /// changes; `chewie_cast`'s `AirPlayController` is one such thing.
+  final ValueListenable<bool>? externalPlayback;
+
+  /// What to play on the receiver. Required whenever [castController] is set.
+  ///
+  /// The receiver fetches this URL itself, so it has to be reachable from the
+  /// TV — which is why Chewie cannot reuse the local data source.
+  final CastMedia? castMedia;
+
+  /// Defines if the cast button should be shown. Only has an effect when
+  /// [castController] is set.
+  final bool allowCasting;
+
+  /// Strings for the casting UI.
+  final CastTranslations castTranslations;
+
+  /// Replaces Chewie's default casting overlay — the thing shown in place of
+  /// the video while a session is live. Receives the connected device, which
+  /// is null in the moment before a session settles.
+  final Widget Function(BuildContext context, CastDevice? device)?
+  castOverlayBuilder;
+
+  /// Extra widgets for the control bar, beside the built-in buttons.
+  ///
+  /// Unlike [additionalOptions], which adds rows to the options sheet, these go
+  /// into the bar itself — for controls that have to be a widget rather than a
+  /// menu entry, such as an AirPlay button.
+  ///
+  /// They inherit the bar's show/hide behaviour, so they fade with the rest of
+  /// the controls rather than sitting on top of the video.
+  ///
+  /// Two things are worth knowing before putting something here:
+  ///
+  /// * **Platform views do not work.** A `UiKitView` placed in the control bar
+  ///   lays out and receives taps but paints nothing — verified on iOS, where a
+  ///   real `AVRoutePickerView` is invisible here while the identical widget
+  ///   renders fine as a sibling of the [Chewie] widget. Draw the control in
+  ///   Flutter instead.
+  /// * **Read [ChewieControlStyle] rather than hard-coding a look.** The skins
+  ///   differ — the Cupertino bar is 30 logical pixels tall in portrait with
+  ///   16px glyphs on frosted pills, the Material bars are taller with 24px
+  ///   icons — so a widget sized for one sits wrong in another. Each skin
+  ///   installs its own values above whatever it is given; a control that
+  ///   takes its size, tint, padding and chrome from there matches the buttons
+  ///   beside it on all three.
+  final List<Widget> Function(BuildContext context)? additionalControls;
+
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider = context
         .dependOnInheritedWidgetOfExactType<ChewieControllerProvider>()!;
@@ -761,9 +864,74 @@ class ChewieController extends ChangeNotifier {
 
   bool get isFullScreen => _isFullScreen;
 
-  bool get isPlaying => videoPlayerController.value.isPlaying;
+  bool get isPlaying => playback.value.isPlaying;
+
+  late final ChewiePlaybackTarget _localPlayback = LocalPlaybackTarget(
+    videoPlayerController,
+  );
+  late final ChewiePlaybackTarget? _castPlayback = castController == null
+      ? null
+      : CastPlaybackTarget(castController!);
+
+  /// Whether a cast session is currently carrying playback.
+  bool get isCasting => castController?.isConnected ?? false;
+
+  /// Whether the video has left this device's screen, or is in the act of
+  /// leaving it.
+  ///
+  /// True for a cast session, for the moments while one is being set up, and
+  /// for [externalPlayback] alike. The controls care about one thing here —
+  /// whether the local surface is what the viewer is looking at — and from the
+  /// instant a device is picked it is not: the casting overlay covers it.
+  ///
+  /// Connecting counts deliberately. Leaving it out let the controls decorate
+  /// a surface the overlay had already replaced: a centre play button drawn on
+  /// top of it, and the control bar fading out on its usual timer, taking the
+  /// pulsing cast button with it.
+  bool get isPlaybackRemote =>
+      isCasting ||
+      castConnectionState.isTransitioning ||
+      (externalPlayback?.value ?? false);
+
+  /// Guards the deferred work in [_initialize] against a controller that was
+  /// disposed before the frame it was waiting for.
+  bool _disposed = false;
+
+  /// Where the session currently is, or [CastConnectionState.disconnected]
+  /// when casting is not configured at all.
+  CastConnectionState get castConnectionState =>
+      castController?.connectionState ?? CastConnectionState.disconnected;
+
+  /// The receiver playback is on, or null when playing locally.
+  CastDevice? get castDevice => castController?.connectedDevice;
+
+  /// Whatever the controls should be driving right now: the local player, or
+  /// the receiver while a session is live.
+  ///
+  /// Listen to this rather than to [videoPlayerController] to follow playback
+  /// across a handover — though note the returned object changes identity when
+  /// a session starts or ends, so listeners have to be moved with it.
+  ChewiePlaybackTarget get playback =>
+      isCasting ? _castPlayback! : _localPlayback;
+
+  /// True once Chewie has handed playback to the receiver, so the handover
+  /// runs exactly once per session in each direction.
+  bool _handedOffToReceiver = false;
+
+  // Sampled while the session is live: some backends reset their value on
+  // disconnect, and by the time we need the position to resume locally the
+  // session is already gone.
+  Duration _lastRemotePosition = Duration.zero;
+  bool _lastRemoteWasPlaying = false;
 
   Future<dynamic> _initialize() async {
+    // _initialize runs again when the web fullscreen path re-creates the
+    // texture, so make sure we never end up subscribed twice.
+    castController?.removeListener(_onCastStateChanged);
+    castController?.addListener(_onCastStateChanged);
+    externalPlayback?.removeListener(_onExternalPlaybackChanged);
+    externalPlayback?.addListener(_onExternalPlaybackChanged);
+
     await videoPlayerController.setLooping(looping);
 
     if ((autoInitialize || autoPlay) &&
@@ -786,6 +954,21 @@ class ChewieController extends ChangeNotifier {
     if (fullScreenByDefault) {
       videoPlayerController.addListener(_fullScreenListener);
     }
+
+    // A session can already be live when this controller is built: senders are
+    // owned by the app, so they outlive the screen that created them, and the
+    // Cast SDKs keep a session running until it is ended. A listener only
+    // fires on a change, so without adopting the state that is already there,
+    // opening a second video would play it on the device while the receiver
+    // still held the first one.
+    //
+    // Deferred by a frame because this runs from the constructor, and apps
+    // build a ChewieController inside build(): handing over notifies the cast
+    // controller, and its listeners would be marked dirty during that build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_disposed) return;
+      _onCastStateChanged();
+    });
   }
 
   Future<void> _fullScreenListener() async {
@@ -793,6 +976,84 @@ class ChewieController extends ChangeNotifier {
       enterFullScreen();
       videoPlayerController.removeListener(_fullScreenListener);
     }
+  }
+
+  /// Moves playback between the device and the receiver as the session opens
+  /// and closes.
+  ///
+  /// Deliberately does not call [notifyListeners]: on this controller that
+  /// means "fullscreen changed" and would pop the fullscreen route. Cast UI
+  /// rebuilds off [castController]'s own notifications instead.
+  /// Nothing to do but rebuild: Chewie does not drive external playback, it
+  /// only needs to stop drawing over a surface the viewer is not watching.
+  void _onExternalPlaybackChanged() => notifyListeners();
+
+  void _onCastStateChanged() {
+    final cast = castController;
+    if (cast == null) return;
+
+    final state = cast.connectionState;
+
+    if (state.isConnected) {
+      _lastRemotePosition = cast.value.position;
+      _lastRemoteWasPlaying = cast.value.isPlaying;
+
+      if (!_handedOffToReceiver) {
+        _handedOffToReceiver = true;
+        _handOffToReceiver();
+      }
+    } else if (state.isDisconnected && _handedOffToReceiver) {
+      _handedOffToReceiver = false;
+      _handBackFromReceiver();
+    }
+  }
+
+  /// Pauses locally and starts the same moment on the receiver.
+  Future<void> _handOffToReceiver() async {
+    final cast = castController;
+    final media = castMedia;
+    if (cast == null || media == null) return;
+
+    final local = videoPlayerController.value;
+    final startAt = local.position;
+    final wasPlaying = local.isPlaying;
+
+    if (wasPlaying) {
+      await videoPlayerController.pause();
+    }
+
+    // Nothing to hand over if the receiver already holds this media. Apps
+    // rebuild their ChewieController routinely — `copyWith`, switching video —
+    // and each new instance starts with _handedOffToReceiver false, so without
+    // this the receiver would be told to load what it is already playing and
+    // would restart from the local position.
+    if (cast.currentMedia == media && cast.value.isInitialized) {
+      return;
+    }
+
+    await cast.load(media, startAt: startAt, autoPlay: wasPlaying);
+  }
+
+  /// Picks local playback back up wherever the receiver left off.
+  Future<void> _handBackFromReceiver() async {
+    if (!videoPlayerController.value.isInitialized) {
+      await videoPlayerController.initialize();
+    }
+
+    await videoPlayerController.seekTo(_lastRemotePosition);
+
+    if (_lastRemoteWasPlaying) {
+      await videoPlayerController.play();
+    }
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    // The app owns the cast controller — unsubscribe, but never dispose it.
+    castController?.removeListener(_onCastStateChanged);
+    externalPlayback?.removeListener(_onExternalPlaybackChanged);
+    super.dispose();
   }
 
   void enterFullScreen() {
@@ -815,24 +1076,26 @@ class ChewieController extends ChangeNotifier {
   }
 
   Future<void> play() async {
-    await videoPlayerController.play();
+    await playback.play();
   }
 
+  // Looping is a local-player concept; receivers manage their own queue, so
+  // this stays pointed at the local controller even mid-session.
   // ignore: avoid_positional_boolean_parameters
   Future<void> setLooping(bool looping) async {
     await videoPlayerController.setLooping(looping);
   }
 
   Future<void> pause() async {
-    await videoPlayerController.pause();
+    await playback.pause();
   }
 
   Future<void> seekTo(Duration moment) async {
-    await videoPlayerController.seekTo(moment);
+    await playback.seekTo(moment);
   }
 
   Future<void> setVolume(double volume) async {
-    await videoPlayerController.setVolume(volume);
+    await playback.setVolume(volume);
   }
 
   void setSubtitle(List<Subtitle> newSubtitle) {

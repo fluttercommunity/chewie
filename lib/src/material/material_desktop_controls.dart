@@ -1,6 +1,9 @@
 import 'dart:async';
 
 import 'package:chewie/src/animated_play_pause.dart';
+import 'package:chewie/src/cast/chewie_cast_controller.dart';
+import 'package:chewie/src/cast/chewie_playback_target.dart';
+import 'package:chewie/src/cast/widgets/cast_button.dart';
 import 'package:chewie/src/center_play_button.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/chewie_progress_colors.dart';
@@ -8,11 +11,14 @@ import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:chewie/src/material/widgets/options_dialog.dart';
 import 'package:chewie/src/material/widgets/playback_speed_dialog.dart';
+import 'package:chewie/src/models/chewie_control_style.dart';
 import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/notifiers/index.dart';
 import 'package:chewie/src/subtitle_overlay.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
@@ -43,12 +49,38 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   Timer? _bufferingDisplayTimer;
   bool _displayBufferingIndicator = false;
 
+  /// Whether to draw the buffering spinner.
+  ///
+  /// Not while playback is remote — a cast session, or AirPlay and anything
+  /// else reported through `externalPlayback`. The phone is a remote control
+  /// rather than a video surface then, whatever is showing the video reports
+  /// its own loading state on the screen the viewer is actually watching, and
+  /// a spinner over the overlay is noise on top of a picture nobody is
+  /// looking at.
+  bool get _showBufferingIndicator =>
+      _displayBufferingIndicator && !chewieController.isPlaybackRemote;
+
   final barHeight = 48.0 * 1.5;
   final marginSize = 5.0;
 
   late VideoPlayerController controller;
   ChewieController? _chewieController;
   late final FocusNode _focusNode;
+
+  /// The cast controller we are subscribed to, remembered separately so we
+  /// unsubscribe from the same object we subscribed to even when the
+  /// [ChewieController] is swapped out from under us.
+  ChewieCastController? _subscribedCast;
+
+  /// The external-playback signal we are subscribed to, remembered for the
+  /// same reason as [_subscribedCast].
+  ValueListenable<bool>? _subscribedExternalPlayback;
+
+  ChewieCastController? get _castController =>
+      _chewieController?.castController;
+
+  /// Local player or cast receiver, whichever currently has the video.
+  ChewiePlaybackTarget get _playback => chewieController.playback;
 
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
@@ -105,7 +137,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
             absorbing: notifier.hideStuff,
             child: Stack(
               children: [
-                if (_displayBufferingIndicator)
+                if (_showBufferingIndicator)
                   _chewieController?.bufferingBuilder?.call(context) ??
                       const Center(child: CircularProgressIndicator())
                 else
@@ -144,6 +176,10 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
   void _dispose() {
     controller.removeListener(_updateState);
+    _subscribedCast?.removeListener(_updateState);
+    _subscribedCast = null;
+    _subscribedExternalPlayback?.removeListener(_updateState);
+    _subscribedExternalPlayback = null;
     _hideTimer?.cancel();
     _initTimer?.cancel();
     _showAfterExpandCollapseTimer?.cancel();
@@ -265,8 +301,53 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
                     if (chewieController.isLive)
                       const Expanded(child: Text('LIVE'))
                     else
-                      _buildPosition(iconColor),
+                      // Flexible so the bar can absorb extra controls instead
+                      // of overflowing: nothing else here yields, so one more
+                      // button was enough to push it over on a narrow window.
+                      Flexible(child: _buildPosition(iconColor)),
                     const Spacer(),
+                    if (chewieController.additionalControls != null)
+                      ChewieControlStyle(
+                        iconSize: 24,
+                        iconColor: Colors.white,
+                        padding: EdgeInsets.zero,
+                        decorate: (child) => SizedBox(
+                          width: kMinInteractiveDimension,
+                          height: kMinInteractiveDimension,
+                          child: Center(child: child),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: chewieController.additionalControls!(
+                            context,
+                          ),
+                        ),
+                      ),
+                    if (_castController != null &&
+                        chewieController.allowCasting)
+                      SizedBox(
+                        // The buttons either side are IconButtons, which
+                        // default to a 48x48 tap target with the icon centred.
+                        // Matching that keeps the cast icon on the same
+                        // baseline instead of sitting lower and looking larger.
+                        width: kMinInteractiveDimension,
+                        height: kMinInteractiveDimension,
+                        child: Center(
+                          child: CastButton(
+                            castController: _castController!,
+                            translations: chewieController.castTranslations,
+                            useRootNavigator: chewieController.useRootNavigator,
+                            cancelButtonText: chewieController
+                                .optionsTranslation
+                                ?.cancelButtonText,
+                            padding: EdgeInsets.zero,
+                            onMenuOpened: () => _hideTimer?.cancel(),
+                            onMenuClosed: () {
+                              if (_latestValue.isPlaying) _startHideTimer();
+                            },
+                          ),
+                        ),
+                      ),
                     if (chewieController.showControls &&
                         chewieController.subtitle != null &&
                         chewieController.subtitle!.isNotEmpty)
@@ -322,6 +403,13 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   }
 
   Widget _buildHitArea() {
+    // Nothing to sit on while playback is remote: the video surface is the
+    // casting or AirPlay overlay by then, and these buttons would cover it -
+    // invisibly still taking its taps if they were merely faded out. The
+    // control bar keeps play/pause and the progress bar for driving whatever
+    // is playing.
+    if (chewieController.isPlaybackRemote) return const SizedBox.expand();
+
     final bool isFinished =
         _latestValue.position >= _latestValue.duration &&
         _latestValue.duration.inSeconds > 0;
@@ -355,7 +443,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
         backgroundColor: Colors.black54,
         iconColor: Colors.white,
         isFinished: isFinished,
-        isPlaying: controller.value.isPlaying,
+        isPlaying: _latestValue.isPlaying,
         show: showPlayButton,
         onPressed: _playPause,
       ),
@@ -376,7 +464,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     );
 
     if (chosenSpeed != null) {
-      controller.setPlaybackSpeed(chosenSpeed);
+      _playback.setPlaybackSpeed(chosenSpeed);
     }
 
     if (_latestValue.isPlaying) {
@@ -388,12 +476,13 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     return GestureDetector(
       onTap: () {
         _cancelAndRestartTimer();
+        final playback = _playback;
 
         if (_latestValue.volume == 0) {
-          controller.setVolume(_latestVolume ?? 0.5);
+          playback.setVolume(_latestVolume ?? 0.5);
         } else {
-          _latestVolume = controller.value.volume;
-          controller.setVolume(0.0);
+          _latestVolume = playback.value.volume;
+          playback.setVolume(0.0);
         }
       },
       child: MouseRegion(
@@ -427,7 +516,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
           margin: const EdgeInsets.only(left: 8.0, right: 4.0),
           padding: const EdgeInsets.only(left: 12.0, right: 12.0),
           child: AnimatedPlayPause(
-            playing: controller.value.isPlaying,
+            playing: _latestValue.isPlaying,
             color: Colors.white,
           ),
         ),
@@ -466,6 +555,14 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
         chewieController.showSubtitles &&
         (chewieController.subtitle?.isNotEmpty ?? false);
     controller.addListener(_updateState);
+    // Follow the receiver too: while casting it, not the local player, is what
+    // reports position and play state.
+    _subscribedCast = chewieController.castController
+      ?..addListener(_updateState);
+    // And whatever else took the video off this device, so the controls stop
+    // drawing over a surface the viewer is not watching.
+    _subscribedExternalPlayback = chewieController.externalPlayback
+      ?..addListener(_updateState);
 
     _updateState();
 
@@ -500,29 +597,37 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   }
 
   void _playPause() {
-    if (controller.value.isPlaying) {
+    final playback = _playback;
+
+    if (playback.value.isPlaying) {
       setState(() {
         notifier.hideStuff = false;
       });
 
       _hideTimer?.cancel();
-      controller.pause();
+      playback.pause();
     } else {
       _cancelAndRestartTimer();
 
-      if (!controller.value.isInitialized) {
+      // Only the local player has an uninitialized state to recover from — a
+      // receiver is either loaded or there is no session.
+      if (!playback.isRemote && !controller.value.isInitialized) {
         controller.initialize().then((_) {
           //[VideoPlayerController.play] If the video is at the end, this method starts playing from the beginning
           controller.play();
         });
       } else {
         //[VideoPlayerController.play] If the video is at the end, this method starts playing from the beginning
-        controller.play();
+        playback.play();
       }
     }
   }
 
   void _startHideTimer() {
+    // While casting the phone is a remote control, not a video surface: there
+    // is nothing behind the controls worth revealing, and hiding them costs the
+    // user a tap, because the first one only brings them back.
+    if (chewieController.isPlaybackRemote) return;
     final hideControlsTimer = chewieController.hideControlsTimer.isNegative
         ? ChewieController.defaultHideControlsTimer
         : chewieController.hideControlsTimer;
@@ -540,10 +645,40 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     }
   }
 
+  /// Shows the controls without marking widgets dirty in the middle of a build.
+  ///
+  /// [_updateState] runs from `didChangeDependencies` as well as from player
+  /// notifications, and the [PlayerNotifier] lives above this widget: setting
+  /// it during a build marks an ancestor dirty, which the framework rejects.
+  /// Reachable whenever a cast session is already live when this widget is
+  /// built, which happens because senders outlive the screens that make them.
+  void _revealControls() {
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) notifier.hideStuff = false;
+      });
+      return;
+    }
+
+    notifier.hideStuff = false;
+  }
+
   void _updateState() {
     if (!mounted) return;
 
-    final bool buffering = getIsBuffering(controller);
+    final playback = _playback;
+    // A session starting must not leave the controls hidden behind an
+    // AbsorbPointer that swallows the next tap.
+    if (playback.isRemote && notifier.hideStuff) {
+      _revealControls();
+    }
+
+    // The Android buffering workaround in getIsBuffering only applies to the
+    // local plugin; a receiver reports its own state honestly.
+    final bool buffering = playback.isRemote
+        ? playback.value.isBuffering
+        : getIsBuffering(controller);
 
     // display the progress bar indicator only after the buffering delay if it has been set
     if (chewieController.progressIndicatorDelay != null) {
@@ -562,8 +697,8 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     }
 
     setState(() {
-      _latestValue = controller.value;
-      _subtitlesPosition = controller.value.position;
+      _latestValue = playback.value;
+      _subtitlesPosition = playback.value.position;
     });
   }
 
@@ -577,15 +712,16 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
 
   void _seekRelative(Duration relativeSeek) {
     _cancelAndRestartTimer();
+    final playback = _playback;
     final position = _latestValue.position + relativeSeek;
     final duration = _latestValue.duration;
 
     if (position < Duration.zero) {
-      controller.seekTo(Duration.zero);
+      playback.seekTo(Duration.zero);
     } else if (position > duration) {
-      controller.seekTo(duration);
+      playback.seekTo(duration);
     } else {
-      controller.seekTo(position);
+      playback.seekTo(position);
     }
   }
 
@@ -594,6 +730,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
       child: MaterialVideoProgressBar(
         controller,
         chapters: chewieController.chapters,
+        playback: _playback,
         onDragStart: () {
           setState(() {
             _dragging = true;

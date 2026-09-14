@@ -1,3 +1,5 @@
+import 'package:chewie/src/cast/cast_connection_state.dart';
+import 'package:chewie/src/cast/widgets/cast_overlay.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/helpers/adaptive_controls.dart';
 import 'package:chewie/src/notifiers/index.dart';
@@ -41,14 +43,7 @@ class PlayerWithControls extends StatelessWidget {
         children: [
           if (chewieController.placeholder != null)
             chewieController.placeholder!,
-          Center(
-            child: AspectRatio(
-              aspectRatio:
-                  chewieController.aspectRatio ??
-                  chewieController.videoPlayerController.value.aspectRatio,
-              child: VideoPlayer(chewieController.videoPlayerController),
-            ),
-          ),
+          _VideoSurface(chewieController: chewieController),
           if (chewieController.overlay != null) chewieController.overlay!,
           if (Theme.of(context).platform != TargetPlatform.iOS)
             Consumer<PlayerNotifier>(
@@ -112,6 +107,62 @@ class PlayerWithControls extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// The picture itself: the local video texture, or the casting overlay while a
+/// session has the video.
+///
+/// Split out and rebuilt off the cast controller because [ChewieController]
+/// deliberately does not notify on cast changes — notifying there means
+/// "fullscreen changed" and would pop the fullscreen route.
+class _VideoSurface extends StatelessWidget {
+  const _VideoSurface({required this.chewieController});
+
+  final ChewieController chewieController;
+
+  @override
+  Widget build(BuildContext context) {
+    final castController = chewieController.castController;
+
+    if (castController == null) {
+      return _buildLocal();
+    }
+
+    return AnimatedBuilder(
+      animation: castController,
+      builder: (context, _) {
+        // Swapped from the moment a device is picked, not once the receiver
+        // has the video. Setting a session up takes seconds, and this used to
+        // leave the local picture running with nothing to show for the tap:
+        // the pulsing cast button was meant to be the feedback for that phase,
+        // but the controls fade on their own timer while connecting, so it was
+        // not on screen to see.
+        final state = chewieController.castConnectionState;
+        if (!state.isConnected && !state.isTransitioning) {
+          return _buildLocal();
+        }
+
+        final device = chewieController.castDevice;
+        return chewieController.castOverlayBuilder?.call(context, device) ??
+            CastOverlay(
+              device: device,
+              translations: chewieController.castTranslations,
+              connecting: !state.isConnected,
+            );
+      },
+    );
+  }
+
+  Widget _buildLocal() {
+    return Center(
+      child: AspectRatio(
+        aspectRatio:
+            chewieController.aspectRatio ??
+            chewieController.videoPlayerController.value.aspectRatio,
+        child: VideoPlayer(chewieController.videoPlayerController),
+      ),
     );
   }
 }
