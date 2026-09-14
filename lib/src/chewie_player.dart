@@ -1087,6 +1087,7 @@ class ChewieController extends ChangeNotifier {
     // The app owns the cast controller — unsubscribe, but never dispose it.
     castController?.removeListener(_onCastStateChanged);
     externalPlayback?.removeListener(_onExternalPlaybackChanged);
+    liveSubtitle.dispose();
     super.dispose();
   }
 
@@ -1161,12 +1162,6 @@ class ChewieController extends ChangeNotifier {
   /// when no cue is showing.
   void setLiveSubtitle(String? text) {
     liveSubtitle.value = text;
-  }
-
-  @override
-  void dispose() {
-    liveSubtitle.dispose();
-    super.dispose();
   }
 }
 
