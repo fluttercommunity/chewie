@@ -902,6 +902,7 @@ class ChewieController extends ChangeNotifier {
   ///   takes its size, tint, padding and chrome from there matches the buttons
   ///   beside it on all three.
   final List<Widget> Function(BuildContext context)? additionalControls;
+
   /// Defines if the player allows swipe to exit fullscreen
   final bool swipeToExitFullscreen;
 
