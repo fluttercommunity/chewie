@@ -1,3 +1,10 @@
+## [1.17.1]
+* 🛠️ [#947](https://github.com/fluttercommunity/chewie/pull/947): Add `disableFullScreenRoute` to let the embedder own fullscreen. Thanks [Ortes](https://github.com/Ortes).
+* 🖱️ [#954](https://github.com/fluttercommunity/chewie/pull/954): Auto-hide the mouse cursor while idle in fullscreen. Thanks [Ortes](https://github.com/Ortes).
+* ⌨️ [#955](https://github.com/fluttercommunity/chewie/pull/955): Toggle fullscreen with the `F` key on desktop. Thanks [Ortes](https://github.com/Ortes).
+* 🕒 [#956](https://github.com/fluttercommunity/chewie/pull/956): Show a hover-time indicator on the progress bar. Thanks [Ortes](https://github.com/Ortes).
+* 🛠️ [#957](https://github.com/fluttercommunity/chewie/pull/957): Show the controls when play/pause comes from outside the controls. Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.17.0]
 * 📺 [#961](https://github.com/fluttercommunity/chewie/pull/961): Casting / screen-mirroring support. Chewie now ships the cast UI — a cast button in the Material, Material desktop and Cupertino skins, a device picker, and an overlay in place of the video while a session is live — plus the local↔remote handover in both directions. The sender itself is supplied by the app through the new `ChewieCastController` abstraction, so a pure-Flutter package does not pull the Google Cast SDK and its native dependencies into every consumer. New `ChewieController` options: `castController`, `castMedia`, `allowCasting`, `castTranslations` and `castOverlayBuilder`. See the [Casting](README.md#-casting) section. Thanks [a1rwulf](https://github.com/a1rwulf).
 
