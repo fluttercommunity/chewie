@@ -206,7 +206,9 @@ void main() {
 
     await _hoverAt(tester, tester.getCenter(find.byType(VideoProgressBar)));
     await tester.pump();
-    expect(find.byType(Text), findsNothing);
+    // No chapters means no chapter label. The hover-time pill still shows the
+    // pointed timecode, so only the '<title> · <time>' form must be absent.
+    expect(find.textContaining(' · '), findsNothing);
   });
 
   testWidgets('non-draggable bar with chapters never seeks', (tester) async {
