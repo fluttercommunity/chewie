@@ -1,29 +1,5 @@
-## [Unreleased]
+## [1.17.0]
 * 📺 [#961](https://github.com/fluttercommunity/chewie/pull/961): Casting / screen-mirroring support. Chewie now ships the cast UI — a cast button in the Material, Material desktop and Cupertino skins, a device picker, and an overlay in place of the video while a session is live — plus the local↔remote handover in both directions. The sender itself is supplied by the app through the new `ChewieCastController` abstraction, so a pure-Flutter package does not pull the Google Cast SDK and its native dependencies into every consumer. New `ChewieController` options: `castController`, `castMedia`, `allowCasting`, `castTranslations` and `castOverlayBuilder`. See the [Casting](README.md#-casting) section. Thanks [a1rwulf](https://github.com/a1rwulf).
-* 📱 The device picker follows the skin: the Cupertino controls open a
-  `CupertinoActionSheet` instead of a Material modal bottom sheet. Which one
-  `CastButton` opens is set by `CastPickerStyle`.
-* ✨ `ChewieController.externalPlayback` takes a `ValueListenable<bool>` saying
-  the video has left this device by some means Chewie does not own — AirPlay
-  being the case it was added for, where the platform routes the same player
-  and there is no receiver to hand over to. `isPlaybackRemote` answers the same
-  question for a cast session and this alike.
-* 🛠️ The casting overlay appears when a device is picked, not when the receiver
-  finally has the video, so tapping one has a visible consequence right away.
-  It says "Connecting…" until the session is up. `CastOverlay` takes a
-  `connecting` flag for it, and `isPlaybackRemote` counts that phase, so the
-  controls stop decorating a surface the overlay has already replaced.
-* 🛠️ No centre play or seek buttons while playback is remote. They sit on the
-  video surface, which is the casting or AirPlay overlay by then.
-* 🛠️ No buffering spinner while playback is remote. Whatever is showing the
-  video reports its own loading state on the screen the viewer is watching, so
-  the spinner only drew over the casting or AirPlay overlay.
-* 🛠️ Progress bar: draw only the empty track when a source reports itself initialized before it knows its duration, instead of asserting on a NaN inside `drawRRect`.
-* ✨ `ChewieController.additionalControls` puts app-supplied widgets in the control bar, for controls that have to be a widget rather than an options-sheet row — an AirPlay button being the motivating case. They inherit the bar's show/hide behaviour.
-* ✨ `ChewieControlStyle` lets a bar tell those widgets how it dresses its own buttons — icon size, tint, padding and chrome — so one widget matches the Material, Material desktop and Cupertino skins instead of being sized for one and sitting wrong in the others. The example demonstrates it with a dependency-free control.
-* 🛠️ A cast session that is already running when a `ChewieController` is built is now adopted, instead of being noticed only if it changes afterwards. Senders belong to the app and outlive the screens that create them, so opening a second video while casting played it on the device while the receiver still held the first.
-* 🛠️ Desktop control bar: let the position label yield instead of overflowing when the bar carries additional controls.
-* 🛠️ Cupertino control bar: separate supplied controls from each other, so two of them do not sit frosted-pill against frosted-pill and read as one button.
 
 ## [1.16.3]
 * 🐛 [#970](https://github.com/fluttercommunity/chewie/pull/970): fix(web): fullscreen pops the host route on iPhone Safari (no Fullscreen API). Thanks [Ortes](https://github.com/Ortes).
