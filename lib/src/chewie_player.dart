@@ -856,6 +856,7 @@ class ChewieController extends ChangeNotifier {
   ///   takes its size, tint, padding and chrome from there matches the buttons
   ///   beside it on all three.
   final List<Widget> Function(BuildContext context)? additionalControls;
+
   /// Whether the mouse cursor auto-hides together with the controls while in
   /// fullscreen (and reappears on mouse movement), like most video players.
   /// Has no effect outside fullscreen or on devices without a pointer.
