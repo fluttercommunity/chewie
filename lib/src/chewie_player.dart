@@ -918,6 +918,7 @@ class ChewieController extends ChangeNotifier {
   ///   takes its size, tint, padding and chrome from there matches the buttons
   ///   beside it on all three.
   final List<Widget> Function(BuildContext context)? additionalControls;
+
   /// Selectable video qualities shown in the options menu.
   ///
   /// Source-agnostic: the host populates this and reacts to selection via
