@@ -908,6 +908,7 @@ class ChewieController extends ChangeNotifier {
   ///   takes its size, tint, padding and chrome from there matches the buttons
   ///   beside it on all three.
   final List<Widget> Function(BuildContext context)? additionalControls;
+
   /// Whether to flash a YouTube-style indicator showing the seeked amount when
   /// seeking with the keyboard arrows on desktop. Repeated presses in the same
   /// direction accumulate (e.g. 10s → 20s → 30s). Defaults to `true`.
