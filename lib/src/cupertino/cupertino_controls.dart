@@ -190,6 +190,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
+    _latestValue = chewieController.playback.value;
 
     if (oldController != chewieController) {
       _dispose();
@@ -874,6 +875,18 @@ class _CupertinoControlsState extends State<CupertinoControls>
       }
     } else {
       _displayBufferingIndicator = buffering;
+    }
+
+    // Play/pause can also come from outside these controls (Control Center,
+    // the lock screen, headset buttons): reveal the controls the same way
+    // _playPause does, so the state change is visible either way.
+    if (_latestValue.isPlaying != playback.value.isPlaying) {
+      if (playback.value.isPlaying) {
+        _cancelAndRestartTimer();
+      } else {
+        _revealControls();
+        _hideTimer?.cancel();
+      }
     }
 
     setState(() {
