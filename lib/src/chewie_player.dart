@@ -416,6 +416,7 @@ class ChewieController extends ChangeNotifier {
     this.castTranslations = const CastTranslations(),
     this.castOverlayBuilder,
     this.additionalControls,
+    this.hideCursorInFullScreen = true,
   }) : assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
@@ -495,6 +496,7 @@ class ChewieController extends ChangeNotifier {
     CastTranslations? castTranslations,
     Widget Function(BuildContext, CastDevice?)? castOverlayBuilder,
     List<Widget> Function(BuildContext)? additionalControls,
+    bool? hideCursorInFullScreen,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -571,6 +573,8 @@ class ChewieController extends ChangeNotifier {
       castTranslations: castTranslations ?? this.castTranslations,
       castOverlayBuilder: castOverlayBuilder ?? this.castOverlayBuilder,
       additionalControls: additionalControls ?? this.additionalControls,
+      hideCursorInFullScreen:
+          hideCursorInFullScreen ?? this.hideCursorInFullScreen,
     );
   }
 
@@ -852,6 +856,12 @@ class ChewieController extends ChangeNotifier {
   ///   takes its size, tint, padding and chrome from there matches the buttons
   ///   beside it on all three.
   final List<Widget> Function(BuildContext context)? additionalControls;
+
+  /// Whether the mouse cursor auto-hides together with the controls while in
+  /// fullscreen (and reappears on mouse movement), like most video players.
+  /// Has no effect outside fullscreen or on devices without a pointer.
+  /// Defaults to `true`.
+  final bool hideCursorInFullScreen;
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider = context
