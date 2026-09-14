@@ -926,6 +926,7 @@ class ChewieController extends ChangeNotifier {
   /// Has no effect outside fullscreen or on devices without a pointer.
   /// Defaults to `true`.
   final bool hideCursorInFullScreen;
+
   /// How far each left/right arrow-key press seeks on the desktop controls.
   /// Also drives the amount shown by the seek indicator. Defaults to 10 seconds.
   final Duration keyboardSeekDuration;
