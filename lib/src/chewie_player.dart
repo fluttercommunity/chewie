@@ -442,6 +442,11 @@ class ChewieController extends ChangeNotifier {
     this.hideCursorInFullScreen = true,
     this.swipeToExitFullscreen = true,
     this.swipeThreshold = 300,
+    this.showSeekIndicator = true,
+    this.keyboardSeekDuration = const Duration(seconds: 10),
+    this.allowDoubleTapSeek = true,
+    this.doubleTapSeekDuration = const Duration(seconds: 10),
+    this.allowDoubleTapToggleFullScreen = true,
   }) : assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
@@ -525,6 +530,11 @@ class ChewieController extends ChangeNotifier {
     bool? hideCursorInFullScreen,
     bool? swipeToExitFullscreen,
     double? swipeThreshold,
+    bool? showSeekIndicator,
+    Duration? keyboardSeekDuration,
+    bool? allowDoubleTapSeek,
+    Duration? doubleTapSeekDuration,
+    bool? allowDoubleTapToggleFullScreen,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -608,6 +618,13 @@ class ChewieController extends ChangeNotifier {
       swipeToExitFullscreen:
           swipeToExitFullscreen ?? this.swipeToExitFullscreen,
       swipeThreshold: swipeThreshold ?? this.swipeThreshold,
+      showSeekIndicator: showSeekIndicator ?? this.showSeekIndicator,
+      keyboardSeekDuration: keyboardSeekDuration ?? this.keyboardSeekDuration,
+      allowDoubleTapSeek: allowDoubleTapSeek ?? this.allowDoubleTapSeek,
+      doubleTapSeekDuration:
+          doubleTapSeekDuration ?? this.doubleTapSeekDuration,
+      allowDoubleTapToggleFullScreen:
+          allowDoubleTapToggleFullScreen ?? this.allowDoubleTapToggleFullScreen,
     );
   }
 
@@ -903,6 +920,12 @@ class ChewieController extends ChangeNotifier {
   ///   beside it on all three.
   final List<Widget> Function(BuildContext context)? additionalControls;
 
+  /// Whether to flash a YouTube-style indicator showing the seeked amount when
+  /// seeking with the keyboard arrows on the desktop controls or by
+  /// double-tapping the mobile controls. Repeated seeks in the same direction
+  /// accumulate (e.g. 10s → 20s → 30s). Defaults to `true`.
+  final bool showSeekIndicator;
+
   /// Defines if the player allows swipe to exit fullscreen
   final bool swipeToExitFullscreen;
 
@@ -915,6 +938,25 @@ class ChewieController extends ChangeNotifier {
   /// Has no effect outside fullscreen or on devices without a pointer.
   /// Defaults to `true`.
   final bool hideCursorInFullScreen;
+
+  /// How far each left/right arrow-key press seeks on the desktop controls.
+  /// Also drives the amount shown by the seek indicator. Defaults to 10 seconds.
+  final Duration keyboardSeekDuration;
+
+  /// Whether double-tapping the left/right side of the mobile [MaterialControls]
+  /// seeks backward/forward, YouTube-style. The middle of the hit area is a
+  /// dead zone. While the seek indicator is visible, further single taps in the
+  /// same zone keep seeking. Defaults to `true`.
+  final bool allowDoubleTapSeek;
+
+  /// How far each double-tap (and follow-up tap) seeks on the mobile
+  /// [MaterialControls]. Defaults to 10 seconds.
+  final Duration doubleTapSeekDuration;
+
+  /// Whether double-clicking the desktop [MaterialDesktopControls] hit area
+  /// toggles fullscreen, like the YouTube desktop player. Only honored when
+  /// [allowFullScreen] is `true`. Defaults to `true`.
+  final bool allowDoubleTapToggleFullScreen;
 
   static ChewieController of(BuildContext context) {
     final chewieControllerProvider = context
