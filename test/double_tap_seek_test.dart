@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:chewie/chewie.dart';
 import 'package:chewie/src/center_play_button.dart';
+import 'package:chewie/src/notifiers/index.dart';
 import 'package:chewie/src/seek_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 
@@ -94,11 +96,13 @@ ChewieController _controller({
   bool allowDoubleTapToggleFullScreen = true,
   bool showSeekIndicator = true,
   bool isLive = false,
+  bool pauseOnBackgroundTap = false,
+  bool autoPlay = false,
   Widget? customControls,
 }) {
   return ChewieController(
     videoPlayerController: VideoPlayerController.networkUrl(Uri.parse(_src)),
-    autoPlay: false,
+    autoPlay: autoPlay,
     autoInitialize: true,
     looping: false,
     isLive: isLive,
@@ -106,6 +110,7 @@ ChewieController _controller({
     doubleTapSeekDuration: doubleTapSeekDuration,
     allowDoubleTapToggleFullScreen: allowDoubleTapToggleFullScreen,
     showSeekIndicator: showSeekIndicator,
+    pauseOnBackgroundTap: pauseOnBackgroundTap,
     customControls: customControls ?? const MaterialControls(),
   );
 }
@@ -132,6 +137,14 @@ SeekIndicator _indicator(WidgetTester tester) =>
 
 Duration _position(ChewieController controller) =>
     controller.videoPlayerController.value.position;
+
+bool _controlsVisible(WidgetTester tester) {
+  final notifier = Provider.of<PlayerNotifier>(
+    tester.element(find.byType(CenterPlayButton)),
+    listen: false,
+  );
+  return !notifier.hideStuff;
+}
 
 /// A point at [widthFraction] across the controls, at vertical center —
 /// clear of the center play/seek button cluster for fractions near 0 or 1.
@@ -272,6 +285,28 @@ void main() {
       expect(indicator.seconds, 20);
     });
 
+    testWidgets('a single tap in the same zone keeps seeking backward', (
+      tester,
+    ) async {
+      final controller = _controller();
+      await _pumpPlayer(tester, controller);
+      await controller.videoPlayerController.seekTo(
+        const Duration(seconds: 30),
+      );
+
+      await _doubleTapAt(tester, _at(tester, 0.1));
+      expect(_position(controller), const Duration(seconds: 20));
+      expect(_indicator(tester).forward, isFalse);
+
+      await _singleTapAt(tester, _at(tester, 0.1));
+
+      expect(_position(controller), const Duration(seconds: 10));
+      final indicator = _indicator(tester);
+      expect(indicator.show, isTrue);
+      expect(indicator.forward, isFalse);
+      expect(indicator.seconds, 20);
+    });
+
     testWidgets('a single tap in the opposite zone does not repeat', (
       tester,
     ) async {
@@ -320,6 +355,40 @@ void main() {
       expect(_position(controller), Duration.zero);
       expect(_indicator(tester).show, isFalse);
       expect(controller.videoPlayerController.value.isPlaying, isTrue);
+
+      await _stopPlayback(tester, controller);
+    });
+  });
+
+  group('single tap while playing (regular hit-area handling)', () {
+    testWidgets('pauses when pauseOnBackgroundTap is true', (tester) async {
+      final controller = _controller(pauseOnBackgroundTap: true);
+      await _pumpPlayer(tester, controller);
+      await controller.videoPlayerController.play();
+      await tester.pump();
+      expect(controller.videoPlayerController.value.isPlaying, isTrue);
+
+      await _singleTapAt(tester, _at(tester, 0.9));
+
+      expect(controller.videoPlayerController.value.isPlaying, isFalse);
+    });
+
+    testWidgets('the first tap keeps the controls up, the second hides them', (
+      tester,
+    ) async {
+      // autoPlay so the controller is already playing before MaterialControls
+      // mounts and snapshots its `_latestValue` — starting playback *after*
+      // mount instead would itself trigger the reveal-and-restart-timer path,
+      // masking the branch under test.
+      final controller = _controller(autoPlay: true);
+      await _pumpPlayer(tester, controller);
+      expect(controller.videoPlayerController.value.isPlaying, isTrue);
+
+      await _singleTapAt(tester, _at(tester, 0.9));
+      expect(_controlsVisible(tester), isTrue);
+
+      await _singleTapAt(tester, _at(tester, 0.9));
+      expect(_controlsVisible(tester), isFalse);
 
       await _stopPlayback(tester, controller);
     });
