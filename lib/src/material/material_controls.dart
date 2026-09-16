@@ -248,6 +248,7 @@ class _MaterialControlsState extends State<MaterialControls>
           title:
               chewieController.optionsTranslation?.qualityButtonText ??
               'Quality',
+        ),
       if (chewieController.hasAudioTracks)
         OptionItem(
           onTap: (context) async {

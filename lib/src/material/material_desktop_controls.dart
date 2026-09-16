@@ -261,6 +261,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
           title:
               chewieController.optionsTranslation?.qualityButtonText ??
               'Quality',
+        ),
       if (chewieController.hasAudioTracks)
         OptionItem(
           onTap: (context) async {
