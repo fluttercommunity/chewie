@@ -699,6 +699,7 @@ class ChewieController extends ChangeNotifier {
   /// getter (rather than keep their own reference) when disposing.
   VideoPlayerController get videoPlayerController => _videoPlayerController;
   VideoPlayerController _videoPlayerController;
+
   /// Selectable audio tracks shown in the options menu.
   ///
   /// Source-agnostic: the host populates this (e.g. from an HLS manifest) and
