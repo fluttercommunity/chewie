@@ -745,9 +745,6 @@ class ChewieController extends ChangeNotifier {
   /// Whether any selectable subtitle tracks are available.
   bool get hasSubtitleTracks => subtitleTracks.isNotEmpty;
 
-  /// The controller for the video you want to play
-  final VideoPlayerController videoPlayerController;
-
   /// Selectable audio tracks shown in the options menu.
   ///
   /// Source-agnostic: the host populates this (e.g. from an HLS manifest) and
