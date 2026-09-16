@@ -1,3 +1,13 @@
+## [1.17.2]
+* 🛠️ [#911](https://github.com/fluttercommunity/chewie/pull/911): Add documentation about pauseOnBackgroundTap feature. Thanks [Ortes](https://github.com/Ortes).
+* ⬆️ [#930](https://github.com/fluttercommunity/chewie/pull/930): Add swipe-down to exit fullscreen. Thanks [Ortes](https://github.com/Ortes).
+* 💬 [#948](https://github.com/fluttercommunity/chewie/pull/948): Multi-track subtitle selection. Thanks [Ortes](https://github.com/Ortes).
+* 🔊 [#949](https://github.com/fluttercommunity/chewie/pull/949): Multi-track audio selection. Thanks [Ortes](https://github.com/Ortes).
+* ⌨️ [#953](https://github.com/fluttercommunity/chewie/pull/953): YouTube-style seek indicator for keyboard seeking. Thanks [Ortes](https://github.com/Ortes).
+* 🔄 [#963](https://github.com/fluttercommunity/chewie/pull/963): Add `ChewieController.swapVideoSource` (in-place video source replacement). Thanks [Ortes](https://github.com/Ortes).
+* 👆 [#964](https://github.com/fluttercommunity/chewie/pull/964): YouTube-style tap gestures (double-tap seek zones on mobile, double-click fullscreen on desktop). Thanks [Ortes](https://github.com/Ortes).
+* ⚙️ [#965](https://github.com/fluttercommunity/chewie/pull/965): Add typed video-quality selection to the options menu of all three skins. Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.17.1]
 * 🛠️ [#947](https://github.com/fluttercommunity/chewie/pull/947): Add `disableFullScreenRoute` to let the embedder own fullscreen. Thanks [Ortes](https://github.com/Ortes).
 * 🖱️ [#954](https://github.com/fluttercommunity/chewie/pull/954): Auto-hide the mouse cursor while idle in fullscreen. Thanks [Ortes](https://github.com/Ortes).
