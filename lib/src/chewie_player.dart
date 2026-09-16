@@ -13,6 +13,7 @@ import 'package:chewie/src/models/option_item.dart';
 import 'package:chewie/src/models/options_translation.dart';
 import 'package:chewie/src/models/subtitle_model.dart';
 import 'package:chewie/src/models/subtitle_style.dart';
+import 'package:chewie/src/models/video_quality.dart';
 import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
 import 'package:flutter/foundation.dart';
@@ -445,6 +446,9 @@ class ChewieController extends ChangeNotifier {
     this.swipeThreshold = 300,
     this.showSeekIndicator = true,
     this.keyboardSeekDuration = const Duration(seconds: 10),
+    this.videoQualities = const <VideoQuality>[],
+    this.activeVideoQualityId,
+    this.onVideoQualityChanged,
   }) : assert(
          playbackSpeeds.every((speed) => speed > 0),
          'The playbackSpeeds values must all be greater than 0',
@@ -530,6 +534,9 @@ class ChewieController extends ChangeNotifier {
     double? swipeThreshold,
     bool? showSeekIndicator,
     Duration? keyboardSeekDuration,
+    List<VideoQuality>? videoQualities,
+    Object? activeVideoQualityId,
+    void Function(VideoQuality quality)? onVideoQualityChanged,
   }) {
     return ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
@@ -615,6 +622,10 @@ class ChewieController extends ChangeNotifier {
       swipeThreshold: swipeThreshold ?? this.swipeThreshold,
       showSeekIndicator: showSeekIndicator ?? this.showSeekIndicator,
       keyboardSeekDuration: keyboardSeekDuration ?? this.keyboardSeekDuration,
+      videoQualities: videoQualities ?? this.videoQualities,
+      activeVideoQualityId: activeVideoQualityId ?? this.activeVideoQualityId,
+      onVideoQualityChanged:
+          onVideoQualityChanged ?? this.onVideoQualityChanged,
     );
   }
 
@@ -914,6 +925,25 @@ class ChewieController extends ChangeNotifier {
   ///   beside it on all three.
   final List<Widget> Function(BuildContext context)? additionalControls;
 
+  /// Selectable video qualities shown in the options menu.
+  ///
+  /// Source-agnostic: the host populates this and reacts to selection via
+  /// [onVideoQualityChanged] — typically by calling [swapVideoSource] with a
+  /// controller for the chosen quality, or by switching the rendition of an
+  /// adaptive stream. May change after the video loads — use
+  /// [setVideoQualities] so the controls rebuild.
+  List<VideoQuality> videoQualities;
+
+  /// Id of the currently selected quality in [videoQualities].
+  Object? activeVideoQualityId;
+
+  /// Called when the user picks a video quality from the menu.
+  final void Function(VideoQuality quality)? onVideoQualityChanged;
+
+  /// Whether more than one selectable video quality is available (a single
+  /// quality offers nothing to choose, so the menu entry stays hidden).
+  bool get hasVideoQualities => videoQualities.length > 1;
+
   /// Whether to flash a YouTube-style indicator showing the seeked amount when
   /// seeking with the keyboard arrows on desktop. Repeated presses in the same
   /// direction accumulate (e.g. 10s → 20s → 30s). Defaults to `true`.
@@ -1187,6 +1217,23 @@ class ChewieController extends ChangeNotifier {
         oldController.dispose();
       });
     }
+  }
+
+  /// Replaces the selectable [videoQualities] and rebuilds the controls.
+  ///
+  /// Use when qualities become known only after the media loads (e.g. once a
+  /// manifest is parsed).
+  void setVideoQualities(List<VideoQuality> qualities) {
+    videoQualities = qualities;
+    notifyListeners();
+  }
+
+  /// Selects [quality] as the active one, updating [activeVideoQualityId]
+  /// and notifying [onVideoQualityChanged].
+  void selectVideoQuality(VideoQuality quality) {
+    activeVideoQualityId = quality.id;
+    onVideoQualityChanged?.call(quality);
+    notifyListeners();
   }
 
   void enterFullScreen() {
