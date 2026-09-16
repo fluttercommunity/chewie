@@ -718,9 +718,6 @@ class ChewieController extends ChangeNotifier {
   /// offers nothing to choose, so the menu entry stays hidden).
   bool get hasAudioTracks => audioTracks.length > 1;
 
-  /// The controller for the video you want to play
-  final VideoPlayerController videoPlayerController;
-
   /// Initialize the Video on Startup. This will prep the video for playback.
   final bool autoInitialize;
 
