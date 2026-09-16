@@ -1,0 +1,1000 @@
+import 'dart:async';
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
+import 'package:chewie/src/animated_play_pause.dart';
+import 'package:chewie/src/cast/chewie_cast_controller.dart';
+import 'package:chewie/src/cast/chewie_playback_target.dart';
+import 'package:chewie/src/cast/widgets/cupertino_cast_button.dart';
+import 'package:chewie/src/center_play_button.dart';
+import 'package:chewie/src/chewie_player.dart';
+import 'package:chewie/src/chewie_progress_colors.dart';
+import 'package:chewie/src/cupertino/cupertino_progress_bar.dart';
+import 'package:chewie/src/cupertino/widgets/cupertino_additional_controls.dart';
+import 'package:chewie/src/cupertino/widgets/cupertino_options_dialog.dart';
+import 'package:chewie/src/helpers/utils.dart';
+import 'package:chewie/src/models/option_item.dart';
+import 'package:chewie/src/models/subtitle_model.dart';
+import 'package:chewie/src/models/video_quality.dart';
+import 'package:chewie/src/notifiers/index.dart';
+import 'package:chewie/src/subtitle_overlay.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
+
+class CupertinoControls extends StatefulWidget {
+  const CupertinoControls({
+    required this.backgroundColor,
+    required this.iconColor,
+    this.showPlayButton = true,
+    super.key,
+  });
+
+  final Color backgroundColor;
+  final Color iconColor;
+  final bool showPlayButton;
+
+  @override
+  State<StatefulWidget> createState() {
+    return _CupertinoControlsState();
+  }
+}
+
+class _CupertinoControlsState extends State<CupertinoControls>
+    with SingleTickerProviderStateMixin {
+  late PlayerNotifier notifier;
+  late VideoPlayerValue _latestValue;
+  double? _latestVolume;
+  Timer? _hideTimer;
+  final marginSize = 5.0;
+  Timer? _expandCollapseTimer;
+  Timer? _initTimer;
+  bool _dragging = false;
+  Duration? _subtitlesPosition;
+  bool _subtitleOn = false;
+  Timer? _bufferingDisplayTimer;
+  bool _displayBufferingIndicator = false;
+
+  /// Whether to draw the buffering spinner.
+  ///
+  /// Not while playback is remote — a cast session, or AirPlay and anything
+  /// else reported through `externalPlayback`. The phone is a remote control
+  /// rather than a video surface then, whatever is showing the video reports
+  /// its own loading state on the screen the viewer is actually watching, and
+  /// a spinner over the overlay is noise on top of a picture nobody is
+  /// looking at.
+  bool get _showBufferingIndicator =>
+      _displayBufferingIndicator && !chewieController.isPlaybackRemote;
+  double selectedSpeed = 1.0;
+  late VideoPlayerController controller;
+
+  /// The cast controller we are subscribed to, remembered separately so we
+  /// unsubscribe from the same object we subscribed to even when the
+  /// [ChewieController] is swapped out from under us.
+  ChewieCastController? _subscribedCast;
+
+  /// The external-playback signal we are subscribed to, remembered for the
+  /// same reason as [_subscribedCast].
+  ValueListenable<bool>? _subscribedExternalPlayback;
+
+  ChewieCastController? get _castController =>
+      _chewieController?.castController;
+
+  /// Local player or cast receiver, whichever currently has the video.
+  ChewiePlaybackTarget get _playback => chewieController.playback;
+
+  // We know that _chewieController is set in didChangeDependencies
+  ChewieController get chewieController => _chewieController!;
+  ChewieController? _chewieController;
+
+  // Hides the mouse cursor along with the controls while idle in fullscreen.
+  MouseCursor get _idleCursor =>
+      chewieController.hideCursorInFullScreen &&
+          chewieController.isFullScreen &&
+          notifier.hideStuff
+      ? SystemMouseCursors.none
+      : MouseCursor.defer;
+
+  @override
+  void initState() {
+    super.initState();
+    notifier = Provider.of<PlayerNotifier>(context, listen: false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_latestValue.hasError) {
+      return chewieController.errorBuilder != null
+          ? chewieController.errorBuilder!(
+              context,
+              chewieController.videoPlayerController.value.errorDescription!,
+            )
+          : const Center(
+              child: Icon(
+                CupertinoIcons.exclamationmark_circle,
+                color: Colors.white,
+                size: 42,
+              ),
+            );
+    }
+
+    final backgroundColor = widget.backgroundColor;
+    final iconColor = widget.iconColor;
+    final orientation = MediaQuery.of(context).orientation;
+    final barHeight = orientation == Orientation.portrait ? 30.0 : 47.0;
+    final buttonPadding = orientation == Orientation.portrait ? 16.0 : 24.0;
+
+    return MouseRegion(
+      cursor: _idleCursor,
+      onHover: (_) => _cancelAndRestartTimer(),
+      child: GestureDetector(
+        onTap: () => _cancelAndRestartTimer(),
+        child: AbsorbPointer(
+          absorbing: notifier.hideStuff,
+          child: Stack(
+            children: [
+              if (_showBufferingIndicator)
+                _chewieController?.bufferingBuilder?.call(context) ??
+                    const Center(child: CircularProgressIndicator())
+              else
+                _buildHitArea(),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  _buildTopBar(
+                    backgroundColor,
+                    iconColor,
+                    barHeight,
+                    buttonPadding,
+                  ),
+                  const Spacer(),
+                  if (_subtitleOn)
+                    Transform.translate(
+                      offset: Offset(
+                        0.0,
+                        notifier.hideStuff ? barHeight * 0.8 : 0.0,
+                      ),
+                      child: _buildSubtitles(chewieController.subtitle!),
+                    ),
+                  _buildBottomBar(backgroundColor, iconColor, barHeight),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _dispose();
+    super.dispose();
+  }
+
+  void _dispose() {
+    controller.removeListener(_updateState);
+    _subscribedCast?.removeListener(_updateState);
+    _subscribedCast = null;
+    _subscribedExternalPlayback?.removeListener(_updateState);
+    _subscribedExternalPlayback = null;
+    _hideTimer?.cancel();
+    _expandCollapseTimer?.cancel();
+    _initTimer?.cancel();
+  }
+
+  @override
+  void didChangeDependencies() {
+    final oldController = _chewieController;
+    _chewieController = ChewieController.of(context);
+    controller = chewieController.videoPlayerController;
+    _latestValue = chewieController.playback.value;
+
+    if (oldController != chewieController) {
+      _dispose();
+      _initialize();
+    }
+
+    super.didChangeDependencies();
+  }
+
+  GestureDetector _buildOptionsButton(Color iconColor, double barHeight) {
+    final options = <OptionItem>[
+      if (chewieController.hasVideoQualities)
+        OptionItem(
+          onTap: (context) async {
+            Navigator.pop(context);
+            _onQualityButtonTap();
+          },
+          iconData: Icons.high_quality_outlined,
+          title:
+              chewieController.optionsTranslation?.qualityButtonText ??
+              'Quality',
+        ),
+    ];
+
+    if (chewieController.additionalOptions != null &&
+        chewieController.additionalOptions!(context).isNotEmpty) {
+      options.addAll(chewieController.additionalOptions!(context));
+    }
+
+    return GestureDetector(
+      onTap: () async {
+        _hideTimer?.cancel();
+
+        if (chewieController.optionsBuilder != null) {
+          await chewieController.optionsBuilder!(context, options);
+        } else {
+          await showCupertinoModalPopup<OptionItem>(
+            context: context,
+            semanticsDismissible: true,
+            useRootNavigator: chewieController.useRootNavigator,
+            builder: (context) => CupertinoOptionsDialog(
+              options: options,
+              cancelButtonText:
+                  chewieController.optionsTranslation?.cancelButtonText,
+            ),
+          );
+          if (_latestValue.isPlaying) {
+            _startHideTimer();
+          }
+        }
+      },
+      child: Container(
+        height: barHeight,
+        color: Colors.transparent,
+        padding: const EdgeInsets.only(left: 4.0, right: 8.0),
+        margin: const EdgeInsets.only(right: 6.0),
+        child: Icon(Icons.more_vert, color: iconColor, size: 18),
+      ),
+    );
+  }
+
+  Widget _buildSubtitles(Subtitles subtitles) {
+    if (!_subtitleOn) {
+      return const SizedBox();
+    }
+    if (_subtitlesPosition == null) {
+      return const SizedBox();
+    }
+    final currentSubtitle = subtitles.getByPosition(_subtitlesPosition!);
+    if (currentSubtitle.isEmpty) {
+      return const SizedBox();
+    }
+
+    return SubtitleOverlay(
+      chewieController: chewieController,
+      margin: EdgeInsets.only(left: marginSize, right: marginSize),
+      text: currentSubtitle.first!.text,
+    );
+  }
+
+  Widget _buildBottomBar(
+    Color backgroundColor,
+    Color iconColor,
+    double barHeight,
+  ) {
+    return SafeArea(
+      bottom: chewieController.isFullScreen,
+      minimum: chewieController.controlsSafeAreaMinimum,
+      child: AnimatedOpacity(
+        opacity: notifier.hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: Container(
+          color: Colors.transparent,
+          alignment: Alignment.bottomCenter,
+          margin: EdgeInsets.all(marginSize),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10.0),
+            child: BackdropFilter(
+              filter: ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+              child: Container(
+                height: barHeight,
+                color: backgroundColor,
+                child: chewieController.isLive
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          _buildPlayPause(controller, iconColor, barHeight),
+                          _buildLive(iconColor),
+                        ],
+                      )
+                    : Row(
+                        children: <Widget>[
+                          _buildSkipBack(iconColor, barHeight),
+                          _buildPlayPause(controller, iconColor, barHeight),
+                          _buildSkipForward(iconColor, barHeight),
+                          _buildPosition(iconColor),
+                          _buildProgressBar(),
+                          _buildRemaining(iconColor),
+                          _buildSubtitleToggle(iconColor, barHeight),
+                          if (chewieController.allowPlaybackSpeedChanging)
+                            _buildSpeedButton(controller, iconColor, barHeight),
+                          if (chewieController.hasVideoQualities ||
+                              (chewieController.additionalOptions != null &&
+                                  chewieController
+                                      .additionalOptions!(context)
+                                      .isNotEmpty))
+                            _buildOptionsButton(iconColor, barHeight),
+                        ],
+                      ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLive(Color iconColor) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 12.0),
+      child: Text('LIVE', style: TextStyle(color: iconColor, fontSize: 12.0)),
+    );
+  }
+
+  GestureDetector _buildExpandButton(
+    Color backgroundColor,
+    Color iconColor,
+    double barHeight,
+    double buttonPadding,
+  ) {
+    return GestureDetector(
+      onTap: _onExpandCollapse,
+      child: AnimatedOpacity(
+        opacity: notifier.hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10.0),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 10.0),
+            child: Container(
+              height: barHeight,
+              padding: EdgeInsets.only(
+                left: buttonPadding,
+                right: buttonPadding,
+              ),
+              color: backgroundColor,
+              child: Center(
+                child: Icon(
+                  chewieController.isFullScreen
+                      ? CupertinoIcons.arrow_down_right_arrow_up_left
+                      : CupertinoIcons.arrow_up_left_arrow_down_right,
+                  color: iconColor,
+                  size: 16,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHitArea() {
+    // Nothing to sit on while playback is remote: the video surface is the
+    // casting or AirPlay overlay by then, and these buttons would cover it -
+    // invisibly still taking its taps if they were merely faded out. The
+    // control bar keeps play/pause and the progress bar for driving whatever
+    // is playing.
+    if (chewieController.isPlaybackRemote) return const SizedBox.expand();
+
+    final bool isFinished =
+        (_latestValue.position >= _latestValue.duration) &&
+        _latestValue.duration.inSeconds > 0;
+    final bool showPlayButton =
+        widget.showPlayButton && !_latestValue.isPlaying && !_dragging;
+
+    return GestureDetector(
+      onTap: _latestValue.isPlaying
+          ? _chewieController?.pauseOnBackgroundTap ?? false
+                ? () {
+                    _playPause();
+
+                    setState(() {
+                      notifier.hideStuff = true;
+                    });
+                  }
+                : _cancelAndRestartTimer
+          : () {
+              _hideTimer?.cancel();
+
+              setState(() {
+                notifier.hideStuff = false;
+              });
+            },
+      child: CenterPlayButton(
+        backgroundColor: widget.backgroundColor,
+        iconColor: widget.iconColor,
+        isFinished: isFinished,
+        isPlaying: _latestValue.isPlaying,
+        show: showPlayButton,
+        onPressed: _playPause,
+      ),
+    );
+  }
+
+  GestureDetector _buildMuteButton(
+    VideoPlayerController controller,
+    Color backgroundColor,
+    Color iconColor,
+    double barHeight,
+    double buttonPadding,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        _cancelAndRestartTimer();
+        final playback = _playback;
+
+        if (_latestValue.volume == 0) {
+          playback.setVolume(_latestVolume ?? 0.5);
+        } else {
+          _latestVolume = playback.value.volume;
+          playback.setVolume(0.0);
+        }
+      },
+      child: AnimatedOpacity(
+        opacity: notifier.hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10.0),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 10.0),
+            child: ColoredBox(
+              color: backgroundColor,
+              child: Container(
+                height: barHeight,
+                padding: EdgeInsets.only(
+                  left: buttonPadding,
+                  right: buttonPadding,
+                ),
+                child: Icon(
+                  _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
+                  color: iconColor,
+                  size: 16,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  GestureDetector _buildPlayPause(
+    VideoPlayerController controller,
+    Color iconColor,
+    double barHeight,
+  ) {
+    return GestureDetector(
+      onTap: _playPause,
+      child: Container(
+        height: barHeight,
+        color: Colors.transparent,
+        padding: const EdgeInsets.only(left: 6.0, right: 6.0),
+        child: AnimatedPlayPause(
+          color: widget.iconColor,
+          playing: _latestValue.isPlaying,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPosition(Color iconColor) {
+    final position = _latestValue.position;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 12.0),
+      child: Text(
+        formatDuration(position),
+        style: TextStyle(color: iconColor, fontSize: 12.0),
+      ),
+    );
+  }
+
+  Widget _buildRemaining(Color iconColor) {
+    final position = _latestValue.duration - _latestValue.position;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Text(
+        '-${formatDuration(position)}',
+        style: TextStyle(color: iconColor, fontSize: 12.0),
+      ),
+    );
+  }
+
+  Widget _buildSubtitleToggle(Color iconColor, double barHeight) {
+    //if don't have subtitle hiden button
+    if (chewieController.subtitle?.isEmpty ?? true) {
+      return const SizedBox();
+    }
+    return GestureDetector(
+      onTap: _subtitleToggle,
+      child: Container(
+        height: barHeight,
+        color: Colors.transparent,
+        margin: const EdgeInsets.only(right: 10.0),
+        padding: const EdgeInsets.only(left: 6.0, right: 6.0),
+        child: Icon(
+          Icons.subtitles,
+          color: _subtitleOn ? iconColor : Colors.grey[700],
+          size: 16.0,
+        ),
+      ),
+    );
+  }
+
+  void _subtitleToggle() {
+    setState(() {
+      _subtitleOn = !_subtitleOn;
+    });
+  }
+
+  GestureDetector _buildSkipBack(Color iconColor, double barHeight) {
+    return GestureDetector(
+      onTap: _skipBack,
+      child: Container(
+        height: barHeight,
+        color: Colors.transparent,
+        margin: const EdgeInsets.only(left: 10.0),
+        padding: const EdgeInsets.only(left: 6.0, right: 6.0),
+        child: Icon(CupertinoIcons.gobackward_15, color: iconColor, size: 18.0),
+      ),
+    );
+  }
+
+  GestureDetector _buildSkipForward(Color iconColor, double barHeight) {
+    return GestureDetector(
+      onTap: _skipForward,
+      child: Container(
+        height: barHeight,
+        color: Colors.transparent,
+        padding: const EdgeInsets.only(left: 6.0, right: 8.0),
+        margin: const EdgeInsets.only(right: 8.0),
+        child: Icon(CupertinoIcons.goforward_15, color: iconColor, size: 18.0),
+      ),
+    );
+  }
+
+  GestureDetector _buildSpeedButton(
+    VideoPlayerController controller,
+    Color iconColor,
+    double barHeight,
+  ) {
+    return GestureDetector(
+      onTap: () async {
+        _hideTimer?.cancel();
+
+        final chosenSpeed = await showCupertinoModalPopup<double>(
+          context: context,
+          semanticsDismissible: true,
+          useRootNavigator: chewieController.useRootNavigator,
+          builder: (context) => _PlaybackSpeedDialog(
+            speeds: chewieController.playbackSpeeds,
+            selected: _latestValue.playbackSpeed,
+          ),
+        );
+
+        if (chosenSpeed != null) {
+          _playback.setPlaybackSpeed(chosenSpeed);
+
+          selectedSpeed = chosenSpeed;
+        }
+
+        if (_latestValue.isPlaying) {
+          _startHideTimer();
+        }
+      },
+      child: Container(
+        height: barHeight,
+        color: Colors.transparent,
+        padding: const EdgeInsets.only(left: 6.0, right: 8.0),
+        margin: const EdgeInsets.only(right: 8.0),
+        child: Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.skewY(0.0)
+            ..rotateX(math.pi)
+            ..rotateZ(math.pi * 0.8),
+          child: Icon(Icons.speed, color: iconColor, size: 18.0),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTopBar(
+    Color backgroundColor,
+    Color iconColor,
+    double barHeight,
+    double buttonPadding,
+  ) {
+    return Container(
+      height: barHeight,
+      margin: EdgeInsets.only(
+        top: marginSize,
+        right: marginSize,
+        left: marginSize,
+      ),
+      child: Row(
+        children: <Widget>[
+          if (chewieController.allowFullScreen)
+            _buildExpandButton(
+              backgroundColor,
+              iconColor,
+              barHeight,
+              buttonPadding,
+            ),
+          const Spacer(),
+          if (chewieController.additionalControls != null)
+            CupertinoAdditionalControls(
+              additionalControls: chewieController.additionalControls!,
+              backgroundColor: backgroundColor,
+              barHeight: barHeight,
+              buttonPadding: buttonPadding,
+              marginSize: marginSize,
+              hidden: notifier.hideStuff,
+              iconColor: iconColor,
+            ),
+          if (_castController != null && chewieController.allowCasting) ...[
+            CupertinoCastButton(
+              castController: _castController!,
+              translations: chewieController.castTranslations,
+              backgroundColor: backgroundColor,
+              barHeight: barHeight,
+              buttonPadding: buttonPadding,
+              hidden: notifier.hideStuff,
+              iconColor: iconColor,
+              useRootNavigator: chewieController.useRootNavigator,
+              cancelButtonText:
+                  chewieController.optionsTranslation?.cancelButtonText,
+              onMenuOpened: () => _hideTimer?.cancel(),
+              onMenuClosed: () {
+                if (_latestValue.isPlaying) _startHideTimer();
+              },
+            ),
+            SizedBox(width: marginSize),
+          ],
+          if (chewieController.allowMuting)
+            _buildMuteButton(
+              controller,
+              backgroundColor,
+              iconColor,
+              barHeight,
+              buttonPadding,
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _cancelAndRestartTimer() {
+    _hideTimer?.cancel();
+
+    setState(() {
+      notifier.hideStuff = false;
+
+      _startHideTimer();
+    });
+  }
+
+  Future<void> _initialize() async {
+    _subtitleOn =
+        chewieController.showSubtitles &&
+        (chewieController.subtitle?.isNotEmpty ?? false);
+    controller.addListener(_updateState);
+    // Follow the receiver too: while casting it, not the local player, is what
+    // reports position and play state.
+    _subscribedCast = chewieController.castController
+      ?..addListener(_updateState);
+    // And whatever else took the video off this device, so the controls stop
+    // drawing over a surface the viewer is not watching.
+    _subscribedExternalPlayback = chewieController.externalPlayback
+      ?..addListener(_updateState);
+
+    _updateState();
+
+    if (controller.value.isPlaying || chewieController.autoPlay) {
+      _startHideTimer();
+    }
+
+    if (chewieController.showControlsOnInitialize) {
+      _initTimer = Timer(const Duration(milliseconds: 200), () {
+        setState(() {
+          notifier.hideStuff = false;
+        });
+      });
+    }
+  }
+
+  void _onExpandCollapse() {
+    setState(() {
+      notifier.hideStuff = true;
+
+      chewieController.toggleFullScreen();
+      _expandCollapseTimer = Timer(const Duration(milliseconds: 300), () {
+        setState(() {
+          _cancelAndRestartTimer();
+        });
+      });
+    });
+  }
+
+  Widget _buildProgressBar() {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.only(right: 12.0),
+        child: CupertinoVideoProgressBar(
+          controller,
+          chapters: chewieController.chapters,
+          playback: _playback,
+          onDragStart: () {
+            setState(() {
+              _dragging = true;
+            });
+
+            _hideTimer?.cancel();
+          },
+          onDragUpdate: () {
+            _hideTimer?.cancel();
+          },
+          onDragEnd: () {
+            setState(() {
+              _dragging = false;
+            });
+
+            _startHideTimer();
+          },
+          colors:
+              chewieController.cupertinoProgressColors ??
+              ChewieProgressColors(
+                playedColor: const Color.fromARGB(120, 255, 255, 255),
+                handleColor: const Color.fromARGB(255, 255, 255, 255),
+                bufferedColor: const Color.fromARGB(60, 255, 255, 255),
+                backgroundColor: const Color.fromARGB(20, 255, 255, 255),
+              ),
+          draggableProgressBar: chewieController.draggableProgressBar,
+        ),
+      ),
+    );
+  }
+
+  void _playPause() {
+    final isFinished =
+        _latestValue.position >= _latestValue.duration &&
+        _latestValue.duration.inSeconds > 0;
+
+    final playback = _playback;
+
+    setState(() {
+      if (playback.value.isPlaying) {
+        notifier.hideStuff = false;
+        _hideTimer?.cancel();
+        playback.pause();
+      } else {
+        _cancelAndRestartTimer();
+
+        // Only the local player has an uninitialized state to recover from — a
+        // receiver is either loaded or there is no session.
+        if (!playback.isRemote && !controller.value.isInitialized) {
+          controller.initialize().then((_) {
+            controller.play();
+          });
+        } else {
+          if (isFinished) {
+            playback.seekTo(Duration.zero);
+          }
+          playback.play();
+        }
+      }
+    });
+  }
+
+  Future<void> _skipBack() async {
+    _cancelAndRestartTimer();
+    final beginning = Duration.zero.inMilliseconds;
+    final skip =
+        (_latestValue.position - const Duration(seconds: 15)).inMilliseconds;
+    await _playback.seekTo(Duration(milliseconds: math.max(skip, beginning)));
+    // Restoring the video speed to selected speed
+    // A delay of 1 second is added to ensure a smooth transition of speed after reversing the video as reversing is an asynchronous function
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      _playback.setPlaybackSpeed(selectedSpeed);
+    });
+  }
+
+  Future<void> _skipForward() async {
+    _cancelAndRestartTimer();
+    final end = _latestValue.duration.inMilliseconds;
+    final skip =
+        (_latestValue.position + const Duration(seconds: 15)).inMilliseconds;
+    await _playback.seekTo(Duration(milliseconds: math.min(skip, end)));
+    // Restoring the video speed to selected speed
+    // A delay of 1 second is added to ensure a smooth transition of speed after forwarding the video as forwaring is an asynchronous function
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      _playback.setPlaybackSpeed(selectedSpeed);
+    });
+  }
+
+  void _startHideTimer() {
+    // While casting the phone is a remote control, not a video surface: there
+    // is nothing behind the controls worth revealing, and hiding them costs the
+    // user a tap, because the first one only brings them back.
+    if (chewieController.isPlaybackRemote) return;
+    final hideControlsTimer = chewieController.hideControlsTimer.isNegative
+        ? ChewieController.defaultHideControlsTimer
+        : chewieController.hideControlsTimer;
+    _hideTimer = Timer(hideControlsTimer, () {
+      setState(() {
+        notifier.hideStuff = true;
+      });
+    });
+  }
+
+  void _bufferingTimerTimeout() {
+    _displayBufferingIndicator = true;
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  /// Shows the controls without marking widgets dirty in the middle of a build.
+  ///
+  /// [_updateState] runs from `didChangeDependencies` as well as from player
+  /// notifications, and the [PlayerNotifier] lives above this widget: setting
+  /// it during a build marks an ancestor dirty, which the framework rejects.
+  /// Reachable whenever a cast session is already live when this widget is
+  /// built, which happens because senders outlive the screens that make them.
+  void _revealControls() {
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) notifier.hideStuff = false;
+      });
+      return;
+    }
+
+    notifier.hideStuff = false;
+  }
+
+  void _updateState() {
+    if (!mounted) return;
+
+    final playback = _playback;
+    // A session starting must not leave the controls hidden behind an
+    // AbsorbPointer that swallows the next tap.
+    if (playback.isRemote && notifier.hideStuff) {
+      _revealControls();
+    }
+
+    // The Android buffering workaround in getIsBuffering only applies to the
+    // local plugin; a receiver reports its own state honestly.
+    final bool buffering = playback.isRemote
+        ? playback.value.isBuffering
+        : getIsBuffering(controller);
+
+    // display the progress bar indicator only after the buffering delay if it has been set
+    if (chewieController.progressIndicatorDelay != null) {
+      if (buffering) {
+        _bufferingDisplayTimer ??= Timer(
+          chewieController.progressIndicatorDelay!,
+          _bufferingTimerTimeout,
+        );
+      } else {
+        _bufferingDisplayTimer?.cancel();
+        _bufferingDisplayTimer = null;
+        _displayBufferingIndicator = false;
+      }
+    } else {
+      _displayBufferingIndicator = buffering;
+    }
+
+    // Play/pause can also come from outside these controls (Control Center,
+    // the lock screen, headset buttons): reveal the controls the same way
+    // _playPause does, so the state change is visible either way.
+    if (_latestValue.isPlaying != playback.value.isPlaying) {
+      if (playback.value.isPlaying) {
+        _cancelAndRestartTimer();
+      } else {
+        _revealControls();
+        _hideTimer?.cancel();
+      }
+    }
+
+    setState(() {
+      _latestValue = playback.value;
+      _subtitlesPosition = playback.value.position;
+    });
+  }
+
+  Future<void> _onQualityButtonTap() async {
+    _hideTimer?.cancel();
+
+    final chosenQuality = await showCupertinoModalPopup<VideoQuality>(
+      context: context,
+      semanticsDismissible: true,
+      useRootNavigator: chewieController.useRootNavigator,
+      builder: (context) => _VideoQualityDialog(
+        qualities: chewieController.videoQualities,
+        selectedId: chewieController.activeVideoQualityId,
+      ),
+    );
+
+    if (chosenQuality != null) {
+      chewieController.selectVideoQuality(chosenQuality);
+    }
+
+    if (_latestValue.isPlaying) {
+      _startHideTimer();
+    }
+  }
+}
+
+class _VideoQualityDialog extends StatelessWidget {
+  const _VideoQualityDialog({
+    required this._qualities,
+    required this._selectedId,
+  });
+
+  final List<VideoQuality> _qualities;
+  final Object? _selectedId;
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedColor = CupertinoTheme.of(context).primaryColor;
+
+    return CupertinoActionSheet(
+      actions: _qualities
+          .map(
+            (quality) => CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.of(context).pop(quality);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (quality.id == _selectedId)
+                    Icon(Icons.check, size: 20.0, color: selectedColor),
+                  Text(quality.label),
+                ],
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+}
+
+class _PlaybackSpeedDialog extends StatelessWidget {
+  const _PlaybackSpeedDialog({required this._speeds, required this._selected});
+
+  final List<double> _speeds;
+  final double _selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedColor = CupertinoTheme.of(context).primaryColor;
+
+    return CupertinoActionSheet(
+      actions: _speeds
+          .map(
+            (e) => CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.of(context).pop(e);
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (e == _selected)
+                    Icon(Icons.check, size: 20.0, color: selectedColor),
+                  Text(e.toString()),
+                ],
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+}
