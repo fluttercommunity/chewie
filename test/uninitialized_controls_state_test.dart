@@ -69,6 +69,47 @@ void main() {
     expect(playButtonWidget.isFinished, false);
   });
 
+  testWidgets("CupertinoControls top bar clears a side inset", (
+    WidgetTester tester,
+  ) async {
+    var videoPlayerController = VideoPlayerController.networkUrl(
+      Uri.parse(srcs[0]),
+    );
+    var chewieController = ChewieController(
+      videoPlayerController: videoPlayerController,
+      autoPlay: false,
+      looping: false,
+      customControls: const CupertinoControls(
+        backgroundColor: Colors.black,
+        iconColor: Colors.white,
+      ),
+    );
+    const rightInset = 84.0;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(padding: const EdgeInsets.only(right: rightInset)),
+            child: Scaffold(body: Chewie(controller: chewieController)),
+          ),
+        ),
+      ),
+    );
+
+    await tester.pump();
+
+    var muteIcon = find.byIcon(Icons.volume_up);
+    expect(muteIcon, findsOneWidget);
+    var screenWidth =
+        tester.view.physicalSize.width / tester.view.devicePixelRatio;
+    expect(
+      tester.getRect(muteIcon).right,
+      lessThanOrEqualTo(screenWidth - rightInset),
+    );
+  });
+
   testWidgets("MaterialDesktopControls state test", (
     WidgetTester tester,
   ) async {

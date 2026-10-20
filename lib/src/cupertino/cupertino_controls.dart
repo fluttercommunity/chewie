@@ -611,7 +611,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     double barHeight,
     double buttonPadding,
   ) {
-    return Container(
+    final topBar = Container(
       height: barHeight,
       margin: EdgeInsets.only(
         top: marginSize,
@@ -668,6 +668,8 @@ class _CupertinoControlsState extends State<CupertinoControls>
         ],
       ),
     );
+
+    return SafeArea(top: false, bottom: false, child: topBar);
   }
 
   void _cancelAndRestartTimer() {
