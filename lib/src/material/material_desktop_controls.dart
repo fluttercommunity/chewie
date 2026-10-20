@@ -384,11 +384,16 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
                     if (chewieController.isLive)
                       const Expanded(child: Text('LIVE'))
                     else
-                      // Flexible so the bar can absorb extra controls instead
-                      // of overflowing: nothing else here yields, so one more
-                      // button was enough to push it over on a narrow window.
-                      Flexible(child: _buildPosition(iconColor)),
-                    const Spacer(),
+                      // Expanded so the label absorbs extra controls instead
+                      // of overflowing, and is the only flex child: next to a
+                      // Spacer, a loose Flexible left half the free space
+                      // unused and pushed the controls toward the middle.
+                      Expanded(
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: _buildPosition(iconColor),
+                        ),
+                      ),
                     if (chewieController.additionalControls != null)
                       ChewieControlStyle(
                         iconSize: 24,
