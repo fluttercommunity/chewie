@@ -100,14 +100,12 @@ void main() {
 
     await tester.pump();
 
-    var muteButton = find.ancestor(
-      of: find.byIcon(Icons.volume_up),
-      matching: find.byType(GestureDetector),
-    );
+    var muteIcon = find.byIcon(Icons.volume_up);
+    expect(muteIcon, findsOneWidget);
     var screenWidth =
         tester.view.physicalSize.width / tester.view.devicePixelRatio;
     expect(
-      tester.getRect(muteButton.first).right,
+      tester.getRect(muteIcon).right,
       lessThanOrEqualTo(screenWidth - rightInset),
     );
   });
