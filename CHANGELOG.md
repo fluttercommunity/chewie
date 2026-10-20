@@ -1,3 +1,7 @@
+## [1.17.3]
+* 🛠️ [#972](https://github.com/fluttercommunity/chewie/pull/972): Keep the Cupertino top bar clear of the side safe-area insets. Thanks [xsahil03x](https://github.com/xsahil03x).
+* 🛠️ [#973](https://github.com/fluttercommunity/chewie/pull/973): Keep the desktop bar's right-hand controls pinned right. Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.17.2]
 * 🛠️ [#911](https://github.com/fluttercommunity/chewie/pull/911): Add documentation about pauseOnBackgroundTap feature. Thanks [Ortes](https://github.com/Ortes).
 * ⬆️ [#930](https://github.com/fluttercommunity/chewie/pull/930): Add swipe-down to exit fullscreen. Thanks [Ortes](https://github.com/Ortes).
