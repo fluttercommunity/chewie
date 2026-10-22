@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:chewie/chewie.dart';
 import 'package:chewie/src/helpers/utils.dart';
 import 'package:flutter/gestures.dart';
@@ -308,24 +310,53 @@ class _VideoProgressBarState extends State<VideoProgressBar> {
         ? constraints.maxHeight
         : widget.barHeight * 2;
 
+    // The label is centered on the pointer but never leaves the bar: near
+    // either end it stops flush with the edge and the pointer slides under it
+    // (YouTube behaviour), so the player's clip cannot cut it off. Its width
+    // is capped at the bar width so long titles ellipsize inside the player.
+    const labelPadding = EdgeInsets.symmetric(horizontal: 8, vertical: 4);
+    const labelStyle = TextStyle(color: Colors.white, fontSize: 12);
+    final label =
+        '${pointedChapter.title} · ${formatDuration(pointedPosition)}';
+    // Measure with the same effective style the Text below renders with
+    // (ambient DefaultTextStyle merged with labelStyle), or an app font with
+    // different metrics makes the measured width too small and the label
+    // ellipsizes even though it would fit.
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: label,
+        style: DefaultTextStyle.of(context).style.merge(labelStyle),
+      ),
+      textDirection: Directionality.of(context),
+      textScaler: MediaQuery.textScalerOf(context),
+      maxLines: 1,
+    )..layout();
+    final labelWidth = math.min(
+      textPainter.width.ceilToDouble() + 1 + labelPadding.horizontal,
+      constraints.maxWidth,
+    );
+    textPainter.dispose();
+    final labelLeft = (clampedDx - labelWidth / 2).clamp(
+      0.0,
+      constraints.maxWidth - labelWidth,
+    );
+
     return Positioned(
-      left: clampedDx,
+      left: labelLeft,
+      width: labelWidth,
       bottom: stackHeight / 2 + widget.barHeight / 2 + widget.handleHeight + 4,
-      child: FractionalTranslation(
-        translation: const Offset(-0.5, 0),
-        child: IgnorePointer(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.8),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              '${pointedChapter.title} · ${formatDuration(pointedPosition)}',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
-            ),
+      child: IgnorePointer(
+        child: Container(
+          padding: labelPadding,
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: labelStyle,
           ),
         ),
       ),

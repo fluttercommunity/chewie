@@ -2,6 +2,7 @@ import 'package:chewie/chewie.dart';
 import 'package:chewie/src/progress_bar.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_player/video_player.dart';
 
@@ -105,6 +106,126 @@ void main() {
     await gesture.moveTo(const Offset(1, 1));
     await tester.pump();
     expect(find.textContaining('Finale'), findsNothing);
+  });
+
+  testWidgets('chapter label stays inside the bar at both ends', (
+    tester,
+  ) async {
+    final controller = _FakeVideoPlayerController();
+    await tester.pumpWidget(
+      _wrapBar(
+        VideoProgressBar(
+          controller,
+          barHeight: 10,
+          handleHeight: 6,
+          drawShadow: true,
+          chapters: _chapters,
+        ),
+      ),
+    );
+
+    final barRect = tester.getRect(find.byType(VideoProgressBar));
+    Rect pillRect(String title) => tester.getRect(
+      find
+          .ancestor(
+            of: find.textContaining(title),
+            matching: find.byType(Container),
+          )
+          .first,
+    );
+
+    final gesture = await _hoverAt(
+      tester,
+      Offset(barRect.left + 1, barRect.center.dy),
+    );
+    await tester.pump();
+    expect(pillRect('Intro').left, greaterThanOrEqualTo(barRect.left));
+
+    await gesture.moveTo(Offset(barRect.right - 1, barRect.center.dy));
+    await tester.pump();
+    expect(pillRect('Finale').right, lessThanOrEqualTo(barRect.right));
+
+    await gesture.moveTo(barRect.center);
+    await tester.pump();
+    final centered = pillRect('Second Chapter');
+    expect(centered.center.dx, moreOrLessEquals(barRect.center.dx, epsilon: 1));
+  });
+
+  testWidgets('the label is measured with the ambient text style', (
+    tester,
+  ) async {
+    final controller = _FakeVideoPlayerController();
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 400,
+              height: 48,
+              child: DefaultTextStyle(
+                style: const TextStyle(letterSpacing: 4),
+                child: VideoProgressBar(
+                  controller,
+                  barHeight: 10,
+                  handleHeight: 6,
+                  drawShadow: true,
+                  chapters: _chapters,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await _hoverAt(tester, tester.getCenter(find.byType(VideoProgressBar)));
+    await tester.pump();
+
+    final paragraph = tester.renderObject<RenderParagraph>(
+      find.descendant(
+        of: find.textContaining('Second Chapter'),
+        matching: find.byType(RichText),
+      ),
+    );
+    expect(paragraph.didExceedMaxLines, isFalse);
+  });
+
+  testWidgets('a long chapter title is capped to the bar width', (
+    tester,
+  ) async {
+    final controller = _FakeVideoPlayerController();
+    await tester.pumpWidget(
+      _wrapBar(
+        VideoProgressBar(
+          controller,
+          barHeight: 10,
+          handleHeight: 6,
+          drawShadow: true,
+          chapters: [
+            ChewieChapter(
+              title: 'A chapter title long enough to run past the bar ' * 4,
+              start: Duration.zero,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final barRect = tester.getRect(find.byType(VideoProgressBar));
+    await _hoverAt(tester, barRect.center);
+    await tester.pump();
+
+    final pill = tester.getRect(
+      find
+          .ancestor(
+            of: find.textContaining('A chapter title'),
+            matching: find.byType(Container),
+          )
+          .first,
+    );
+    expect(pill.width, lessThanOrEqualTo(barRect.width));
+    expect(pill.left, greaterThanOrEqualTo(barRect.left));
+    expect(pill.right, lessThanOrEqualTo(barRect.right));
   });
 
   testWidgets('scrubbing shows the pointed chapter and seeks on release', (
