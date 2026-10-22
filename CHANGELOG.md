@@ -1,3 +1,6 @@
+## [1.17.4]
+* 🛠️ [#975](https://github.com/fluttercommunity/chewie/pull/975): Keep the hovered chapter label inside the progress bar. Thanks [Elios Cama](https://github.com/elios-fullphysio).
+
 ## [1.17.3]
 * 🛠️ [#972](https://github.com/fluttercommunity/chewie/pull/972): Keep the Cupertino top bar clear of the side safe-area insets. Thanks [xsahil03x](https://github.com/xsahil03x).
 * 🛠️ [#973](https://github.com/fluttercommunity/chewie/pull/973): Keep the desktop bar's right-hand controls pinned right. Thanks [Ortes](https://github.com/Ortes).
