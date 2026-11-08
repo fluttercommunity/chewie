@@ -47,6 +47,12 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
   late PlayerNotifier notifier;
   late VideoPlayerValue _latestValue;
   double? _latestVolume;
+  bool _volumeHovered = false;
+  bool _volumeDragging = false;
+  bool _volumeFocused = false;
+  // Shown during a drag: a cast receiver reports the new volume only once it
+  // has applied it, which would make the thumb lag behind the pointer.
+  double _dragVolume = 0;
   Timer? _hideTimer;
   Timer? _initTimer;
   late var _subtitlesPosition = Duration.zero;
@@ -589,34 +595,123 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     }
   }
 
-  GestureDetector _buildMuteButton(VideoPlayerController controller) {
-    return GestureDetector(
-      onTap: () {
-        _cancelAndRestartTimer();
-        final playback = _playback;
+  /// The mute button, plus a volume slider that slides out next to it while
+  /// the pointer hovers it, a drag on it is still in progress, or it has
+  /// keyboard focus.
+  Widget _buildMuteButton(VideoPlayerController controller) {
+    final volume = _volumeDragging ? _dragVolume : _latestValue.volume;
+    final expanded = _volumeHovered || _volumeDragging || _volumeFocused;
 
-        if (_latestValue.volume == 0) {
-          playback.setVolume(_latestVolume ?? 0.5);
-        } else {
-          _latestVolume = playback.value.volume;
-          playback.setVolume(0.0);
-        }
+    return MouseRegion(
+      onEnter: (_) => setState(() => _volumeHovered = true),
+      onExit: (_) {
+        setState(() => _volumeHovered = false);
+        if (!_volumeDragging) _cancelAndRestartTimer();
       },
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: AnimatedOpacity(
-          opacity: notifier.hideStuff ? 0.0 : 1.0,
-          duration: const Duration(milliseconds: 300),
-          child: ClipRect(
-            child: Container(
-              height: barHeight,
-              padding: const EdgeInsets.only(right: 15.0),
-              child: Icon(
-                _latestValue.volume > 0 ? Icons.volume_up : Icons.volume_off,
-                color: Colors.white,
+      child: AnimatedOpacity(
+        opacity: notifier.hideStuff ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 300),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GestureDetector(
+              onTap: () {
+                _cancelAndRestartTimer();
+                final playback = _playback;
+
+                if (_latestValue.volume == 0) {
+                  playback.setVolume(_latestVolume ?? 0.5);
+                } else {
+                  _latestVolume = playback.value.volume;
+                  playback.setVolume(0.0);
+                }
+              },
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: SizedBox(
+                  height: barHeight,
+                  child: Icon(
+                    volume == 0
+                        ? Icons.volume_off
+                        : volume < 0.5
+                        ? Icons.volume_down
+                        : Icons.volume_up,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
-          ),
+            ClipRect(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOut,
+                width: expanded ? _volumeSliderWidth : 0,
+                height: barHeight,
+                child: OverflowBox(
+                  alignment: AlignmentDirectional.centerStart,
+                  minWidth: _volumeSliderWidth,
+                  maxWidth: _volumeSliderWidth,
+                  child: _buildVolumeSlider(volume),
+                ),
+              ),
+            ),
+            const SizedBox(width: 15.0),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static const _volumeSliderWidth = 72.0;
+
+  Widget _buildVolumeSlider(double volume) {
+    return SliderTheme(
+      data: SliderTheme.of(context).copyWith(
+        trackHeight: 3,
+        activeTrackColor: Colors.white,
+        inactiveTrackColor: Colors.white30,
+        thumbColor: Colors.white,
+        overlayColor: Colors.white24,
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+        overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
+        trackShape: const RoundedRectSliderTrackShape(),
+        showValueIndicator: ShowValueIndicator.never,
+      ),
+      // Tab can reach the slider even while it is collapsed: open it while it
+      // holds focus so the keyboard user sees what the arrow keys change.
+      child: Focus(
+        canRequestFocus: false,
+        skipTraversal: true,
+        onFocusChange: (focused) {
+          setState(() => _volumeFocused = focused);
+          if (focused) {
+            _cancelAndRestartTimer();
+          } else if (_latestValue.isPlaying) {
+            _hideTimer?.cancel();
+            _startHideTimer();
+          }
+        },
+        child: Slider(
+          value: volume.clamp(0.0, 1.0),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          onChangeStart: (value) {
+            _hideTimer?.cancel();
+            // Remember the level before the drag, so unmuting after dragging
+            // down to zero brings it back instead of the 0.5 fallback.
+            if (_latestValue.volume > 0) _latestVolume = _latestValue.volume;
+            setState(() {
+              _volumeDragging = true;
+              _dragVolume = value;
+            });
+          },
+          onChanged: (value) {
+            setState(() => _dragVolume = value);
+            _playback.setVolume(value);
+          },
+          onChangeEnd: (value) {
+            setState(() => _volumeDragging = false);
+            _cancelAndRestartTimer();
+          },
         ),
       ),
     );
@@ -823,6 +918,8 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
         ? ChewieController.defaultHideControlsTimer
         : chewieController.hideControlsTimer;
     _hideTimer = Timer(hideControlsTimer, () {
+      // Keep the bar up while the volume slider is open and in use.
+      if (_volumeHovered || _volumeDragging || _volumeFocused) return;
       setState(() {
         notifier.hideStuff = true;
       });
