@@ -699,7 +699,7 @@ class _MaterialDesktopControlsState extends State<MaterialDesktopControls>
     for (final track in tracks) {
       if (track.id == activeId) return track;
     }
-    return tracks.first;
+    return chewieController.defaultSubtitleTrack;
   }
 
   Future<void> _onSubtitleTrackButtonTap() async {
