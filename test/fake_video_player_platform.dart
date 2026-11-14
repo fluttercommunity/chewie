@@ -35,6 +35,52 @@ class FakeVideoPlayerPlatform extends VideoPlayerPlatform {
 
   int _nextPlayerId = 1;
 
+  /// Whether the platform claims audio-track support. Off by default, like
+  /// the platform interface.
+  bool audioTrackSupport = false;
+
+  /// Tracks reported by [getAudioTracks] for every player.
+  List<VideoAudioTrack> audioTracks = [];
+
+  /// Reports no tracks until the player has been told to play, as some
+  /// platforms do.
+  bool audioTracksNeedPlayback = false;
+
+  /// Thrown by [getAudioTracks] and [selectAudioTrack] when set.
+  Object? audioTrackError;
+
+  /// How many times [getAudioTracks] was called.
+  int audioTrackReads = 0;
+
+  /// Every `(playerId, trackId)` passed to [selectAudioTrack], in order.
+  final List<(int, String)> audioTrackSelections = [];
+
+  @override
+  bool isAudioTrackSupportAvailable() => audioTrackSupport;
+
+  @override
+  Future<List<VideoAudioTrack>> getAudioTracks(int playerId) async {
+    audioTrackReads++;
+    if (audioTrackError != null) throw audioTrackError!;
+    if (audioTracksNeedPlayback && !isPlaying(playerId)) return [];
+    return audioTracks;
+  }
+
+  @override
+  Future<void> selectAudioTrack(int playerId, String trackId) async {
+    if (audioTrackError != null) throw audioTrackError!;
+    audioTrackSelections.add((playerId, trackId));
+    audioTracks = [
+      for (final track in audioTracks)
+        VideoAudioTrack(
+          id: track.id,
+          label: track.label,
+          language: track.language,
+          isSelected: track.id == trackId,
+        ),
+    ];
+  }
+
   /// Reports every live player as buffering, or done buffering.
   ///
   /// Chewie shows its spinner off VideoPlayerValue.isBuffering, which only the

@@ -298,6 +298,26 @@ subtitleBuilder: (context, subtitle) => Container(
 ),
 ```
 
+### Subtitle and Audio Tracks
+
+List subtitle files as tracks and Chewie adds a subtitle toggle and picker, downloads a track the first time it is chosen, and shows its cues in sync. Audio tracks of an HLS stream show up in the options menu on their own:
+
+```dart
+ChewieController(
+  videoPlayerController: VideoPlayerController.networkUrl(hlsUrl),
+  preferredLanguages: const ['fr', 'en'], // optional
+  subtitleTracks: [
+    SubtitleTrack(id: 'en', label: 'English', language: 'en', url: enVttUrl),
+    SubtitleTrack(id: 'fr', label: 'Français', language: 'fr', url: frSrtUrl),
+  ],
+  onSubtitleError: (track, error, stackTrace) => log('$error'), // optional
+);
+```
+
+- `url` takes a WebVTT or SubRip file. For signed URLs, headers or other formats, pass `loader` instead; `parseSubtitles` turns WebVTT or SubRip text into cues.
+- Audio tracks come from `video_player` (`getAudioTracks`) where the platform supports it. Supplying `audioTracks` or `onAudioTrackChanged`, or calling `setAudioTracks`, puts you in charge instead, e.g. to switch with `swapVideoSource`. `autoDetectAudioTracks: false` turns detection off.
+- A track without `url` or `loader` is yours to feed: react in `onSubtitleTrackChanged` and push cues with `setLiveSubtitle`.
+
 ## 🔖 Chapters
 
 Pass a list of `ChewieChapter`s, sorted by ascending start time, to draw the progress bar as YouTube-style chapter segments. Hovering or scrubbing the bar shows the pointed chapter's title above it:

@@ -594,7 +594,7 @@ class _CupertinoControlsState extends State<CupertinoControls>
     for (final track in tracks) {
       if (track.id == activeId) return track;
     }
-    return tracks.first;
+    return chewieController.defaultSubtitleTrack;
   }
 
   Future<void> _onAudioTrackButtonTap() async {
