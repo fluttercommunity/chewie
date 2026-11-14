@@ -18,6 +18,7 @@ import 'package:chewie/src/models/video_quality.dart';
 import 'package:chewie/src/models/subtitle_track.dart';
 import 'package:chewie/src/notifiers/player_notifier.dart';
 import 'package:chewie/src/player_with_controls.dart';
+import 'package:chewie/src/subtitle_loader.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -417,9 +418,12 @@ class ChewieController extends ChangeNotifier {
     this.audioTracks = const <AudioTrack>[],
     this.activeAudioTrackId,
     this.onAudioTrackChanged,
+    this.autoDetectAudioTracks = true,
     this.subtitleTracks = const <SubtitleTrack>[],
     this.activeSubtitleTrackId,
     this.onSubtitleTrackChanged,
+    this.onSubtitleError,
+    this.preferredLanguages = const <String>[],
     this.customControls,
     this.errorBuilder,
     this.bufferingBuilder,
@@ -473,7 +477,12 @@ class ChewieController extends ChangeNotifier {
          'A castMedia is required when a castController is set: Chewie cannot '
          'derive a URL the receiver can reach from the local data source.',
        ) {
+    _managesAudioTracks =
+        autoDetectAudioTracks &&
+        audioTracks.isEmpty &&
+        onAudioTrackChanged == null;
     _initialize();
+    _showCuesOf(_subtitleTrackWithId(activeSubtitleTrackId));
   }
 
   ChewieController copyWith({
@@ -508,9 +517,13 @@ class ChewieController extends ChangeNotifier {
     List<AudioTrack>? audioTracks,
     Object? activeAudioTrackId,
     void Function(AudioTrack track)? onAudioTrackChanged,
+    bool? autoDetectAudioTracks,
     List<SubtitleTrack>? subtitleTracks,
     Object? activeSubtitleTrackId,
     void Function(SubtitleTrack? track)? onSubtitleTrackChanged,
+    void Function(SubtitleTrack track, Object error, StackTrace stackTrace)?
+    onSubtitleError,
+    List<String>? preferredLanguages,
     Widget? customControls,
     WidgetBuilder? bufferingBuilder,
     Widget Function(BuildContext, String)? errorBuilder,
@@ -558,7 +571,7 @@ class ChewieController extends ChangeNotifier {
     Duration? doubleTapSeekDuration,
     bool? allowDoubleTapToggleFullScreen,
   }) {
-    return ChewieController(
+    final copy = ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
       videoPlayerController:
           videoPlayerController ?? this.videoPlayerController,
@@ -596,9 +609,19 @@ class ChewieController extends ChangeNotifier {
       subtitle: subtitle ?? this.subtitle,
       subtitleBuilder: subtitleBuilder ?? this.subtitleBuilder,
       subtitleStyle: subtitleStyle ?? this.subtitleStyle,
-      audioTracks: audioTracks ?? this.audioTracks,
-      activeAudioTrackId: activeAudioTrackId ?? this.activeAudioTrackId,
+      // Tracks Chewie detected belong to this controller's player: the copy
+      // detects its own instead of inheriting them as if host-supplied.
+      audioTracks:
+          audioTracks ??
+          (_managesAudioTracks ? const <AudioTrack>[] : this.audioTracks),
+      activeAudioTrackId:
+          activeAudioTrackId ??
+          (_managesAudioTracks ? null : this.activeAudioTrackId),
       onAudioTrackChanged: onAudioTrackChanged ?? this.onAudioTrackChanged,
+      autoDetectAudioTracks:
+          autoDetectAudioTracks ?? this.autoDetectAudioTracks,
+      onSubtitleError: onSubtitleError ?? this.onSubtitleError,
+      preferredLanguages: preferredLanguages ?? this.preferredLanguages,
       subtitleTracks: subtitleTracks ?? this.subtitleTracks,
       activeSubtitleTrackId:
           activeSubtitleTrackId ?? this.activeSubtitleTrackId,
@@ -660,6 +683,11 @@ class ChewieController extends ChangeNotifier {
       allowDoubleTapToggleFullScreen:
           allowDoubleTapToggleFullScreen ?? this.allowDoubleTapToggleFullScreen,
     );
+    if (copy.videoPlayerController == this.videoPlayerController) {
+      copy._audioPreferenceApplied = _audioPreferenceApplied;
+      copy._chosenAudioLanguage = _chosenAudioLanguage;
+    }
+    return copy;
   }
 
   static const defaultHideControlsTimer = Duration(seconds: 3);
@@ -725,9 +753,12 @@ class ChewieController extends ChangeNotifier {
 
   /// Selectable subtitle tracks shown in the options menu.
   ///
-  /// Source-agnostic: the host populates this (e.g. from an HLS manifest) and
-  /// reacts to selection via [onSubtitleTrackChanged]. May change after the
-  /// video loads — use [setSubtitleTracks] so the controls rebuild.
+  /// A track with a [SubtitleTrack.url] or [SubtitleTrack.loader] is loaded
+  /// and displayed by Chewie once selected. Any other track is source-agnostic:
+  /// the host populates this (e.g. from an HLS manifest), reacts to selection
+  /// via [onSubtitleTrackChanged] and pushes cues with [setLiveSubtitle]. May
+  /// change after the video loads — use [setSubtitleTracks] so the controls
+  /// rebuild.
   List<SubtitleTrack> subtitleTracks;
 
   /// Id of the currently selected track in [subtitleTracks], or `null` when
@@ -736,6 +767,33 @@ class ChewieController extends ChangeNotifier {
 
   /// Called when the user picks a track from the menu (or `null` for "Off").
   final void Function(SubtitleTrack? track)? onSubtitleTrackChanged;
+
+  /// Called when the cues of a track with a [SubtitleTrack.url] or
+  /// [SubtitleTrack.loader] could not be loaded. The track is turned off, and
+  /// selecting it again retries. When null, the error goes to
+  /// [FlutterError.reportError] instead.
+  final void Function(SubtitleTrack track, Object error, StackTrace stackTrace)?
+  onSubtitleError;
+
+  /// Languages the viewer prefers, most wanted first, as BCP-47 tags (`fr`,
+  /// `pt-BR`). A tag also matches on its primary language, so `fr` picks a
+  /// `fr-CA` track.
+  ///
+  /// Decides which track the subtitle toggle turns on (see
+  /// [defaultSubtitleTrack]) and, when Chewie detects the audio tracks itself
+  /// (see [autoDetectAudioTracks]), which one plays first. Empty by default:
+  /// the first subtitle track and the stream's default audio track are used.
+  final List<String> preferredLanguages;
+
+  /// The track the subtitle toggle turns on: the first of [subtitleTracks]
+  /// matching [preferredLanguages], else the first track.
+  SubtitleTrack? get defaultSubtitleTrack =>
+      _firstInLanguage(
+        subtitleTracks,
+        (track) => track.language,
+        preferredLanguages,
+      ) ??
+      subtitleTracks.firstOrNull;
 
   /// The text of the cue currently on screen, for streaming sources that emit
   /// cues over time (e.g. HLS) rather than as a static [subtitle] list. Push
@@ -747,10 +805,12 @@ class ChewieController extends ChangeNotifier {
 
   /// Selectable audio tracks shown in the options menu.
   ///
-  /// Source-agnostic: the host populates this (e.g. from an HLS manifest) and
-  /// reacts to selection via [onAudioTrackChanged]. May change after the video
-  /// loads — use [setAudioTracks] so the controls rebuild. Unlike subtitles,
-  /// audio is never "off": one track is always active.
+  /// Left empty, Chewie fills it from the video player — see
+  /// [autoDetectAudioTracks]. Otherwise it is source-agnostic: the host
+  /// populates this (e.g. from an HLS manifest) and reacts to selection via
+  /// [onAudioTrackChanged]. May change after the video loads — use
+  /// [setAudioTracks] so the controls rebuild. Unlike subtitles, audio is
+  /// never "off": one track is always active.
   List<AudioTrack> audioTracks;
 
   /// Id of the currently selected track in [audioTracks].
@@ -758,6 +818,28 @@ class ChewieController extends ChangeNotifier {
 
   /// Called when the user picks an audio track from the menu.
   final void Function(AudioTrack track)? onAudioTrackChanged;
+
+  /// Whether Chewie lists the audio tracks of [videoPlayerController] and
+  /// switches between them by itself, on platforms where `video_player`
+  /// supports it.
+  ///
+  /// Only applies while the host supplies neither [audioTracks] nor
+  /// [onAudioTrackChanged]; calling [setAudioTracks] hands control back to
+  /// the host. Set to `false` to never show audio tracks the host did not
+  /// supply. Defaults to `true`.
+  final bool autoDetectAudioTracks;
+
+  bool _managesAudioTracks = false;
+  bool _audioTracksReadOnInit = false;
+  bool _audioTracksReadOnPlay = false;
+  bool _audioPreferenceApplied = false;
+  int _audioSelections = 0;
+  String? _chosenAudioLanguage;
+  Future<void>? _audioTrackSwitch;
+
+  List<Subtitle>? _activeCues;
+  Object? _cueRequest;
+  final Map<SubtitleTrack, Future<List<Subtitle>>> _cuesByTrack = {};
 
   /// Whether more than one selectable audio track is available (a single track
   /// offers nothing to choose, so the menu entry stays hidden).
@@ -1133,6 +1215,11 @@ class ChewieController extends ChangeNotifier {
     castController?.addListener(_onCastStateChanged);
     externalPlayback?.removeListener(_onExternalPlaybackChanged);
     externalPlayback?.addListener(_onExternalPlaybackChanged);
+    castController?.removeListener(_updateLiveCue);
+    castController?.addListener(_updateLiveCue);
+    videoPlayerController.removeListener(_onVideoPlayerChanged);
+    videoPlayerController.addListener(_onVideoPlayerChanged);
+    _detectAudioTracks();
 
     await videoPlayerController.setLooping(looping);
 
@@ -1178,6 +1265,153 @@ class ChewieController extends ChangeNotifier {
       enterFullScreen();
       videoPlayerController.removeListener(_fullScreenListener);
     }
+  }
+
+  void _onVideoPlayerChanged() {
+    _detectAudioTracks();
+    _updateLiveCue();
+  }
+
+  void _detectAudioTracks() {
+    if (!_managesAudioTracks) return;
+    final value = videoPlayerController.value;
+    if (!value.isInitialized) return;
+    if (!_audioTracksReadOnInit) {
+      _audioTracksReadOnInit = true;
+      _readAudioTracks();
+    } else if (!_audioTracksReadOnPlay &&
+        value.isPlaying &&
+        !value.isBuffering) {
+      // Some platforms only know the tracks once playback has started.
+      _audioTracksReadOnPlay = true;
+      _readAudioTracks();
+    }
+  }
+
+  Future<void> _readAudioTracks() async {
+    final player = videoPlayerController;
+    final selections = _audioSelections;
+    List<VideoAudioTrack> found;
+    try {
+      if (!player.isAudioTrackSupportAvailable()) return;
+      await _audioTrackSwitch;
+      found = await player.getAudioTracks();
+    } catch (_) {
+      // Unsupported here (UnimplementedError) or the player is gone. Tracks
+      // from a previous source must not stay in the menu.
+      found = const [];
+    }
+    if (_disposed || !_managesAudioTracks || player != videoPlayerController) {
+      return;
+    }
+    if (found.isEmpty && audioTracks.isEmpty) return;
+
+    audioTracks = [
+      for (final track in found)
+        AudioTrack(
+          id: track.id,
+          label: _firstNonEmpty([track.label, track.language]) ?? track.id,
+          language: track.language,
+        ),
+    ];
+    // A choice made while the platform was answering is newer than its
+    // isSelected flags.
+    if (selections != _audioSelections) {
+      notifyListeners();
+      return;
+    }
+    activeAudioTrackId = found
+        .where((track) => track.isSelected)
+        .firstOrNull
+        ?.id;
+
+    if (!_audioPreferenceApplied && audioTracks.isNotEmpty) {
+      _audioPreferenceApplied = true;
+      final preferred = _firstInLanguage(
+        audioTracks,
+        (track) => track.language,
+        [?_chosenAudioLanguage, ...preferredLanguages],
+      );
+      if (preferred != null && preferred.id != activeAudioTrackId) {
+        activeAudioTrackId = preferred.id;
+        _switchAudioTrack(preferred);
+      }
+    }
+    notifyListeners();
+  }
+
+  void _switchAudioTrack(AudioTrack track) {
+    final player = videoPlayerController;
+    final id = track.id;
+    if (id is! String) return;
+    _audioTrackSwitch = () async {
+      try {
+        await player.selectAudioTrack(id);
+      } catch (_) {
+        // Show what is really playing rather than the track that failed.
+        unawaited(Future<void>.microtask(_readAudioTracks));
+      }
+    }();
+  }
+
+  SubtitleTrack? _subtitleTrackWithId(Object? id) {
+    if (id == null) return null;
+    return subtitleTracks.where((track) => track.id == id).firstOrNull;
+  }
+
+  /// Displays the cues of [track] when it carries its own source. Tracks
+  /// without one are the host's to feed, so [liveSubtitle] is left alone.
+  Future<void> _showCuesOf(SubtitleTrack? track) async {
+    final request = _cueRequest = Object();
+    final hadCues = _activeCues != null;
+    _activeCues = null;
+    if (track == null || !track.hasSource) {
+      if (hadCues) liveSubtitle.value = null;
+      return;
+    }
+    liveSubtitle.value = null;
+
+    final load = _cuesByTrack[track] ??= loadSubtitleTrack(track);
+    final List<Subtitle> cues;
+    try {
+      cues = await load;
+    } catch (error, stackTrace) {
+      if (_disposed) return;
+      if (identical(request, _cueRequest)) selectSubtitleTrack(null);
+      // Every selection awaiting this load lands here; report it once.
+      if (!identical(_cuesByTrack[track], load)) return;
+      _cuesByTrack.remove(track);
+      if (onSubtitleError != null) {
+        onSubtitleError!(track, error, stackTrace);
+      } else {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stackTrace,
+            library: 'chewie',
+            context: ErrorDescription('while loading subtitles of $track'),
+          ),
+        );
+      }
+      return;
+    }
+    // The selection may have moved on, or the controller gone, meanwhile.
+    if (_disposed || !identical(request, _cueRequest)) return;
+    _activeCues = cues;
+    _updateLiveCue();
+  }
+
+  void _updateLiveCue() {
+    final cues = _activeCues;
+    if (cues == null || _disposed) return;
+    final position = isCasting
+        ? castController!.value.position
+        : videoPlayerController.value.position;
+    final text = [
+      for (final cue in cues)
+        if (position >= cue.start && position < cue.end) cue.text.toString(),
+    ].join('\n');
+    liveSubtitle.value = text.isEmpty ? null : text;
   }
 
   /// Moves playback between the device and the receiver as the session opens
@@ -1254,7 +1488,9 @@ class ChewieController extends ChangeNotifier {
     _disposed = true;
     // The app owns the cast controller — unsubscribe, but never dispose it.
     castController?.removeListener(_onCastStateChanged);
+    castController?.removeListener(_updateLiveCue);
     externalPlayback?.removeListener(_onExternalPlaybackChanged);
+    videoPlayerController.removeListener(_onVideoPlayerChanged);
     liveSubtitle.dispose();
     super.dispose();
   }
@@ -1297,7 +1533,15 @@ class ChewieController extends ChangeNotifier {
 
     // No-op unless fullScreenByDefault attached it and it hasn't fired yet.
     oldController.removeListener(_fullScreenListener);
+    oldController.removeListener(_onVideoPlayerChanged);
     _videoPlayerController = newController;
+    // The new player has its own audio tracks: read them again, and keep the
+    // language the viewer was listening to.
+    _audioTracksReadOnInit = false;
+    _audioTracksReadOnPlay = false;
+    _audioPreferenceApplied = false;
+    newController.addListener(_onVideoPlayerChanged);
+    _onVideoPlayerChanged();
     notifyListeners();
 
     if (disposeOldController) {
@@ -1376,16 +1620,28 @@ class ChewieController extends ChangeNotifier {
   ///
   /// Use when tracks become known only after the media loads (e.g. once an
   /// HLS manifest is parsed).
+  ///
+  /// Also ends Chewie's own detection (see [autoDetectAudioTracks]): from here
+  /// on the tracks are the host's.
   void setAudioTracks(List<AudioTrack> tracks) {
+    _managesAudioTracks = false;
     audioTracks = tracks;
     notifyListeners();
   }
 
   /// Selects [track] as the active audio rendition, updating
-  /// [activeAudioTrackId] and notifying [onAudioTrackChanged].
+  /// [activeAudioTrackId] and notifying [onAudioTrackChanged]. For tracks
+  /// Chewie detected itself (see [autoDetectAudioTracks]) the video player is
+  /// switched to it as well.
   void selectAudioTrack(AudioTrack track) {
     activeAudioTrackId = track.id;
     onAudioTrackChanged?.call(track);
+    if (_managesAudioTracks) {
+      _audioSelections++;
+      _audioPreferenceApplied = true;
+      _chosenAudioLanguage = track.language;
+      _switchAudioTrack(track);
+    }
     notifyListeners();
   }
 
@@ -1395,18 +1651,25 @@ class ChewieController extends ChangeNotifier {
   /// HLS manifest is parsed).
   void setSubtitleTracks(List<SubtitleTrack> tracks) {
     subtitleTracks = tracks;
+    _cuesByTrack.removeWhere((track, _) => !tracks.contains(track));
+    _showCuesOf(_subtitleTrackWithId(activeSubtitleTrackId));
     notifyListeners();
   }
 
   /// Selects [track] (or `null` to turn subtitles off), updating
   /// [activeSubtitleTrackId], notifying [onSubtitleTrackChanged] and clearing
   /// any on-screen [liveSubtitle] when turned off.
+  ///
+  /// A track with a [SubtitleTrack.url] or [SubtitleTrack.loader] is loaded
+  /// (once) and its cues shown through [liveSubtitle] as the video plays; a
+  /// failure is reported to [onSubtitleError].
   void selectSubtitleTrack(SubtitleTrack? track) {
     activeSubtitleTrackId = track?.id;
     if (track == null) {
       liveSubtitle.value = null;
     }
     onSubtitleTrackChanged?.call(track);
+    _showCuesOf(track);
     notifyListeners();
   }
 
@@ -1429,4 +1692,26 @@ class ChewieControllerProvider extends InheritedWidget {
   @override
   bool updateShouldNotify(ChewieControllerProvider oldWidget) =>
       controller != oldWidget.controller;
+}
+
+String? _firstNonEmpty(List<String?> values) =>
+    values.where((value) => value != null && value.isNotEmpty).firstOrNull;
+
+T? _firstInLanguage<T>(
+  List<T> tracks,
+  String? Function(T track) languageOf,
+  List<String> languages,
+) {
+  String primary(String tag) => tag.split(RegExp('[-_]')).first;
+  for (final wanted in languages.map((tag) => tag.toLowerCase())) {
+    T? sameLanguage;
+    for (final track in tracks) {
+      final language = languageOf(track)?.toLowerCase();
+      if (language == null) continue;
+      if (language == wanted) return track;
+      if (primary(language) == primary(wanted)) sameLanguage ??= track;
+    }
+    if (sameLanguage != null) return sameLanguage;
+  }
+  return null;
 }
