@@ -1,7 +1,3 @@
-## Unreleased
-* 🔊 Audio tracks of the video are listed and switched by Chewie itself where `video_player` supports it. Opt out with `autoDetectAudioTracks: false`; host-supplied tracks are untouched.
-* 💬 `SubtitleTrack.url` (WebVTT or SubRip) and `SubtitleTrack.loader` let a track load and display its own cues. New `onSubtitleError`, `preferredLanguages` and `parseSubtitles`.
-
 ## [1.17.3]
 * 🛠️ [#972](https://github.com/fluttercommunity/chewie/pull/972): Keep the Cupertino top bar clear of the side safe-area insets. Thanks [xsahil03x](https://github.com/xsahil03x).
 * 🛠️ [#973](https://github.com/fluttercommunity/chewie/pull/973): Keep the desktop bar's right-hand controls pinned right. Thanks [Ortes](https://github.com/Ortes).

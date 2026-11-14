@@ -219,6 +219,75 @@ void main() {
       controller.dispose();
     });
 
+    test('a read in flight never overrides a newer selection', () async {
+      final vpc = _network(_srcA);
+      final controller = ChewieController(videoPlayerController: vpc);
+      await vpc.initialize();
+      await _settle();
+
+      platform.audioTracksGate = Completer<void>();
+      await vpc.play();
+      await _settle();
+      controller.selectAudioTrack(controller.audioTracks[1]);
+      await _settle();
+
+      // The held answer still says English is selected.
+      platform.audioTracksGate!.complete();
+      await _settle();
+
+      expect(controller.activeAudioTrackId, 'fr-id');
+      expect(platform.audioTrackSelections.single.$2, 'fr-id');
+
+      await vpc.dispose();
+      controller.dispose();
+    });
+
+    test('a failed read after swapVideoSource clears the old tracks', () async {
+      final oldVpc = _network(_srcA);
+      await oldVpc.initialize();
+      final controller = ChewieController(videoPlayerController: oldVpc);
+      await _settle();
+      expect(controller.audioTracks, hasLength(3));
+
+      platform.audioTrackError = StateError('player gone');
+      final newVpc = _network(_srcB);
+      await controller.swapVideoSource(newVpc);
+      await _settle();
+
+      expect(controller.audioTracks, isEmpty);
+      expect(controller.hasAudioTracks, isFalse);
+
+      await _driveFrame();
+      await newVpc.dispose();
+      controller.dispose();
+    });
+
+    test('copyWith keeps the language the viewer chose', () async {
+      final vpc = _network(_srcA);
+      final controller = ChewieController(
+        videoPlayerController: vpc,
+        preferredLanguages: const ['fr'],
+      );
+      await vpc.initialize();
+      await _settle();
+      expect(controller.activeAudioTrackId, 'fr-id');
+
+      controller.selectAudioTrack(controller.audioTracks[0]);
+      await _settle();
+      final copy = controller.copyWith(showControls: false);
+      await _settle();
+
+      expect(copy.activeAudioTrackId, 'en-id');
+      expect(platform.audioTrackSelections.map((s) => s.$2), [
+        'fr-id',
+        'en-id',
+      ]);
+
+      await vpc.dispose();
+      controller.dispose();
+      copy.dispose();
+    });
+
     test('are not inherited as host tracks by copyWith', () async {
       final vpc = _network(_srcA);
       final controller = ChewieController(videoPlayerController: vpc);
@@ -238,6 +307,28 @@ void main() {
       controller.dispose();
       copy.dispose();
     });
+  });
+
+  test('copyWith carries the new track options', () {
+    void onError(SubtitleTrack track, Object error, StackTrace stack) {}
+    final controller = ChewieController(
+      videoPlayerController: _network(_srcA),
+      autoDetectAudioTracks: false,
+      preferredLanguages: const ['fr'],
+      onSubtitleError: onError,
+    );
+
+    final copy = controller.copyWith(showControls: false);
+    expect(copy.autoDetectAudioTracks, isFalse);
+    expect(copy.preferredLanguages, const ['fr']);
+    expect(copy.onSubtitleError, same(onError));
+
+    final changed = controller.copyWith(
+      autoDetectAudioTracks: true,
+      preferredLanguages: const ['en'],
+    );
+    expect(changed.autoDetectAudioTracks, isTrue);
+    expect(changed.preferredLanguages, const ['en']);
   });
 
   group('nothing automatic happens', () {
@@ -391,12 +482,19 @@ void main() {
       controller.dispose();
     }
 
-    for (final targetPlatform in [TargetPlatform.android, TargetPlatform.iOS]) {
+    final optionsIcons = {
+      TargetPlatform.android: Icons.more_vert,
+      TargetPlatform.iOS: Icons.more_vert,
+      TargetPlatform.macOS: Icons.settings,
+    };
+
+    for (final MapEntry(key: targetPlatform, value: optionsIcon)
+        in optionsIcons.entries) {
       testWidgets('$targetPlatform: the Audio menu lists and switches the '
           'detected tracks', (tester) async {
         final controller = await pump(tester, targetPlatform);
 
-        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.tap(find.byIcon(optionsIcon));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Audio'));
         await tester.pumpAndSettle();
@@ -417,7 +515,7 @@ void main() {
         platform.audioTracks = [];
         final controller = await pump(tester, targetPlatform);
 
-        final options = find.byIcon(Icons.more_vert);
+        final options = find.byIcon(optionsIcon);
         if (options.evaluate().isNotEmpty) {
           await tester.tap(options);
           await tester.pumpAndSettle();

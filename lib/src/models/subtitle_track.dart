@@ -32,13 +32,15 @@ class SubtitleTrack {
   final String? language;
 
   /// A WebVTT (`.vtt`) or SubRip (`.srt`) file Chewie downloads with a plain
-  /// GET when the track is first selected. Ignored when [loader] is set.
+  /// GET when the track is first selected, giving up after 30 seconds.
+  /// Ignored when [loader] is set.
   final Uri? url;
 
   /// Produces the cues when the track is first selected, for anything a plain
   /// GET of [url] does not cover: signed URLs, request headers, bundled
   /// assets, other formats. `parseSubtitles` turns WebVTT or SubRip text into
-  /// cues.
+  /// cues. Each cue's [Subtitle.text] must be a `String`; it may contain the
+  /// inline markup `parseSubtitleMarkup` understands.
   final SubtitleLoader? loader;
 
   /// Whether Chewie loads and displays this track's cues by itself.

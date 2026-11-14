@@ -62,5 +62,8 @@ Duration _parseTimestamp(String timestamp) {
 Future<List<Subtitle>> loadSubtitleTrack(SubtitleTrack track) async {
   final loader = track.loader;
   if (loader != null) return loader();
-  return parseSubtitles(await fetchText(track.url!));
+  // Without a limit, a server that never answers would keep the track
+  // loading for good: the pending fetch is cached, so no retry would happen.
+  final text = await fetchText(track.url!).timeout(const Duration(seconds: 30));
+  return parseSubtitles(text);
 }

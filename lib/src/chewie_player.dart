@@ -571,7 +571,7 @@ class ChewieController extends ChangeNotifier {
     Duration? doubleTapSeekDuration,
     bool? allowDoubleTapToggleFullScreen,
   }) {
-    return ChewieController(
+    final copy = ChewieController(
       draggableProgressBar: draggableProgressBar ?? this.draggableProgressBar,
       videoPlayerController:
           videoPlayerController ?? this.videoPlayerController,
@@ -683,6 +683,11 @@ class ChewieController extends ChangeNotifier {
       allowDoubleTapToggleFullScreen:
           allowDoubleTapToggleFullScreen ?? this.allowDoubleTapToggleFullScreen,
     );
+    if (copy.videoPlayerController == this.videoPlayerController) {
+      copy._audioPreferenceApplied = _audioPreferenceApplied;
+      copy._chosenAudioLanguage = _chosenAudioLanguage;
+    }
+    return copy;
   }
 
   static const defaultHideControlsTimer = Duration(seconds: 3);
@@ -828,10 +833,12 @@ class ChewieController extends ChangeNotifier {
   bool _audioTracksReadOnInit = false;
   bool _audioTracksReadOnPlay = false;
   bool _audioPreferenceApplied = false;
+  int _audioSelections = 0;
   String? _chosenAudioLanguage;
   Future<void>? _audioTrackSwitch;
 
   List<Subtitle>? _activeCues;
+  Object? _cueRequest;
   final Map<SubtitleTrack, Future<List<Subtitle>>> _cuesByTrack = {};
 
   /// Whether more than one selectable audio track is available (a single track
@@ -1283,18 +1290,21 @@ class ChewieController extends ChangeNotifier {
 
   Future<void> _readAudioTracks() async {
     final player = videoPlayerController;
-    final List<VideoAudioTrack> found;
+    final selections = _audioSelections;
+    List<VideoAudioTrack> found;
     try {
       if (!player.isAudioTrackSupportAvailable()) return;
       await _audioTrackSwitch;
       found = await player.getAudioTracks();
     } catch (_) {
-      // Unsupported here (UnimplementedError) or the player is gone.
-      return;
+      // Unsupported here (UnimplementedError) or the player is gone. Tracks
+      // from a previous source must not stay in the menu.
+      found = const [];
     }
     if (_disposed || !_managesAudioTracks || player != videoPlayerController) {
       return;
     }
+    if (found.isEmpty && audioTracks.isEmpty) return;
 
     audioTracks = [
       for (final track in found)
@@ -1304,6 +1314,12 @@ class ChewieController extends ChangeNotifier {
           language: track.language,
         ),
     ];
+    // A choice made while the platform was answering is newer than its
+    // isSelected flags.
+    if (selections != _audioSelections) {
+      notifyListeners();
+      return;
+    }
     activeAudioTrackId = found
         .where((track) => track.isSelected)
         .firstOrNull
@@ -1346,6 +1362,7 @@ class ChewieController extends ChangeNotifier {
   /// Displays the cues of [track] when it carries its own source. Tracks
   /// without one are the host's to feed, so [liveSubtitle] is left alone.
   Future<void> _showCuesOf(SubtitleTrack? track) async {
+    final request = _cueRequest = Object();
     final hadCues = _activeCues != null;
     _activeCues = null;
     if (track == null || !track.hasSource) {
@@ -1354,16 +1371,16 @@ class ChewieController extends ChangeNotifier {
     }
     liveSubtitle.value = null;
 
+    final load = _cuesByTrack[track] ??= loadSubtitleTrack(track);
     final List<Subtitle> cues;
     try {
-      cues = await (_cuesByTrack[track] ??= loadSubtitleTrack(track));
+      cues = await load;
     } catch (error, stackTrace) {
-      _cuesByTrack.remove(track);
       if (_disposed) return;
-      if (activeSubtitleTrackId == track.id) {
-        activeSubtitleTrackId = null;
-        notifyListeners();
-      }
+      if (identical(request, _cueRequest)) selectSubtitleTrack(null);
+      // Every selection awaiting this load lands here; report it once.
+      if (!identical(_cuesByTrack[track], load)) return;
+      _cuesByTrack.remove(track);
       if (onSubtitleError != null) {
         onSubtitleError!(track, error, stackTrace);
       } else {
@@ -1379,7 +1396,7 @@ class ChewieController extends ChangeNotifier {
       return;
     }
     // The selection may have moved on, or the controller gone, meanwhile.
-    if (_disposed || activeSubtitleTrackId != track.id) return;
+    if (_disposed || !identical(request, _cueRequest)) return;
     _activeCues = cues;
     _updateLiveCue();
   }
@@ -1620,6 +1637,8 @@ class ChewieController extends ChangeNotifier {
     activeAudioTrackId = track.id;
     onAudioTrackChanged?.call(track);
     if (_managesAudioTracks) {
+      _audioSelections++;
+      _audioPreferenceApplied = true;
       _chosenAudioLanguage = track.language;
       _switchAudioTrack(track);
     }

@@ -63,8 +63,13 @@ class FakeVideoPlayerPlatform extends VideoPlayerPlatform {
     audioTrackReads++;
     if (audioTrackError != null) throw audioTrackError!;
     if (audioTracksNeedPlayback && !isPlaying(playerId)) return [];
-    return audioTracks;
+    final answer = audioTracks;
+    await audioTracksGate?.future;
+    return answer;
   }
+
+  /// Holds [getAudioTracks] answers, taken when called, until completed.
+  Completer<void>? audioTracksGate;
 
   @override
   Future<void> selectAudioTrack(int playerId, String trackId) async {

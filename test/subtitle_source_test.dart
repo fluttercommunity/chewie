@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:video_player/video_player.dart';
 
+import 'fake_cast_controller.dart';
 import 'fake_video_player_platform.dart';
 
 const _vtt = '''
@@ -67,6 +68,23 @@ void main() {
       expect(cues[0].text, 'Bonjour');
       expect(cues[1].start, const Duration(hours: 1));
       expect(cues[1].text, '<b>Fin</b>');
+    });
+
+    test('skips STYLE and REGION blocks and keeps arrows in cue text', () {
+      final cues = parseSubtitles('''
+WEBVTT
+
+STYLE
+::cue { color: yellow }
+
+REGION
+id:fred width:40%
+
+00:01.000 --> 00:02.000
+Left --> right
+''');
+      expect(cues.single.text, 'Left --> right');
+      expect(cues.single.start, const Duration(seconds: 1));
     });
 
     test('returns nothing for text without cues', () {
@@ -222,9 +240,11 @@ void main() {
           },
         );
         final errors = <(SubtitleTrack, Object)>[];
+        final selections = <SubtitleTrack?>[];
         final controller = ChewieController(
           videoPlayerController: vpc,
           subtitleTracks: [track],
+          onSubtitleTrackChanged: selections.add,
           onSubtitleError: (track, error, _) => errors.add((track, error)),
         );
         var notified = 0;
@@ -236,6 +256,7 @@ void main() {
         expect(errors.single.$2, isA<SocketException>());
         expect(controller.activeSubtitleTrackId, isNull);
         expect(controller.liveSubtitle.value, isNull);
+        expect(selections, [track, null]);
         expect(notified, 2);
 
         controller.selectSubtitleTrack(track);
@@ -243,6 +264,55 @@ void main() {
         expect(attempts, 2);
         expect(controller.liveSubtitle.value, 'Back online');
 
+        controller.dispose();
+      },
+    );
+
+    test('one failed fetch is reported once', () async {
+      final pending = Completer<List<Subtitle>>();
+      final track = SubtitleTrack(
+        id: 'en',
+        label: 'en',
+        loader: () => pending.future,
+      );
+      final errors = <Object>[];
+      final controller = ChewieController(
+        videoPlayerController: vpc,
+        subtitleTracks: [track],
+        onSubtitleError: (_, error, _) => errors.add(error),
+      );
+      controller.selectSubtitleTrack(track);
+      controller.selectSubtitleTrack(null);
+      controller.selectSubtitleTrack(track);
+
+      pending.completeError(StateError('offline'));
+      await _settle();
+
+      expect(errors, hasLength(1));
+      expect(controller.activeSubtitleTrackId, isNull);
+      controller.dispose();
+    });
+
+    test(
+      'a replaced track with the same id never shows the old cues',
+      () async {
+        final old = Completer<List<Subtitle>>();
+        SubtitleTrack english(Future<List<Subtitle>> Function() loader) =>
+            SubtitleTrack(id: 'en', label: 'en', loader: loader);
+        final stale = english(() => old.future);
+        final controller = ChewieController(
+          videoPlayerController: vpc,
+          subtitleTracks: [stale],
+          activeSubtitleTrackId: 'en',
+        );
+
+        // For example a signed URL refreshed while the first one loads.
+        controller.setSubtitleTracks([english(() async => _cues('Fresh'))]);
+        await _settle();
+        old.complete(_cues('Stale'));
+        await _settle();
+
+        expect(controller.liveSubtitle.value, 'Fresh');
         controller.dispose();
       },
     );
@@ -290,6 +360,38 @@ void main() {
       await _settle();
       expect(errors, isEmpty);
       await vpc.seekTo(const Duration(seconds: 1));
+    });
+
+    test('cues follow the receiver while casting', () async {
+      final cast = FakeCastController();
+      final track = SubtitleTrack(
+        id: 'en',
+        label: 'en',
+        loader: () async => _cues('On the TV', startSeconds: 60),
+      );
+      final controller = ChewieController(
+        videoPlayerController: vpc,
+        castController: cast,
+        castMedia: const CastMedia(url: 'https://example.com/v.m3u8'),
+        subtitleTracks: [track],
+        activeSubtitleTrackId: 'en',
+      );
+      await _settle();
+      expect(controller.liveSubtitle.value, isNull);
+
+      cast.completeConnection();
+      cast.emitRemoteValue(
+        const VideoPlayerValue(
+          duration: Duration(minutes: 5),
+          position: Duration(seconds: 61),
+          isInitialized: true,
+        ),
+      );
+      expect(controller.isCasting, isTrue);
+      expect(controller.liveSubtitle.value, 'On the TV');
+
+      controller.dispose();
+      expect(cast.hasAnyListeners, isFalse);
     });
 
     test('tracks without a source are still fed by the host', () async {
@@ -479,6 +581,56 @@ void main() {
         expect(loaded, ['fr']);
         expect(controller.activeSubtitleTrackId, 'fr');
         expect(find.text('Bonjour'), findsOneWidget);
+
+        await tester.pumpWidget(const SizedBox());
+        unawaited(controller.videoPlayerController.dispose());
+        await tester.pump();
+        controller.dispose();
+      });
+
+      testWidgets('$name: a failed load turns the toggle back off', (
+        tester,
+      ) async {
+        var attempts = 0;
+        final errors = <Object>[];
+        final controller = ChewieController(
+          videoPlayerController: _network(),
+          autoInitialize: true,
+          customControls: controls,
+          onSubtitleError: (_, error, _) => errors.add(error),
+          subtitleTracks: [
+            SubtitleTrack(
+              id: 'en',
+              label: 'en',
+              loader: () async {
+                if (++attempts == 1) throw StateError('offline');
+                return _cues('Second try');
+              },
+            ),
+          ],
+        );
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: ThemeData(platform: targetPlatform),
+            home: Scaffold(body: Chewie(controller: controller)),
+          ),
+        );
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        await tester.tap(find.byIcon(toggle));
+        await tester.pump();
+        await tester.pump();
+        expect(errors, hasLength(1));
+        expect(controller.activeSubtitleTrackId, isNull);
+        expect(find.byIcon(toggle), findsOneWidget);
+
+        // Off again, so the next tap turns it on and retries.
+        await tester.tap(find.byIcon(toggle));
+        await tester.pump();
+        await tester.pump();
+        expect(attempts, 2);
+        expect(find.text('Second try'), findsOneWidget);
 
         await tester.pumpWidget(const SizedBox());
         unawaited(controller.videoPlayerController.dispose());
