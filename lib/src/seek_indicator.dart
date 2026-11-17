@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A YouTube-style transient indicator that flashes the amount of time seeked
 /// when the user seeks with the keyboard.

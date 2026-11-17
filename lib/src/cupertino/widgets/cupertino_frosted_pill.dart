@@ -1,6 +1,6 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The frosted, rounded background each button in Cupertino's control bars
 /// wears.

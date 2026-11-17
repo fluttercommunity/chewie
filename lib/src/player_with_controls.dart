@@ -3,7 +3,7 @@ import 'package:chewie/src/cast/widgets/cast_overlay.dart';
 import 'package:chewie/src/chewie_player.dart';
 import 'package:chewie/src/helpers/adaptive_controls.dart';
 import 'package:chewie/src/notifiers/index.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 

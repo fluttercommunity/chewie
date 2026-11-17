@@ -1,6 +1,6 @@
 import 'package:chewie/src/cupertino/widgets/cupertino_frosted_pill.dart';
 import 'package:chewie/src/models/chewie_control_style.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// `ChewieController.additionalControls` as Cupertino's top bar wants them.
 ///

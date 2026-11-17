@@ -1,5 +1,5 @@
 import 'package:chewie/src/models/video_quality.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Lets the user pick one of the available [VideoQuality]s. Pops with the
 /// chosen [VideoQuality], or `null` when dismissed.

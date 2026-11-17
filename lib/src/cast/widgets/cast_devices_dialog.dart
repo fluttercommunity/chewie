@@ -2,7 +2,7 @@ import 'package:chewie/src/cast/cast_connection_state.dart';
 import 'package:chewie/src/cast/cast_device.dart';
 import 'package:chewie/src/cast/chewie_cast_controller.dart';
 import 'package:chewie/src/models/cast_translations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// The device picker, shown as a modal bottom sheet when the cast button is
 /// tapped.

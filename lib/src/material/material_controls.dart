@@ -25,7 +25,7 @@ import 'package:chewie/src/notifiers/index.dart';
 import 'package:chewie/src/seek_indicator.dart';
 import 'package:chewie/src/subtitle_overlay.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';

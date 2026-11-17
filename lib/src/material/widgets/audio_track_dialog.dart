@@ -1,5 +1,5 @@
 import 'package:chewie/src/models/audio_track.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Lets the user pick one of the available [AudioTrack]s. Pops with the chosen
 /// [AudioTrack], or `null` when dismissed. Unlike subtitles there is no "off"

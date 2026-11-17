@@ -3,8 +3,8 @@ import 'package:chewie/src/cast/chewie_cast_controller.dart';
 import 'package:chewie/src/cast/widgets/cast_devices_dialog.dart';
 import 'package:chewie/src/cast/widgets/cupertino_cast_devices_sheet.dart';
 import 'package:chewie/src/models/cast_translations.dart';
-import 'package:flutter/cupertino.dart' show showCupertinoModalPopup;
-import 'package:flutter/material.dart';
+import 'package:cupertino_ui/cupertino_ui.dart' show showCupertinoModalPopup;
+import 'package:material_ui/material_ui.dart';
 
 /// How [CastButton] presents its device picker.
 enum CastPickerStyle {
