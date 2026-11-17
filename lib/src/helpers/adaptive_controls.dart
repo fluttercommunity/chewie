@@ -1,6 +1,5 @@
 import 'package:chewie/chewie.dart';
-// ignore: deprecated_member_use
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 class AdaptiveControls extends StatelessWidget {
   const AdaptiveControls({this.showPlayButton = true, super.key});

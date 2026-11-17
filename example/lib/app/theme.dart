@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 // ignore: avoid_classes_with_only_static_members
 class AppTheme {

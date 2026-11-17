@@ -1,5 +1,5 @@
 import 'package:chewie/chewie.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// A control the app hands to Chewie's bar, demonstrating
 /// [ChewieController.additionalControls] and [ChewieControlStyle].

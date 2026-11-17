@@ -1,6 +1,5 @@
 import 'package:chewie/src/models/option_item.dart';
-// ignore: deprecated_member_use
-import 'package:flutter/cupertino.dart';
+import 'package:cupertino_ui/cupertino_ui.dart';
 
 class CupertinoOptionsDialog extends StatefulWidget {
   const CupertinoOptionsDialog({

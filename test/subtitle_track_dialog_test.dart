@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:chewie/src/material/widgets/subtitle_track_dialog.dart';
 import 'package:chewie/src/models/subtitle_track.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 const _tracks = <SubtitleTrack>[
