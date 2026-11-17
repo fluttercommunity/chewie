@@ -1,3 +1,7 @@
+## [1.18.1]
+* 🔊 [#976](https://github.com/fluttercommunity/chewie/pull/976): Add a hover volume slider to the desktop controls. Thanks [Ortes](https://github.com/Ortes).
+* 💬 [#979](https://github.com/fluttercommunity/chewie/pull/979): Add audio and subtitle track menus and live subtitles to Cupertino controls. Thanks [Ortes](https://github.com/Ortes).
+
 ## [1.18.0]
 * 🛠️ [#980](https://github.com/fluttercommunity/chewie/pull/980): Migrate codebase and widgets to `material_ui` and `cupertino_ui`. Thanks [Ortes](https://github.com/Ortes).
 * **BREAKING CHANGE**: Library now requires at least Flutter and Dart versions `3.47.0` and `3.12` or higher respectively, and has migrated to `material_ui` and `cupertino_ui`.
