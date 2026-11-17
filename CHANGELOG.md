@@ -1,3 +1,7 @@
+## [1.18.0]
+* 🛠️ [#980](https://github.com/fluttercommunity/chewie/pull/980): Migrate codebase and widgets to `material_ui` and `cupertino_ui`. Thanks [Ortes](https://github.com/Ortes).
+* **BREAKING CHANGE**: Library now requires at least Flutter and Dart versions `3.47.0` and `3.12` or higher respectively, and has migrated to `material_ui` and `cupertino_ui`.
+
 ## [1.17.4]
 * 🛠️ [#975](https://github.com/fluttercommunity/chewie/pull/975): Keep the hovered chapter label inside the progress bar. Thanks [Elios Cama](https://github.com/elios-fullphysio).
 
