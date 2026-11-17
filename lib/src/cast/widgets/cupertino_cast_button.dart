@@ -2,6 +2,7 @@ import 'package:chewie/src/cast/chewie_cast_controller.dart';
 import 'package:chewie/src/cast/widgets/cast_button.dart';
 import 'package:chewie/src/cupertino/widgets/cupertino_frosted_pill.dart';
 import 'package:chewie/src/models/cast_translations.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// [CastButton] wrapped in the chrome Cupertino's control bar expects.

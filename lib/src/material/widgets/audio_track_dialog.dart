@@ -1,4 +1,5 @@
 import 'package:chewie/src/models/audio_track.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// Lets the user pick one of the available [AudioTrack]s. Pops with the chosen

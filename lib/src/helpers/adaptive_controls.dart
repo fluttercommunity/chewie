@@ -1,4 +1,5 @@
 import 'package:chewie/chewie.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 class AdaptiveControls extends StatelessWidget {

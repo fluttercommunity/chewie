@@ -1,3 +1,4 @@
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// A YouTube-style transient indicator that flashes the amount of time seeked

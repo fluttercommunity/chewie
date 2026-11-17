@@ -1,5 +1,6 @@
 import 'package:chewie/src/cast/cast_device.dart';
 import 'package:chewie/src/models/cast_translations.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// What Chewie shows in place of the video surface while a session is live.

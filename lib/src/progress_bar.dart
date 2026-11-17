@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:chewie/chewie.dart';
 import 'package:chewie/src/helpers/utils.dart';
 import 'package:flutter/gestures.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 

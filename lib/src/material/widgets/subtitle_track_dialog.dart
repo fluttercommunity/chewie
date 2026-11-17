@@ -1,4 +1,5 @@
 import 'package:chewie/src/models/subtitle_track.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// The user's pick from a [SubtitleTrackDialog].

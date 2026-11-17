@@ -3,7 +3,9 @@ import 'package:chewie/src/cast/chewie_cast_controller.dart';
 import 'package:chewie/src/cast/widgets/cast_devices_dialog.dart';
 import 'package:chewie/src/cast/widgets/cupertino_cast_devices_sheet.dart';
 import 'package:chewie/src/models/cast_translations.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/cupertino.dart' show showCupertinoModalPopup;
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 /// How [CastButton] presents its device picker.

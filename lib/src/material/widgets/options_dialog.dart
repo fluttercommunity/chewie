@@ -1,4 +1,5 @@
 import 'package:chewie/src/models/option_item.dart';
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 class OptionsDialog extends StatefulWidget {
