@@ -570,99 +570,102 @@ class _ProgressBarPainter extends CustomPainter {
     return boundaries;
   }
 
-  void _drawBar(
-    Canvas canvas,
-    double fromX,
-    double toX,
-    double baseOffset,
-    Paint paint,
-    List<double> boundaries,
-  ) {
-    if (toX <= fromX) return;
-    var segmentStart = fromX;
-    for (final boundary in boundaries) {
-      if (boundary <= fromX || boundary >= toX) continue;
-      final segmentEnd = boundary - _chapterGapWidth / 2;
-      if (segmentEnd > segmentStart) {
-        canvas.drawRRect(
-          RRect.fromRectAndRadius(
-            Rect.fromPoints(
-              Offset(segmentStart, baseOffset),
-              Offset(segmentEnd, baseOffset + barHeight),
-            ),
-            const Radius.circular(4.0),
-          ),
-          paint,
-        );
-      }
-      segmentStart = boundary + _chapterGapWidth / 2;
-    }
-    if (toX > segmentStart) {
-      canvas.drawRRect(
+  Path _barPath(Size size, double baseOffset) {
+    final path = Path();
+    void addSegment(double fromX, double toX) {
+      if (toX <= fromX) return;
+      path.addRRect(
         RRect.fromRectAndRadius(
-          Rect.fromPoints(
-            Offset(segmentStart, baseOffset),
-            Offset(toX, baseOffset + barHeight),
-          ),
-          const Radius.circular(4.0),
+          Rect.fromLTRB(fromX, baseOffset, toX, baseOffset + barHeight),
+          Radius.circular(barHeight / 2),
         ),
-        paint,
       );
     }
+
+    var segmentStart = 0.0;
+    for (final boundary in _chapterBoundaries(size)) {
+      addSegment(segmentStart, boundary - _chapterGapWidth / 2);
+      segmentStart = boundary + _chapterGapWidth / 2;
+    }
+    addSegment(segmentStart, size.width);
+    return path;
   }
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final baseOffset = size.height / 2 - barHeight / 2;
-    final boundaries = _chapterBoundaries(size);
-
-    _drawBar(
-      canvas,
-      0.0,
-      size.width,
-      baseOffset,
-      colors.backgroundPaint,
-      boundaries,
-    );
-    if (!value.isInitialized) {
-      return;
-    }
-    // A source can report itself initialized before it knows how long it is —
-    // a cast receiver does exactly this between accepting the media and
-    // reporting on it. Dividing by that zero produces a NaN that asserts its
-    // way out of drawRRect, so draw only the empty track until a duration
-    // arrives.
-    if (value.duration.inMilliseconds <= 0) {
-      return;
+  /// Where the played part ends, or null when nothing is played yet.
+  ///
+  /// A source can report itself initialized before it knows how long it is —
+  /// a cast receiver does exactly this between accepting the media and
+  /// reporting on it. Dividing by that zero produces a NaN that asserts its
+  /// way out of drawRRect, so only the empty track is drawn until a duration
+  /// arrives.
+  double? _playedPart(Size size) {
+    if (!value.isInitialized || value.duration.inMilliseconds <= 0) {
+      return null;
     }
     final double playedPartPercent =
         (draggableValue != null
             ? draggableValue!.inMilliseconds
             : value.position.inMilliseconds) /
         value.duration.inMilliseconds;
-    final double playedPart = playedPartPercent > 1
-        ? size.width
-        : playedPartPercent * size.width;
-    for (final DurationRange range in value.buffered) {
-      final double start = range.startFraction(value.duration) * size.width;
-      final double end = range.endFraction(value.duration) * size.width;
-      _drawBar(
-        canvas,
-        start,
-        end,
-        baseOffset,
-        colors.bufferedPaint,
-        boundaries,
-      );
-    }
-    _drawBar(
-      canvas,
-      0.0,
-      playedPart,
-      baseOffset,
-      colors.playedPaint,
-      boundaries,
+    return playedPartPercent.clamp(0.0, 1.0) * size.width;
+  }
+
+  /// The played part, rounded on the right so a handle smaller than the bar
+  /// does not reveal a square end. It spans the whole layer height, like the
+  /// other parts, so only the clip draws the bar's top and bottom edges.
+  RRect _playedShape(double playedPart, Rect layerRect) {
+    final cornerRadius = Radius.elliptical(barHeight / 2, layerRect.height / 2);
+    return RRect.fromRectAndCorners(
+      Rect.fromLTRB(
+        layerRect.left,
+        layerRect.top,
+        math.max(layerRect.left, playedPart),
+        layerRect.bottom,
+      ),
+      topRight: cornerRadius,
+      bottomRight: cornerRadius,
     );
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final baseOffset = size.height / 2 - barHeight / 2;
+
+    // The track, buffered and played parts are painted in one layer, then
+    // clipped to the rounded bar shape once. Painting each part as its own
+    // rounded bar anti-aliases every edge several times, so the track under
+    // the played part bleeds through as a light outline, worst on the rounded
+    // corners.
+    final layerRect = Rect.fromLTRB(
+      -1.0,
+      baseOffset - 1.0,
+      size.width + 1.0,
+      baseOffset + barHeight + 1.0,
+    );
+    canvas.save();
+    canvas.clipPath(_barPath(size, baseOffset));
+    canvas.saveLayer(layerRect, Paint());
+    canvas.drawRect(layerRect, colors.backgroundPaint);
+    final double? playedPart = _playedPart(size);
+    if (playedPart != null) {
+      for (final DurationRange range in value.buffered) {
+        canvas.drawRect(
+          Rect.fromLTRB(
+            range.startFraction(value.duration) * size.width,
+            layerRect.top,
+            range.endFraction(value.duration) * size.width,
+            layerRect.bottom,
+          ),
+          colors.bufferedPaint,
+        );
+      }
+      canvas.drawRRect(_playedShape(playedPart, layerRect), colors.playedPaint);
+    }
+    canvas.restore();
+    canvas.restore();
+    if (playedPart == null) {
+      return;
+    }
 
     if (drawShadow) {
       final Path shadowPath = Path()
