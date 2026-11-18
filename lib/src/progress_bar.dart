@@ -607,18 +607,35 @@ class _ProgressBarPainter extends CustomPainter {
             ? draggableValue!.inMilliseconds
             : value.position.inMilliseconds) /
         value.duration.inMilliseconds;
-    return playedPartPercent > 1 ? size.width : playedPartPercent * size.width;
+    return playedPartPercent.clamp(0.0, 1.0) * size.width;
+  }
+
+  /// The played part, rounded on the right so a handle smaller than the bar
+  /// does not reveal a square end. It spans the whole layer height, like the
+  /// other parts, so only the clip draws the bar's top and bottom edges.
+  RRect _playedShape(double playedPart, Rect layerRect) {
+    final cornerRadius = Radius.elliptical(barHeight / 2, layerRect.height / 2);
+    return RRect.fromRectAndCorners(
+      Rect.fromLTRB(
+        layerRect.left,
+        layerRect.top,
+        math.max(layerRect.left, playedPart),
+        layerRect.bottom,
+      ),
+      topRight: cornerRadius,
+      bottomRight: cornerRadius,
+    );
   }
 
   @override
   void paint(Canvas canvas, Size size) {
     final baseOffset = size.height / 2 - barHeight / 2;
 
-    // The track, buffered and played parts are painted as plain rectangles in
-    // one layer, then clipped to the rounded bar shape once. Painting each part as
-    // its own rounded bar anti-aliases every edge several times, so the track
-    // under the played part bleeds through as a light outline, worst on the
-    // rounded corners.
+    // The track, buffered and played parts are painted in one layer, then
+    // clipped to the rounded bar shape once. Painting each part as its own
+    // rounded bar anti-aliases every edge several times, so the track under
+    // the played part bleeds through as a light outline, worst on the rounded
+    // corners.
     final layerRect = Rect.fromLTRB(
       -1.0,
       baseOffset - 1.0,
@@ -642,15 +659,7 @@ class _ProgressBarPainter extends CustomPainter {
           colors.bufferedPaint,
         );
       }
-      canvas.drawRect(
-        Rect.fromLTRB(
-          layerRect.left,
-          layerRect.top,
-          playedPart,
-          layerRect.bottom,
-        ),
-        colors.playedPaint,
-      );
+      canvas.drawRRect(_playedShape(playedPart, layerRect), colors.playedPaint);
     }
     canvas.restore();
     canvas.restore();
